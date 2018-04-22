@@ -10,27 +10,28 @@ use Snap\Request;
  *
  * @since  1.0.0
  */
-class Middleware extends Hookable {
+class Middleware extends Hookable
+{
 
-	protected $filters = [
-		'snap_middleware_is_logged_in' => 'is_logged_in'
-	];
+    protected $filters = [
+        'snap_middleware_is_logged_in' => 'is_logged_in'
+    ];
 
 
-	public function is_logged_in( Request $request, $redirect = null ) {
-		if ( is_user_logged_in() ) {
-			return true;
-		} else {
-			if ( $redirect === 'login' ) {
-				Request::redirect_to_login();
-			} elseif ( $redirect === '404' ) {
-				Request::set_404();
-			} elseif ( $redirect === 'admin' ) {
-				Request::redirect_to_admin();
-			} else {
-				return false; 
-			}
-		}
-	}
-
+    public function is_logged_in(Request $request, $redirect = null)
+    {
+        if (is_user_logged_in()) {
+            return true;
+        } else {
+            if ($redirect === 'login') {
+                Request::redirect_to_login();
+            } elseif ($redirect === '404') {
+                Request::set_404();
+            } elseif ($redirect === 'admin') {
+                Request::redirect_to_admin();
+            } else {
+                return false;
+            }
+        }
+    }
 }
