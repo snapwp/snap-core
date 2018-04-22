@@ -27,6 +27,9 @@
     "scripts": {
         "sniff": [
             "phpcs --ignore=vendor --extensions=php --standard=PSR2 ."
+        ],
+        "fix": [
+            "phpcbf --ignore=vendor --extensions=php --standard=PSR2 ."
         ]
     }
 }
