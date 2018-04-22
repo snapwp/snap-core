@@ -5,7 +5,7 @@
     "authors": [
         {
             "name": "Jake Whiteley",
-            "email": "jakebwhiteley@gmail.com",
+            "email": "jakebwhiteley@gmail.com"
         }
     ],
     "keywords": [
@@ -15,7 +15,7 @@
         "psr-4": {
             "Snap\\Core\\": ""
         },
-    "files": ["src/modules/functions.php"]
+        "files": ["src/modules/functions.php"]
     },
     "require": {
         "php": ">=7",
