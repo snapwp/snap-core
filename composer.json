@@ -13,7 +13,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Snap\\Core\\": ""
+            "Snap\\Core\\": "src/"
         },
         "files": ["src/modules/functions.php"]
     },
