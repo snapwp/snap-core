@@ -55,16 +55,13 @@ class Loader
         load_template($path, true);
 
         $file_name = basename($path);
-        
-        // Check if the file was a class.
-        if (strpos($file_name, 'class-') !== false) {
-            $class_name =  str_replace(' ', '_', ucwords(str_replace([ 'class-', '-', '.php'], [ '', ' ', '' ], $file_name)));
 
-            // If the included class extends the Hookable abstract.
-            if (class_exists($class_name) && is_subclass_of($class_name, '\Snap\Hookable')) {
-                // Boot it up.
-                ( new $class_name )->run();
-            }
+        $class_name = '\\Theme\\'.ucwords(str_replace(['.php'], [''], $file_name));
+
+        // If the included class extends the Hookable abstract.
+        if (class_exists($class_name) && is_subclass_of($class_name, Hookable::class)) {
+            // Boot it up.
+            ( new $class_name )->run();
         }
     }
 
@@ -77,6 +74,15 @@ class Loader
      */
     public static function load_theme()
     {
+        $snap_modules = [
+            \Snap\Core\Modules\Cleanup::class
+        ];
+
+        foreach ($snap_modules as $module) {
+            // Boot it up.
+            ( new $module )->run();
+        }
+
         self::load_child_theme();
 
         // Now all files are loaded, turn on output buffer until a view is dispatched.
