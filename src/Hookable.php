@@ -257,8 +257,46 @@ class Hookable
         }
     }
 
-    
+    /**
+     * Syntactic sugar around remove_hook.
+     *
+     * @see  \Snap\Core\Hookable::remove_hook
+     * @since  1.0.0
+     * 
+     * @param  string|array  $tag                The hook(s) to remove the callback from.
+     * @param  callable      $function_to_remove The callback to remove.
+     * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
+     */
+    final public function remove_action($tag, $function_to_remove, $priority = 10)
+    {
+        $this->remove_hook($tag, $function_to_remove, $priority);
+    }
+
+    /**
+     * Syntactic sugar around remove_hook.
+     *
+     * @see  \Snap\Core\Hookable::remove_hook
+     * @since  1.0.0
+     * 
+     * @param  string|array  $tag                The hook(s) to remove the callback from.
+     * @param  callable      $function_to_remove The callback to remove.
+     * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
+     */
     final public function remove_filter($tag, $function_to_remove, $priority = 10)
+    {
+        $this->remove_hook($tag, $function_to_remove, $priority);
+    }
+
+    /**
+     * Removes a the given callback from a specific hook.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string|array  $tag                The hook(s) to remove the callback from.
+     * @param  callable      $function_to_remove The callback to remove.
+     * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
+     */
+    final public function remove_hook($tag, $function_to_remove, $priority = 10)
     {
         if (is_string($function_to_remove) && is_callable([ $this, $function_to_remove ])) {
             $function_to_remove = [ $this, $function_to_remove ];
@@ -306,8 +344,8 @@ class Hookable
      *
      * @since 1.0.0
      *
-     * @param  callable|string   $callback      Closure or function name.
-     * @param  integer           $accepted_args The amount of arguments passed into the hook.
+     * @param  callable $callback      Closure or function name.
+     * @param  integer  $accepted_args The amount of arguments passed into the hook.
      * @return integer
      */
     final private function get_argument_count($callback, $accepted_args = 1)
