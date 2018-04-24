@@ -21,7 +21,7 @@ function snap_render_view($slug, $name = '')
     // When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any modules (such as the page <head>).
     ob_end_flush();
     
-    get_template_part('views/' . str_replace([ 'views/', '.php' ], '', $slug), $name);
+    get_template_part('templates/views/' . str_replace([ 'templates/views/', '.php' ], '', $slug), $name);
 }
 
 /**

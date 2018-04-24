@@ -1,8 +1,8 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Core\Modules;
 
-use Snap\Hookable;
+use Snap\Core\Hookable;
 
 /**
  * Ensure all post templates found in views/templates/ folder get treated as templates by WordPress,
@@ -53,7 +53,7 @@ class Post_Templates extends Hookable
     function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
         // path to  templates folder
-        $path = get_stylesheet_directory() . '/views/templates/';
+        $path = get_stylesheet_directory() . 'templates/views/post-templates/';
 
         $templates = scandir($path);
 
@@ -76,7 +76,7 @@ class Post_Templates extends Hookable
                 }
 
                 if (in_array($post_type, $types)) {
-                    $post_templates['views/templates/' . $tpl] = trim($header[1]);
+                    $post_templates['templates/views/post-templates/' . $tpl] = trim($header[1]);
                 }
             }
         }

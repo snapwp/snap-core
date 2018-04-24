@@ -144,10 +144,10 @@ class Snap
                 extract($data);
             }
 
-            include(locate_template('modules/' . $name . ( ! empty($slug) ? '-' . $slug : '' ) . '.php'));
+            include(locate_template('templates/modules/' . $name . ( ! empty($slug) ? '-' . $slug : '' ) . '.php'));
         } else {
             unset($data, $extract);
-            get_template_part('modules/' . $name, $slug);
+            get_template_part('templates/modules/' . $name, $slug);
         }
     }
 

@@ -75,7 +75,8 @@ class Loader
     public static function load_theme()
     {
         $snap_modules = [
-            \Snap\Core\Modules\Cleanup::class
+            \Snap\Core\Modules\Cleanup::class,
+            \Snap\Core\Modules\Post_Templates::class,
         ];
 
         foreach ($snap_modules as $module) {
