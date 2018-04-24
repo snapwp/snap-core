@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Core;
 
 /**
  * A collection of useful helper functions.

@@ -77,25 +77,6 @@ class Loader
      */
     public static function load_theme()
     {
-        $snap_core = get_template_directory() . '/snap/core';
-        $snap_modules = get_template_directory() . '/snap/modules';
-        $snap_functions = get_template_directory() . '/snap/functions';
-
-        // Include and load core files from the parent.
-        foreach (self::scandir($snap_core) as $path) {
-            load_template($path, true);
-        }
-
-        // Load Snap module classes.
-        foreach (self::scandir($snap_modules) as $module) {
-            self::load_file($module);
-        }
-
-        // Load Snap helper functions.
-        foreach (self::scandir($snap_functions) as $path) {
-            load_template($path, true);
-        }
-
         self::load_child_theme();
 
         // Now all files are loaded, turn on output buffer until a view is dispatched.

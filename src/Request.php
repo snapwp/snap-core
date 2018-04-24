@@ -2,7 +2,6 @@
 
 namespace Snap\Core;
 
-use Snap\Utils;
 
 /**
 
