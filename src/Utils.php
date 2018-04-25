@@ -39,15 +39,10 @@ class Utils
     /**
      * Returns the translated role of the current user or for a given user object.
      *
-     * Examples:
-     * echo fat_get_user_role();
-     * echo fat_get_user_role( $user );
-     * echo fat_get_user_role( get_user_by( 'login', 'user123' ) );
-     *
      * @since  1.0.0
      *
      * @param  WP_User $user A user to get the role of
-     * @return string|bool   The translated name of the current role, false if no role found
+     * @return string|bool The translated name of the current role, false if no role found
      **/
     public static function get_user_role($user = null)
     {
@@ -68,8 +63,8 @@ class Utils
      *
      * @since  1.0.0
      *
-     * @param  boolean  $remove_query  If true, the URL is returned without any query params.
-     * @return string                  The current URL.
+     * @param  boolean  $remove_query If true, the URL is returned without any query params.
+     * @return string   The current URL.
      */
     public static function get_current_url($remove_query = false)
     {
