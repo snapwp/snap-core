@@ -3,7 +3,6 @@
 use Snap\Core\Snap;
 use Snap\Core\Hookable;
 use Snap\Core\Utils;
-use Snap\Core\Loader;
 
 /**
  * A helper function for calling Snap::module.
@@ -12,7 +11,7 @@ use Snap\Core\Loader;
  *
  * @since  1.0.0
  *
- * @see Snap::module
+ * @see Snap\Core\Snap::module
  */
 function snap_render_module($name, $slug = '', $data = null, $extract = false)
 {
@@ -24,7 +23,7 @@ function snap_render_module($name, $slug = '', $data = null, $extract = false)
  *
  * @since 1.0.0
  *
- * @see Snap\Utils::get_widget_count
+ * @see Snap\Core\Utils::get_widget_count
  */
 function snap_get_widget_count($sidebar_id)
 {
@@ -36,7 +35,7 @@ function snap_get_widget_count($sidebar_id)
  *
  * @since 1.0.0
  *
- * @see Snap\Utils::get_user_role
+ * @see Snap\Core\Utils::get_user_role
  */
 function snap_get_user_role($user = null)
 {
@@ -52,7 +51,7 @@ function snap_get_user_role($user = null)
  *
  * @since 1.0.0
  *
- * @see Snap\Utils::get_user_role
+ * @see Snap\Core\Utils::get_user_role
  */
 function snap_loop($module = null, $module_overrides = null, $wp_query = null)
 {
@@ -66,7 +65,7 @@ function snap_loop($module = null, $module_overrides = null, $wp_query = null)
  *
  * @since  1.0.0
  *
- * @see Snap_Hookable::debug_hook
+ * @see Snap\Core\Hookable::debug_hook
  */
 function snap_debug_hook($hook)
 {
@@ -78,7 +77,7 @@ function snap_debug_hook($hook)
  *
  * @since  1.0.0
  *
- * @see Snap\Utils::get_current_url
+ * @see Snap\Core\Utils::get_current_url
  */
 function snap_get_current_url($remove_query = false)
 {
@@ -340,7 +339,7 @@ function snap_get_the_post_thumbnail_url($post, $size = 'full')
     $extensions = apply_filters('snap_placeholder_img_extensions', [ '.jpg', '.svg', '.png' ]);
 
     // Get the theme defined placeholder image directory path.
-    $placeholder_directory = trailingslashit(Loader::get_option('img_placholder_dir'));
+    $placeholder_directory = trailingslashit(Snap::config('img_placholder_dir'));
 
     // Get relative path to placeholder folder.
     $base = $placeholder_directory . 'placeholder-' . $size;

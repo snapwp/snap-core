@@ -3,45 +3,12 @@
 namespace Snap\Core;
 
 /**
- * Initializes Snap classes, includes child includes, and provides the options interface.
+ * Initializes Snap classe and child includes.
  *
  * @since 1.0.0
  */
 class Loader
 {
-    /**
-     * The Artisan options array.
-     *
-     * @since  1.0.0
-     *
-     * @var array $options {
-     *      @var  bool        disable_xmlrpc          If true sets the `xmlrpc_enabled` filter to return false.
-     *                                                XMLRPC is only really used these days if Jetpack is installed,
-     *                                                and can otherwise be a potential security hole.
-     *      @var  int         default_image_quality   The default upload quality of image media.
-     *                                                Smaller numbers give smaller uploaded image sizes, but with reduced image
-     *                                                quality. Setting to 100 will actually increase uploaded image size!
-     *      @var  bool        remove_asset_versions   Removes the version query strings from the end of enqueued assets. Contrary to popular belief, query strings
-     *                                                can actually increase lookup time and are not good cache busters.
-     *      @var  bool|array  enable_thumbnails       If true, post thumbnails are available for all post types. Can also be an array of post types to
-     *                                                enable thumbnails for.
-     *      @var  bool        reset_image_sizes       If true, all default image sizes are removed leaving only 'full'.
-     * }
-     */
-    private static $options = [
-        'disable_xmlrpc'            => true,
-        'disable_comments'          => false,
-        'default_image_quality'     => 75,
-        'remove_asset_versions'     => true,
-        'defer_scripts'             => true,
-        'defer_scripts_skip'        => [],
-        'use_jquery_cdn'            => '3.2.1',
-        'img_placholder_dir'        => 'assets/images/',
-        'enable_thumbnails'         => [],
-        'reset_image_sizes'         => false,
-        'insert_image_default_size' => 'medium_large',
-    ];
-
     /**
      * If the supplied path is of a Snap_* class, initialize the class and fire the run() method.
      *
@@ -90,63 +57,6 @@ class Loader
         ob_start();
     }
 
-    /**
-     * Returns the option value for a given key. Returns null if the key could not be found.
-     *
-     * @since  1.0.0
-     *
-     * @param  string $key The key to get the value for.
-     * @return mixed|null
-     */
-    public static function get_option($key)
-    {
-        $options = self::$options;
-
-        if (! empty($options)) {
-            return isset($options[ $key ]) ? $options[ $key ] : null;
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the Snap_Factory::$options array.
-     *
-     * @since  1.0.0
-     *
-     * @return array The Snap_Factory::$options array.
-     */
-    public static function get_options()
-    {
-        return self::$options;
-    }
-
-    /**
-     * Sets an option in the Snap_Factory::$options array.
-     *
-     * @since  1.0.0
-     *
-     * @param string $key   The options key to replace.
-     * @param mixed  $value The new value to set.
-     */
-    public static function set_option($key, $value)
-    {
-        self::$options[ $key ] = $value;
-    }
-
-    /**
-     * Sets an array of options at once.
-     *
-     * Uses wp_parse_args to update or create option key => value pairs in Snap_Factory::$options.
-     *
-     * @since  1.0.0
-     *
-     * @param  array $options The array of option key => value pairs.
-     */
-    public static function set_options($options)
-    {
-        self::$options = wp_parse_args($options, self::$options);
-    }
 
     /**
      * Includes any child includes.

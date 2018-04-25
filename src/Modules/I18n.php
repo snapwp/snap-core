@@ -1,14 +1,16 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Core\Modules;
 
-use Snap\Hookable;
+use Snap\Core\Hookable;
 
 class I18n extends Hookable
 {
     /**
      * Filters to add on init.
      *
+     * @since 1.0.0
+     * 
      * @var array
      */
     protected $filters = [

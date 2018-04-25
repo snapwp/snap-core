@@ -1,9 +1,9 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Core\Modules;
 
-use Snap\Hookable;
-use Snap\Loader;
+use Snap\Core\Hookable;
+use Snap\Core\Snap;
 
 /**
  * All asset (script and style) related functionality.
@@ -32,12 +32,12 @@ class Assets extends Hookable
     public function boot()
     {
         // Whether to add 'defer' to enqueued scripts.
-        if (Loader::get_option('defer_scripts') && ! is_admin()) {
+        if (Snap::config('defer_scripts') && ! is_admin()) {
             $this->add_filter('script_loader_tag', 'defer_scripts', 10, 2);
         }
 
         // Whether to remove asset version strings.
-        if (Loader::get_option('remove_asset_versions')) {
+        if (Snap::config('remove_asset_versions')) {
             $this->add_filter([ 'style_loader_src', 'script_loader_src' ], 'disable_asset_versioning', 15);
         }
     }
@@ -51,12 +51,12 @@ class Assets extends Hookable
     public function script_enqueuer()
     {
         // Get specified jQuery version.
-        $jquery_version = Loader::get_option('use_jquery_cdn');
+        $jquery_version = Snap::config('use_jquery_cdn');
 
         // if a valid jQuery version has been specified.
         if (! is_admin() && $jquery_version !== false && version_compare($jquery_version, '0.0.1', '>=') === true) {
             // get all non-deferred scripts, to check for jQuery.
-            $defer_exclude_list = Loader::get_option('defer_scripts_skip');
+            $defer_exclude_list = Snap::config('defer_scripts_skip');
             
             wp_deregister_script('jquery');
             wp_register_script(
@@ -82,10 +82,10 @@ class Assets extends Hookable
     public function defer_scripts($tag, $handle)
     {
         // Get the script handles to exclude.
-        if (empty(Loader::get_option('defer_scripts_skip'))) {
+        if (empty(Snap::config('defer_scripts_skip'))) {
             $exclude_list = [];
         } else {
-            $exclude_list = Loader::get_option('defer_scripts_skip');
+            $exclude_list = Snap::config('defer_scripts_skip');
         }
 
         // If the defer_scripts_skip option was not present, or was incompatible.

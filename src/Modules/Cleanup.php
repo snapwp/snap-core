@@ -3,7 +3,7 @@
 namespace Snap\Core\Modules;
 
 use Snap\Core\Hookable;
-use Snap\Core\Loader;
+use Snap\Core\Snap;
 
 class Cleanup extends Hookable
 {
@@ -20,7 +20,7 @@ class Cleanup extends Hookable
     public function boot()
     {
         // xmlrpc is a potential security weakness. Most of the time it is completely irrelevent
-        if (Loader::get_option('disable_xmlrpc')) {
+        if (Snap::config('disable_xmlrpc')) {
             $this->add_filter('xmlrpc_enabled', '__return_false');
         }
     }

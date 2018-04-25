@@ -5,68 +5,84 @@ namespace Snap\Core;
 /**
  * The main Snap class.
  *
- * Provides theme access to Snap\Route, options, and templating functions.
+ * Provides theme wide access to the service container and provides handy accessors for Core classes.
  *
  * @since 1.0.0
  */
 class Snap
 {
     /**
-     * Router instance.
+     * Container instance.
      *
      * @since 1.0.0
      *
-     * @var Snap\Router
+     * @var Snap\Core\Container|null
      */
-    static $router = null;
+    static $container = null;
 
     /**
-     * Request instance.
+     * Whether Snap has been setup yet.
      *
      * @since 1.0.0
-     *
-     * @var Snap\Request
+     * 
+     * @var boolean
      */
-    static $request = null;
+    static $setup = false;
 
     /**
      * This class never needs to be instantiated.
      *
      * @since  1.0.0
      */
-    private function __construct()
+    final private function __construct()
     {
+        // No code here...
+    }    
+
+    /**
+     * This class never needs to be instantiated.
+     *
+     * @since  1.0.0
+     */
+    final private function __clone()
+    {
+        // No code here...
     }
 
     /**
-     * Gets the internal router instance.
+     * Setup Snap.
      *
-     * Although Snap\Request is not a singleton, it makes a lot of sense to only have one instance of it
-     * during a normal request cycle.
+     * Must be run in order for anything to work.
      *
-     * @since 1.0.0
-     *
-     * @return Snap\Request
+     * @since  1.0.0
      */
-    private static function get_router()
+    public static function setup()
     {
-        if (self::$router instanceof Router) {
-            return self::$router;
-        } else {
-            self::$router = new Router();
-            return self::$router;
+        if (!self::$setup) {
+            self::$container = new Container();
+
+            self::$container->add('Router', function() {
+                return new Router();
+            }); 
+
+            self::$container->add('Request', function() {
+                return new Request();
+            });
+
+            // Boot up the config parser.
+            $config = new Config(get_stylesheet_directory().'/config');
+
+            self::$container->add('Config', function() use ($config) {
+                return $config;
+            });
+
+            // Run the loader.
+            Loader::load_theme();
         }
+
+        self::$setup = true;
     }
 
-    private static function get_request()
-    {
-        if (self::$request instanceof Request) {
-            return self::$request;
-        } else {
-            self::$request = new Request();
-            return self::$request;
-        }
-    }
 
     /**
      * Runs the standard WP loop, and renders a module for each post.
@@ -76,12 +92,12 @@ class Snap
      *
      * @since 1.0.0
      *
-     * @param  string    $module    Optional. The module name to render for each post.
-     *                              If null, then defaults to post-type/{post type}.php.
-     * @param  array     $module    Optional. An array of overrides.
-     *                              Keys are integers indicating which iteration index to apply to, and values are the module to load instead of $module
-     *                              There is also a special key 'alternate' which will load the value on every odd iteration.
-     * @param  WP_Query  $wp_query  Optional. An optional custom WP_Query to loop through. Defaults to the global WP_Query instance.
+     * @param  string   $module   Optional. The module name to render for each post.
+     *                            If null, then defaults to post-type/{post type}.php.
+     * @param  array    $module   Optional. An array of overrides.
+     *                            Keys are the iteration index to apply the override, and values are the module to load instead of $module.
+     *                            There is also a special key 'alternate' which will load the value on every odd iteration.
+     * @param  WP_Query $wp_query Optional. An optional custom WP_Query to loop through. Defaults to the global WP_Query instance.
      */
     public static function loop($module = null, $module_overrides = null, $wp_query = null)
     {
@@ -104,11 +120,11 @@ class Snap
                     // An override is present, so load that instead.
                     Snap::module($module_overrides[ $count ]);
                 } elseif (is_array($module_overrides)
-                    && isset($module_overrides[ 'alternate' ])
+                    && isset($module_overrides['alternate'])
                     && $count % 2 !== 0
                 ) {
                     // An override is present, so load that instead.
-                    Snap::module($module_overrides[ 'alternate' ]);
+                    Snap::module($module_overrides['alternate']);
                 } elseif ($module === null) {
                     // Load the default module for this content type.
                     Snap::module('post-type/' . get_post_type());
@@ -151,15 +167,60 @@ class Snap
         }
     }
 
-    public static function route()
+    /**
+     * Return the Container object.
+     *
+     * @since  1.0.0
+     * 
+     * @return Snap\Core\Container
+     */
+    public static function services()
     {
-        self::get_router()->reset();
-
-        return self::get_router();
+        return self::$container;
     }
 
+    /**
+     * Fetches the config object from the container, or optionally fetches a config option directly.
+     *
+     * @since  1.0.0
+     *
+     * @param string $option The option name to fetch.
+     * @param mixed $default If the option was not found, the default value to be returned instead.
+     * @return Snap\Core\Request
+     */
+    public static function config($option = null, $default = null)
+    {
+        if ($option === null) {
+            return self::services()->get('Config');
+        }
+
+        return self::services()->get('Config')->get($option, $default);
+    }
+
+    /**
+     * Fetch the Router object from the container.
+     *
+     * @since  1.0.0
+     * 
+     * @return Snap\Core\Router
+     */
+    public static function route()
+    {
+        $router = self::services()->get('Router');
+        $router->reset();
+
+        return $router;
+    }
+
+    /**
+     * Fetch the Request object from the container.
+     *
+     * @since  1.0.0
+     * 
+     * @return Snap\Core\Request
+     */
     public static function request()
     {
-        return self::get_request();
+        return self::services()->get('Request');
     }
 }

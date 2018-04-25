@@ -1,9 +1,9 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Core\Modules;
 
-use Snap\Hookable;
-use Snap\Loader;
+use Snap\Core\Hookable;
+use Snap\Core\Snap;
 
 /**
  * Additional code directly affecting admin area, or the removal of functionality.
@@ -45,7 +45,7 @@ class Admin extends Hookable
     public function boot()
     {
         // Completely disable WordPress comments.
-        if (Loader::get_option('disable_comments')) {
+        if (Snap::config('disable_comments')) {
             // Ensures all code which uses comments gets fed an empty array.
             $this->add_filter('comments_array', '__return_empty_array', 20);
 
@@ -132,7 +132,7 @@ class Admin extends Hookable
     public function branding_admin_footer()
     {
         echo sprintf(
-            '%s <a href="http://wordpress.org" target="_blank">WordPress</a> %s <a href="" target="_blank">WP Artisan</a>',
+            '%s <a href="http://wordpress.org" target="_blank">WordPress</a> %s <a href="" target="_blank">SnapWP</a>',
             __('Built using', 'snap'),
             __('and', 'snap')
         );

@@ -1,9 +1,9 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Core\Modules;
 
-use Snap\Hookable;
-use Snap\Request;
+use Snap\Core\Hookable;
+use Snap\Core\Request;
 
 /**
  * Additional code directly affecting admin area, or the removal of functionality.

@@ -1,9 +1,9 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Core\Modules;
 
-use Snap\Loader;
-use Snap\Hookable;
+use Snap\Core\Snap;
+use Snap\Core\Hookable;
 
 /**
  * Controls custom image sizes and thumbnail support.
@@ -35,23 +35,23 @@ class Images extends Hookable
     public function boot()
     {
         // Override the default image compression quality.
-        if (is_numeric(Loader::get_option('default_image_quality'))) {
+        if (is_numeric(Snap::config('default_image_quality'))) {
             add_filter('wp_editor_set_quality', [ $this, 'get_upload_quality' ]);
         }
 
         // Enable post-thumbnail support.
-        if (! empty(Loader::get_option('enable_thumbnails'))) {
+        if (! empty(Snap::config('enable_thumbnails'))) {
             $this->enable_thumbnail_support();
         }
 
         // Remove all default image sizes.
-        if (Loader::get_option('reset_image_sizes') !== false) {
+        if (Snap::config('reset_image_sizes') !== false) {
             add_filter('intermediate_image_sizes_advanced', [ $this, 'remove_default_image_sizes' ]);
             add_filter('intermediate_image_sizes', [ $this, 'remove_default_image_sizes' ]);
         }
 
         // Add custom image sizes if defined.
-        if (! empty(Loader::get_option('image_sizes'))) {
+        if (! empty(Snap::config('image_sizes'))) {
             // Register all image sizes.
             $this->register_image_sizes();
 
@@ -61,7 +61,7 @@ class Images extends Hookable
         }
 
         // Set default image size dropdown value.
-        if (! empty(Loader::get_option('insert_image_default_size'))) {
+        if (! empty(Snap::config('insert_image_default_size'))) {
             add_filter('after_setup_theme', [ $this, 'set_insert_image_default_size' ]);
         }
     }
@@ -95,7 +95,7 @@ class Images extends Hookable
      */
     public function get_upload_quality()
     {
-        return (int) Loader::get_option('default_image_quality');
+        return (int) Snap::config('default_image_quality');
     }
 
     /**
@@ -122,20 +122,20 @@ class Images extends Hookable
     public function set_insert_image_default_size()
     {
         update_option('image_default_align', 'center');
-        update_option('image_default_size', Loader::get_option('insert_image_default_size'));
+        update_option('image_default_size', Snap::config('insert_image_default_size'));
     }
 
     /**
      * Enabled theme support for thumbnails.
      *
-     * Uses the value of Loader::get_option( 'enable_thumbnails' ) enable thumbnails for all post types or a select few.
+     * Uses the value of Snap::config( 'enable_thumbnails' ) enable thumbnails for all post types or a select few.
      *
      * @since  1.0.0
      */
     private function enable_thumbnail_support()
     {
         // Get the option for thumbnail support.
-        $enabled_thumbails = Loader::get_option('enable_thumbnails');
+        $enabled_thumbails = Snap::config('enable_thumbnails');
 
         if (is_array($enabled_thumbails)) {
             add_theme_support('post-thumbnails', $enabled_thumbails);
@@ -154,7 +154,7 @@ class Images extends Hookable
     private function register_image_sizes()
     {
         // Loop through sizes.
-        foreach (Loader::get_option('image_sizes') as $name => $size_info) {
+        foreach (Snap::config('image_sizes') as $name => $size_info) {
             // Get size properties with basic fallbacks.
             $width = (int) isset($size_info[0]) ? $size_info[0] : 0;
             $height = (int) isset($size_info[1]) ? $size_info[1] : 0;
