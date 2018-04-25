@@ -4,43 +4,43 @@ namespace Snap\Core;
 
 class Config
 {
-	private $path = '';
-	private $cache = [];
+    private $path = '';
+    private $cache = [];
 
-	private $config = [
-		'theme' => [
-			'disable_xmlrpc'            => true,
-	        'disable_comments'          => false,
-	        'default_image_quality'     => 75,
-	        'remove_asset_versions'     => true,
-	        'defer_scripts'             => true,
-	        'defer_scripts_skip'        => [],
-	        'use_jquery_cdn'            => '3.2.1',
-	        'img_placholder_dir'        => 'assets/images/',
-	        'enable_thumbnails'         => [],
-	        'reset_image_sizes'         => false,
-	        'insert_image_default_size' => 'medium_large',
-		]
-	];
+    private $config = [
+        'theme' => [
+            'disable_xmlrpc'            => true,
+            'disable_comments'          => false,
+            'default_image_quality'     => 75,
+            'remove_asset_versions'     => true,
+            'defer_scripts'             => true,
+            'defer_scripts_skip'        => [],
+            'use_jquery_cdn'            => '3.2.1',
+            'img_placholder_dir'        => 'assets/images/',
+            'enable_thumbnails'         => [],
+            'reset_image_sizes'         => false,
+            'insert_image_default_size' => 'medium_large',
+        ]
+    ];
 
-	public function __construct(string $path)
-	{
-		$this->path = trailingslashit($path);
+    public function __construct(string $path)
+    {
+        $this->path = trailingslashit($path);
 
-		$this->load_files();
+        $this->load_files();
 
-		$this->parse_files();
-	}
+        $this->parse_files();
+    }
 
-	public function get($option, $default = null)
-	{
-		if ($this->has($option)) {
+    public function get($option, $default = null)
+    {
+        if ($this->has($option)) {
             return $this->cache[$option];
         }
         return $default;
-	}
+    }
 
-	public function has($option)
+    public function has($option)
     {
         // Check if already cached
         if (isset($this->cache[$option])) {
@@ -68,39 +68,39 @@ class Config
 
     public function set($option, $value)
     {
-    	$this->cache[$option] = $value;
+        $this->cache[$option] = $value;
     }
 
-	private function load_files()
-	{
-		if (is_dir($this->path)) {
+    private function load_files()
+    {
+        if (is_dir($this->path)) {
             $this->files = glob($this->path . '*.*');
         }
-	}
+    }
 
-	private function parse_files()
-	{
-		if (!empty($this->files)) {
-			foreach ($this->files as $file) {
-	            $parsedOptions = require $file;
+    private function parse_files()
+    {
+        if (!empty($this->files)) {
+            foreach ($this->files as $file) {
+                $parsedOptions = require $file;
 
-		        $optionSet = $this->get_filename($file);
+                $optionSet = $this->get_filename($file);
 
-		        if (!is_array($parsedOptions)) {
-		        	continue;
-		        }
+                if (!is_array($parsedOptions)) {
+                    continue;
+                }
 
-		        if (isset($this->config[$optionSet])) {
-		        	$this->config[$optionSet] = array_merge($this->config[$optionSet], $parsedOptions);
-		        } else {
-		        	$this->config[$optionSet] = $parsedOptions;
-		        }
-			}
-		}
-	}
+                if (isset($this->config[$optionSet])) {
+                    $this->config[$optionSet] = array_merge($this->config[$optionSet], $parsedOptions);
+                } else {
+                    $this->config[$optionSet] = $parsedOptions;
+                }
+            }
+        }
+    }
 
-	private function get_filename($path)
-	{
-		return str_replace('.php', '', basename($path));
-	}
+    private function get_filename($path)
+    {
+        return str_replace('.php', '', basename($path));
+    }
 }

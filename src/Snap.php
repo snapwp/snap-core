@@ -24,7 +24,7 @@ class Snap
      * Whether Snap has been setup yet.
      *
      * @since 1.0.0
-     * 
+     *
      * @var boolean
      */
     static $setup = false;
@@ -37,7 +37,7 @@ class Snap
     final private function __construct()
     {
         // No code here...
-    }    
+    }
 
     /**
      * This class never needs to be instantiated.
@@ -61,18 +61,18 @@ class Snap
         if (!self::$setup) {
             self::$container = new Container();
 
-            self::$container->add('Router', function() {
+            self::$container->add('Router', function () {
                 return new Router();
-            }); 
+            });
 
-            self::$container->add('Request', function() {
+            self::$container->add('Request', function () {
                 return new Request();
             });
 
             // Boot up the config parser.
             $config = new Config(get_stylesheet_directory().'/config');
 
-            self::$container->add('Config', function() use ($config) {
+            self::$container->add('Config', function () use ($config) {
                 return $config;
             });
 
@@ -171,7 +171,7 @@ class Snap
      * Return the Container object.
      *
      * @since  1.0.0
-     * 
+     *
      * @return Snap\Core\Container
      */
     public static function services()
@@ -201,7 +201,7 @@ class Snap
      * Fetch the Router object from the container.
      *
      * @since  1.0.0
-     * 
+     *
      * @return Snap\Core\Router
      */
     public static function route()
@@ -216,7 +216,7 @@ class Snap
      * Fetch the Request object from the container.
      *
      * @since  1.0.0
-     * 
+     *
      * @return Snap\Core\Request
      */
     public static function request()

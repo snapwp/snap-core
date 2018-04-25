@@ -262,7 +262,7 @@ class Hookable
      *
      * @see  \Snap\Core\Hookable::remove_hook
      * @since  1.0.0
-     * 
+     *
      * @param  string|array  $tag                The hook(s) to remove the callback from.
      * @param  callable      $function_to_remove The callback to remove.
      * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
@@ -277,7 +277,7 @@ class Hookable
      *
      * @see  \Snap\Core\Hookable::remove_hook
      * @since  1.0.0
-     * 
+     *
      * @param  string|array  $tag                The hook(s) to remove the callback from.
      * @param  callable      $function_to_remove The callback to remove.
      * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
@@ -291,7 +291,7 @@ class Hookable
      * Removes a the given callback from a specific hook.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string|array  $tag                The hook(s) to remove the callback from.
      * @param  callable      $function_to_remove The callback to remove.
      * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
