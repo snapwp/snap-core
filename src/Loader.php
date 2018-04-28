@@ -27,8 +27,8 @@ class Loader
 
         // If the included class extends the Hookable abstract.
         if (class_exists($class_name) && is_subclass_of($class_name, Hookable::class)) {
-            // Boot it up.
-            ( new $class_name )->run();
+            // Boot it up and resolve dependencies
+            Snap::services()->resolve($class_name)->run();
         }
     }
 
@@ -44,11 +44,11 @@ class Loader
         $snap_modules = [
             \Snap\Core\Modules\Cleanup::class,
             \Snap\Core\Modules\Post_Templates::class,
+            \Snap\Core\Modules\Images::class,
         ];
 
         foreach ($snap_modules as $module) {
-            // Boot it up.
-            ( new $module )->run();
+            Snap::services()->resolve($module)->run();
         }
 
         self::load_child_theme();

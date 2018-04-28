@@ -2,6 +2,8 @@
 
 namespace Snap\Core;
 
+use Hodl\Container;
+
 /**
  * The main Snap class.
  *
@@ -61,20 +63,18 @@ class Snap
         if (!self::$setup) {
             self::$container = new Container();
 
-            self::$container->add('Router', function () {
+            self::$container->add(Router::class, function () {
                 return new Router();
             });
 
-            self::$container->add('Request', function () {
+            self::$container->add(Request::class, function () {
                 return new Request();
             });
 
             // Boot up the config parser.
             $config = new Config(get_stylesheet_directory().'/config');
 
-            self::$container->add('Config', function () use ($config) {
-                return $config;
-            });
+            self::$container->addInstance($config);
 
             // Run the loader.
             Loader::load_theme();
@@ -172,7 +172,7 @@ class Snap
      *
      * @since  1.0.0
      *
-     * @return Snap\Core\Container
+     * @return Hodl\Container
      */
     public static function services()
     {
@@ -186,15 +186,15 @@ class Snap
      *
      * @param string $option The option name to fetch.
      * @param mixed $default If the option was not found, the default value to be returned instead.
-     * @return Snap\Core\Request
+     * @return mixed|Snap\Core\Config
      */
     public static function config($option = null, $default = null)
     {
         if ($option === null) {
-            return self::services()->get('Config');
+            return self::services()->get(Config::class);
         }
 
-        return self::services()->get('Config')->get($option, $default);
+        return self::services()->get(Config::class)->get($option, $default);
     }
 
     /**
@@ -206,7 +206,7 @@ class Snap
      */
     public static function route()
     {
-        $router = self::services()->get('Router');
+        $router = self::services()->get(Router::class);
         $router->reset();
 
         return $router;
@@ -221,6 +221,6 @@ class Snap
      */
     public static function request()
     {
-        return self::services()->get('Request');
+        return self::services()->get(Request::class);
     }
 }
