@@ -85,6 +85,23 @@ function snap_get_current_url($remove_query = false)
 }
 
 
+if (! function_exists('config')) {
+    /**
+     * Returns a key from the Config service.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $option  The option name to fetch.
+     * @param  mixed  $default If the option was not found, the default value to be returned instead.
+     * @return mixed The option value, or default if nto found.
+     */
+    function config($key, $default = null)
+    {
+        return Snap::services()->get('Snap\Core\Config')->get($key, $default);
+    }
+}
+
+
 
 
 
@@ -325,7 +342,7 @@ function snap_get_the_post_thumbnail_url($post, $size = 'full')
     $extensions = apply_filters('snap_placeholder_img_extensions', [ '.jpg', '.svg', '.png' ]);
 
     // Get the theme defined placeholder image directory path.
-    $placeholder_directory = trailingslashit(Snap::config('img_placholder_dir'));
+    $placeholder_directory = trailingslashit(Snap::config('imgages.placeholder_dir'));
 
     // Get relative path to placeholder folder.
     $base = $placeholder_directory . 'placeholder-' . $size;

@@ -2,6 +2,7 @@
 
 namespace Snap\Core\Modules;
 
+use Snap\Core\Snap;
 use Snap\Core\Hookable;
 
 /**
@@ -32,7 +33,7 @@ class Post_Templates extends Hookable
     function get_search_form($old_form)
     {
         ob_start();
-        snap_render_module('searchform');
+        Snap::module('searchform');
         $form = ob_get_clean();
 
         return $form;
@@ -53,7 +54,7 @@ class Post_Templates extends Hookable
     function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
         // path to  templates folder
-        $path = get_stylesheet_directory() . 'templates/views/post-templates/';
+        $path = get_stylesheet_directory() . '/templates/views/post-templates/';
 
         $templates = scandir($path);
 

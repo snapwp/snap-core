@@ -4,6 +4,7 @@ namespace Snap\Core\Modules;
 
 use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Core\Config;
 
 /**
  * Controls custom image sizes and thumbnail support.
@@ -17,7 +18,7 @@ class Images extends Hookable
      *
      * @var array
      */
-    private $default_image_sizes = [ 'thumbnail', 'medium', 'medium_large', 'large' ];
+    const DEFAULT_IMAGE_SIZES = [ 'thumbnail', 'medium', 'medium_large', 'large' ];
 
     /**
      * Holds any defined image dropdown names.
@@ -28,41 +29,52 @@ class Images extends Hookable
      */
     public static $size_dropdown_names = [];
 
+    /**
+     * Boot up and get image related config.
+     *
+     * @since  1.0.0
+     * 
+     * @param Config $config Config service.
+     */
+    public function __construct(Config $config)
+    {
+        $this->config = $config->get('images');
+    }
 
     /**
-     * Register class filters.
+     * Register class conditional filters.
+     *
+     * @since  1.0.0
      */
     public function boot()
     {
         // Override the default image compression quality.
-        if (is_numeric(Snap::config('default_image_quality'))) {
-            add_filter('wp_editor_set_quality', [ $this, 'get_upload_quality' ]);
+        if (is_numeric($this->config['default_image_quality'])) {
+            $this->add_filter('wp_editor_set_quality', 'get_upload_quality');
         }
 
         // Enable post-thumbnail support.
-        if (! empty(Snap::config('enable_thumbnails'))) {
-            $this->enable_thumbnail_support();
-        }
+        $this->enable_thumbnail_support();
 
         // Remove all default image sizes.
-        if (Snap::config('reset_image_sizes') !== false) {
-            add_filter('intermediate_image_sizes_advanced', [ $this, 'remove_default_image_sizes' ]);
-            add_filter('intermediate_image_sizes', [ $this, 'remove_default_image_sizes' ]);
+        if ($this->config['reset_image_sizes'] !== false) {
+            $this->add_filter('intermediate_image_sizes_advanced', 'remove_default_image_sizes');
+            $this->add_filter('intermediate_image_sizes', 'remove_default_image_sizes');
         }
 
         // Add custom image sizes if defined.
-        if (! empty(Snap::config('image_sizes'))) {
+        if (! empty($this->config['image_sizes'])) {
             // Register all image sizes.
             $this->register_image_sizes();
 
             if (! empty(self::$size_dropdown_names)) {
-                add_filter('image_size_names_choose', [ $this, 'enable_custom_image_sizes' ]);
+                $this->add_filter('image_size_names_choose', 'enable_custom_image_sizes');
             }
         }
 
         // Set default image size dropdown value.
-        if (! empty(Snap::config('insert_image_default_size'))) {
-            add_filter('after_setup_theme', [ $this, 'set_insert_image_default_size' ]);
+        if (! empty($this->config['insert_image_default_size'])) {
+            $this->add_filter('after_setup_theme', 'set_insert_image_default_size');
         }
     }
     
@@ -79,9 +91,12 @@ class Images extends Hookable
         // Merge custom sizes into $sizes.
         $sizes = array_merge($sizes, self::$size_dropdown_names);
 
-        // Ensure 'Full size' is always at end
+        // Ensure 'Full size' is always at end.
         unset($sizes['full']);
-        $sizes['full'] = 'Full Size';
+
+        if ($this->config['insert_image_allow_full_size'] || empty($sizes)) {
+            $sizes['full'] = 'Full Size';
+        }
 
         return $sizes;
     }
@@ -95,7 +110,7 @@ class Images extends Hookable
      */
     public function get_upload_quality()
     {
-        return (int) Snap::config('default_image_quality');
+        return (int) $this->config['default_image_quality'];
     }
 
     /**
@@ -108,7 +123,7 @@ class Images extends Hookable
      */
     public function remove_default_image_sizes($sizes = [])
     {
-        return array_diff($sizes, $this->default_image_sizes);
+        return array_diff($sizes, self::DEFAULT_IMAGE_SIZES);
     }
 
     /**
@@ -122,25 +137,26 @@ class Images extends Hookable
     public function set_insert_image_default_size()
     {
         update_option('image_default_align', 'center');
-        update_option('image_default_size', Snap::config('insert_image_default_size'));
+        update_option('image_default_size', $this->config['insert_image_default_size']);
     }
 
     /**
      * Enabled theme support for thumbnails.
      *
-     * Uses the value of Snap::config( 'enable_thumbnails' ) enable thumbnails for all post types or a select few.
+     * Uses the value of Snap::config( 'images.supports_featured_images' ) enable thumbnails for all post types or a select few.
      *
      * @since  1.0.0
      */
     private function enable_thumbnail_support()
     {
-        // Get the option for thumbnail support.
-        $enabled_thumbails = Snap::config('enable_thumbnails');
+        $enabled_thumbails = $this->config['supports_featured_images'];
 
-        if (is_array($enabled_thumbails)) {
-            add_theme_support('post-thumbnails', $enabled_thumbails);
-        } elseif ($enabled_thumbails === true) {
-            add_theme_support('post-thumbnails');
+        if (! empty($enabled_thumbails)) {
+            if (is_array($enabled_thumbails)) {
+                add_theme_support('post-thumbnails', $enabled_thumbails);
+            } elseif ($enabled_thumbails === true) {
+                add_theme_support('post-thumbnails');
+            }
         }
     }
 
@@ -154,26 +170,19 @@ class Images extends Hookable
     private function register_image_sizes()
     {
         // Loop through sizes.
-        foreach (Snap::config('image_sizes') as $name => $size_info) {
+        foreach ($this->config['image_sizes'] as $name => $size_info) {
             // Get size properties with basic fallbacks.
             $width = (int) isset($size_info[0]) ? $size_info[0] : 0;
             $height = (int) isset($size_info[1]) ? $size_info[1] : 0;
             $crop = isset($size_info[2]) ? $size_info[2] : false;
 
-            if (in_array($name, $this->default_image_sizes)) {
+            if (in_array($name, self::DEFAULT_IMAGE_SIZES)) {
                 if ($size_info !== false) {
                     // Set other built-in sizes.
                     update_option($name . '_size_w', $width);
                     update_option($name . '_size_h', $height);
                     update_option($name . '_crop', $crop);
                 } else {
-                    /**
-                     * Closure callback to dynamically remove one image size at a time.
-                     *
-                     * @param array  $sizes Images sizes currently defined.
-                     * @param string $name  The image size to remove.
-                     * @return  array $sizes
-                     */
                     $callback = function ($sizes = []) use ($name) {
                         return array_diff($sizes, [ $name ]);
                     };
@@ -188,7 +197,7 @@ class Images extends Hookable
             }
 
             // If a custom dropdown name has been definaed.
-            if (isset($size_info[3])) {
+            if (isset($size_info[3]) && ! empty($size_info[3])) {
                 self::$size_dropdown_names[ $name ] = $size_info[3];
             }
         }
