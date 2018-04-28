@@ -9,18 +9,27 @@ class Config
 
     private $config = [
         'theme' => [
-            'disable_xmlrpc'            => true,
-            'disable_comments'          => false,
-            'default_image_quality'     => 75,
-            'remove_asset_versions'     => true,
-            'defer_scripts'             => true,
-            'defer_scripts_skip'        => [],
-            'use_jquery_cdn'            => '3.2.1',
-            'img_placholder_dir'        => 'assets/images/',
-            'enable_thumbnails'         => [],
-            'reset_image_sizes'         => false,
-            'insert_image_default_size' => 'medium_large',
+            'disable_xmlrpc' => true,
+            'disable_comments' => false,
+            'remove_asset_versions' => true,
+            'defer_scripts' => true,
+            'defer_scripts_skip' => [],
+            'use_jquery_cdn' => '3.2.1',
+            'snap_modules' => [],
         ]
+        'images' => [
+            'default_image_quality' => 75,
+            'placeholder_dir' => 'assets/images/',
+            'supports_featured_images' => [
+                'post',
+                'page',
+            ],
+            'reset_image_sizes' => true,
+            'image_sizes' => [],
+            'insert_image_default_size' => 'medium',
+            'insert_image_allow_full_size' => true,
+        ],
+        'services' => []
     ];
 
     public function __construct(string $path)
