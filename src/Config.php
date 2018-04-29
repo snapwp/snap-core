@@ -16,7 +16,7 @@ class Config
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
             'snap_modules' => [],
-        ]
+        ],
         'images' => [
             'default_image_quality' => 75,
             'placeholder_dir' => 'assets/images/',

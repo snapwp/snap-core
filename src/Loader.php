@@ -45,6 +45,7 @@ class Loader
             \Snap\Core\Modules\Cleanup::class,
             \Snap\Core\Modules\Post_Templates::class,
             \Snap\Core\Modules\Images::class,
+            \Snap\Core\Modules\Assets::class,
         ];
 
         foreach ($snap_modules as $module) {
@@ -124,7 +125,7 @@ class Loader
             foreach ($contents as $file) {
                 $path = $folder . $file;
 
-                if ('.' === $file || '_admin' === $file || '_public' === $file || 'index.php' === $file || '..' === $file) {
+                if ('.' === $file || 'admin' === $file || 'public' === $file || 'index.php' === $file || '..' === $file) {
                     continue;
                 } elseif (pathinfo($path, PATHINFO_EXTENSION) === 'php') {
                     $files[] = $path;
