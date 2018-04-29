@@ -19,7 +19,7 @@ class Config
         ],
         'images' => [
             'default_image_quality' => 75,
-            'placeholder_dir' => 'assets/images/',
+            'placeholder_dir' => 'assets/images/placeholders/',
             'supports_featured_images' => [
                 'post',
                 'page',
