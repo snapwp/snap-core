@@ -339,7 +339,7 @@ class Images extends Hookable
      */
     private function register_image_sizes()
     {
-        if (! empty(Snap::config('images.image_sizes'))) {
+        if (empty(Snap::config('images.image_sizes'))) {
             return;
         }
 
