@@ -2,7 +2,9 @@
 
 namespace Snap\Core;
 
+use WP_Query;
 use Hodl\Container;
+use Snap\Core\Modules\Assets;
 
 /**
  * The main Snap class.
@@ -76,6 +78,11 @@ class Snap
 
             self::$container->addInstance($config);
 
+            // Add the assets module to avoid parsing the mix-manifest multiple times
+            self::$container->add(Assets::class, function () {
+                return new Assets();
+            });
+
             // Run the loader.
             Loader::load_theme();
         }
@@ -102,7 +109,7 @@ class Snap
     public static function loop($module = null, $module_overrides = null, $wp_query = null)
     {
         // Use either the global or supplied WP_Query object.
-        if ($wp_query instanceof \WP_Query) {
+        if ($wp_query instanceof WP_Query) {
             $wp_query = $wp_query;
         } else {
             global $wp_query;
