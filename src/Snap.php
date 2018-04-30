@@ -62,7 +62,7 @@ class Snap
      */
     public static function setup()
     {
-        if (!self::$setup) {
+        if (! self::$setup) {
             self::$container = new Container();
 
             self::$container->add(Router::class, function () {
