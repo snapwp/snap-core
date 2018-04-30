@@ -16,11 +16,16 @@ use Snap\Core\Modules\Assets;
 class Snap
 {
     /**
+     * SnapWP website.
+     */
+    const SNAPWP_HOME = 'https://snapwp.com';
+
+    /**
      * Container instance.
      *
      * @since 1.0.0
      *
-     * @var Snap\Core\Container|null
+     * @var Hodl\Container|null
      */
     static $container = null;
 

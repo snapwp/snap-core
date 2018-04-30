@@ -46,7 +46,12 @@ class Loader
             \Snap\Core\Modules\Post_Templates::class,
             \Snap\Core\Modules\Images::class,
             \Snap\Core\Modules\Assets::class,
+            \Snap\Core\Modules\Admin::class,
         ];
+
+        if (Snap::config('theme.disable_comments') === true) {
+            $snap_modules[] = \Snap\Core\Modules\Disable_Comments::class;
+        }
 
         foreach ($snap_modules as $module) {
             Snap::services()->resolve($module)->run();

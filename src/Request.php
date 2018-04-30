@@ -2,9 +2,6 @@
 
 namespace Snap\Core;
 
-use WP_Http;
-use Snap\Core\Utils;
-
 /**
 
  * @since 1.0.0
@@ -94,21 +91,7 @@ class Request
     public $is_mobile = false;
 
     /**
-     * Populate the request bags and set up.
-     *
-     * @since 1.0.0
-     */
-    public function __construct()
-    {
-        $this->populate_server();
-        $this->populate_query();
-        $this->populate_post();
-        $this->populate_request();
-        $this->populate_properties();
-    }
-
-    /**
-     * Redirect the current request to a separate URL.
+     * Redirect the current request to a seperate URL.
      *
      * @since 1.0.0
      *
@@ -129,7 +112,7 @@ class Request
      *
      * @since 1.0.0
      *
-     * @param string $redirect_after Optional. The URL the user should be sent to after the login screen. Defaults to current URL.
+     * @param string $redirect_after The URL the user should be sent to after the login screen. Defaults to current URL.
      */
     public function redirect_to_login($redirect_after = null)
     {
@@ -151,8 +134,17 @@ class Request
     {
         global $wp_query;
         $wp_query->set_404();
-        status_header(WP_Http::NOT_FOUND);
+        status_header(\WP_Http::NOT_FOUND);
         nocache_headers();
+    }
+
+    public function __construct()
+    {
+        $this->populate_server();
+        $this->populate_query();
+        $this->populate_post();
+        $this->populate_request();
+        $this->populate_properties();
     }
 
     /**
@@ -179,85 +171,34 @@ class Request
         return array_filter(explode('/', $this->path));
     }
 
-    /**
-     * Checks if the current request is a given HTTP method.
-     *
-     * @since 1.0.0
-     * 
-     * @param  string  $method The method to check for.
-     * @return boolean
-     */
     public function is_method($method)
     {
         return strtoupper($method) === $this->get_method();
     }
 
-    /**
-     * Return a sanitized value from current request params.
-     *
-     * @since 1.0.0
-     * 
-     * @param  key   $key     The key of the value to fetch.
-     * @param  mixed $default Optional. A default value to return if the key was not present.
-     * @return mixed          The value if present, else the default.
-     */
     public function request($key, $default = null)
     {
         return $this->request->get($key, $default);
     }
 
-    /**
-     * Return a sanitized value from the server.
-     *
-     * @since 1.0.0
-     * 
-     * @param  key   $key     The key of the value to fetch.
-     * @param  mixed $default Optional. A default value to return if the key was not present.
-     * @return mixed          The value if present, else the default.
-     */
     public function server($key, $default = null)
     {
         return $this->server->get($key, $default);
     }
 
-    /**
-     * Return a value from the current $_POST params.
-     *
-     * @since 1.0.0
-     * 
-     * @param  key   $key     The key of the value to fetch.
-     * @param  mixed $default Optional. A default value to return if the key was not present.
-     * @return mixed          The value if present, else the default.
-     */
     public function post($key, $default = null)
     {
         return $this->post->get($key, $default);
     }
 
-    /**
-     * Return a value from the current query ($_GET params).
-     *
-     * @since 1.0.0
-     * 
-     * @param  key   $key     The key of the value to fetch.
-     * @param  mixed $default Optional. A default value to return if the key was not present.
-     * @return mixed          The value if present, else the default.
-     */
     public function query($key, $default = null)
     {
         return $this->query->get($key, $default);
     }
 
-    /**
-     * Get and set the current request variables.
-     *
-     * This is made up of the summation of $_GET and $_POST globals, with $_POST taking 
-     * precedence.
-     *
-     * This data is raw and unsanitized.
-     *
-     * @since 1.0.0
-     */
+
+
+
     private function populate_request()
     {
         if ($this->get_method() === 'GET') {
@@ -268,36 +209,16 @@ class Request
             );
         }
     }
-
-    /**
-     * Get and set $_GET globals.
-     *
-     * This data is raw and unsanitized.
-     *
-     * @since 1.0.0
-     */
     private function populate_query()
     {
         $this->query = new Request_Bag($_GET);
     }
 
-    /**
-     * Get and set $_POST globals.
-     *
-     * This data is raw and unsanitized.
-     *
-     * @since 1.0.0
-     */
     private function populate_post()
     {
         $this->post = new Request_Bag($_POST);
     }
 
-    /**
-     * Get and set various information relating to the current request.
-     * 
-     * @rsince 1.0.0
-     */
     private function populate_properties()
     {
         global $wp;
@@ -313,11 +234,6 @@ class Request
         $this->path = rtrim(parse_url($this->url, PHP_URL_PATH), '/');
     }
 
-    /**
-     * Get and sanitize $_SERVER globals.
-     *
-     * @since 1.0.0
-     */
     private function populate_server()
     {
         $definition = [
