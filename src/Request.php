@@ -6,7 +6,8 @@ use WP_Http;
 use Snap\Core\Utils;
 
 /**
-
+ * Gathers all request variables into one place and provides a simple API for changes affecting the response.
+ * 
  * @since 1.0.0
  */
 class Request
@@ -15,6 +16,7 @@ class Request
      * Request query params.
      *
      * @since 1.0.0
+     * 
      * @var Snap_Request_Bag
      */
     public $query = null;
@@ -23,6 +25,7 @@ class Request
      * Request post params.
      *
      * @since 1.0.0
+     * 
      * @var Snap_Request_Bag
      */
     public $post = null;
@@ -31,6 +34,7 @@ class Request
      * Request server params.
      *
      * @since 1.0.0
+     * 
      * @var Snap_Request_Bag
      */
     public $server = null;
@@ -41,6 +45,7 @@ class Request
      * POST takes precedence.
      *
      * @since 1.0.0
+     * 
      * @var Snap_Request_Bag
      */
     public $request = null;
@@ -49,6 +54,7 @@ class Request
      * The current request URL.
      *
      * @since 1.0.0
+     * 
      * @var string
      */
     public $url;
@@ -57,6 +63,7 @@ class Request
      * The current request path.
      *
      * @since 1.0.0
+     * 
      * @var string
      */
     public $path;
@@ -65,6 +72,7 @@ class Request
      * The current request scheme.
      *
      * @since 1.0.0
+     * 
      * @var string
      */
     public $scheme;
@@ -73,6 +81,7 @@ class Request
      * The current query being run by WordPress.
      *
      * @since 1.0.0
+     * 
      * @var string
      */
     public $matched_query;
@@ -81,6 +90,7 @@ class Request
      * The current rewrite rule being run.
      *
      * @since 1.0.0
+     * 
      * @var string
      */
     public $matched_rule;
@@ -89,7 +99,8 @@ class Request
      * Whether WordPress thinks the current request is from a mobile.
      *
      * @since 1.0.0
-     * @var bool
+     * 
+     * @var boolean
      */
     public $is_mobile = false;
 
