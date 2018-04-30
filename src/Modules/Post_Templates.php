@@ -13,7 +13,6 @@ class Post_Templates extends Hookable
 {
     /**
      * Filters to add on init.
-     *
      * @var array
      */
     protected $filters = [
@@ -30,10 +29,10 @@ class Post_Templates extends Hookable
      * @param  string $old_form WP default searchform.php markup
      * @return string           Markup for modules/searchform.php
      */
-    function get_search_form($old_form)
+    public function get_search_form($old_form)
     {
         ob_start();
-        Snap::module('searchform');
+        Snap::view()->module('searchform');
         $form = ob_get_clean();
 
         return $form;
@@ -51,7 +50,7 @@ class Post_Templates extends Hookable
      * @param string       $post_type      Post type to get the templates for.
      * @return array                       Modified array of page templates
      */
-    function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
+    public function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
         // path to  templates folder
         $path = get_stylesheet_directory() . '/templates/views/post-templates/';
@@ -90,7 +89,7 @@ class Post_Templates extends Hookable
      *
      * @since  1.0.0
      */
-    function register_theme_template_hooks()
+    public function register_theme_template_hooks()
     {
         foreach (get_post_types([ 'public' => true ]) as $post_type) {
             add_filter("theme_{$post_type}_templates", [ $this, 'custom_template_locator' ], 10, 4);

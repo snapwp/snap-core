@@ -4,6 +4,7 @@ use Snap\Core\Snap;
 use Snap\Core\Hookable;
 use Snap\Core\Utils;
 use Snap\Core\Router;
+use Snap\Core\View;
 
 /**
  * A helper function for calling Snap::module.
@@ -16,7 +17,7 @@ use Snap\Core\Router;
  */
 function snap_render_module($name, $slug = '', $data = null, $extract = false)
 {
-    Snap::module($name, $slug, $data, $extract);
+    Snap::view()->module($name, $slug, $data, $extract);
 }
 
 
@@ -34,7 +35,7 @@ function snap_render_module($name, $slug = '', $data = null, $extract = false)
  */
 function snap_loop($module = null, $module_overrides = null, $wp_query = null)
 {
-    Snap::loop($module, $module_overrides, $wp_query);
+    Snap::view()->loop($module, $module_overrides, $wp_query);
 }
 
 /**
