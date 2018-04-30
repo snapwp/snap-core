@@ -86,7 +86,7 @@ class Utils
      *
      * @return array Data for all currently registered image sizes.
      */
-    static public function get_image_sizes()
+    public static function get_image_sizes()
     {
         global $_wp_additional_image_sizes;
 
@@ -119,7 +119,7 @@ class Utils
      * @param  string $size The image size for which to retrieve data.
      * @return bool|array Size data about an image size or false if the size doesn't exist.
      */
-    static public function get_image_size($size)
+    public static function get_image_size($size)
     {
         $sizes = self::get_image_sizes();
 
@@ -181,5 +181,4 @@ class Utils
 
         return false;
     }
-
 }

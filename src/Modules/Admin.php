@@ -16,7 +16,6 @@ class Admin extends Hookable
      * Filters to add on init.
      *
      * @since  1.0.0
-     *
      * @var array
      */
     protected $filters = [
@@ -29,8 +28,8 @@ class Admin extends Hookable
 
     /**
      * Actions to add on init.
+     * 
      * @since  1.0.0
-     *
      * @var array
      */
     protected $actions = [
@@ -90,7 +89,7 @@ class Admin extends Hookable
             '%s <a href="http://wordpress.org" target="_blank">WordPress</a> %s <a href="%s" target="_blank">SnapWP</a>',
             __('Built using', 'snap'),
             __('and', 'snap'),
-            esc_url( Snap::SNAPWP_HOME )
+            esc_url(Snap::SNAPWP_HOME)
         );
     }
 

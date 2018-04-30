@@ -15,37 +15,35 @@ class Disable_Comments extends Hookable
      * Filters to add on init.
      *
      * @since  1.0.0
-     *
      * @var array
      */
     protected $filters = [
         'comments_array' => [
-        	20 => '__return_empty_array',
+            20 => '__return_empty_array',
         ],
         'comments_open' => [
-        	20 => '__return_false'
+            20 => '__return_false'
         ],
         'pre_option_default_pingback_flag' => '__return_zero'
     ];
 
     /**
      * Actions to add on init.
-     * 
      * @since  1.0.0
      *
      * @var array
      */
     protected $actions = [
-    	'widgets_init' => 'remove_comments_widget',
-    	'admin_print_footer_scripts-index.php' => 'remove_comments_dashboard_css',
-    	'wp_dashboard_setup' => 'remove_comments_dashboard_widget',
-    	'admin_menu' => 'remove_comments_access',
-    	'template_redirect' => [
-    		9 => 'remove_comments_stop_bots'
-    	],	
-    	'add_meta_boxes' => [
-    		9999 => 'remove_comments_meta_boxes'
-    	]
+        'widgets_init' => 'remove_comments_widget',
+        'admin_print_footer_scripts-index.php' => 'remove_comments_dashboard_css',
+        'wp_dashboard_setup' => 'remove_comments_dashboard_widget',
+        'admin_menu' => 'remove_comments_access',
+        'template_redirect' => [
+            9 => 'remove_comments_stop_bots'
+        ],
+        'add_meta_boxes' => [
+            9999 => 'remove_comments_meta_boxes'
+        ]
     ];
 
     /**
@@ -69,7 +67,7 @@ class Disable_Comments extends Hookable
      *
      * @since 1.0.0
      */
-   public function remove_comments_access()
+    public function remove_comments_access()
     {
         global $pagenow;
 
