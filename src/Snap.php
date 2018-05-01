@@ -97,10 +97,6 @@ class Snap
         self::$setup = true;
     }
 
-
-
-
-
     /**
      * Return the Container object.
      *

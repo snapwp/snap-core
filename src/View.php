@@ -4,19 +4,16 @@ namespace Snap\Core;
 
 class View
 {
+    private $current_view = null;
+
 	public function render($slug, $name = '')
 	{
 		// When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any modules (such as the page <head>).
 	    ob_end_flush();
 
-	    $name = (string) $name;
-	    $slug = str_replace([ 'templates/views/', '.php' ], '', $slug);
+        $this->current_view = $this->get_template_name($slug, $name);
 
-		if ( '' !== $name )
-			$template = "{$slug}-{$name}.php";
-
-		$template = "{$slug}.php";
-	    include(locate_template('templates/views/' . $template));
+	    include(locate_template('templates/views/' . $this->current_view));
 	}
 
 	/**
@@ -24,11 +21,11 @@ class View
      *
      * @since  1.0.0
      *
-     * @param  string $slug     The name for the generic template.
+     * @param  string $slug     The slug for the generic template.
      * @param  string $name     Optional. The name of the specialised template.
-     * @param  mixed  $data     Additional data to pass to a module. Available in the module as $data. Useful for PHP loops.
+     * @param  mixed  $data     Optional. Additional data to pass to a module. Available in the module as $data. Useful for PHP loops.
      *                          It is important to note that nothing is done to destroy/restore the current wordpress loop.
-     * @param  bool   $extract  Whether to extract() $data or not.
+     * @param  bool   $extract  Optional. Whether to extract() $data or not.
      */
     public function module($slug, $name = '', $data = null, $extract = false)
     {
@@ -37,7 +34,7 @@ class View
                 extract($data);
             }
 
-            include(locate_template('templates/modules/' . $slug . ( ! empty($name) ? '-' . $name : '' ) . '.php'));
+            include(locate_template('templates/modules/' . $this->get_template_name($slug, $name));
         } else {
             unset($data, $extract);
             get_template_part('templates/modules/' . $slug, $name);
@@ -100,5 +97,40 @@ class View
         }
 
         wp_reset_postdata();
+    }
+
+    /**
+     * Returns the current tevie wtemplate name.
+     *
+     * @since 1.0.0
+     * 
+     * @return string|null Returns null if called before a view has been dispatched.
+     */
+    public function get_current_view()
+    {
+        return $this->current_view;
+    }
+
+    /**
+     * Generate the template file name from the slug and name.
+     *
+     * @since 1.0.0
+     * 
+     * @param  string $slug The slug for the generic template.
+     * @param  string $name Optional. The name of the specialised template.
+     * @return string
+     */
+    private function get_template_name($slug, $name = '')
+    {
+        $name = (string) $name;
+        $slug = str_replace([ 'templates/views/', '.php' ], '', $slug);
+
+        $template = "{$slug}.php";
+
+        if ( '' !== $name ) {
+            $template = "{$slug}-{$name}.php";
+        }
+
+        return $template;
     }
 }
