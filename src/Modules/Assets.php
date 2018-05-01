@@ -16,7 +16,6 @@ class Assets extends Hookable
      * mix-manifest.json contents stored as array.
      *
      * @since 1.0.0
-     * 
      * @var array|null
      */
     protected $manifest = null;
@@ -25,7 +24,6 @@ class Assets extends Hookable
      * Actions to add on init.
      *
      * @since 1.0.0
-     * 
      * @var array
      */
     protected $actions = [
@@ -54,7 +52,7 @@ class Assets extends Hookable
      * Retrieves a filename public URL with Webpack version ID if present.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $file The asset file to look for.
      * @return string       The (possibly versioned) asset URL.
      */

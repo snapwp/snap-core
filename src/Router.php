@@ -16,7 +16,6 @@ class Router
      * If set to true, then all remaining methods on this route are skipped.
      *
      * @since 1.0.0
-     *
      * @var boolean
      */
     private $shortcircuit = false;
@@ -25,7 +24,6 @@ class Router
      * Whether the current route is valid.
      *
      * @since 1.0.0
-     *
      * @var boolean
      */
     private $route_valid = false;
@@ -34,7 +32,6 @@ class Router
      * Whether the current request has matched a route or not.
      *
      * @since 1.0.0
-     *
      * @var boolean
      */
     private $has_matched_route = false;
@@ -43,7 +40,6 @@ class Router
      * Middleware stack to apply to the current route.
      *
      * @since 1.0.0
-     *
      * @var array
      */
     private $middleware = [];
@@ -52,7 +48,6 @@ class Router
      * A record of the current group level's middleware.
      *
      * @since 1.0.0
-     *
      * @var array
      */
     private $last_middleware = [];
@@ -61,7 +56,6 @@ class Router
      * Whether the active route is within a group or not.
      *
      * @since 1.0.0
-     *
      * @var boolean
      */
     private $is_group = false;
@@ -264,7 +258,8 @@ class Router
 
                 do_action("snap_render_view_{$view}", Snap::request());
                 
-                snap_render_view($slug, $name);
+                //snap_render_view($slug, $name);
+                Snap::services()->get(View::class)->Render($slug, $name);
 
                 $this->has_matched_route = true;
             }

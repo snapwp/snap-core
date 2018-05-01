@@ -15,7 +15,6 @@ class Images extends Hookable
      * Default WordPress image sizes.
      *
      * @since  1.0.0
-     *
      * @var array
      */
     const DEFAULT_IMAGE_SIZES = [ 'thumbnail', 'medium', 'medium_large', 'large' ];
@@ -24,7 +23,6 @@ class Images extends Hookable
      * Holds any defined image dropdown names.
      *
      * @since  1.0.0
-     *
      * @var array
      */
     public static $size_dropdown_names = [];
@@ -33,7 +31,6 @@ class Images extends Hookable
      * The file extensions to check when finding palceholders.
      *
      * @since  1.0.0
-     * 
      * @var array
      */
     protected $placeholder_extensions = [];
@@ -42,7 +39,6 @@ class Images extends Hookable
      * The placeholder directory path.
      *
      * @since  1.0.0
-     * 
      * @var array
      */
     protected $placeholder_directory = '';
@@ -51,7 +47,6 @@ class Images extends Hookable
      * The placeholder directory path URI.
      *
      * @since  1.0.0
-     * 
      * @var array
      */
     protected $placeholder_directory_uri = '';
@@ -60,7 +55,6 @@ class Images extends Hookable
      * The filters to run when booted.
      *
      * @since  1.0.0
-     * 
      * @var array
      */
     protected $filters = [
@@ -266,7 +260,7 @@ class Images extends Hookable
      * Scans the file system to see if a given file exists with an extension from $this->placeholder_extensions.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $file_name The placeholder to look for, minus extension.
      * @return string|bool       false if not found, otherwise the public URI to the found placeholder.
      */
@@ -291,7 +285,7 @@ class Images extends Hookable
      * Parses image $attr array, turning them into HTML.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  array $attr  The $attr array.
      * @return string
      */
