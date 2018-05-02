@@ -32,7 +32,7 @@ class Post_Templates extends Hookable
     public function get_search_form($old_form)
     {
         ob_start();
-        Snap::view()->module('searchform');
+        Snap::view()->partial('searchform');
         $form = ob_get_clean();
 
         return $form;

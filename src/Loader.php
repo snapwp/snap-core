@@ -16,14 +16,16 @@ class Loader
      *
      * @param  string $path The path to an included file.
      */
-    public static function load_file($path)
+    public static function load_hookables($path)
     {
         // Require the file.
-        load_template($path, true);
+        //load_template($path, true);
 
-        $file_name = basename($path);
-
-        $class_name = '\\Theme\\'.ucwords(str_replace(['.php'], [''], $file_name));
+        $class_name = str_replace(
+            ['/', '.php'], 
+            ['\\', ''], 
+            str_replace(get_stylesheet_directory() . '/includes/', 'Theme\\', $path)
+        );
 
         // If the included class extends the Hookable abstract.
         if (class_exists($class_name) && is_subclass_of($class_name, Hookable::class)) {
@@ -77,14 +79,14 @@ class Loader
         $child_directory = get_stylesheet_directory() . '/includes/';
 
         $child_includes = [];
-
+/*
         if (is_admin()) {
             // Get child _admin directory contents.
             $child_includes = self::scandir($child_directory . '_admin/', $child_includes);
         } else {
             // Get child _public directory contents.
             $child_includes = self::scandir($child_directory . '_public/', $child_includes);
-        }
+        }*/
 
         $child_includes = self::scandir($child_directory, $child_includes);
 
@@ -100,7 +102,7 @@ class Loader
 
         if (! empty($child_includes)) {
             foreach ($child_includes as $file) {
-                self::load_file($file);
+                self::load_hookables($file);
             }
         }
     }
@@ -130,7 +132,7 @@ class Loader
             foreach ($contents as $file) {
                 $path = $folder . $file;
 
-                if ('.' === $file || 'admin' === $file || 'public' === $file || 'index.php' === $file || '..' === $file) {
+                if ('.' === $file || '..' === $file || 'functions' === $file) {
                     continue;
                 } elseif (pathinfo($path, PATHINFO_EXTENSION) === 'php') {
                     $files[] = $path;

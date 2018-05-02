@@ -7,35 +7,35 @@ use Snap\Core\Router;
 use Snap\Core\View;
 
 /**
- * A helper function for calling Snap::module.
+ * A helper function for calling Snap::partial.
  *
- * Render a module template from the modules directory, optionally passing data to the template.
+ * Render a partial template from the partials directory, optionally passing data to the template.
  *
  * @since  1.0.0
  *
- * @see Snap\Core\Snap::module
+ * @see Snap\Core\Snap::partial
  */
-function snap_render_module($name, $slug = '', $data = null, $extract = false)
+function snap_render_partial($name, $slug = '', $data = null, $extract = false)
 {
-    Snap::view()->module($name, $slug, $data, $extract);
+    Snap::view()->partial($name, $slug, $data, $extract);
 }
 
 
 
 
 /**
- * Runs the standard WP loop, and renders a module for each post.
+ * Runs the standard WP loop, and renders a partial for each post.
  *
  * A replacement for the standard have_posts loop that also works on custom WP_Query objects,
- * and allows easy module choice for each iteration.
+ * and allows easy partial choice for each iteration.
  *
  * @since 1.0.0
  *
  * @see Snap\Core\Utils::get_user_role
  */
-function snap_loop($module = null, $module_overrides = null, $wp_query = null)
+function snap_loop($partial = null, $partial_overrides = null, $wp_query = null)
 {
-    Snap::view()->loop($module, $module_overrides, $wp_query);
+    Snap::view()->loop($partial, $partial_overrides, $wp_query);
 }
 
 /**
@@ -234,7 +234,7 @@ if (! function_exists('snap_get_image_height')) {
  */
 function snap_render_view($slug, $name = '')
 {
-    // When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any modules (such as the page <head>).
+    // When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any partials (such as the page <head>).
     ob_end_flush();
     
     get_template_part('templates/views/' . str_replace([ 'templates/views/', '.php' ], '', $slug), $name);
