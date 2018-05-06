@@ -16,11 +16,8 @@ class Loader
      *
      * @param  string $path The path to an included file.
      */
-    public static function load_hookables($path)
+    public static function load_hookable($path)
     {
-        // Require the file.
-        //load_template($path, true);
-
         $class_name = str_replace(
             ['/', '.php'], 
             ['\\', ''], 
@@ -29,7 +26,7 @@ class Loader
 
         // If the included class extends the Hookable abstract.
         if (class_exists($class_name) && is_subclass_of($class_name, Hookable::class)) {
-            // Boot it up and resolve dependencies
+            // Boot it up and resolve dependencies.
             Snap::services()->resolve($class_name)->run();
         }
     }
@@ -44,11 +41,12 @@ class Loader
     public static function load_theme()
     {
         $snap_modules = [
+            \Snap\Core\Modules\Admin::class,
+            \Snap\Core\Modules\Assets::class,
             \Snap\Core\Modules\Cleanup::class,
+            \Snap\Core\Modules\I18n::class,
             \Snap\Core\Modules\Post_Templates::class,
             \Snap\Core\Modules\Images::class,
-            \Snap\Core\Modules\Assets::class,
-            \Snap\Core\Modules\Admin::class,
         ];
 
         if (Snap::config('theme.disable_comments') === true) {
@@ -65,7 +63,6 @@ class Loader
         ob_start();
     }
 
-
     /**
      * Includes any child includes.
      *
@@ -78,18 +75,6 @@ class Loader
         // Path to child theme includes folder.
         $child_directory = get_stylesheet_directory() . '/includes/';
 
-        $child_includes = [];
-/*
-        if (is_admin()) {
-            // Get child _admin directory contents.
-            $child_includes = self::scandir($child_directory . '_admin/', $child_includes);
-        } else {
-            // Get child _public directory contents.
-            $child_includes = self::scandir($child_directory . '_public/', $child_includes);
-        }*/
-
-        $child_includes = self::scandir($child_directory, $child_includes);
-
         /**
          * Allow the child_includes to be modified before inclusion.
          *
@@ -98,11 +83,19 @@ class Loader
          * @param array  $child_includes The array of child files.
          * @return array $child_includes
          */
-        $child_includes = apply_filters('snap_theme_includes', $child_includes);
+        $child_includes = apply_filters('snap_theme_includes', self::scandir($child_directory));
 
         if (! empty($child_includes)) {
             foreach ($child_includes as $file) {
-                self::load_hookables($file);
+                self::load_hookable($file);
+            }
+        }
+
+        $child_functions = self::scandir($child_directory . 'functions/');
+
+         if (! empty($child_functions)) {
+            foreach ($child_functions as $file) {
+                include($file);
             }
         }
     }

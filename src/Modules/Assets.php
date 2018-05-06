@@ -138,7 +138,7 @@ class Assets extends Hookable
      * @since 1.0.0
      *
      * @param string $src The src URL for the asset.
-     * @return  The URL without an asset string.
+     * @return string The URL without an asset string.
      */
     public function remove_versions_from_assets($src)
     {

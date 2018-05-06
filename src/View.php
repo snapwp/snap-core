@@ -2,13 +2,29 @@
 
 namespace Snap\Core;
 
+use Snap\Core\Modules\Pagination;
+
 class View
 {
+    /**
+     * The current view name being displayed.
+     *
+     * @since  1.0.0
+     * @var string|null
+     */
     private $current_view = null;
 
+    /**
+     * Renders a view.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string $slug The slug for the generic template.
+     * @param  string $name Optional. The name of the specialised template.
+     */
 	public function render($slug, $name = '')
 	{
-		// When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any modules (such as the page <head>).
+		// When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any partials (such as the page <head>).
 	    ob_end_flush();
 
         $this->current_view = $this->get_template_name($slug, $name);
@@ -17,46 +33,46 @@ class View
 	}
 
 	/**
-     * Fetch and display a template module.
+     * Fetch and display a template partial.
      *
      * @since  1.0.0
      *
      * @param  string $slug     The slug for the generic template.
      * @param  string $name     Optional. The name of the specialised template.
-     * @param  mixed  $data     Optional. Additional data to pass to a module. Available in the module as $data. Useful for PHP loops.
+     * @param  mixed  $data     Optional. Additional data to pass to a partial. Available in the partial as $data. Useful for PHP loops.
      *                          It is important to note that nothing is done to destroy/restore the current wordpress loop.
      * @param  bool   $extract  Optional. Whether to extract() $data or not.
      */
-    public function module($slug, $name = '', $data = null, $extract = false)
+    public function partial($slug, $name = '', $data = null, $extract = false)
     {
         if ($data !== null) {
             if (is_array($data) && $extract === true) {
                 extract($data);
             }
 
-            include(locate_template('templates/modules/' . $this->get_template_name($slug, $name));
+            include(locate_template('templates/partials/' . $this->get_template_name($slug, $name)));
         } else {
             unset($data, $extract);
-            get_template_part('templates/modules/' . $slug, $name);
+            get_template_part('templates/partials/' . $slug, $name);
         }
     }
 
     /**
-     * Runs the standard WP loop, and renders a module for each post.
+     * Runs the standard WP loop, and renders a partial for each post.
      *
      * A replacement for the standard have_posts loop that also works on custom WP_Query objects,
-     * and allows easy module choice for each iteration.
+     * and allows easy partial choice for each iteration.
      *
      * @since 1.0.0
      *
-     * @param  string   $module   Optional. The module name to render for each post.
+     * @param  string   $partial   Optional. The partial name to render for each post.
      *                            If null, then defaults to post-type/{post type}.php.
-     * @param  array    $module   Optional. An array of overrides.
-     *                            Keys are the iteration index to apply the override, and values are the module to load instead of $module.
+     * @param  array    $partial   Optional. An array of overrides.
+     *                            Keys are the iteration index to apply the override, and values are the partial to load instead of $partial.
      *                            There is also a special key 'alternate' which will load the value on every odd iteration.
      * @param  WP_Query $wp_query Optional. An optional custom WP_Query to loop through. Defaults to the global WP_Query instance.
      */
-    public function loop($module = null, $module_overrides = null, $wp_query = null)
+    public function loop($partial = null, $partial_overrides = null, $wp_query = null)
     {
         // Use either the global or supplied WP_Query object.
         if ($wp_query instanceof WP_Query) {
@@ -72,35 +88,51 @@ class View
             while ($wp_query->have_posts()) {
                 $wp_query->the_post();
 
-                // Work out what module to render.
-                if (is_array($module_overrides) && isset($module_overrides[ $count ])) {
+                // Work out what partial to render.
+                if (is_array($partial_overrides) && isset($partial_overrides[ $count ])) {
                     // An override is present, so load that instead.
-                    $this->module($module_overrides[ $count ]);
-                } elseif (is_array($module_overrides)
-                    && isset($module_overrides['alternate'])
+                    $this->partial($partial_overrides[ $count ]);
+                } elseif (is_array($partial_overrides)
+                    && isset($partial_overrides['alternate'])
                     && $count % 2 !== 0
                 ) {
                     // An override is present, so load that instead.
-                    $this->module($module_overrides['alternate']);
-                } elseif ($module === null) {
-                    // Load the default module for this content type.
-                    $this->module('post-type/' . get_post_type());
+                    $this->partial($partial_overrides['alternate']);
+                } elseif ($partial === null) {
+                    // Load the default partial for this content type.
+                    $this->partial('post-type/' . get_post_type());
                 } else {
-                    // Load the supplied default module.
-                    $this->module($module);
+                    // Load the supplied default partial.
+                    $this->partial($partial);
                 }
 
                 $count++;
             }
         } else {
-            $this->module('post-type/none');
+            $this->partial('post-type/none');
         }
 
         wp_reset_postdata();
     }
 
+    public function pagination($args = [])
+    {
+        $pagination = Snap::services()->resolve(
+            Pagination::class, 
+            [
+                'args' => $args
+            ]
+        );
+
+        if (isset($args['echo']) && $args['echo'] !== true) {
+            return $pagination->get();
+        }
+        
+        return $pagination->render();
+    }
+
     /**
-     * Returns the current tevie wtemplate name.
+     * Returns the current view template name.
      *
      * @since 1.0.0
      * 

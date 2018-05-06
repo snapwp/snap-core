@@ -5,6 +5,9 @@ namespace Snap\Core\Modules;
 use Snap\Core\Hookable;
 use Snap\Core\Snap;
 
+/**
+ * Cleanup WordPress output and functionality.
+ */
 class Cleanup extends Hookable
 {
     /**
@@ -16,85 +19,130 @@ class Cleanup extends Hookable
     protected $actions = [
         'init' => 'clean_wp_head',
         'admin_bar_init' => 'move_adminbar_inline_styles',
+        'admin_menu' => [
+            999 => 'remove_editor_links',
+        ],
+        'load-theme-editor.php' => 'restrict_access',
+        'load-plugin-editor.php' => 'restrict_access',
+        'admin_bar_menu' => [
+            99 => 'clean_adminbar',
+        ]
     ];
 
+    /**
+     * Conditionally add filters.
+     *
+     * @since  1.0.0
+     */
     public function boot()
     {
-        // xmlrpc is a potential security weakness. Most of the time it is completely irrelevent
+        // xmlrpc is a potential security weakness. Most of the time it is completely irrelevant.
         if (Snap::config('disable_xmlrpc')) {
             $this->add_filter('xmlrpc_enabled', '__return_false');
         }
     }
     
     /**
-     * Move all admin bar css and js to footer
+     * Move all frontend admin bar css and js to footer.
+     *
+     * @since  1.0.0
      */
     public function move_adminbar_inline_styles()
     {
         if (! is_admin()) {
-            // remove the inline styles normally added by the admin bar and move to the footer
-            remove_action('wp_head', '_admin_bar_bump_cb');
-            remove_action('wp_head', 'wp_admin_bar_header');
-            add_action('wp_footer', 'wp_admin_bar_header');
-            add_action('wp_footer', '_admin_bar_bump_cb');
+            // Remove the inline styles normally added by the admin bar and move to the footer.
+            $this->remove_action('wp_head', '_admin_bar_bump_cb');
+            $this->remove_action('wp_head', 'wp_admin_bar_header');
+            $this->add_action('wp_footer', 'wp_admin_bar_header');
+            $this->add_action('wp_footer', '_admin_bar_bump_cb');
 
-            // unregister the main admin bar css files
+            // Unregister the main admin bar css files...
             wp_dequeue_style('admin-bar');
 
-            // and print to footer
-            add_action('wp_footer', function () {
+            // ... and print to footer.
+            $this->add_action('wp_footer', function () {
                 wp_enqueue_style('admin-bar');
             });
         }
     }
 
     /**
+     * Removes clutter from the admin bar.
+     *
+     * @since  1.0.0
+     * 
+     * @param  WP_Admin_Bar $wp_admin_bar [description]
+     */
+    public function clean_adminbar($wp_admin_bar)
+    {
+        $wp_admin_bar->remove_node( 'wp-logo' );
+    }
+
+    /**
+     * Remove theme and plugin editor links from admin.
+     *
+     * We do not disable via DISALLOW_FILE_EDIT as some plugins need this.
+     * Feel free to override this in your wp-config.
+     *
+     * @since  1.0.0
+     */
+    public function remove_editor_links()
+    {
+        remove_submenu_page('themes.php', 'theme-editor.php');
+        remove_submenu_page('plugins.php', 'plugin-editor.php');
+    }
+
+    /**
+     * Sends 403 header and related message to the browser.
+     *
+     * @since  1.0.0
+     */
+    public function restrict_access()
+    {
+        wp_die( 'You are not allowed to be here', 403 );
+    }
+
+    /**
      * Clean up wp_head()
      *
-     * Remove unnecessary <link>'s
-     * Remove inline CSS and JS from WP emoji support
-     * Remove inline CSS used by Recent Comments widget
-     * Remove inline CSS used by posts with galleries
-     *
+     * @since  1.0.0
     */
     public function clean_wp_head()
     {
         global $wp_widget_factory;
 
         // Originally from http://wpengineer.com/1438/wordpress-header/
-        remove_action('wp_head', 'feed_links_extra', 3);
+        $this->remove_action('wp_head', 'feed_links_extra', 3);
         
-        // emojis
+        // Remove emojis.
         $this->remove_emojis();
 
-        // remove next/previous links
-        remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10);
+        // Remove next/previous links.
+        $this->remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10);
         
-        // oembed
-        remove_action('wp_head', 'wp_oembed_add_discovery_links');
-        remove_action('wp_head', 'wp_oembed_add_host_js');
+        // remove oembed.
+        $this->remove_action('wp_head', 'wp_oembed_add_discovery_links');
+        $this->remove_action('wp_head', 'wp_oembed_add_host_js');
 
-        // generic
-        remove_action('wp_head', 'rsd_link');
-        remove_action('wp_head', 'wlwmanifest_link');
-        remove_action('wp_head', 'wp_generator');
-        remove_action('wp_head', 'wp_shortlink_wp_head', 10);
-        remove_action('wp_head', 'rest_output_link_wp_head', 10);
+        // Generic fixes.
+        $this->remove_action('wp_head', 'rsd_link');
+        $this->remove_action('wp_head', 'wlwmanifest_link');
+        $this->remove_action('wp_head', 'wp_generator');
+        $this->remove_action('wp_head', 'wp_shortlink_wp_head', 10);
+        $this->remove_action('wp_head', 'rest_output_link_wp_head', 10);
         
         if (isset($wp_widget_factory->widgets['WP_Widget_Recent_Comments'])) {
-            remove_action('wp_head', [$wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style']);
+            $this->remove_action('wp_head', [$wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style']);
         }
-        
-        add_action('wp_head', 'ob_start', 1, 0);
-        
-        add_action('wp_head', function () {
-            $pattern = '/.*' . preg_quote(esc_url(get_feed_link('comments_' . get_default_feed())), '/') . '.*[\r\n]+/';
-            echo preg_replace($pattern, '', ob_get_clean());
-        }, 3, 0);
 
         add_filter('use_default_gallery_style', '__return_false');
     }
 
+    /**
+     * Remove emoji js and css site-wide.
+     * 
+     * @since 1.0.0
+     */
     private function remove_emojis()
     {
         $this->remove_hook(['the_content_feed', 'comment_text_rss'], 'wp_staticize_emoji');

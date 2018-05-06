@@ -6,7 +6,7 @@ use Snap\Core\Hookable;
 use Snap\Core\Snap;
 
 /**
- * Additional code directly affecting admin area, or the removal of functionality.
+ * Additional code directly affecting admin area.
  *
  * @since  1.0.0
  */
