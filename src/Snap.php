@@ -3,6 +3,7 @@
 namespace Snap\Core;
 
 use WP_Query;
+use wpdb;
 use Hodl\Container;
 use Snap\Core\Modules\Assets;
 
@@ -68,27 +69,33 @@ class Snap
         if (! self::$setup) {
             self::$container = new Container();
 
-            self::$container->add(Router::class, function () {
+            self::services()->add(Router::class, function () {
                 return new Router();
             });
 
-            self::$container->add(Request::class, function () {
+            self::services()->add(Request::class, function () {
                 return new Request();
             });
             
-            self::$container->add(View::class, function ($hodl) {
+            self::services()->add(View::class, function ($hodl) {
                 return $hodl->resolve(View::class);
             });
 
             // Boot up the config parser.
             $config = new Config(get_stylesheet_directory().'/config');
 
-            self::$container->addInstance($config);
+            self::services()->addInstance($config);
 
             // Add the assets module to avoid parsing the mix-manifest multiple times
-            self::$container->add(Assets::class, function () {
+            self::services()->add(Assets::class, function () {
                 return new Assets();
             });
+
+            // Add global WP classes
+            global $wpdb;
+            global $wp_query;
+            self::services()->addInstance($wp_query);
+            self::services()->addInstance($wpdb);
 
             // Run the loader.
             Loader::load_theme();
