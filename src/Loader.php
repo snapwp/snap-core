@@ -57,10 +57,18 @@ class Loader
             Snap::services()->resolve($module)->run();
         }
 
+        self::load_widgets();
         self::load_child_theme();
 
         // Now all files are loaded, turn on output buffer until a view is dispatched.
         ob_start();
+    }
+
+    public static function load_widgets()
+    {
+        add_action('widgets_init', function() {
+            register_widget( \Snap\Core\Widgets\Related_Pages::class );
+        });
     }
 
     /**
