@@ -2,7 +2,9 @@
 
 namespace Snap\Core;
 
+use Exception;
 use Snap\Core\Modules\Pagination;
+use Snap\Core\Modules\Related_Pages;
 
 class View
 {
@@ -27,9 +29,13 @@ class View
 		// When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any partials (such as the page <head>).
 	    ob_end_flush();
 
+        if ($this->current_view !== null) {
+            throw new Exception('Views should not be nested');
+        }
+
         $this->current_view = $this->get_template_name($slug, $name);
 
-	    include(locate_template('templates/views/' . $this->current_view));
+	    require(locate_template('templates/views/' . $this->current_view));
 	}
 
 	/**
@@ -45,15 +51,18 @@ class View
      */
     public function partial($slug, $name = '', $data = null, $extract = false)
     {
+        $file_name = locate_template('templates/partials/' . $this->get_template_name($slug, $name));
+
         if ($data !== null) {
             if (is_array($data) && $extract === true) {
                 extract($data);
             }
-
-            include(locate_template('templates/partials/' . $this->get_template_name($slug, $name)));
         } else {
             unset($data, $extract);
-            get_template_part('templates/partials/' . $slug, $name);
+        }
+
+        if (! empty($file_name)) {
+            require($file_name);
         }
     }
 

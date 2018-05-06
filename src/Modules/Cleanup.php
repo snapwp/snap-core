@@ -7,6 +7,8 @@ use Snap\Core\Snap;
 
 /**
  * Cleanup WordPress output and functionality.
+ *
+ * @since  1.0.0
  */
 class Cleanup extends Hookable
 {
@@ -17,7 +19,9 @@ class Cleanup extends Hookable
      * @var array
      */
     protected $actions = [
+        'widgets_init' => 'remove_pointless_widgets',
         'init' => 'clean_wp_head',
+        'style_loader_tag' => 'clean_asset_tags',
         'admin_bar_init' => 'move_adminbar_inline_styles',
         'admin_menu' => [
             999 => 'remove_editor_links',
@@ -67,6 +71,20 @@ class Cleanup extends Hookable
     }
 
     /**
+     * Remove some useless default widgets.
+     * 
+     * @since 1.0.0
+     */
+    public function remove_pointless_widgets()
+    {
+        // Just why?
+        unregister_widget('WP_Widget_Meta');
+
+        // There are better ways of doing this.
+        unregister_widget('WP_Widget_RSS');
+    }
+
+    /**
      * Removes clutter from the admin bar.
      *
      * @since  1.0.0
@@ -90,6 +108,27 @@ class Cleanup extends Hookable
     {
         remove_submenu_page('themes.php', 'theme-editor.php');
         remove_submenu_page('plugins.php', 'plugin-editor.php');
+    }
+
+    /**
+     * Remove un needed attributes from asset tags.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string $tag Original asset tag.
+     * @return string
+     */
+    public function clean_asset_tags($tag)
+    {
+        preg_match_all("!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $tag, $matches);
+       
+        if ( empty($matches[2]) ) {
+            return $tag;
+        }
+
+        $media = $matches[3][0] !== '' && $matches[3][0] !== 'all' ? ' media="' . $matches[3][0] . '"' : '';
+
+        return "\t".'<link rel="stylesheet" href="' . $matches[2][0] . '"' . $media . '>' . "\n";
     }
 
     /**

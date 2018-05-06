@@ -7,7 +7,9 @@ use Snap\Core\Hookable;
 
 /**
  * Ensure all post templates found in views/templates/ folder get treated as templates by WordPress,
- * and ensure all is_page_template() requests are routed to the primary front controller (index.php)
+ * and ensure all is_page_template() requests are routed to the primary front controller (index.php).
+ *
+ * @since  1.0.0
  */
 class Post_Templates extends Hookable
 {

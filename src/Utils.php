@@ -78,6 +78,42 @@ class Utils
     }
 
     /**
+     * Get value of top level hierarchical post ID.
+     * 
+     * Does not work with the objects returned by get_pages().
+     *
+     * @since  1.0.0
+     *
+     * @param (int|WP_Post|array) $post null Optional. Post object,array, or ID of a post to find the top ancestors for.
+     * @return int ID
+     */
+    public static function get_top_level_parent_id($post = null)
+    {
+        if (is_search() || is_404()) {
+            return null;
+        }
+        
+        switch ($post) {
+            case null;
+                global $post;
+            case is_int($post):
+                $post = get_post($post);
+            case is_object($post):
+                $ancestors = $post->ancestors;
+                break;
+            case is_array($post):
+                $ancestors = $post['ancestors'];
+                break;
+        }
+     
+        if ($ancestors && ! empty($ancestors)) {
+            return (int) end($ancestors);
+        } else {
+            return (int) $post->ID;
+        }
+    }
+
+    /**
      * Get size information for all currently registered image sizes.
      *
      * @global $_wp_additional_image_sizes
@@ -180,5 +216,166 @@ class Utils
         }
 
         return false;
+    }
+
+    /**
+     * Get current page depth.
+     *
+     * @since  1.0.0
+     *
+     * @param int|WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
+     * @return integer
+     */
+    public function get_page_depth($page = null)
+    {
+        if ($page === null) {
+            global $wp_query;
+        
+            $object = $wp_query->get_queried_object();
+        } else {
+            $object = get_post($page);
+        }
+
+        $parent_id  = $object->post_parent;
+        $depth = 0;
+
+        while ($parent_id > 0) {
+            $page = get_page($parent_id);
+            $parent_id = $page->post_parent;
+            $depth++;
+        }
+     
+        return $depth;
+    }
+
+    /**
+     * Lists debug info about all callbacks for a given hook.
+     *
+     * Returns information for all callbacks in order of execution and priority.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $hook The hook to find callbacks for.
+     * @return array        Array of priorities, each containing a nested array of callbacks.
+     */
+    final public static function debug_hook($hook = '')
+    {
+        global $wp_filter;
+
+        $return = [];
+
+        if (! is_string($hook) || ! isset($wp_filter[ $hook ]) || empty($wp_filter[ $hook ]->callbacks)) {
+            return $return;
+        }
+
+        foreach ($wp_filter[ $hook ]->callbacks as $priority => $callbacks) {
+            $return[ $priority ] = [];
+
+            foreach ($callbacks as $key => $callback) {
+                $function = $callback['function'];
+                $args = $callback['accepted_args'];
+
+                if (is_array($function)) {
+                    // Is a class
+                    if (is_callable([ $function[0], $function[1] ])) {
+                        $return[ $priority ][ $key ] = self::generate_hook_info(
+                            'Class Method',
+                            new \ReflectionMethod($function[0], $function[1]),
+                            $args
+                        );
+                    } else {
+                        $return[ $priority ][ $key ] = self::generate_undefined_hook_info();
+                    }
+                } elseif (is_object($function) && $function instanceof \Closure) {
+                    // Is a closure.
+                    $return[ $priority ][ $key ] = self::generate_hook_info(
+                        'Closure',
+                        new \ReflectionFunction($function),
+                        $args
+                    );
+                } elseif (strpos($function, '::') !== false) {
+                    // Is a static method.
+                    list( $class, $method ) = explode('::', $function);
+
+                    if (is_callable([ $class, $method ])) {
+                        $return[ $priority ][ $key ] = self::generate_hook_info(
+                            'Static Method',
+                            new \ReflectionMethod($class, $method),
+                            $args
+                        );
+                    } else {
+                        $return[ $priority ][ $key ] = self::generate_undefined_hook_info();
+                    }
+                } else {
+                    // Is a function.
+                    if (function_exists($function)) {
+                        $return[ $priority ][ $key ] = self::generate_hook_info(
+                            'Function',
+                            new \ReflectionFunction($function),
+                            $args
+                        );
+                    } else {
+                        $return[ $priority ][ $key ] = self::generate_undefined_hook_info();
+                    }
+                }
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * Generate output for a hook callback.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $type
+     * @param  object $reflector The reflection object handling this callback.
+     * @param  int    $args      The number of args defined when this callback was added.
+     * @return array
+     */
+    final private static function generate_hook_info($type, $reflector, $args)
+    {
+        $output = [
+            'type' => $type,
+            'file_name' => $reflector->getFileName(),
+            'line_number' => $reflector->getStartLine(),
+            'class' => null,
+            'name' => null,
+            'is_internal' => false
+        ];
+
+        if ($reflector instanceof \ReflectionMethod) {
+            $output['class'] = $reflector->getDeclaringClass()->getName();
+        }
+
+        if ('Closure' !== $type) {
+            $output['name'] = $reflector->getName();
+            $output['is_internal'] = $reflector->isInternal();
+        }
+
+        $output['accepted_args'] = $args;
+
+        return $output;
+    }
+
+    /**
+     * Generate output for an undefined callback.
+     *
+     * @since 1.0.0
+     *
+     * @return array
+     */
+    final private static function generate_undefined_hook_info()
+    {
+        return [
+            'type' => 'Undefined',
+            'file_name' => null,
+            'line_number' => null,
+            'class' => null,
+            'name' => null,
+            'is_internal' => null,
+            'accepted_args' => 0,
+        ];
     }
 }
