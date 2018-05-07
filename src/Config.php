@@ -2,11 +2,35 @@
 
 namespace Snap\Core;
 
+/**
+ * A simple config manager.
+ *
+ * @since  1.0.0
+ */
 class Config
 {
-    private $path = '';
+    /**
+     * Config directory paths, in order of addition.
+     *
+     * @since  1.0.0
+     * @var string
+     */
+    private $paths = '';
+
+    /**
+     * When a config item is accessed via dot notation, it is stored here for easier retrieval.
+     *
+     * @since  1.0.0
+     * @var array
+     */
     private $cache = [];
 
+    /**
+     * Config defaults.
+     *
+     * @since  1.0.0
+     * @var array
+     */
     private $config = [
         'theme' => [
             'disable_xmlrpc' => true,
@@ -20,10 +44,7 @@ class Config
         'images' => [
             'default_image_quality' => 75,
             'placeholder_dir' => 'assets/images/placeholders/',
-            'supports_featured_images' => [
-                'post',
-                'page',
-            ],
+            'supports_featured_images' => true,
             'reset_image_sizes' => true,
             'image_sizes' => [],
             'insert_image_default_size' => 'medium',
@@ -32,34 +53,56 @@ class Config
         'services' => []
     ];
 
-    public function __construct(string $path)
+    /**
+     * A new config folder path.
+     *
+     * @since  1.0.0
+     * 
+     * @param string $path Path to config directory.
+     */
+    public function add_path(string $path)
     {
-        $this->path = trailingslashit($path);
-
-        $this->load_files();
-
-        $this->parse_files();
+        $path = trailingslashit($path);
+        $this->paths[] = $path;
+        $this->parse_files($path);
     }
 
+    /**
+     * Retrieve a config value.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string $option  The config key to retrieve.
+     * @param  mixed  $default A default value to return if the config key was not defined.
+     * @return mixed The config value.
+     */
     public function get($option, $default = null)
     {
         if ($this->has($option)) {
             return $this->cache[$option];
         }
+
         return $default;
     }
 
-    public function has($option)
+    /**
+     * Check if a given config value exists in the cache.
+     *
+     * @since 1.0.0
+     * 
+     * @param  string  $option The dot notation option key to look for
+     * @return boolean         Whether an option exists for the given key.
+     */
+    public function has($key)
     {
-        // Check if already cached
-        if (isset($this->cache[$option])) {
+        // Check if already cached.
+        if (isset($this->cache[$key])) {
             return true;
         }
 
-        $segments = explode('.', $option);
+        $segments = explode('.', $key);
         $root = $this->config;
 
-        // nested case
         foreach ($segments as $segment) {
             if (array_key_exists($segment, $root)) {
                 $root = $root[$segment];
@@ -69,28 +112,40 @@ class Config
             }
         }
 
-        // Set cache for the given key
-        $this->cache[$option] = $root;
+        // Set cache for the given key.
+        $this->cache[$key] = $root;
 
         return true;
     }
 
-    public function set($option, $value)
+    /**
+     * Sets an option.
+     *
+     * @since  1.0.0
+     * 
+     * @param string $key   The key of this option.
+     * @param mixed  $value The value to set for this option.
+     */
+    public function set($key, $value)
     {
-        $this->cache[$option] = $value;
+        $this->cache[$key] = $value;
     }
 
-    private function load_files()
+    /**
+     * Scans a path for config files, and merges them into the config.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string $path Directory path to scan.
+     */
+    private function parse_files($path)
     {
-        if (is_dir($this->path)) {
-            $this->files = glob($this->path . '*.*');
+        if (is_dir($path)) {
+            $files = glob($path . '*.php');
         }
-    }
 
-    private function parse_files()
-    {
-        if (!empty($this->files)) {
-            foreach ($this->files as $file) {
+        if (! empty($files)) {
+            foreach ($files as $file) {
                 $parsedOptions = require $file;
 
                 $optionSet = $this->get_filename($file);
@@ -108,6 +163,14 @@ class Config
         }
     }
 
+    /**
+     * Get the filename without extension from a given path.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string $path Full file path.
+     * @return string       Filename.
+     */
     private function get_filename($path)
     {
         return str_replace('.php', '', basename($path));

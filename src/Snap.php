@@ -82,7 +82,12 @@ class Snap
             });
 
             // Boot up the config parser.
-            $config = new Config(get_stylesheet_directory().'/config');
+            $config = new Config();
+            $config->add_path(get_template_directory().'/config');
+
+            if (is_child_theme()) {
+                $config->add_path(get_stylesheet_directory().'/config');
+            }
 
             self::services()->addInstance($config);
 
