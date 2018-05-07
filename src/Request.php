@@ -2,6 +2,9 @@
 
 namespace Snap\Core;
 
+use WP_Http;
+use Snap\Core\Request\Bag;
+
 /**
  * Gathers all request variables into one place and provides a simple API for changes affecting the response.
  * 
@@ -13,7 +16,7 @@ class Request
      * Request query params.
      *
      * @since 1.0.0
-     * @var Snap_Request_Bag
+     * @var Snap\Core\Request\Bag
      */
     public $query = null;
 
@@ -21,7 +24,7 @@ class Request
      * Request post params.
      * @since 1.0.0
      * 
-     * @var Snap_Request_Bag
+     * @var Snap\Core\Request\Bag
      */
     public $post = null;
 
@@ -29,7 +32,7 @@ class Request
      * Request server params.
      *
      * @since 1.0.0
-     * @var Snap_Request_Bag
+     * @var Snap\Core\Request\Bag
      */
     public $server = null;
 
@@ -39,7 +42,7 @@ class Request
      * POST takes precedence.
      *
      * @since 1.0.0
-     * @var Snap_Request_Bag
+     * @var Snap\Core\Request\Bag
      */
     public $request = null;
 
@@ -135,7 +138,7 @@ class Request
     {
         global $wp_query;
         $wp_query->set_404();
-        status_header(\WP_Http::NOT_FOUND);
+        status_header(WP_Http::NOT_FOUND);
         nocache_headers();
     }
 
@@ -203,21 +206,21 @@ class Request
     private function populate_request()
     {
         if ($this->get_method() === 'GET') {
-            $this->request = new Request_Bag($this->query->to_array());
+            $this->request = new Bag($this->query->to_array());
         } else {
-            $this->request = new Request_Bag(
+            $this->request = new Bag(
                 array_merge($this->query->to_array(), $this->post->to_array())
             );
         }
     }
     private function populate_query()
     {
-        $this->query = new Request_Bag($_GET);
+        $this->query = new Bag($_GET);
     }
 
     private function populate_post()
     {
-        $this->post = new Request_Bag($_POST);
+        $this->post = new Bag($_POST);
     }
 
     private function populate_properties()
@@ -255,6 +258,6 @@ class Request
 
         $server = filter_input_array(INPUT_SERVER, $definition);
 
-        $this->server = new Request_Bag($server);
+        $this->server = new Bag($server);
     }
 }

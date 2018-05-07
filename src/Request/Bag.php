@@ -1,8 +1,8 @@
 <?php
 
-namespace Snap\Core;
+namespace Snap\Core\Request;
 
-class Request_Bag
+class Bag
 {
     private $data = [];
 
