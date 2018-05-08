@@ -15,7 +15,7 @@
         "psr-4": {
             "Snap\\Core\\": "src/"
         },
-        "files": ["src/modules/functions.php"]
+        "files": ["src/Modules/functions.php"]
     },
     "require": {
         "php": ">=7",
@@ -30,7 +30,7 @@
             "phpcs --ignore=vendor --extensions=php --standard=PSR2 ."
         ],
         "fix": [
-            "phpcbf --ignore=vendor --extensions=php --standard=PSR2 ."
+            "phpcbf --ignore=*/vendor/* --extensions=php --standard=PSR2 ."
         ]
     }
 }
