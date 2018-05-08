@@ -14,12 +14,12 @@ use Snap\Core\Utils;
  */
 class Related_Pages extends WP_Widget
 {
-	/**
-	 * Related_Pages arguments array.
-	 *
-	 * @since 1.0.0
-	 * @var array
-	 */
+    /**
+     * Related_Pages arguments array.
+     *
+     * @since 1.0.0
+     * @var array
+     */
     private $args = [];
 
     /**
@@ -47,7 +47,7 @@ class Related_Pages extends WP_Widget
      * The widget output.
      *
      * @since 1.0.0
-     * 
+     *
      * @param  array $args     The sidebar args.
      * @param  array $instance The instance args.
      */
@@ -64,9 +64,9 @@ class Related_Pages extends WP_Widget
             $instance,
             /**
              * Edit the default Related_Pages default arguments.
-             * 
+             *
              * @since  1.0.0
-             * 
+             *
              * @param  array $defaults {
              *     The default arguments.
              *
@@ -95,7 +95,7 @@ class Related_Pages extends WP_Widget
      
             echo $args['before_widget'];
 
-            if ( ! empty( $title ) ) {
+            if (! empty($title)) {
                 echo $args['before_title'] . $title . $args['after_title'];
             }
              
@@ -109,46 +109,46 @@ class Related_Pages extends WP_Widget
      * Output the admin widget form.
      *
      * @since 1.0.0
-     * 
+     *
      * @param  array $instance The current instance args.
      */
-    public function form( $instance )
+    public function form($instance)
     {
-        if ( isset( $instance[ 'title' ] ) ) {
+        if (isset($instance[ 'title' ])) {
             $title = $instance[ 'title' ];
         } else {
-            $title = __( 'New title', 'wpb_widget_domain' );
-        }        
+            $title = __('New title', 'wpb_widget_domain');
+        }
 
-        if ( isset( $instance[ 'show_parent' ] ) ) {
+        if (isset($instance[ 'show_parent' ])) {
             $show_parent = $instance[ 'show_parent' ];
         }
         ?>
             <p>
-                <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> 
-                <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+                <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label> 
+                <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
             </p>
             <p>
-                <input class="checkbox" type="checkbox" id="<?php echo $this->get_field_id( 'show_parent' ); ?>" name="<?php echo $this->get_field_name( 'show_parent' ); ?>" <?php checked($show_parent); ?>>
-                &nbsp;<label for="<?php echo $this->get_field_id( 'show_parent' ); ?>"><?php _e('Include the top level page', 'snap'); ?></label>
+                <input class="checkbox" type="checkbox" id="<?php echo $this->get_field_id('show_parent'); ?>" name="<?php echo $this->get_field_name('show_parent'); ?>" <?php checked($show_parent); ?>>
+                &nbsp;<label for="<?php echo $this->get_field_id('show_parent'); ?>"><?php _e('Include the top level page', 'snap'); ?></label>
             </p>
-        <?php 
+        <?php
     }
          
     /**
      * Update the widget upon saving.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  array $new_instance Submitted instance args.
      * @param  array $old_instance Old instance args.
      * @return array               New instance args to save.
      */
-    public function update( $new_instance, $old_instance )
+    public function update($new_instance, $old_instance)
     {
         $instance = [];
-        $instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-        $instance['show_parent'] = ( ! empty( $new_instance['show_parent'] ) ) ? true : false;
+        $instance['title'] = ( ! empty($new_instance['title']) ) ? strip_tags($new_instance['title']) : '';
+        $instance['show_parent'] = ( ! empty($new_instance['show_parent']) ) ? true : false;
         return $instance;
     }
 
@@ -171,11 +171,11 @@ class Related_Pages extends WP_Widget
     {
         $str = $this->args['container_start'];
 
-        if ( $this->args['show_parent'] && $this->parent_page_id !== false ) {
+        if ($this->args['show_parent'] && $this->parent_page_id !== false) {
             $str .= $this->get_parent_link_html();
         }
 
-        foreach ( $this->pages as $page ) {
+        foreach ($this->pages as $page) {
             $str .= $this->get_link_html($page);
         }
 
@@ -187,7 +187,7 @@ class Related_Pages extends WP_Widget
      * Construct the HTML for the parent link.
      *
      * @since  1.0.0
-     * 
+     *
      * @return string
      */
     private function get_parent_link_html()
@@ -202,7 +202,7 @@ class Related_Pages extends WP_Widget
             $link_class = $this->args['link_class'];
         }
 
-        return sprintf( 
+        return sprintf(
             '<li class="%s">%s<a class="%s" href="%s">%s%s%s</a>%s</li>',
             $li_class,
             $this->args['before_link'],
@@ -235,7 +235,7 @@ class Related_Pages extends WP_Widget
             $link_class = $this->args['link_class'];
         }
 
-        return sprintf( 
+        return sprintf(
             '<li class="%s">%s<a class="%s" href="%s">%s%s%s</a>%s</li>',
             $li_class,
             $this->args['before_link'],
@@ -252,7 +252,7 @@ class Related_Pages extends WP_Widget
      * Returns the widget default arguments.
      *
      * @since  1.0.0
-     * 
+     *
      * @return array
      */
     private function get_defaults()

@@ -7,7 +7,7 @@ use Snap\Core\Request\Bag;
 
 /**
  * Gathers all request variables into one place and provides a simple API for changes affecting the response.
- * 
+ *
  * @since 1.0.0
  */
 class Request
@@ -23,7 +23,7 @@ class Request
     /**
      * Request post params.
      * @since 1.0.0
-     * 
+     *
      * @var Snap\Core\Request\Bag
      */
     public $post = null;

@@ -19,8 +19,8 @@ class Loader
     public static function load_hookable($path)
     {
         $class_name = str_replace(
-            ['/', '.php'], 
-            ['\\', ''], 
+            ['/', '.php'],
+            ['\\', ''],
             str_replace(get_stylesheet_directory() . '/includes/', 'Theme\\', $path)
         );
 
@@ -66,8 +66,8 @@ class Loader
 
     public static function load_widgets()
     {
-        add_action('widgets_init', function() {
-            register_widget( \Snap\Core\Widgets\Related_Pages::class );
+        add_action('widgets_init', function () {
+            register_widget(\Snap\Core\Widgets\Related_Pages::class);
         });
     }
 
@@ -101,7 +101,7 @@ class Loader
 
         $child_functions = self::scandir($child_directory . 'functions/');
 
-         if (! empty($child_functions)) {
+        if (! empty($child_functions)) {
             foreach ($child_functions as $file) {
                 include($file);
             }

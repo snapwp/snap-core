@@ -79,7 +79,7 @@ class Utils
 
     /**
      * Get value of top level hierarchical post ID.
-     * 
+     *
      * Does not work with the objects returned by get_pages().
      *
      * @since  1.0.0

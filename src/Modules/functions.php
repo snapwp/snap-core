@@ -193,7 +193,7 @@ if (! function_exists('snap_debug_hook')) {
 if (! function_exists('snap_get_top_parent_page_id')) {
     /**
      * Get value of top level hierarchical post ID.
-     * 
+     *
      * Does not work with the objects returned by get_pages().
      *
      * @since  1.0.0
@@ -209,7 +209,7 @@ if (! function_exists('snap_get_top_parent_page_id')) {
 if (! function_exists('snap_get_page_depth')) {
     /**
      * Get current page depth.
-     * 
+     *
      * @since  1.0.0
      *
      * @see Snap\Core\Utils::snap_get_page_depth

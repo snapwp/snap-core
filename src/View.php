@@ -20,14 +20,14 @@ class View
      * Renders a view.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $slug The slug for the generic template.
      * @param  string $name Optional. The name of the specialised template.
      */
-	public function render($slug, $name = '')
-	{
-		// When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any partials (such as the page <head>).
-	    ob_end_flush();
+    public function render($slug, $name = '')
+    {
+        // When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any partials (such as the page <head>).
+        ob_end_flush();
 
         if ($this->current_view !== null) {
             throw new Exception('Views should not be nested');
@@ -35,10 +35,10 @@ class View
 
         $this->current_view = $this->get_template_name($slug, $name);
 
-	    require(locate_template('templates/views/' . $this->current_view));
-	}
+        require(locate_template('templates/views/' . $this->current_view));
+    }
 
-	/**
+    /**
      * Fetch and display a template partial.
      *
      * @since  1.0.0
@@ -127,7 +127,7 @@ class View
     public function pagination($args = [])
     {
         $pagination = Snap::services()->resolve(
-            Pagination::class, 
+            Pagination::class,
             [
                 'args' => $args
             ]
@@ -144,7 +144,7 @@ class View
      * Returns the current view template name.
      *
      * @since 1.0.0
-     * 
+     *
      * @return string|null Returns null if called before a view has been dispatched.
      */
     public function get_current_view()
@@ -156,7 +156,7 @@ class View
      * Generate the template file name from the slug and name.
      *
      * @since 1.0.0
-     * 
+     *
      * @param  string $slug The slug for the generic template.
      * @param  string $name Optional. The name of the specialised template.
      * @return string
@@ -168,7 +168,7 @@ class View
 
         $template = "{$slug}.php";
 
-        if ( '' !== $name ) {
+        if ('' !== $name) {
             $template = "{$slug}-{$name}.php";
         }
 

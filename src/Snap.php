@@ -164,7 +164,7 @@ class Snap
     public static function request()
     {
         return self::services()->get(Request::class);
-    }    
+    }
 
     /**
      * Fetch the Request object from the container.

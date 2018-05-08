@@ -72,7 +72,7 @@ class Cleanup extends Hookable
 
     /**
      * Remove some useless default widgets.
-     * 
+     *
      * @since 1.0.0
      */
     public function remove_pointless_widgets()
@@ -88,12 +88,12 @@ class Cleanup extends Hookable
      * Removes clutter from the admin bar.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  WP_Admin_Bar $wp_admin_bar [description]
      */
     public function clean_adminbar($wp_admin_bar)
     {
-        $wp_admin_bar->remove_node( 'wp-logo' );
+        $wp_admin_bar->remove_node('wp-logo');
     }
 
     /**
@@ -114,7 +114,7 @@ class Cleanup extends Hookable
      * Remove un needed attributes from asset tags.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $tag Original asset tag.
      * @return string
      */
@@ -122,7 +122,7 @@ class Cleanup extends Hookable
     {
         preg_match_all("!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $tag, $matches);
        
-        if ( empty($matches[2]) ) {
+        if (empty($matches[2])) {
             return $tag;
         }
 
@@ -138,7 +138,7 @@ class Cleanup extends Hookable
      */
     public function restrict_access()
     {
-        wp_die( 'You are not allowed to be here', 403 );
+        wp_die('You are not allowed to be here', 403);
     }
 
     /**
@@ -179,7 +179,7 @@ class Cleanup extends Hookable
 
     /**
      * Remove emoji js and css site-wide.
-     * 
+     *
      * @since 1.0.0
      */
     private function remove_emojis()

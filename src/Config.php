@@ -57,7 +57,7 @@ class Config
      * A new config folder path.
      *
      * @since  1.0.0
-     * 
+     *
      * @param string $path Path to config directory.
      */
     public function add_path(string $path)
@@ -71,7 +71,7 @@ class Config
      * Retrieve a config value.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $option  The config key to retrieve.
      * @param  mixed  $default A default value to return if the config key was not defined.
      * @return mixed The config value.
@@ -89,7 +89,7 @@ class Config
      * Check if a given config value exists in the cache.
      *
      * @since 1.0.0
-     * 
+     *
      * @param  string  $option The dot notation option key to look for
      * @return boolean         Whether an option exists for the given key.
      */
@@ -122,7 +122,7 @@ class Config
      * Sets an option.
      *
      * @since  1.0.0
-     * 
+     *
      * @param string $key   The key of this option.
      * @param mixed  $value The value to set for this option.
      */
@@ -135,7 +135,7 @@ class Config
      * Scans a path for config files, and merges them into the config.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $path Directory path to scan.
      */
     private function parse_files($path)
@@ -167,7 +167,7 @@ class Config
      * Get the filename without extension from a given path.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $path Full file path.
      * @return string       Filename.
      */
