@@ -73,10 +73,10 @@ class Hookable
      *
      * @since 1.0.0
      *
-     * @param string    $tag             The name of the filter to hook the $function_to_add callback to.
-     * @param callable  $function_to_add The callback to be run when the filter is applied.
-     * @param integer   $priority        The priority of the callback.
-     * @param integer   $accepted_args   The amount of arguments the callback accepts.
+     * @param string   $tag             The name of the filter to hook the $function_to_add callback to.
+     * @param callable $function_to_add The callback to be run when the filter is applied.
+     * @param integer  $priority        The priority of the callback.
+     * @param integer  $accepted_args   The amount of arguments the callback accepts.
      */
     final public function add_action($tag, $function_to_add, $priority = 10, $accepted_args = 1)
     {
@@ -91,11 +91,11 @@ class Hookable
      *
      * @since 1.0.0
      *
-     * @param string|array  $tag             The name of the filter to hook the $function_to_add callback to.
-     *                                       Can also be an array of filters.
-     * @param callable      $function_to_add The callback to be run when the filter is applied.
-     * @param integer       $priority        The priority of the callback.
-     * @param integer       $accepted_args   The amount of arguments the callback accepts.
+     * @param string|array $tag             The name of the filter to hook the $function_to_add callback to.
+     *                                      Can also be an array of filters.
+     * @param callable     $function_to_add The callback to be run when the filter is applied.
+     * @param integer      $priority        The priority of the callback.
+     * @param integer      $accepted_args   The amount of arguments the callback accepts.
      */
     final public function add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
     {
@@ -132,9 +132,9 @@ class Hookable
      * @see  \Snap\Core\Hookable::remove_hook
      * @since  1.0.0
      *
-     * @param  string|array  $tag                The hook(s) to remove the callback from.
-     * @param  callable      $function_to_remove The callback to remove.
-     * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
+     * @param  string|array $tag                The hook(s) to remove the callback from.
+     * @param  callable     $function_to_remove The callback to remove.
+     * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
     final public function remove_action($tag, $function_to_remove, $priority = 10)
     {
@@ -147,9 +147,9 @@ class Hookable
      * @see  \Snap\Core\Hookable::remove_hook
      * @since  1.0.0
      *
-     * @param  string|array  $tag                The hook(s) to remove the callback from.
-     * @param  callable      $function_to_remove The callback to remove.
-     * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
+     * @param  string|array $tag                The hook(s) to remove the callback from.
+     * @param  callable     $function_to_remove The callback to remove.
+     * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
     final public function remove_filter($tag, $function_to_remove, $priority = 10)
     {
@@ -161,9 +161,9 @@ class Hookable
      *
      * @since  1.0.0
      *
-     * @param  string|array  $tag                The hook(s) to remove the callback from.
-     * @param  callable      $function_to_remove The callback to remove.
-     * @param  integer       $priority           Optional. The priority of the callback to remove. Defaults to 10.
+     * @param  string|array $tag                The hook(s) to remove the callback from.
+     * @param  callable     $function_to_remove The callback to remove.
+     * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
     final public function remove_hook($tag, $function_to_remove, $priority = 10)
     {

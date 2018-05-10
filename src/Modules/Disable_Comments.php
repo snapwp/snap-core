@@ -29,6 +29,7 @@ class Disable_Comments extends Hookable
 
     /**
      * Actions to add on init.
+     *
      * @since  1.0.0
      *
      * @var array

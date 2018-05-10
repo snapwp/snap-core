@@ -15,6 +15,7 @@ class Post_Templates extends Hookable
 {
     /**
      * Filters to add on init.
+     *
      * @var array
      */
     protected $filters = [

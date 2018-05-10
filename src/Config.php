@@ -90,7 +90,7 @@ class Config
      *
      * @since 1.0.0
      *
-     * @param  string  $option The dot notation option key to look for
+     * @param  string $option The dot notation option key to look for
      * @return boolean         Whether an option exists for the given key.
      */
     public function has($key)

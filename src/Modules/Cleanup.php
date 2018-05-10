@@ -145,7 +145,7 @@ class Cleanup extends Hookable
      * Clean up wp_head()
      *
      * @since  1.0.0
-    */
+     */
     public function clean_wp_head()
     {
         global $wp_widget_factory;

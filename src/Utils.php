@@ -63,7 +63,7 @@ class Utils
      *
      * @since  1.0.0
      *
-     * @param  boolean  $remove_query If true, the URL is returned without any query params.
+     * @param  boolean $remove_query If true, the URL is returned without any query params.
      * @return string   The current URL.
      */
     public static function get_current_url($remove_query = false)

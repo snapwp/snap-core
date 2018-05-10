@@ -99,7 +99,7 @@ class Router
      *
      * @since 1.0.0
      *
-     * @param  bool|callable  $result The result of a custom expression.
+     * @param  bool|callable $result The result of a custom expression.
      * @return Snap\Router
      */
     public function is($result)
@@ -120,7 +120,7 @@ class Router
      *
      * @since 1.0.0
      *
-     * @param  bool  $result The result of a custom expression.
+     * @param  bool $result The result of a custom expression.
      * @return Snap\Router
      */
     public function is_not($result)
@@ -141,7 +141,7 @@ class Router
      *
      * @since  1.0.0
      *
-     * @param  string  $template Optional specific template to check for.
+     * @param  string $template Optional specific template to check for.
      * @return Snap\Router
      */
     public function is_page_template($template = '')
@@ -258,7 +258,7 @@ class Router
 
                 do_action("snap_render_view_{$view}", Snap::request());
                 
-                //snap_render_view($slug, $name);
+                // snap_render_view($slug, $name);
                 Snap::services()->get(View::class)->Render($slug, $name);
 
                 $this->has_matched_route = true;

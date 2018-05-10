@@ -49,8 +49,8 @@ class Pagination
      *
      * @since  1.0.0
      *
-     * @param array $args {
-     *     Optional. An array of arguments.
+     * @param array    $args {
+     *        Optional. An array of arguments.
      *
      *     @type bool   $echo                Whether to echo or return the HTML. Default true.
      *     @type int    $range               How many page links should be displayed at once. Default 5.

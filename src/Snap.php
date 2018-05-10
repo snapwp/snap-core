@@ -127,7 +127,7 @@ class Snap
      * @since  1.0.0
      *
      * @param string $option The option name to fetch.
-     * @param mixed $default If the option was not found, the default value to be returned instead.
+     * @param mixed  $default If the option was not found, the default value to be returned instead.
      * @return mixed|Snap\Core\Config
      */
     public static function config($option = null, $default = null)

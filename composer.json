@@ -23,11 +23,25 @@
         "jakewhiteley/hodl": "~1.0"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "~3.0"
+        "squizlabs/php_codesniffer": "~3.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
+        "wp-coding-standards/wpcs": "^0.14.1"
     },
     "scripts": {
         "sniff": [
             "phpcs --ignore=vendor --extensions=php --standard=PSR2 ."
+        ],           
+        "sniff-docs": [
+            "phpcs --ignore=*/vendor/* --extensions=php --standard=WordPress-Docs --exclude=Squiz.Commenting.FileComment ."
+        ],         
+        "fix-docs": [
+            "phpcbf --ignore=*/vendor/* --extensions=php --standard=WordPress-Docs --exclude=Squiz.Commenting.FileComment ."
+        ],        
+        "snap": [
+            "phpcs --extensions=php ."
+        ],       
+        "snap-fix": [
+            "phpcbf --extensions=php ."
         ],
         "fix": [
             "phpcbf --ignore=*/vendor/* --extensions=php --standard=PSR2 ."

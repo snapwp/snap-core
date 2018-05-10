@@ -22,6 +22,7 @@ class Request
 
     /**
      * Request post params.
+     *
      * @since 1.0.0
      *
      * @var Snap\Core\Request\Bag
