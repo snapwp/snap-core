@@ -29,22 +29,16 @@
     },
     "scripts": {
         "sniff": [
-            "phpcs --ignore=vendor --extensions=php --standard=PSR2 ."
+            "phpcs --extensions=php ."
         ],           
+        "fix": [
+            "phpcbf --extensions=php ."
+        ],
         "sniff-docs": [
             "phpcs --ignore=*/vendor/* --extensions=php --standard=WordPress-Docs --exclude=Squiz.Commenting.FileComment ."
         ],         
         "fix-docs": [
             "phpcbf --ignore=*/vendor/* --extensions=php --standard=WordPress-Docs --exclude=Squiz.Commenting.FileComment ."
-        ],        
-        "snap": [
-            "phpcs --extensions=php ."
-        ],       
-        "snap-fix": [
-            "phpcbf --extensions=php ."
-        ],
-        "fix": [
-            "phpcbf --ignore=*/vendor/* --extensions=php --standard=PSR2 ."
-        ]
+        ]       
     }
 }
