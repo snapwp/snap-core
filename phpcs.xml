@@ -6,6 +6,8 @@
     <exclude-pattern>*/tests/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
 
+    <autoload>./vendor/wp-coding-standards/wpcs/WordPress/PHPCSAliases.php</autoload>
+
     <arg name="colors"/>
 
     <rule ref="PSR2">
@@ -13,29 +15,28 @@
         <exclude name="Squiz.Classes.ValidClassName"/>
     </rule>
 
-    <rule name="WordPress.NamingConventions.ValidFunctionName"/>
-    <rule name="WordPress.NamingConventions.ValidHookName"/>
-    <rule name="WordPress.NamingConventions.ValidVariableName"/>
-    <rule name="WordPress.Arrays.ArrayDeclarationSpacing"/>
-    <rule name="WordPress.Arrays.ArrayIndentation"/>
-    <rule name="WordPress.Arrays.ArrayKeySpacingRestrictions"/>
-    <rule name="WordPress.Arrays.CommaAfterArrayItem"/>
-    <rule name="WordPress.Arrays.MultipleStatementAlignment"/>
-    <rule name="WordPress.DB.PreparedSQLPlaceholders"/>
-    <rule name="WordPress.DB.RestrictedClasses"/>
-    <rule name="WordPress.DB.RestrictedFunctions"/>
-    <rule name="WordPress.NamingConventions.ValidFunctionName"/>
-    <rule name="WordPress.NamingConventions.ValidHookName"/>
-    <rule name="WordPress.NamingConventions.ValidVariableName"/>
-    <rule name="WordPress.PHP.DiscourageGoto"/>
-    <rule name="WordPress.PHP.POSIXFunctions"/>
-    <rule name="WordPress.PHP.RestrictedPHPFunctions"/>
+    <rule ref="WordPress.NamingConventions.ValidFunctionName"/>
+    <rule ref="WordPress.NamingConventions.ValidHookName"/>
 
-    <rule name="WordPress.WP.CapitalPDangit"/>
-    <rule name="WordPress.WP.I18n"/>
-    <rule name="WordPress.WP.PreparedSQL"/>
 
-    <rule name="PEAR.NamingConventions.ValidClassName"/>
-    <rule name="Squiz.Strings.ConcatenationSpacing"/>
+    <rule ref="WordPress.Arrays.ArrayIndentation"/>
+    <rule ref="WordPress.Arrays.ArrayKeySpacingRestrictions"/>
+    <rule ref="WordPress.Arrays.CommaAfterArrayItem"/>
+    <rule ref="WordPress.Arrays.MultipleStatementAlignment"/>
+    <rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
+    <rule ref="WordPress.DB.RestrictedClasses"/>
+    <rule ref="WordPress.DB.RestrictedFunctions"/>
+    <rule ref="WordPress.PHP.DiscourageGoto"/>
+    <rule ref="WordPress.PHP.POSIXFunctions"/>
+    <rule ref="WordPress.PHP.RestrictedPHPFunctions"/>
+
+    <rule ref="WordPress.WP.CapitalPDangit"/>
+    <rule ref="WordPress.WP.I18n"/>
+    <rule ref="WordPress.WP.PreparedSQL"/>
+
+    <rule ref="PEAR.Functions.FunctionCallSignature"/>
+    <rule ref="PEAR.NamingConventions.ValidClassName"/>
+
+    <rule ref="Squiz.NamingConventions.ValidVariableName"/>
 
 </ruleset>

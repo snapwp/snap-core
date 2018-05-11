@@ -25,13 +25,15 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "~3.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
-        "wp-coding-standards/wpcs": "^0.14.1"
+        "wp-coding-standards/wpcs": "^0.14.1",
+        "friendsofphp/php-cs-fixer": "^2.11"
     },
     "scripts": {
         "sniff": [
             "phpcs --extensions=php ."
         ],           
         "fix": [
+            "php-cs-fixer fix",
             "phpcbf --extensions=php ."
         ],
         "sniff-docs": [
