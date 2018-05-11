@@ -34,9 +34,9 @@ class Post_Templates extends Hookable
      */
     public function get_search_form($old_form)
     {
-        ob_start();
+        \ob_start();
         Snap::view()->partial('searchform');
-        $form = ob_get_clean();
+        $form = \ob_get_clean();
 
         return $form;
     }
@@ -58,28 +58,28 @@ class Post_Templates extends Hookable
         // path to  templates folder
         $path = get_stylesheet_directory() . '/templates/views/post-templates/';
 
-        $templates = scandir($path);
+        $templates = \scandir($path);
 
         if (! empty($templates)) {
             foreach ($templates as $tpl) {
                 $full_path = $path.$tpl;
 
-                if ($tpl == '.' || $tpl == '..' || is_dir($full_path) || $tpl == '_example.php') {
+                if ($tpl == '.' || $tpl == '..' || \is_dir($full_path) || $tpl == '_example.php') {
                     continue;
                 }
 
-                if (! preg_match('|Template Name:(.*)$|mi', file_get_contents($full_path), $header)) {
+                if (! \preg_match('|Template Name:(.*)$|mi', \file_get_contents($full_path), $header)) {
                     continue;
                 }
 
                 $types = [ 'page' ];
 
-                if (preg_match('|Template Post Type:(.*)$|mi', file_get_contents($full_path), $type)) {
-                    $types = explode(',', _cleanup_header_comment(str_replace(' ', '', $type[1])));
+                if (\preg_match('|Template Post Type:(.*)$|mi', \file_get_contents($full_path), $type)) {
+                    $types = \explode(',', _cleanup_header_comment(\str_replace(' ', '', $type[1])));
                 }
 
-                if (in_array($post_type, $types)) {
-                    $post_templates['templates/views/post-templates/' . $tpl] = trim($header[1]);
+                if (\in_array($post_type, $types)) {
+                    $post_templates[ 'templates/views/post-templates/' . $tpl ] = \trim($header[1]);
                 }
             }
         }

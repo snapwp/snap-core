@@ -22,7 +22,7 @@
     <rule ref="WordPress.Arrays.ArrayIndentation"/>
     <rule ref="WordPress.Arrays.ArrayKeySpacingRestrictions"/>
     <rule ref="WordPress.Arrays.CommaAfterArrayItem"/>
-    <rule ref="WordPress.Arrays.MultipleStatementAlignment"/>
+    <!-- <rule ref="WordPress.Arrays.MultipleStatementAlignment"/> -->
     <rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
     <rule ref="WordPress.DB.RestrictedClasses"/>
     <rule ref="WordPress.DB.RestrictedFunctions"/>

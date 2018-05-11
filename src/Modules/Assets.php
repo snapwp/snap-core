@@ -63,11 +63,11 @@ class Assets extends Hookable
         }
 
         // there was no manifest or no file present
-        if ($this->manifest === null || ! isset($this->manifest[$file])) {
+        if ($this->manifest === null || ! isset($this->manifest[ $file ])) {
             return $file;
         }
 
-        return get_stylesheet_directory_uri() . $this->manifest[$file];
+        return get_stylesheet_directory_uri() . $this->manifest[ $file ];
     }
 
     /**
@@ -82,7 +82,7 @@ class Assets extends Hookable
         $jquery_version = Snap::config('theme.use_jquery_cdn');
 
         // if a valid jQuery version has been specified.
-        if (! is_admin() && $jquery_version !== false && version_compare($jquery_version, '0.0.1', '>=') === true) {
+        if (! is_admin() && $jquery_version !== false && \version_compare($jquery_version, '0.0.1', '>=') === true) {
             // get all non-deferred scripts, to check for jQuery.
             $defer_exclude_list = Snap::config('theme.defer_scripts_skip');
             
@@ -93,7 +93,7 @@ class Assets extends Hookable
                 "//ajax.googleapis.com/ajax/libs/jquery/{$jquery_version}/jquery.min.js",
                 [],
                 null,
-                ( is_array($defer_exclude_list) && in_array('jquery', $defer_exclude_list) ) ? false : true
+                ( \is_array($defer_exclude_list) && \in_array('jquery', $defer_exclude_list) ) ? false : true
             );
 
             wp_enqueue_script('jquery');
@@ -121,15 +121,15 @@ class Assets extends Hookable
         }
 
         // If the defer_scripts_skip option was not present, or was incompatible.
-        if (! is_array($exclude_list)) {
+        if (! \is_array($exclude_list)) {
             $exclude_list = [];
         }
 
-        if (in_array($handle, $exclude_list)) {
+        if (\in_array($handle, $exclude_list)) {
             return $tag;
         }
 
-        return str_replace(' src', ' defer="defer" src', $tag);
+        return \str_replace(' src', ' defer="defer" src', $tag);
     }
 
     /**
@@ -154,10 +154,10 @@ class Assets extends Hookable
     {
         $manifest_path = get_stylesheet_directory() . '/mix-manifest.json';
 
-        if (file_exists($manifest_path)) {
-            $manifest = file_get_contents($manifest_path);
+        if (\file_exists($manifest_path)) {
+            $manifest = \file_get_contents($manifest_path);
 
-            $this->manifest = (array) json_decode($manifest);
+            $this->manifest = (array) \json_decode($manifest);
         }
     }
 }

@@ -30,7 +30,7 @@ class Utils
         
         // if our sidebar exists, return count.
         if (isset($_wp_sidebars_widgets[ $sidebar_id ])) {
-            return count($_wp_sidebars_widgets[ $sidebar_id ]);
+            return \count($_wp_sidebars_widgets[ $sidebar_id ]);
         }
         
         return 0;
@@ -53,7 +53,7 @@ class Utils
         }
         
         $roles = $user->roles;
-        $role = array_shift($roles);
+        $role = \array_shift($roles);
         
         return isset($wp_roles->role_names[ $role ]) ? translate_user_role($wp_roles->role_names[ $role ]) : false;
     }
@@ -96,18 +96,18 @@ class Utils
         switch ($post) {
             case null;
                 global $post;
-            case is_int($post):
+            case \is_int($post):
                 $post = get_post($post);
-            case is_object($post):
+            case \is_object($post):
                 $ancestors = $post->ancestors;
                 break;
-            case is_array($post):
+            case \is_array($post):
                 $ancestors = $post['ancestors'];
                 break;
         }
      
         if ($ancestors && ! empty($ancestors)) {
-            return (int) end($ancestors);
+            return (int) \end($ancestors);
         } else {
             return (int) $post->ID;
         }
@@ -129,7 +129,7 @@ class Utils
         $sizes = [];
 
         foreach (get_intermediate_image_sizes() as $size) {
-            if (in_array($size, ['thumbnail', 'medium', 'medium_large', 'large'])) {
+            if (\in_array($size, ['thumbnail', 'medium', 'medium_large', 'large'])) {
                 $sizes[ $size ] = [
                     'width' => get_option("{$size}_size_w"),
                     'height' => get_option("{$size}_size_h"),
@@ -159,7 +159,7 @@ class Utils
     {
         $sizes = self::get_image_sizes();
 
-        if (is_string($size) && isset($sizes[ $size ])) {
+        if (\is_string($size) && isset($sizes[ $size ])) {
             return $sizes[ $size ];
         }
 
@@ -264,7 +264,7 @@ class Utils
 
         $return = [];
 
-        if (! is_string($hook) || ! isset($wp_filter[ $hook ]) || empty($wp_filter[ $hook ]->callbacks)) {
+        if (! \is_string($hook) || ! isset($wp_filter[ $hook ]) || empty($wp_filter[ $hook ]->callbacks)) {
             return $return;
         }
 
@@ -275,9 +275,9 @@ class Utils
                 $function = $callback['function'];
                 $args = $callback['accepted_args'];
 
-                if (is_array($function)) {
+                if (\is_array($function)) {
                     // Is a class
-                    if (is_callable([ $function[0], $function[1] ])) {
+                    if (\is_callable([ $function[0], $function[1] ])) {
                         $return[ $priority ][ $key ] = self::generate_hook_info(
                             'Class Method',
                             new \ReflectionMethod($function[0], $function[1]),
@@ -286,18 +286,18 @@ class Utils
                     } else {
                         $return[ $priority ][ $key ] = self::generate_undefined_hook_info();
                     }
-                } elseif (is_object($function) && $function instanceof \Closure) {
+                } elseif (\is_object($function) && $function instanceof \Closure) {
                     // Is a closure.
                     $return[ $priority ][ $key ] = self::generate_hook_info(
                         'Closure',
                         new \ReflectionFunction($function),
                         $args
                     );
-                } elseif (strpos($function, '::') !== false) {
+                } elseif (\strpos($function, '::') !== false) {
                     // Is a static method.
-                    list( $class, $method ) = explode('::', $function);
+                    list( $class, $method ) = \explode('::', $function);
 
-                    if (is_callable([ $class, $method ])) {
+                    if (\is_callable([ $class, $method ])) {
                         $return[ $priority ][ $key ] = self::generate_hook_info(
                             'Static Method',
                             new \ReflectionMethod($class, $method),
@@ -308,7 +308,7 @@ class Utils
                     }
                 } else {
                     // Is a function.
-                    if (function_exists($function)) {
+                    if (\function_exists($function)) {
                         $return[ $priority ][ $key ] = self::generate_hook_info(
                             'Function',
                             new \ReflectionFunction($function),
@@ -342,7 +342,7 @@ class Utils
             'line_number' => $reflector->getStartLine(),
             'class' => null,
             'name' => null,
-            'is_internal' => false
+            'is_internal' => false,
         ];
 
         if ($reflector instanceof \ReflectionMethod) {

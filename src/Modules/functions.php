@@ -14,7 +14,7 @@ use Snap\Core\View;
  * *********************************************************************************************************************
  */
 
-if (! function_exists('snap_render_partial')) {
+if (! \function_exists('snap_render_partial')) {
     /**
      * A helper function for calling Snap::partial.
      *
@@ -30,7 +30,7 @@ if (! function_exists('snap_render_partial')) {
     }
 }
 
-if (! function_exists('snap_render_partial')) {
+if (! \function_exists('snap_render_partial')) {
     /**
      * Render a view.
      *
@@ -46,7 +46,7 @@ if (! function_exists('snap_render_partial')) {
     }
 }
 
-if (! function_exists('snap_loop')) {
+if (! \function_exists('snap_loop')) {
     /**
      * Runs the standard WP loop, and renders a partial for each post.
      *
@@ -63,7 +63,7 @@ if (! function_exists('snap_loop')) {
     }
 }
 
-if (! function_exists('snap_pagination')) {
+if (! \function_exists('snap_pagination')) {
     /**
      * Output Snap pagination
      *
@@ -77,7 +77,7 @@ if (! function_exists('snap_pagination')) {
     }
 }
 
-if (! function_exists('snap_get_current_view')) {
+if (! \function_exists('snap_get_current_view')) {
     /**
      * Returns the current view being rendered.
      *
@@ -102,7 +102,7 @@ if (! function_exists('snap_get_current_view')) {
  * *********************************************************************************************************************
  */
 
-if (! function_exists('config')) {
+if (! \function_exists('config')) {
     /**
      * Returns a key from the Config service.
      *
@@ -118,7 +118,7 @@ if (! function_exists('config')) {
     }
 }
 
-if (! function_exists('snap_get_current_url')) {
+if (! \function_exists('snap_get_current_url')) {
     /**
      * Gets the current full URL of the page with or without query strings.
      *
@@ -132,7 +132,7 @@ if (! function_exists('snap_get_current_url')) {
     }
 }
 
-if (! function_exists('snap_get_current_url_segments')) {
+if (! \function_exists('snap_get_current_url_segments')) {
     /**
      * Gets the path segments of the current URL.
      *
@@ -146,7 +146,7 @@ if (! function_exists('snap_get_current_url_segments')) {
     }
 }
 
-if (! function_exists('snap_get_widget_count')) {
+if (! \function_exists('snap_get_widget_count')) {
     /**
      * Counts the number of widgets for a given sidebar ID.
      *
@@ -160,7 +160,7 @@ if (! function_exists('snap_get_widget_count')) {
     }
 }
 
-if (! function_exists('snap_get_user_role')) {
+if (! \function_exists('snap_get_user_role')) {
     /**
      * Returns the translated role of the current user or for a given user object.
      *
@@ -174,7 +174,7 @@ if (! function_exists('snap_get_user_role')) {
     }
 }
 
-if (! function_exists('snap_debug_hook')) {
+if (! \function_exists('snap_debug_hook')) {
     /**
      * Lists debug info about all callbacks for a given hook.
      *
@@ -190,7 +190,7 @@ if (! function_exists('snap_debug_hook')) {
     }
 }
 
-if (! function_exists('snap_get_top_parent_page_id')) {
+if (! \function_exists('snap_get_top_parent_page_id')) {
     /**
      * Get value of top level hierarchical post ID.
      *
@@ -206,7 +206,7 @@ if (! function_exists('snap_get_top_parent_page_id')) {
     }
 }
 
-if (! function_exists('snap_get_page_depth')) {
+if (! \function_exists('snap_get_page_depth')) {
     /**
      * Get current page depth.
      *
@@ -232,7 +232,7 @@ if (! function_exists('snap_get_page_depth')) {
  * *********************************************************************************************************************
  */
 
-if (! function_exists('snap_get_image_sizes')) {
+if (! \function_exists('snap_get_image_sizes')) {
     /**
      * Get size information for all currently registered image sizes.
      *
@@ -246,7 +246,7 @@ if (! function_exists('snap_get_image_sizes')) {
     }
 }
 
-if (! function_exists('snap_get_image_size')) {
+if (! \function_exists('snap_get_image_size')) {
     /**
      * Get size information for a specific image size.
      *
@@ -260,7 +260,7 @@ if (! function_exists('snap_get_image_size')) {
     }
 }
 
-if (! function_exists('snap_get_image_width')) {
+if (! \function_exists('snap_get_image_width')) {
     /**
      * Get the px width of a specific image size.
      *
@@ -276,7 +276,7 @@ if (! function_exists('snap_get_image_width')) {
     }
 }
 
-if (! function_exists('snap_get_image_height')) {
+if (! \function_exists('snap_get_image_height')) {
     /**
      * Get the px height of a specific image size.
      *

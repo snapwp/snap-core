@@ -30,7 +30,7 @@ class Cleanup extends Hookable
         'load-plugin-editor.php' => 'restrict_access',
         'admin_bar_menu' => [
             99 => 'clean_adminbar',
-        ]
+        ],
     ];
 
     /**
@@ -64,9 +64,12 @@ class Cleanup extends Hookable
             wp_dequeue_style('admin-bar');
 
             // ... and print to footer.
-            $this->add_action('wp_footer', function () {
-                wp_enqueue_style('admin-bar');
-            });
+            $this->add_action(
+                'wp_footer',
+                function () {
+                    wp_enqueue_style('admin-bar');
+                }
+            );
         }
     }
 
@@ -120,7 +123,7 @@ class Cleanup extends Hookable
      */
     public function clean_asset_tags($tag)
     {
-        preg_match_all("!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $tag, $matches);
+        \preg_match_all("!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $tag, $matches);
        
         if (empty($matches[2])) {
             return $tag;

@@ -85,7 +85,7 @@ class Router
             } else {
                 $callback();
                 // As this is a nested group, remove this level's middleware.
-                $this->middleware = array_diff($this->middleware, $this->last_middleware);
+                $this->middleware = \array_diff($this->middleware, $this->last_middleware);
 
                 $this->last_middleware = [];
             }
@@ -104,7 +104,7 @@ class Router
      */
     public function is($result)
     {
-        if (is_callable($result)) {
+        if (\is_callable($result)) {
             $result = $result();
         }
 
@@ -125,7 +125,7 @@ class Router
      */
     public function is_not($result)
     {
-        if (is_callable($result)) {
+        if (\is_callable($result)) {
             $result = $result();
         }
 
@@ -168,16 +168,16 @@ class Router
      */
     public function using($stack = [])
     {
-        if (! is_array($stack)) {
+        if (! \is_array($stack)) {
             $stack = [ $stack ];
         }
 
         foreach ($stack as $callback) {
-            $parts = explode('|', $callback);
+            $parts = \explode('|', $callback);
             $args = [];
 
-            if (count($parts) === 2) {
-                $args = explode(',', $parts[1]);
+            if (\count($parts) === 2) {
+                $args = \explode(',', $parts[1]);
             }
 
             $action = $this->get_middleware_action($parts[0]);
@@ -280,7 +280,7 @@ class Router
         global $wp_query;
 
         // call method on WP_Query.
-        if (is_callable([ $wp_query, $name ])) {
+        if (\is_callable([ $wp_query, $name ])) {
             if ($this->can_proceed() && $wp_query->{$name}($arguments) === false) {
                 $this->shortcircuit = true;
             }
@@ -288,7 +288,7 @@ class Router
             return $this;
         }
 
-        if (function_exists($name)) {
+        if (\function_exists($name)) {
             if ($this->can_proceed() && $name($arguments) !== true) {
                 $this->shortcircuit = true;
             }

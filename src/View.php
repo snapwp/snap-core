@@ -27,7 +27,7 @@ class View
     public function render($slug, $name = '')
     {
         // When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any partials (such as the page <head>).
-        ob_end_flush();
+        \ob_end_flush();
 
         if ($this->current_view !== null) {
             throw new Exception('Views should not be nested');
@@ -46,7 +46,7 @@ class View
      * @param  string $slug     The slug for the generic template.
      * @param  string $name     Optional. The name of the specialised template.
      * @param  mixed  $data     Optional. Additional data to pass to a partial. Available in the partial as $data. Useful for PHP loops.
-     *                          It is important to note that nothing is done to destroy/restore the current wordpress loop.
+     *                          It is important to note that nothing is done to destroy/restore the current WordPress loop.
      * @param  bool   $extract  Optional. Whether to extract() $data or not.
      */
     public function partial($slug, $name = '', $data = null, $extract = false)
@@ -54,8 +54,8 @@ class View
         $file_name = locate_template('templates/partials/' . $this->get_template_name($slug, $name));
 
         if ($data !== null) {
-            if (is_array($data) && $extract === true) {
-                extract($data);
+            if (\is_array($data) && $extract === true) {
+                \extract($data);
             }
         } else {
             unset($data, $extract);
@@ -98,10 +98,10 @@ class View
                 $wp_query->the_post();
 
                 // Work out what partial to render.
-                if (is_array($partial_overrides) && isset($partial_overrides[ $count ])) {
+                if (\is_array($partial_overrides) && isset($partial_overrides[ $count ])) {
                     // An override is present, so load that instead.
                     $this->partial($partial_overrides[ $count ]);
-                } elseif (is_array($partial_overrides)
+                } elseif (\is_array($partial_overrides)
                     && isset($partial_overrides['alternate'])
                     && $count % 2 !== 0
                 ) {
@@ -129,7 +129,7 @@ class View
         $pagination = Snap::services()->resolve(
             Pagination::class,
             [
-                'args' => $args
+                'args' => $args,
             ]
         );
 
@@ -164,7 +164,7 @@ class View
     private function get_template_name($slug, $name = '')
     {
         $name = (string) $name;
-        $slug = str_replace([ 'templates/views/', '.php' ], '', $slug);
+        $slug = \str_replace([ 'templates/views/', '.php' ], '', $slug);
 
         $template = "{$slug}.php";
 

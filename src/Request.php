@@ -173,12 +173,12 @@ class Request
      */
     public function get_path_segments()
     {
-        return array_filter(explode('/', $this->path));
+        return \array_filter(\explode('/', $this->path));
     }
 
     public function is_method($method)
     {
-        return strtoupper($method) === $this->get_method();
+        return \strtoupper($method) === $this->get_method();
     }
 
     public function request($key, $default = null)
@@ -210,7 +210,7 @@ class Request
             $this->request = new Bag($this->query->to_array());
         } else {
             $this->request = new Bag(
-                array_merge($this->query->to_array(), $this->post->to_array())
+                \array_merge($this->query->to_array(), $this->post->to_array())
             );
         }
     }
@@ -236,7 +236,7 @@ class Request
 
         $this->url = Utils::get_current_url();
 
-        $this->path = rtrim(parse_url($this->url, PHP_URL_PATH), '/');
+        $this->path = \rtrim(\parse_url($this->url, PHP_URL_PATH), '/');
     }
 
     private function populate_server()
@@ -245,8 +245,8 @@ class Request
             'REQUEST_METHOD' => [
                 'filter'  => FILTER_CALLBACK,
                 'options' => function ($method) {
-                    return strtoupper(filter_var($method, FILTER_SANITIZE_STRING));
-                }
+                    return \strtoupper(\filter_var($method, FILTER_SANITIZE_STRING));
+                },
             ],
             'QUERY_STRING'    => FILTER_UNSAFE_RAW,
             'REMOTE_ADDR'     => FILTER_VALIDATE_IP,
@@ -254,10 +254,10 @@ class Request
             'SERVER_NAME'     => FILTER_SANITIZE_STRING,
             'HTTP_HOST'       => FILTER_SANITIZE_URL,
             'HTTP_REFERER'    => FILTER_SANITIZE_URL,
-            'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING
+            'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING,
         ];
 
-        $server = filter_input_array(INPUT_SERVER, $definition);
+        $server = \filter_input_array(INPUT_SERVER, $definition);
 
         $this->server = new Bag($server);
     }

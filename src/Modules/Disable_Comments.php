@@ -22,9 +22,9 @@ class Disable_Comments extends Hookable
             20 => '__return_empty_array',
         ],
         'comments_open' => [
-            20 => '__return_false'
+            20 => '__return_false',
         ],
-        'pre_option_default_pingback_flag' => '__return_zero'
+        'pre_option_default_pingback_flag' => '__return_zero',
     ];
 
     /**
@@ -40,11 +40,11 @@ class Disable_Comments extends Hookable
         'wp_dashboard_setup' => 'remove_comments_dashboard_widget',
         'admin_menu' => 'remove_comments_access',
         'template_redirect' => [
-            9 => 'remove_comments_stop_bots'
+            9 => 'remove_comments_stop_bots',
         ],
         'add_meta_boxes' => [
-            9999 => 'remove_comments_meta_boxes'
-        ]
+            9999 => 'remove_comments_meta_boxes',
+        ],
     ];
 
     /**

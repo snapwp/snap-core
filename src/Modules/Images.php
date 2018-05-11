@@ -59,7 +59,7 @@ class Images extends Hookable
      */
     protected $filters = [
         'post_thumbnail_html' => 'placeholder_image_fallback',
-        'wp_editor_set_quality' => 'get_upload_quality'
+        'wp_editor_set_quality' => 'get_upload_quality',
     ];
 
     /**
@@ -116,7 +116,7 @@ class Images extends Hookable
     public function enable_custom_image_sizes($sizes)
     {
         // Merge custom sizes into $sizes.
-        $sizes = array_merge($sizes, self::$size_dropdown_names);
+        $sizes = \array_merge($sizes, self::$size_dropdown_names);
 
         // Ensure 'Full size' is always at end.
         unset($sizes['full']);
@@ -137,7 +137,7 @@ class Images extends Hookable
      */
     public function get_upload_quality($quality)
     {
-        if (is_numeric(Snap::config('images.default_image_quality'))) {
+        if (\is_numeric(Snap::config('images.default_image_quality'))) {
             return (int) Snap::config('images.default_image_quality');
         }
         return $quality;
@@ -153,7 +153,7 @@ class Images extends Hookable
      */
     public function remove_default_image_sizes($sizes = [])
     {
-        return array_diff($sizes, self::DEFAULT_IMAGE_SIZES);
+        return \array_diff($sizes, self::DEFAULT_IMAGE_SIZES);
     }
 
     /**
@@ -233,12 +233,12 @@ class Images extends Hookable
         }
 
         if ($placeholder_url !== false) {
-            $html = sprintf(
+            $html = \sprintf(
                 '<img src="%s" alt="%s" width="%d" height="%d" %s>',
                 $placeholder_url,
                 get_the_title($post_id),
-                is_array($original_size) ? $original_size[0] : Utils::get_image_width($size),
-                is_array($original_size) ? $original_size[1] : Utils::get_image_height($size),
+                \is_array($original_size) ? $original_size[0] : Utils::get_image_width($size),
+                \is_array($original_size) ? $original_size[1] : Utils::get_image_height($size),
                 $this->parse_attributes($attr)
             );
 
@@ -272,7 +272,7 @@ class Images extends Hookable
             // check if the file exists
             $file_path = $this->placeholder_directory . $file_name . $ext;
             
-            if (file_exists($file_path) === true) {
+            if (\file_exists($file_path) === true) {
                 $placeholder_url = $this->placeholder_directory_uri . $file_name . $ext;
                 break;
             }
@@ -297,11 +297,11 @@ class Images extends Hookable
             $html = '';
 
             foreach ($attr as $key => $value) {
-                $html .= sprintf('%s="%s" ', $key, esc_attr($value));
+                $html .= \sprintf('%s="%s" ', $key, esc_attr($value));
             }
         }
 
-        return trim($html);
+        return \trim($html);
     }
 
     /**
@@ -316,7 +316,7 @@ class Images extends Hookable
         $enabled_thumbails = Snap::config('images.supports_featured_images');
 
         if (! empty($enabled_thumbails)) {
-            if (is_array($enabled_thumbails)) {
+            if (\is_array($enabled_thumbails)) {
                 add_theme_support('post-thumbnails', $enabled_thumbails);
             } elseif ($enabled_thumbails === true) {
                 add_theme_support('post-thumbnails');
@@ -344,7 +344,7 @@ class Images extends Hookable
             $height = (int) isset($size_info[1]) ? $size_info[1] : 0;
             $crop = isset($size_info[2]) ? $size_info[2] : false;
 
-            if (in_array($name, self::DEFAULT_IMAGE_SIZES)) {
+            if (\in_array($name, self::DEFAULT_IMAGE_SIZES)) {
                 if ($size_info !== false) {
                     // Set other built-in sizes.
                     update_option($name . '_size_w', $width);
@@ -352,7 +352,7 @@ class Images extends Hookable
                     update_option($name . '_crop', $crop);
                 } else {
                     $callback = function ($sizes = []) use ($name) {
-                        return array_diff($sizes, [ $name ]);
+                        return \array_diff($sizes, [ $name ]);
                     };
 
                     // Remove the size.

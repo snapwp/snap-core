@@ -51,41 +51,41 @@ class Admin extends Hookable
             'application/msword' => [
                 __('Word Docs', 'snap'),
                 __('Manage Word Docs', 'snap'),
-                _n_noop('Word Doc <span class="count">(%s)</span>', 'Word Docs <span class="count">(%s)</span>')
+                _n_noop('Word Doc <span class="count">(%s)</span>', 'Word Docs <span class="count">(%s)</span>'),
             ],
             'application/vnd.ms-excel' => [
                 __('Excel Docs', 'snap'),
                 __('Manage Excel Docs', 'snap'),
-                _n_noop('Excel Doc <span class="count">(%s)</span>', 'Excel Docs <span class="count">(%s)</span>')
+                _n_noop('Excel Doc <span class="count">(%s)</span>', 'Excel Docs <span class="count">(%s)</span>'),
             ],
             'application/pdf' => [
                 __('PDFs', 'snap'),
                 __('Manage PDFs', 'snap'),
-                _n_noop('PDF <span class="count">(%s)</span>', 'PDFs <span class="count">(%s)</span>')
+                _n_noop('PDF <span class="count">(%s)</span>', 'PDFs <span class="count">(%s)</span>'),
             ],
             'application/zip' => [
                 __('ZIPs', 'snap'),
                 __('Manage ZIPs', 'snap'),
-                _n_noop('ZIP <span class="count">(%s)</span>', 'ZIPs <span class="count">(%s)</span>')
+                _n_noop('ZIP <span class="count">(%s)</span>', 'ZIPs <span class="count">(%s)</span>'),
             ],
             'text/csv' => [
                 __('CSVs', 'snap'),
                 __('Manage CSVs', 'snap'),
-                _n_noop('CSV <span class="count">(%s)</span>', 'CSVs <span class="count">(%s)</span>')
+                _n_noop('CSV <span class="count">(%s)</span>', 'CSVs <span class="count">(%s)</span>'),
             ],
         ];
 
-        return array_merge($post_mime_types, $additional_mime_types);
+        return \array_merge($post_mime_types, $additional_mime_types);
     }
 
     /**
-     * Outputs the 'designed by snap media' footer in wordpress admin.
+     * Outputs the 'designed by snap media' footer in WordPress admin.
      *
      * @since  1.0.0
      */
     public function branding_admin_footer()
     {
-        echo sprintf(
+        echo \sprintf(
             '%s <a href="http://wordpress.org" target="_blank">WordPress</a> %s <a href="%s" target="_blank">SnapWP</a>',
             __('Built using', 'snap'),
             __('and', 'snap'),

@@ -101,12 +101,12 @@ class Hookable
     {
         $callback = $function_to_add;
 
-        if (is_string($function_to_add) && is_callable([ $this, $function_to_add ])) {
+        if (\is_string($function_to_add) && \is_callable([ $this, $function_to_add ])) {
             // Bind the callback to the current child class.
             $callback = [ $this, $function_to_add ];
         }
 
-        if (is_array($tag)) {
+        if (\is_array($tag)) {
             // Add the callback to all provided hooks.
             foreach ($tag as $hook) {
                 add_filter(
@@ -167,11 +167,11 @@ class Hookable
      */
     final public function remove_hook($tag, $function_to_remove, $priority = 10)
     {
-        if (is_string($function_to_remove) && is_callable([ $this, $function_to_remove ])) {
+        if (\is_string($function_to_remove) && \is_callable([ $this, $function_to_remove ])) {
             $function_to_remove = [ $this, $function_to_remove ];
         }
 
-        if (is_array($tag)) {
+        if (\is_array($tag)) {
             foreach ($tag as $hook) {
                 remove_filter($hook, $function_to_remove, $priority);
             }
@@ -190,14 +190,14 @@ class Hookable
     final private function add_hooks($hooks)
     {
         foreach ($hooks as $tag => $filter) {
-            if (is_string($filter)) {
+            if (\is_string($filter)) {
                 $this->add_filter($tag, $filter);
             } else {
                 foreach ($filter as $priority => $callbacks) {
-                    if (is_string($callbacks)) {
+                    if (\is_string($callbacks)) {
                         $this->add_filter($tag, $callbacks, $priority);
                     } else {
-                        $count = count($callbacks);
+                        $count = \count($callbacks);
 
                         for ($i = 0; $i < $count; $i++) {
                             $this->add_filter($tag, $callbacks[ $i ], $priority);
@@ -219,9 +219,9 @@ class Hookable
      */
     final private function get_argument_count($callback, $accepted_args = 1)
     {
-        if (is_string($callback) && is_callable([ $this, $callback ])) {
+        if (\is_string($callback) && \is_callable([ $this, $callback ])) {
             return ( new \ReflectionMethod($this, $callback) )->getNumberOfParameters();
-        } elseif (is_object($callback) && $callback instanceof \Closure) {
+        } elseif (\is_object($callback) && $callback instanceof \Closure) {
             return ( new \ReflectionFunction($callback) )->getNumberOfParameters();
         } else {
             return $accepted_args ? $accepted_args : 1;
@@ -235,7 +235,7 @@ class Hookable
      */
     final private function parse_actions()
     {
-        if (isset($this->actions) && is_array($this->actions) && ! empty($this->actions)) {
+        if (isset($this->actions) && \is_array($this->actions) && ! empty($this->actions)) {
             $this->add_hooks($this->actions);
         }
     }
@@ -247,7 +247,7 @@ class Hookable
      */
     final private function parse_filters()
     {
-        if (isset($this->filters) && is_array($this->filters) && ! empty($this->filters)) {
+        if (isset($this->filters) && \is_array($this->filters) && ! empty($this->filters)) {
             $this->add_hooks($this->filters);
         }
     }

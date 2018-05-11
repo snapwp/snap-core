@@ -26,7 +26,7 @@ class Bag
     // trimm all params
     public function get_numeric($key, $default = null)
     {
-        return filter_var($this->get($key, $default), FILTER_SANITIZE_NUMBER_FLOAT);
+        return \filter_var($this->get($key, $default), FILTER_SANITIZE_NUMBER_FLOAT);
     }
 
     // getInt

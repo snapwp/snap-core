@@ -18,14 +18,14 @@ class Loader
      */
     public static function load_hookable($path)
     {
-        $class_name = str_replace(
+        $class_name = \str_replace(
             ['/', '.php'],
             ['\\', ''],
-            str_replace(get_stylesheet_directory() . '/includes/', 'Theme\\', $path)
+            \str_replace(get_stylesheet_directory() . '/includes/', 'Theme\\', $path)
         );
 
         // If the included class extends the Hookable abstract.
-        if (class_exists($class_name) && is_subclass_of($class_name, Hookable::class)) {
+        if (\class_exists($class_name) && \is_subclass_of($class_name, Hookable::class)) {
             // Boot it up and resolve dependencies.
             Snap::services()->resolve($class_name)->run();
         }
@@ -61,14 +61,17 @@ class Loader
         self::load_child_theme();
 
         // Now all files are loaded, turn on output buffer until a view is dispatched.
-        ob_start();
+        \ob_start();
     }
 
     public static function load_widgets()
     {
-        add_action('widgets_init', function () {
-            register_widget(\Snap\Core\Widgets\Related_Pages::class);
-        });
+        add_action(
+            'widgets_init',
+            function () {
+                register_widget(\Snap\Core\Widgets\Related_Pages::class);
+            }
+        );
     }
 
     /**
@@ -123,9 +126,9 @@ class Loader
         $folder = trailingslashit($folder);
 
         // Check the taret exists.
-        if (is_dir($folder)) {
+        if (\is_dir($folder)) {
             // Scan the directory for files to include.
-            $contents = scandir($folder);
+            $contents = \scandir($folder);
         }
 
         if (! empty($contents)) {
@@ -135,9 +138,9 @@ class Loader
 
                 if ('.' === $file || '..' === $file || 'functions' === $file) {
                     continue;
-                } elseif (pathinfo($path, PATHINFO_EXTENSION) === 'php') {
+                } elseif (\pathinfo($path, PATHINFO_EXTENSION) === 'php') {
                     $files[] = $path;
-                } elseif (is_dir($path)) {
+                } elseif (\is_dir($path)) {
                     // Sub directory, scan this dir as well.
                     $files = self::scandir(trailingslashit($path), $files);
                 }

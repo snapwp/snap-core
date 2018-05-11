@@ -69,17 +69,26 @@ class Snap
         if (! self::$setup) {
             self::$container = new Container();
 
-            self::services()->add(Router::class, function () {
-                return new Router();
-            });
+            self::services()->add(
+                Router::class,
+                function () {
+                    return new Router();
+                }
+            );
 
-            self::services()->add(Request::class, function () {
-                return new Request();
-            });
+            self::services()->add(
+                Request::class,
+                function () {
+                    return new Request();
+                }
+            );
             
-            self::services()->add(View::class, function ($hodl) {
-                return $hodl->resolve(View::class);
-            });
+            self::services()->add(
+                View::class,
+                function ($hodl) {
+                    return $hodl->resolve(View::class);
+                }
+            );
 
             // Boot up the config parser.
             $config = new Config();
@@ -92,9 +101,12 @@ class Snap
             self::services()->addInstance($config);
 
             // Add the assets module to avoid parsing the mix-manifest multiple times
-            self::services()->add(Assets::class, function () {
-                return new Assets();
-            });
+            self::services()->add(
+                Assets::class,
+                function () {
+                    return new Assets();
+                }
+            );
 
             // Add global WP classes
             global $wpdb;

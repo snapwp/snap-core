@@ -14,7 +14,7 @@ class Middleware extends Hookable
 {
 
     protected $filters = [
-        'snap_middleware_is_logged_in' => 'is_logged_in'
+        'snap_middleware_is_logged_in' => 'is_logged_in',
     ];
 
 

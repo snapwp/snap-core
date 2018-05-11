@@ -90,7 +90,7 @@ class Related_Pages extends WP_Widget
         // Populate $pages array.
         $this->get_pages();
 
-        if (count($this->pages) > 0) {
+        if (\count($this->pages) > 0) {
             $title = apply_filters('widget_title', $instance['title']);
      
             echo $args['before_widget'];
@@ -114,14 +114,14 @@ class Related_Pages extends WP_Widget
      */
     public function form($instance)
     {
-        if (isset($instance[ 'title' ])) {
-            $title = $instance[ 'title' ];
+        if (isset($instance['title'])) {
+            $title = $instance['title'];
         } else {
             $title = __('New title', 'wpb_widget_domain');
         }
 
-        if (isset($instance[ 'show_parent' ])) {
-            $show_parent = $instance[ 'show_parent' ];
+        if (isset($instance['show_parent'])) {
+            $show_parent = $instance['show_parent'];
         }
         ?>
             <p>
@@ -147,7 +147,7 @@ class Related_Pages extends WP_Widget
     public function update($new_instance, $old_instance)
     {
         $instance = [];
-        $instance['title'] = ( ! empty($new_instance['title']) ) ? strip_tags($new_instance['title']) : '';
+        $instance['title'] = ( ! empty($new_instance['title']) ) ? \strip_tags($new_instance['title']) : '';
         $instance['show_parent'] = ( ! empty($new_instance['show_parent']) ) ? true : false;
         return $instance;
     }
@@ -202,7 +202,7 @@ class Related_Pages extends WP_Widget
             $link_class = $this->args['link_class'];
         }
 
-        return sprintf(
+        return \sprintf(
             '<li class="%s">%s<a class="%s" href="%s">%s%s%s</a>%s</li>',
             $li_class,
             $this->args['before_link'],
@@ -235,7 +235,7 @@ class Related_Pages extends WP_Widget
             $link_class = $this->args['link_class'];
         }
 
-        return sprintf(
+        return \sprintf(
             '<li class="%s">%s<a class="%s" href="%s">%s%s%s</a>%s</li>',
             $li_class,
             $this->args['before_link'],

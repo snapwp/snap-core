@@ -50,7 +50,7 @@ class Config
             'insert_image_default_size' => 'medium',
             'insert_image_allow_full_size' => true,
         ],
-        'services' => []
+        'services' => [],
     ];
 
     /**
@@ -79,7 +79,7 @@ class Config
     public function get($option, $default = null)
     {
         if ($this->has($option)) {
-            return $this->cache[$option];
+            return $this->cache[ $option ];
         }
 
         return $default;
@@ -96,16 +96,16 @@ class Config
     public function has($key)
     {
         // Check if already cached.
-        if (isset($this->cache[$key])) {
+        if (isset($this->cache[ $key ])) {
             return true;
         }
 
-        $segments = explode('.', $key);
+        $segments = \explode('.', $key);
         $root = $this->config;
 
         foreach ($segments as $segment) {
-            if (array_key_exists($segment, $root)) {
-                $root = $root[$segment];
+            if (\array_key_exists($segment, $root)) {
+                $root = $root[ $segment ];
                 continue;
             } else {
                 return false;
@@ -113,7 +113,7 @@ class Config
         }
 
         // Set cache for the given key.
-        $this->cache[$key] = $root;
+        $this->cache[ $key ] = $root;
 
         return true;
     }
@@ -128,7 +128,7 @@ class Config
      */
     public function set($key, $value)
     {
-        $this->cache[$key] = $value;
+        $this->cache[ $key ] = $value;
     }
 
     /**
@@ -140,8 +140,8 @@ class Config
      */
     private function parse_files($path)
     {
-        if (is_dir($path)) {
-            $files = glob($path . '*.php');
+        if (\is_dir($path)) {
+            $files = \glob($path . '*.php');
         }
 
         if (! empty($files)) {
@@ -150,14 +150,14 @@ class Config
 
                 $optionSet = $this->get_filename($file);
 
-                if (!is_array($parsedOptions)) {
+                if (!\is_array($parsedOptions)) {
                     continue;
                 }
 
-                if (isset($this->config[$optionSet])) {
-                    $this->config[$optionSet] = array_merge($this->config[$optionSet], $parsedOptions);
+                if (isset($this->config[ $optionSet ])) {
+                    $this->config[ $optionSet ] = \array_merge($this->config[ $optionSet ], $parsedOptions);
                 } else {
-                    $this->config[$optionSet] = $parsedOptions;
+                    $this->config[ $optionSet ] = $parsedOptions;
                 }
             }
         }
@@ -173,6 +173,6 @@ class Config
      */
     private function get_filename($path)
     {
-        return str_replace('.php', '', basename($path));
+        return \str_replace('.php', '', \basename($path));
     }
 }
