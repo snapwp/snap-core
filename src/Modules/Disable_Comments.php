@@ -72,7 +72,7 @@ class Disable_Comments extends Hookable
     {
         global $pagenow;
 
-        if ($pagenow == 'comment.php' || $pagenow == 'edit-comments.php' || $pagenow == 'options-discussion.php') {
+        if ($pagenow === 'comment.php' || $pagenow === 'edit-comments.php' || $pagenow === 'options-discussion.php') {
             wp_die(__('Comments are closed.'), '', [ 'response' => 403 ]);
         }
 

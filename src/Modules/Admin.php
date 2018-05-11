@@ -24,6 +24,13 @@ class Admin extends Hookable
         
         // Add snap notice text to admin screens.
         'admin_footer_text' => 'branding_admin_footer',
+
+        // Add custom columns.
+        'manage_pages_columns' => 'register_columns',
+        'manage_posts_columns' => 'register_columns',
+        'manage_edit-page_sortable_columns' => 'register_sortable_columns',
+        'manage_edit-post_sortable_columns' => 'register_sortable_columns',
+        'request' => 'template_column_orderby',
     ];
 
     /**
@@ -35,6 +42,10 @@ class Admin extends Hookable
     protected $actions = [
         // Flush rewrite rules after theme activation - always a good idea!
         'after_switch_theme' => 'flush_rewrite_rules',
+
+        // Output custom column content.
+        'manage_pages_custom_column' => 'populate_columns',
+        'manage_posts_custom_column' => 'populate_columns',
     ];
     
     /**
@@ -79,7 +90,7 @@ class Admin extends Hookable
     }
 
     /**
-     * Outputs the 'designed by snap media' footer in WordPress admin.
+     * Outputs the SnapWP footer in WordPress admin.
      *
      * @since  1.0.0
      */
@@ -101,5 +112,89 @@ class Admin extends Hookable
     public function flush_rewrite_rules()
     {
         flush_rewrite_rules();
+    }
+
+    /**
+     * Add new columns to admin views.
+     *
+     * @since  1.0.0
+     * 
+     * @param array $columns WP_List_Table columns array.
+     * @param array $columns
+     */
+    public function register_columns($columns = []) 
+    {
+        return array_merge(
+            $columns, 
+            [
+                'snap_template' => 'Template'
+            ]
+        );
+    }
+
+    /**
+     * Populate custom columns.
+     *
+     * @since  1.0.0
+     * 
+     * @param string $column Column name.
+     * @param int $post_id The post ID.
+     */
+    public function populate_columns($column, $post_id) 
+    {
+        $page_templates = \array_flip(get_page_templates());
+
+        switch ($column) {
+            case 'snap_template' :
+                $template = get_page_template_slug($post_id);
+                echo isset($page_templates[$template]) ? $page_templates[$template] : '—';
+            break;
+        }
+    }
+
+    /**
+     * Register which custom columns are sortable.
+     *
+     * @since  1.0.0
+     * 
+     * @param  array $columns Current WP_List_Table columns.
+     * @return array
+     */
+    public function register_sortable_columns($columns) 
+    {
+        $columns['snap_template'] = 'snap_template';
+        return $columns;
+    }
+
+    /**
+     * Define custom orderby rules for custom sortable columns.
+     *
+     * @since  1.0.0
+     * 
+     * @param  array $vars Request query vars before being passed to the global WP_Query, and into pre_get_posts.
+     * @return array
+     */
+    public function template_column_orderby($vars) {
+        if (is_admin() && isset($vars['orderby']) && 'snap_template' === $vars['orderby']) {
+            $vars = array_merge(
+                $vars, 
+                [
+                    'orderby' => 'not_exists_clause title',
+                    'meta_query' => [
+                        'relation' => 'OR',
+                        'exists_clause' => [ 
+                            'key' => '_wp_page_template',
+                            'compare' => 'EXISTS'           
+                        ],
+                        'not_exists_clause' => [ 
+                            'key' => '_wp_page_template',
+                            'compare' => 'NOT EXISTS'           
+                        ]
+                    ]
+                ] 
+            );
+        }
+
+        return $vars;
     }
 }

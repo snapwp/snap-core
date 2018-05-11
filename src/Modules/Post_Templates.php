@@ -64,7 +64,7 @@ class Post_Templates extends Hookable
             foreach ($templates as $tpl) {
                 $full_path = $path.$tpl;
 
-                if ($tpl == '.' || $tpl == '..' || \is_dir($full_path) || $tpl == '_example.php') {
+                if ($tpl === '.' || $tpl === '..' || \is_dir($full_path) || $tpl === '_example.php') {
                     continue;
                 }
 
