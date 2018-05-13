@@ -279,8 +279,8 @@ class Router
     {
         global $wp_query;
 
-        // call method on WP_Query.
-        if (\is_callable([ $wp_query, $name ])) {
+        // WP_Query also uses call, which can lead to unwanted negatives.
+        if (\is_callable([ $wp_query, $name ]) && \method_exists($wp_query, $name)) {
             if ($this->can_proceed() && $wp_query->{$name}($arguments) === false) {
                 $this->shortcircuit = true;
             }
