@@ -64,7 +64,7 @@ class Assets extends Hookable
 
         // there was no manifest or no file present
         if ($this->manifest === null || ! isset($this->manifest[ $file ])) {
-            return $file;
+            return get_stylesheet_directory_uri() . $file;
         }
 
         return get_stylesheet_directory_uri() . $this->manifest[ $file ];
