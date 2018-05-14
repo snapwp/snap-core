@@ -266,6 +266,46 @@ class Router
     }
 
     /**
+     * Dispatch a controller action.
+     *
+     * The dispatched action and the controller class are autowired.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string $controller The controller name followed by the action, seperated by an @. eg. MyController@MyAction
+     *                            If no action is supplied, then 'index' is presumed.
+     */
+    public function dispatch($controller)
+    {
+        if ($this->can_proceed()) {
+            // As this is the correct route, apply middleware stack.
+            $this->apply_middleware();
+
+            // Passed all middleware.
+            if ($this->can_proceed()) {
+                list($class, $action) = explode('@', $controller); 
+
+                if ($action === null) {
+                    $action = 'index';
+                }
+
+                $fqn = '\\Theme\\Controllers\\' . $class;
+
+                if (class_exists($fqn)) {
+                    Snap::services()->resolveMethod(
+                        Snap::services()->resolve($fqn), 
+                        $action
+                    );
+                } else {
+                    throw new \Exception("The controller $fqn could not be found.");
+                }
+
+                $this->has_matched_route = true;
+            }
+        }
+    }
+
+    /**
      * Magic method to wrap any undefined routes to the global WP_Query.
      *
      * @since  1.0.0
