@@ -21,7 +21,7 @@ class Loader
         $class_name = \str_replace(
             ['/', '.php'],
             ['\\', ''],
-            \str_replace(get_stylesheet_directory() . '/includes/', 'Theme\\', $path)
+            \str_replace(get_stylesheet_directory() . '/theme/', 'Theme\\', $path)
         );
 
         // If the included class extends the Hookable abstract.
@@ -84,7 +84,7 @@ class Loader
     private static function load_child_theme()
     {
         // Path to child theme includes folder.
-        $child_directory = get_stylesheet_directory() . '/includes/';
+        $child_directory = get_stylesheet_directory() . '/theme/';
 
         /**
          * Allow the child_includes to be modified before inclusion.
@@ -99,14 +99,6 @@ class Loader
         if (! empty($child_includes)) {
             foreach ($child_includes as $file) {
                 self::load_hookable($file);
-            }
-        }
-
-        $child_functions = self::scandir($child_directory . 'functions/');
-
-        if (! empty($child_functions)) {
-            foreach ($child_functions as $file) {
-                include($file);
             }
         }
     }
@@ -136,7 +128,7 @@ class Loader
             foreach ($contents as $file) {
                 $path = $folder . $file;
 
-                if ('.' === $file || '..' === $file || 'functions' === $file) {
+                if ('.' === $file || '..' === $file) {
                     continue;
                 } elseif (\pathinfo($path, PATHINFO_EXTENSION) === 'php') {
                     $files[] = $path;
