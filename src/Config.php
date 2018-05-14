@@ -15,7 +15,7 @@ class Config
      * @since  1.0.0
      * @var string
      */
-    private $paths = '';
+    private $paths = [];
 
     /**
      * When a config item is accessed via dot notation, it is stored here for easier retrieval.
