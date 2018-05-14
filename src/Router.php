@@ -258,8 +258,7 @@ class Router
 
                 do_action("snap_render_view_{$view}", Snap::request());
                 
-                // snap_render_view($slug, $name);
-                Snap::services()->get(View::class)->Render($slug, $name);
+                Snap::view()->render($slug, $name);
 
                 $this->has_matched_route = true;
             }
