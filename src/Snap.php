@@ -27,7 +27,7 @@ class Snap
      * @since 1.0.0
      * @var Hodl\Container|null
      */
-    static $container = null;
+    private static $container = null;
 
     /**
      * Whether Snap has been setup yet.
@@ -35,7 +35,7 @@ class Snap
      * @since 1.0.0
      * @var boolean
      */
-    static $setup = false;
+    private static $setup = false;
 
     /**
      * This class never needs to be instantiated.

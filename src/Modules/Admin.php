@@ -53,8 +53,8 @@ class Admin extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  array $post_mime_types The current list of mime types
-     * @return array                  The original list with our additional types
+     * @param  array $post_mime_types The current list of mime types.
+     * @return array The original list with our additional types.
      */
     public function additional_mime_types($post_mime_types)
     {
@@ -118,16 +118,16 @@ class Admin extends Hookable
      * Add new columns to admin views.
      *
      * @since  1.0.0
-     * 
-     * @param array $columns WP_List_Table columns array.
-     * @param array $columns
+     *
+     * @param  array $columns WP_List_Table columns array.
+     * @return array $columns
      */
-    public function register_columns($columns = []) 
+    public function register_columns($columns = [])
     {
-        return array_merge(
-            $columns, 
+        return \array_merge(
+            $columns,
             [
-                'snap_template' => 'Template'
+                'snap_template' => 'Template',
             ]
         );
     }
@@ -136,19 +136,19 @@ class Admin extends Hookable
      * Populate custom columns.
      *
      * @since  1.0.0
-     * 
+     *
      * @param string $column Column name.
-     * @param int $post_id The post ID.
+     * @param int    $post_id The post ID.
      */
-    public function populate_columns($column, $post_id) 
+    public function populate_columns($column, $post_id)
     {
         $page_templates = \array_flip(get_page_templates());
 
         switch ($column) {
-            case 'snap_template' :
+            case 'snap_template':
                 $template = get_page_template_slug($post_id);
-                echo isset($page_templates[$template]) ? $page_templates[$template] : '—';
-            break;
+                echo isset($page_templates[ $template ]) ? $page_templates[ $template ] : '—';
+                break;
         }
     }
 
@@ -156,11 +156,11 @@ class Admin extends Hookable
      * Register which custom columns are sortable.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  array $columns Current WP_List_Table columns.
      * @return array
      */
-    public function register_sortable_columns($columns) 
+    public function register_sortable_columns($columns)
     {
         $columns['snap_template'] = 'snap_template';
         return $columns;
@@ -170,28 +170,29 @@ class Admin extends Hookable
      * Define custom orderby rules for custom sortable columns.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  array $vars Request query vars before being passed to the global WP_Query, and into pre_get_posts.
      * @return array
      */
-    public function template_column_orderby($vars) {
+    public function template_column_orderby($vars)
+    {
         if (is_admin() && isset($vars['orderby']) && 'snap_template' === $vars['orderby']) {
-            $vars = array_merge(
-                $vars, 
+            $vars = \array_merge(
+                $vars,
                 [
                     'orderby' => 'not_exists_clause title',
                     'meta_query' => [
                         'relation' => 'OR',
-                        'exists_clause' => [ 
+                        'exists_clause' => [
                             'key' => '_wp_page_template',
-                            'compare' => 'EXISTS'           
+                            'compare' => 'EXISTS',
                         ],
-                        'not_exists_clause' => [ 
+                        'not_exists_clause' => [
                             'key' => '_wp_page_template',
-                            'compare' => 'NOT EXISTS'           
-                        ]
-                    ]
-                ] 
+                            'compare' => 'NOT EXISTS',
+                        ],
+                    ],
+                ]
             );
         }
 

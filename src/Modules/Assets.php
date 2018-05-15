@@ -13,7 +13,7 @@ use Snap\Core\Snap;
 class Assets extends Hookable
 {
     /**
-     * mix-manifest.json contents stored as array.
+     * Mix-manifest.json contents stored as array.
      *
      * @since 1.0.0
      * @var array|null
@@ -54,7 +54,7 @@ class Assets extends Hookable
      * @since  1.0.0
      *
      * @param  string $file The asset file to look for.
-     * @return string       The (possibly versioned) asset URL.
+     * @return string The (possibly versioned) asset URL.
      */
     public function get_asset_url($file)
     {
@@ -62,7 +62,7 @@ class Assets extends Hookable
             $this->parse_manifest();
         }
 
-        // there was no manifest or no file present
+        // There was no manifest or no file present.
         if ($this->manifest === null || ! isset($this->manifest[ $file ])) {
             return get_stylesheet_directory_uri() . $file;
         }

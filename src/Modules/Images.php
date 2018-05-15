@@ -111,7 +111,7 @@ class Images extends Hookable
      * @since  1.0.0
      *
      * @param  array $sizes Current sizes for inclusion.
-     * @return array        Altered $sizes
+     * @return array Altered $sizes
      */
     public function enable_custom_image_sizes($sizes)
     {
@@ -133,7 +133,8 @@ class Images extends Hookable
      *
      * @since  1.0.0
      *
-     * @return  int A number between 0-100.
+     * @param  int $quality Existing value.
+     * @return int A number between 0-100.
      */
     public function get_upload_quality($quality)
     {
@@ -149,7 +150,7 @@ class Images extends Hookable
      * @since  1.0.0
      *
      * @param  array $sizes Current registered sizes.
-     * @return array        Modified $sizes array.
+     * @return array Modified $sizes array.
      */
     public function remove_default_image_sizes($sizes = [])
     {
@@ -182,7 +183,7 @@ class Images extends Hookable
      * @param  string|array $size              The post thumbnail size. Image size or array of width and height
      *                                         values (in that order). Default 'post-thumbnail'.
      * @param  string       $attr              Query string of attributes.
-     * @return string                          The image HTML
+     * @return string The image HTML
      */
     public function placeholder_image_fallback($html, $post_id, $post_thumbnail_id, $size, $attr)
     {
@@ -202,13 +203,12 @@ class Images extends Hookable
      *
      * @since 1.0.0
      *
-     * @param  string       $html              The post thumbnail HTML.
      * @param  int          $post_id           The post ID.
      * @param  string       $post_thumbnail_id The post thumbnail ID.
      * @param  string|array $size              The post thumbnail size. Image size or array of width and height
      *                                         values (in that order). Default 'post-thumbnail'.
      * @param  string       $attr              Query string of attributes.
-     * @return string                          The image HTML
+     * @return string The image HTML
      */
     public function get_placeholder_image($post_id, $post_thumbnail_id, $size, $attr = [])
     {
@@ -219,16 +219,16 @@ class Images extends Hookable
             $size = 'full';
         }
 
-        // Search for a size specific placeholder first
+        // Search for a size specific placeholder first.
         $placeholder_url = $this->search_for_placeholder('placeholder-' . $size);
 
         if ($placeholder_url === false) {
-            // Then the post type placeholder
+            // Then the post type placeholder.
             $placeholder_url = $this->search_for_placeholder('placeholder-' . get_post_type($post_id));
         }
 
         if ($placeholder_url === false) {
-            // Finally a generic placeholder
+            // Finally a generic placeholder.
             $placeholder_url = $this->search_for_placeholder('placeholder');
         }
 
@@ -262,14 +262,14 @@ class Images extends Hookable
      * @since  1.0.0
      *
      * @param  string $file_name The placeholder to look for, minus extension.
-     * @return string|bool       false if not found, otherwise the public URI to the found placeholder.
+     * @return string|bool false if not found, otherwise the public URI to the found placeholder.
      */
     private function search_for_placeholder($file_name)
     {
         $placeholder_url = false;
 
         foreach ($this->placeholder_extensions as $ext) {
-            // check if the file exists
+            // Check if the file exists.
             $file_path = $this->placeholder_directory . $file_name . $ext;
             
             if (\file_exists($file_path) === true) {
@@ -286,7 +286,7 @@ class Images extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  array $attr  The $attr array.
+     * @param  array $attr The $attr array.
      * @return string
      */
     private function parse_attributes($attr)

@@ -2,10 +2,15 @@
 
 namespace Snap\Core;
 
-use Exception;
+use Snap\Core\Exceptions\TemplatingException;
 use Snap\Core\Modules\Pagination;
 use Snap\Core\Modules\Related_Pages;
 
+/**
+ * The basic view class for snap.
+ *
+ * Renders templates and provides handy methods to reduce repeating common template tasks.
+ */
 class View
 {
     /**
@@ -20,38 +25,57 @@ class View
      * Renders a view.
      *
      * @since  1.0.0
+     * 
+     * @throws TemplatingException If no template found.
+     * @throws TemplatingException If views are nested.
      *
      * @param  string $slug The slug for the generic template.
      * @param  string $name Optional. The name of the specialised template.
      */
     public function render($slug, $name = '')
     {
-        // When Snap first boots up, it starts the output buffer. Now we have a matched view, we can flush any partials (such as the page <head>).
+        /*
+         * When Snap first boots up, it starts the output buffer.
+         * Now we have a matched view, we can flush any partials (such as the page <head>).
+         */
         \ob_end_flush();
 
         if ($this->current_view !== null) {
-            throw new Exception('Views should not be nested');
+            throw new TemplatingException('Views should not be nested');
         }
 
         $this->current_view = $this->get_template_name($slug, $name);
 
-        require(locate_template('templates/views/' . $this->current_view));
+        $path = locate_template('templates/views/' . $this->current_view);
+
+        if ($path === '') {
+            throw new TemplatingException('Could not find view: ' . $this->current_view);
+        }
+
+        require($path);
     }
 
     /**
      * Fetch and display a template partial.
      *
      * @since  1.0.0
+     * 
+     * @throws TemplatingException If no partial template found.
      *
      * @param  string $slug     The slug for the generic template.
      * @param  string $name     Optional. The name of the specialised template.
-     * @param  mixed  $data     Optional. Additional data to pass to a partial. Available in the partial as $data. Useful for PHP loops.
-     *                          It is important to note that nothing is done to destroy/restore the current WordPress loop.
+     * @param  mixed  $data     Optional. Additional data to pass to a partial. Available in the partial as $data.
+     *                          It is important to note that nothing is done to destroy/restore the current loop.
      * @param  bool   $extract  Optional. Whether to extract() $data or not.
      */
     public function partial($slug, $name = '', $data = null, $extract = false)
     {
-        $file_name = locate_template('templates/partials/' . $this->get_template_name($slug, $name));
+        $partial_template_name = $this->get_template_name($slug, $name);
+        $file_name = locate_template('templates/partials/' . $partial_template_name);
+
+        if ($file_name === '') {
+            throw new TemplatingException('Could not find partial: ' . $partial_template_name);
+        }
 
         if ($data !== null) {
             if (\is_array($data) && $extract === true) {
@@ -61,9 +85,7 @@ class View
             unset($data, $extract);
         }
 
-        if (! empty($file_name)) {
-            require($file_name);
-        }
+        require($file_name);
     }
 
     /**
@@ -74,12 +96,15 @@ class View
      *
      * @since 1.0.0
      *
-     * @param  string   $partial   Optional. The partial name to render for each post.
-     *                            If null, then defaults to post-type/{post type}.php.
-     * @param  array    $partial   Optional. An array of overrides.
-     *                            Keys are the iteration index to apply the override, and values are the partial to load instead of $partial.
-     *                            There is also a special key 'alternate' which will load the value on every odd iteration.
-     * @param  WP_Query $wp_query Optional. An optional custom WP_Query to loop through. Defaults to the global WP_Query instance.
+     * @param string   $partial           Optional. The partial name to render for each post.
+     *                                    If null, then defaults to post-type/{post type}.php.
+     * @param array    $partial_overrides Optional. An array of overrides.
+     *                                    Keys = iteration to apply the override to
+     *                                    values = the partial to load instead of $partial.
+     *                                    There is also a special key 'alternate', which will load the value on every
+     *                                    other iteration.
+     * @param WP_Query $wp_query          Optional. An optional custom WP_Query to loop through. 
+     *                                    Defaults to the global WP_Query instance.
      */
     public function loop($partial = null, $partial_overrides = null, $wp_query = null)
     {
@@ -124,6 +149,16 @@ class View
         wp_reset_postdata();
     }
 
+    /**
+     * Wrapper for outputting Pagination.
+     *
+     * @since 1.0.0
+     * @see \Snap\Core\Modules\Pagination
+     * 
+     * @param  array $args Args to pass to the Pagination instance.
+     * @return bool|string If $args['echo'] then return true/false if the render is successfull,
+     *                     else return the pagination HTML.
+     */
     public function pagination($args = [])
     {
         $pagination = Snap::services()->resolve(

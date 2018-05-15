@@ -90,8 +90,8 @@ class Config
      *
      * @since 1.0.0
      *
-     * @param  string $option The dot notation option key to look for
-     * @return boolean         Whether an option exists for the given key.
+     * @param  string $key The dot notation option key to look for.
+     * @return boolean Whether an option exists for the given key.
      */
     public function has($key)
     {
@@ -146,18 +146,18 @@ class Config
 
         if (! empty($files)) {
             foreach ($files as $file) {
-                $parsedOptions = require $file;
+                $parsed_options = require $file;
 
-                $optionSet = $this->get_filename($file);
+                $option_set = $this->get_filename($file);
 
-                if (!\is_array($parsedOptions)) {
+                if (!\is_array($parsed_options)) {
                     continue;
                 }
 
-                if (isset($this->config[ $optionSet ])) {
-                    $this->config[ $optionSet ] = \array_merge($this->config[ $optionSet ], $parsedOptions);
+                if (isset($this->config[ $option_set ])) {
+                    $this->config[ $option_set ] = \array_merge($this->config[ $option_set ], $parsed_options);
                 } else {
-                    $this->config[ $optionSet ] = $parsedOptions;
+                    $this->config[ $option_set ] = $parsed_options;
                 }
             }
         }

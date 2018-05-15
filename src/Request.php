@@ -136,7 +136,7 @@ class Request
     public function redirect_to_admin($path = null, $status = 302)
     {
         self::redirect(admin_url($path), $status);
-    }    
+    }
 
     /**
      * Redirects the user to the current login URL.
@@ -148,7 +148,7 @@ class Request
      * @param string $redirect_after The URL the user should be sent to after the login screen. Defaults to current URL.
      * @param int    $status Optional. The HTTP status to send when redirecting. Default 302.
      */
-    public function redirect_to_login($redirect_after = null,  $status = 302)
+    public function redirect_to_login($redirect_after = null, $status = 302)
     {
         if ($redirect_after === null) {
             $redirect_after = Utils::get_current_url();
@@ -200,8 +200,8 @@ class Request
      * Checks if the current request matches the supplied HTTP method.
      *
      * @since  1.0.0
-     * 
-     * @param  string  $method HTTP method to check against. Case insensitive.
+     *
+     * @param  string $method HTTP method to check against. Case insensitive.
      * @return boolean
      */
     public function is_method($method)
@@ -285,7 +285,7 @@ class Request
 
     /**
      * Creates and fills the query bag with $_GET parameters.
-     * 
+     *
      * @since 1.0.0
      */
     private function populate_query()
@@ -295,7 +295,7 @@ class Request
 
     /**
      * Creates and fills the query bag with $_POST parameters.
-     * 
+     *
      * @since 1.0.0
      */
     private function populate_post()
@@ -305,7 +305,7 @@ class Request
 
     /**
      * Populates Request class parameters.
-     * 
+     *
      * @since 1.0.0
      */
     private function populate_properties()
@@ -325,7 +325,7 @@ class Request
 
     /**
      * Creates and fills the query bag with selected $_SERVER parameters.
-     * 
+     *
      * @since 1.0.0
      */
     private function populate_server()

@@ -2,6 +2,9 @@
 
 namespace Snap\Core;
 
+use Exception;
+use BadMethodCallException;
+
 /**
  * A wrapper which replaces the standard if/else/switch block, and provides a more fluent API for
  * the front controllers.
@@ -69,7 +72,7 @@ class Router
      * @since 1.0.0
      *
      * @param  closure $callback A closure in which the grouped routes are registered.
-     * @return Snap\Router
+     * @return Snap\Core\Router
      */
     public function group(closure $callback)
     {
@@ -100,7 +103,7 @@ class Router
      * @since 1.0.0
      *
      * @param  bool|callable $result The result of a custom expression.
-     * @return Snap\Router
+     * @return Snap\Core\Router
      */
     public function is($result)
     {
@@ -121,7 +124,7 @@ class Router
      * @since 1.0.0
      *
      * @param  bool $result The result of a custom expression.
-     * @return Snap\Router
+     * @return Snap\Core\Router
      */
     public function is_not($result)
     {
@@ -142,7 +145,7 @@ class Router
      * @since  1.0.0
      *
      * @param  string $template Optional specific template to check for.
-     * @return Snap\Router
+     * @return Snap\Core\Router
      */
     public function is_page_template($template = '')
     {
@@ -194,11 +197,13 @@ class Router
     }
 
     /**
-     * returns the hook name for a given middleware.
+     * Returns the hook name for a given middleware.
      *
      * @since  1.0.0
      *
-     * @param  string $middleware_name The name of the middleware
+     * @throws BadMethodCallException If the hook was not found.
+     *
+     * @param  string $middleware_name The name of the middleware.
      * @return string
      */
     private function get_middleware_action($middleware_name)
@@ -206,7 +211,7 @@ class Router
         if (has_action("snap_middleware_{$middleware_name}")) {
             return "snap_middleware_{$middleware_name}";
         } else {
-            throw new \BadMethodCallException("No middleware called '{$middleware_name}' found");
+            throw new BadMethodCallException("No middleware called '{$middleware_name}' found");
         }
     }
 
@@ -215,7 +220,7 @@ class Router
      *
      * @since  1.0.0
      *
-     * @return Snap\Router
+     * @return Snap\Core\Router
      */
     public function reset()
     {
@@ -271,8 +276,11 @@ class Router
      * The dispatched action and the controller class are autowired.
      *
      * @since  1.0.0
-     * 
-     * @param  string $controller The controller name followed by the action, seperated by an @. eg. MyController@MyAction
+     *
+     * @throws Exception If the supplied controller doesn't exist.
+     *
+     * @param  string $controller The controller name followed by the action, seperated by an @.
+     *                            eg. MyController@MyAction
      *                            If no action is supplied, then 'index' is presumed.
      */
     public function dispatch($controller)
@@ -283,7 +291,7 @@ class Router
 
             // Passed all middleware.
             if ($this->can_proceed()) {
-                list($class, $action) = explode('@', $controller); 
+                list($class, $action) = \explode('@', $controller);
 
                 if ($action === null) {
                     $action = 'index';
@@ -291,13 +299,13 @@ class Router
 
                 $fqn = '\\Theme\\Controllers\\' . $class;
 
-                if (class_exists($fqn)) {
+                if (\class_exists($fqn)) {
                     Snap::services()->resolveMethod(
-                        Snap::services()->resolve($fqn), 
+                        Snap::services()->resolve($fqn),
                         $action
                     );
                 } else {
-                    throw new \Exception("The controller $fqn could not be found.");
+                    throw new Exception("The controller $fqn could not be found.");
                 }
 
                 $this->has_matched_route = true;
@@ -312,7 +320,7 @@ class Router
      *
      * @param  string $name      The called method.
      * @param  mixed  $arguments The called method arguments.
-     * @return Snap\Router
+     * @return Snap\Core\Router
      */
     public function __call($name, $arguments)
     {

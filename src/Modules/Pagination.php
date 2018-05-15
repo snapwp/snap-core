@@ -280,10 +280,10 @@ class Pagination
         if (! empty($min) && ! empty($max) && $this->args['range'] >= 0) {
             for ($i = $min; $i <= $max; $i++) {
                 if ($this->current_page == $i) {
-                    // output active HTML
+                    // output active HTML.
                     $output .= \sprintf($this->args['active_link_wrapper'], $i);
                 } else {
-                    // output link HTML
+                    // output link HTML.
                     $output .= \sprintf(
                         $this->args['link_wrapper'],
                         esc_attr(get_pagenum_link($i)),

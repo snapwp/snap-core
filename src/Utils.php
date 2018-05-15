@@ -2,6 +2,10 @@
 
 namespace Snap\Core;
 
+
+use ReflectionMethod;
+use ReflectionFunction;
+
 /**
  * A collection of useful helper functions.
  *
@@ -41,8 +45,8 @@ class Utils
      *
      * @since  1.0.0
      *
-     * @param  WP_User $user A user to get the role of
-     * @return string|bool The translated name of the current role, false if no role found
+     * @param  WP_User $user A user to get the role of.
+     * @return string|bool The translated name of the current role, false if no role found.
      **/
     public static function get_user_role($user = null)
     {
@@ -94,13 +98,19 @@ class Utils
         }
         
         switch ($post) {
-            case null;
+            // No post has been set, so use global.
+            case null:
                 global $post;
+
+            // The post ID has been provided.
             case \is_int($post):
                 $post = get_post($post);
+
+            // A WP_Post was provided.
             case \is_object($post):
                 $ancestors = $post->ancestors;
                 break;
+
             case \is_array($post):
                 $ancestors = $post['ancestors'];
                 break;
@@ -256,7 +266,7 @@ class Utils
      * @since  1.0.0
      *
      * @param  string $hook The hook to find callbacks for.
-     * @return array        Array of priorities, each containing a nested array of callbacks.
+     * @return array Array of priorities, each containing a nested array of callbacks.
      */
     final public static function debug_hook($hook = '')
     {
@@ -276,11 +286,11 @@ class Utils
                 $args = $callback['accepted_args'];
 
                 if (\is_array($function)) {
-                    // Is a class
+                    // Is a class.
                     if (\is_callable([ $function[0], $function[1] ])) {
                         $return[ $priority ][ $key ] = self::generate_hook_info(
                             'Class Method',
-                            new \ReflectionMethod($function[0], $function[1]),
+                            new ReflectionMethod($function[0], $function[1]),
                             $args
                         );
                     } else {
@@ -300,7 +310,7 @@ class Utils
                     if (\is_callable([ $class, $method ])) {
                         $return[ $priority ][ $key ] = self::generate_hook_info(
                             'Static Method',
-                            new \ReflectionMethod($class, $method),
+                            new ReflectionMethod($class, $method),
                             $args
                         );
                     } else {
@@ -311,7 +321,7 @@ class Utils
                     if (\function_exists($function)) {
                         $return[ $priority ][ $key ] = self::generate_hook_info(
                             'Function',
-                            new \ReflectionFunction($function),
+                            new ReflectionFunction($function),
                             $args
                         );
                     } else {
@@ -329,7 +339,7 @@ class Utils
      *
      * @since  1.0.0
      *
-     * @param  string $type
+     * @param  string $type      The callback type.
      * @param  object $reflector The reflection object handling this callback.
      * @param  int    $args      The number of args defined when this callback was added.
      * @return array
@@ -345,7 +355,7 @@ class Utils
             'is_internal' => false,
         ];
 
-        if ($reflector instanceof \ReflectionMethod) {
+        if ($reflector instanceof ReflectionMethod) {
             $output['class'] = $reflector->getDeclaringClass()->getName();
         }
 

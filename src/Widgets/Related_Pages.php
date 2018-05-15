@@ -25,13 +25,24 @@ class Related_Pages extends WP_Widget
     /**
      * The top level parent page ID.
      *
-     * @since  1.0.0
+     * @since 1.0.0
      * @var int|null
      */
     private $parent_page_id = null;
 
+    /**
+     * Array of pages to display.
+     *
+     * @since 1.0.0
+     * @var array
+     */
     private $pages = [];
 
+    /**
+     * Boot up and declare this class as a widget.
+     *
+     * @since 1.0.0
+     */
     public function __construct()
     {
         parent::__construct(
