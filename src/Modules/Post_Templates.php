@@ -29,8 +29,8 @@ class Post_Templates extends Hookable
      *
      * @since 1.0.0
      *
-     * @param  string $old_form WP default searchform.php markup
-     * @return string           Markup for modules/searchform.php
+     * @param  string $old_form WP default searchform.php markup.
+     * @return string Markup for modules/searchform.php.
      */
     public function get_search_form($old_form)
     {
@@ -48,14 +48,14 @@ class Post_Templates extends Hookable
      *
      * @param array        $post_templates Array of page templates. Keys are filenames,
      *                                     values are translated names.
-     * @param WP_Theme     $this           The theme object.
+     * @param WP_Theme     $wp_theme       The theme object.
      * @param WP_Post|null $post           The post being edited, provided for context, or null.
      * @param string       $post_type      Post type to get the templates for.
      * @return array                       Modified array of page templates
      */
     public function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
-        // path to  templates folder
+        // Path to  templates folder.
         $path = get_stylesheet_directory() . '/templates/views/post-templates/';
 
         $templates = \scandir($path);
@@ -100,16 +100,16 @@ class Post_Templates extends Hookable
     }
 
     /**
-     * Ensure post template requests get routed to our main front controller instead of some random file
+     * Ensure post template requests get routed to our main front controller instead of some random file.
      *
      * @since  1.0.0
      *
-     * @param  string $template_path Path of template to load
-     * @return string                Path of template to load
+     * @param  string $template_path Path of template to load.
+     * @return string Path of template to load.
      */
     public function post_template_routing($template_path)
     {
-        // if current request is a post/page template, return path to main front controller
+        // If current request is a post/page template, return path to main front controller.
         if (is_page_template()) {
             return get_stylesheet_directory() . '/index.php';
         }

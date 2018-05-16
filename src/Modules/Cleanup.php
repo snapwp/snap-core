@@ -92,7 +92,7 @@ class Cleanup extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  WP_Admin_Bar $wp_admin_bar [description]
+     * @param  WP_Admin_Bar $wp_admin_bar Global WP_Admin_Bar instance.
      */
     public function clean_adminbar($wp_admin_bar)
     {
@@ -153,7 +153,6 @@ class Cleanup extends Hookable
     {
         global $wp_widget_factory;
 
-        // Originally from http://wpengineer.com/1438/wordpress-header/
         $this->remove_action('wp_head', 'feed_links_extra', 3);
         
         // Remove emojis.
@@ -162,7 +161,7 @@ class Cleanup extends Hookable
         // Remove next/previous links.
         $this->remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10);
         
-        // remove oembed.
+        // Remove oembed.
         $this->remove_action('wp_head', 'wp_oembed_add_discovery_links');
         $this->remove_action('wp_head', 'wp_oembed_add_host_js');
 

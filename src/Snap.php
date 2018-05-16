@@ -100,7 +100,7 @@ class Snap
 
             self::services()->addInstance($config);
 
-            // Add the assets module to avoid parsing the mix-manifest multiple times
+            // Add the assets module to avoid parsing the mix-manifest multiple times.
             self::services()->add(
                 Assets::class,
                 function () {
@@ -108,7 +108,7 @@ class Snap
                 }
             );
 
-            // Add global WP classes
+            // Add global WP classes.
             global $wpdb;
             global $wp_query;
             self::services()->addInstance($wp_query);

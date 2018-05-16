@@ -64,6 +64,11 @@ class Loader
         \ob_start();
     }
 
+    /**
+     * Register additional Snap widgets.
+     *
+     * @since 1.0.0
+     */
     public static function load_widgets()
     {
         add_action(

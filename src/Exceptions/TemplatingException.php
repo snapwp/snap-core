@@ -7,5 +7,5 @@ namespace Snap\Core\Exceptions;
  */
 class TemplatingException extends BaseException
 {
-	
+    
 }

@@ -25,7 +25,7 @@ class View
      * Renders a view.
      *
      * @since  1.0.0
-     * 
+     *
      * @throws TemplatingException If no template found.
      * @throws TemplatingException If views are nested.
      *
@@ -59,7 +59,7 @@ class View
      * Fetch and display a template partial.
      *
      * @since  1.0.0
-     * 
+     *
      * @throws TemplatingException If no partial template found.
      *
      * @param  string $slug     The slug for the generic template.
@@ -103,7 +103,7 @@ class View
      *                                    values = the partial to load instead of $partial.
      *                                    There is also a special key 'alternate', which will load the value on every
      *                                    other iteration.
-     * @param WP_Query $wp_query          Optional. An optional custom WP_Query to loop through. 
+     * @param WP_Query $wp_query          Optional. An optional custom WP_Query to loop through.
      *                                    Defaults to the global WP_Query instance.
      */
     public function loop($partial = null, $partial_overrides = null, $wp_query = null)
@@ -154,7 +154,7 @@ class View
      *
      * @since 1.0.0
      * @see \Snap\Core\Modules\Pagination
-     * 
+     *
      * @param  array $args Args to pass to the Pagination instance.
      * @return bool|string If $args['echo'] then return true/false if the render is successfull,
      *                     else return the pagination HTML.

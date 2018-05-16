@@ -2,7 +2,6 @@
 
 namespace Snap\Core;
 
-
 use ReflectionMethod;
 use ReflectionFunction;
 
