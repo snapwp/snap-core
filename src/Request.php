@@ -3,6 +3,7 @@
 namespace Snap\Core;
 
 use WP_Http;
+use ArrayAccess;
 use Snap\Core\Request\Bag;
 
 /**
@@ -10,7 +11,7 @@ use Snap\Core\Request\Bag;
  *
  * @since 1.0.0
  */
-class Request
+class Request implements ArrayAccess
 {
     /**
      * Request query params.
@@ -348,6 +349,67 @@ class Request
 
         $server = \filter_input_array(INPUT_SERVER, $definition);
 
+        if ('' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $server['HTTP_HOST'])) {
+            wp_die('This site has been temporarily disabled due to suspicious activity');
+        }
+
         $this->server = new Bag($server);
+    }
+
+    /**
+     * Set a item on the request bag.
+     *
+     * @since  1.0.0
+     * 
+     * @param  mixed $offset The offset to set.
+     * @param  mixed $value  The value to set.
+     * @return boolean
+     */
+    public function offsetSet($offset, $value)
+    {
+        if (\is_null($offset)) {
+            $this->request[] = $value;
+        } else {
+            $this->request[$offset] = $value;
+        }
+    }
+
+    /**
+     * Whether an item exists in the request bag.
+     *
+     * @since  1.0.0
+     * 
+     * @param  mixed $offset An offset to check for.
+     * @return boolean
+     */
+    public function offsetExists($offset)
+    {
+        return $this->request->has($offset);
+    }
+
+    /**
+     * Remove an item from the request bag.
+     *
+     * @since  1.0.0
+     * 
+     * @param  mixed $offset The offset to unset.
+     * @return mixed         
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->request[$offset]);
+    }
+
+    /**
+     * Get an item from the request bag.
+     *
+     * @since  1.0.0
+     * 
+     * @param  mixed $offset The offset to get.
+     * @return mixed         
+     */
+    public function offsetGet($offset)
+    {
+        return $this->request->get($offset, null);
     }
 }
