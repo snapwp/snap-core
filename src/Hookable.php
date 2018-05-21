@@ -42,30 +42,18 @@ class Hookable
     }
 
     /**
-     * Run after class hooks have been added.
-     *
-     * To be overridden by the child class.
-     *
-     * @since 1.0.0
-     */
-    protected function after_boot()
-    {
-    }
-
-    /**
      * Boot up the class.
      *
-     * The boot method is run, then hooks are registered, then after_boot is run.
+     * The hooks are registered, then boot is run.
      * This gives some extra options for conditionally adding filters.
      *
      * @since 1.0.0
      */
     final public function run()
     {
-        $this->boot();
         $this->parse_filters();
         $this->parse_actions();
-        $this->after_boot();
+        $this->boot();
     }
 
     /**
