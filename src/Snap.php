@@ -108,6 +108,8 @@ class Snap
                 }
             );
 
+            self::register_providers();
+
             // Add global WP classes.
             global $wpdb;
             global $wp_query;
@@ -188,5 +190,20 @@ class Snap
     public static function view()
     {
         return self::services()->get(View::class);
+    }    
+
+
+    private static function register_providers()
+    {
+        $providers = self::config('services.providers');
+
+        foreach($providers as $provider) {
+            $provider = self::services()->resolve($provider);
+            $provider->register();
+        }
+
+        foreach($providers as $provider) {
+           self::services()->resolveMethod($provider, 'boot');
+        }
     }
 }
