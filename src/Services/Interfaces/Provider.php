@@ -2,7 +2,7 @@
 
 namespace Snap\Core\Services\Interfaces;
 
-interface Provider 
+interface Provider
 {
-	public function register();
+    public function register();
 }

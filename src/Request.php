@@ -349,7 +349,7 @@ class Request implements ArrayAccess
 
         $server = \filter_input_array(INPUT_SERVER, $definition);
 
-        if ('' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $server['HTTP_HOST'])) {
+        if ('' !== \preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $server['HTTP_HOST'])) {
             wp_die('This site has been temporarily disabled due to suspicious activity');
         }
 
@@ -360,7 +360,7 @@ class Request implements ArrayAccess
      * Set a item on the request bag.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  mixed $offset The offset to set.
      * @param  mixed $value  The value to set.
      * @return boolean
@@ -370,7 +370,7 @@ class Request implements ArrayAccess
         if (\is_null($offset)) {
             $this->request[] = $value;
         } else {
-            $this->request[$offset] = $value;
+            $this->request[ $offset ] = $value;
         }
     }
 
@@ -378,7 +378,7 @@ class Request implements ArrayAccess
      * Whether an item exists in the request bag.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  mixed $offset An offset to check for.
      * @return boolean
      */
@@ -391,22 +391,22 @@ class Request implements ArrayAccess
      * Remove an item from the request bag.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  mixed $offset The offset to unset.
-     * @return mixed         
+     * @return mixed
      */
     public function offsetUnset($offset)
     {
-        unset($this->request[$offset]);
+        unset($this->request[ $offset ]);
     }
 
     /**
      * Get an item from the request bag.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  mixed $offset The offset to get.
-     * @return mixed         
+     * @return mixed
      */
     public function offsetGet($offset)
     {

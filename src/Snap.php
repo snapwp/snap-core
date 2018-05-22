@@ -190,7 +190,7 @@ class Snap
     public static function view()
     {
         return self::services()->get(View::class);
-    }    
+    }
 
     /**
      * Registers any service providers define din theme config.
@@ -201,13 +201,13 @@ class Snap
     {
         $providers = self::config('services.providers');
 
-        foreach($providers as $provider) {
+        foreach ($providers as $provider) {
             $provider = self::services()->resolve($provider);
             $provider->register();
         }
 
-        foreach($providers as $provider) {
-           self::services()->resolveMethod($provider, 'boot');
+        foreach ($providers as $provider) {
+            self::services()->resolveMethod($provider, 'boot');
         }
     }
 }
