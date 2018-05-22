@@ -4,17 +4,8 @@ namespace Snap\Core\Services;
 
 class Provider implements Interfaces\Provider
 {
-	public $services = [];
-	
-	public $factories = [];
-
-	public function __construct()
-	{
-		
-	}
-
 	/**
-	 * Called after all service providers have been registered.
+	 * Called after all service providers have been registered and are available.
 	 *
 	 * @since 1.0.0
 	 */
@@ -24,8 +15,9 @@ class Provider implements Interfaces\Provider
 	}
 
 	/**
-	 * Register any
-	 * @return [type] [description]
+	 * Register any services into the container.
+	 *
+	 * @since 1.0.0
 	 */
 	public function register()
 	{

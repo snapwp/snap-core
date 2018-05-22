@@ -192,7 +192,11 @@ class Snap
         return self::services()->get(View::class);
     }    
 
-
+    /**
+     * Registers any service providers define din theme config.
+     *
+     * @since 1.0.0
+     */
     private static function register_providers()
     {
         $providers = self::config('services.providers');
