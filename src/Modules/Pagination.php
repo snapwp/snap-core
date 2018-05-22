@@ -164,12 +164,12 @@ class Pagination
             'show_first_last'     => true,
             'show_previous_next'  => true,
             'active_link_wrapper' => '<li class="active">%s</li>',
-            'link_wrapper'        => '<li><a href="%s">%s</a></li>',
-            'first_wrapper'       => '<li><a href="%s">' . __('First page', 'snap') . '</a></li>',
-            'previous_wrapper'    => '<li><a href="%s">' . __('Previous', 'snap') . '</a></li>',
-            'next_wrapper'        => '<li><a href="%s">' . __('Next', 'snap') . '</a></li>',
-            'last_wrapper'        => '<li><a href="%s">' . __('Last page', 'snap') . '</a></li>',
-            'before_output'       => '<nav aria-label="' . __('Pagination', 'snap') . '"><ul role="navigation">',
+            'link_wrapper'        => '<li><a href="%s" itemprop="url">><span itemprop="name">%s</span></a></li>',
+            'first_wrapper'       => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('First page', 'snap') . '</span></a></li>',
+            'previous_wrapper'    => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Previous', 'snap') . '</span></a></li>',
+            'next_wrapper'        => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Next', 'snap') . '</span></a></li>',
+            'last_wrapper'        => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Last page', 'snap') . '</span></a></li>',
+            'before_output'       => '<nav aria-label="' . __('Pagination', 'snap') . '"><ul role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">',
             'after_output'        => '</ul></nav>',
         ];
     }

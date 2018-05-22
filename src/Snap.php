@@ -69,6 +69,16 @@ class Snap
         if (! self::$setup) {
             self::$container = new Container();
 
+            // Boot up the config parser.
+            $config = new Config();
+            $config->add_path(get_template_directory().'/config');
+
+            if (is_child_theme()) {
+                $config->add_path(get_stylesheet_directory().'/config');
+            }
+
+            self::services()->addInstance($config);
+
             self::services()->add(
                 Router::class,
                 function () {
@@ -90,16 +100,6 @@ class Snap
                 }
             );
 
-            // Boot up the config parser.
-            $config = new Config();
-            $config->add_path(get_template_directory().'/config');
-
-            if (is_child_theme()) {
-                $config->add_path(get_stylesheet_directory().'/config');
-            }
-
-            self::services()->addInstance($config);
-
             // Add the assets module to avoid parsing the mix-manifest multiple times.
             self::services()->add(
                 Assets::class,
@@ -108,13 +108,14 @@ class Snap
                 }
             );
 
-            self::register_providers();
 
             // Add global WP classes.
             global $wpdb;
             global $wp_query;
             self::services()->addInstance($wp_query);
             self::services()->addInstance($wpdb);
+            
+            self::register_providers();
 
             // Run the loader.
             Loader::load_theme();
