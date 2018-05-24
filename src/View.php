@@ -2,9 +2,11 @@
 
 namespace Snap\Core;
 
+use Snap\Core\Snap;
 use Snap\Core\Exceptions\TemplatingException;
 use Snap\Core\Modules\Pagination;
 use Snap\Core\Modules\Related_Pages;
+use Snap\Core\Templating\Partial;
 
 /**
  * The basic view class for snap.
@@ -58,34 +60,22 @@ class View
     /**
      * Fetch and display a template partial.
      *
+     * It is important to note that nothing is done to destroy/restore the current loop.
+     *
      * @since  1.0.0
      *
      * @throws TemplatingException If no partial template found.
      *
-     * @param  string $slug     The slug for the generic template.
-     * @param  string $name     Optional. The name of the specialised template.
-     * @param  mixed  $data     Optional. Additional data to pass to a partial. Available in the partial as $data.
-     *                          It is important to note that nothing is done to destroy/restore the current loop.
-     * @param  bool   $extract  Optional. Whether to extract() $data or not.
+     * @param  string $slug The slug for the generic template.
+     * @param  string $name Optional. The name of the specialised template.
+     * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
+     * @return \Snap\Core\Templating\Partial
      */
-    public function partial($slug, $name = '', $data = null, $extract = false)
+    public function partial($slug, $name = '', $data = [])
     {
-        $partial_template_name = $this->get_template_name($slug, $name);
-        $file_name = locate_template('templates/partials/' . $partial_template_name);
-
-        if ($file_name === '') {
-            throw new TemplatingException('Could not find partial: ' . $partial_template_name);
-        }
-
-        if ($data !== null) {
-            if (\is_array($data) && $extract === true) {
-                \extract($data);
-            }
-        } else {
-            unset($data, $extract);
-        }
-
-        require($file_name);
+        $partial = Snap::services()->get(Partial::class);
+        $partial->render($slug, $name, $data);
+        return $partial;
     }
 
     /**
@@ -196,7 +186,7 @@ class View
      * @param  string $name Optional. The name of the specialised template.
      * @return string
      */
-    private function get_template_name($slug, $name = '')
+    public function get_template_name($slug, $name = '')
     {
         $name = (string) $name;
         $slug = \str_replace([ 'templates/views/', '.php' ], '', $slug);

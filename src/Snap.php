@@ -6,6 +6,7 @@ use WP_Query;
 use wpdb;
 use Hodl\Container;
 use Snap\Core\Modules\Assets;
+use Snap\Core\Templating\Partial;
 
 /**
  * The main Snap class.
@@ -97,6 +98,13 @@ class Snap
                 View::class,
                 function ($hodl) {
                     return $hodl->resolve(View::class);
+                }
+            ); 
+
+            self::services()->addFactory(
+                Partial::class,
+                function ($hodl) {
+                    return $hodl->resolve(Partial::class);
                 }
             );
 
