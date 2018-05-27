@@ -2,8 +2,8 @@
 
 namespace Snap\Core\Templating;
 
+use Snap\Core\Snap;
 use Snap\Core\Request;
-use Snap\Core\View;
 
 /**
  * The basic view class for snap.
@@ -12,7 +12,20 @@ use Snap\Core\View;
  */
 class Partial
 {
+    /**
+     * The parent View.
+     *
+     * @since  1.0.0
+     * @var Snap\Core\View
+     */
     private $view;
+
+    /**
+     * The global request.
+     *
+     * @since  1.0.0
+     * @var Snap\Core\Request
+     */
     private $request;
 
     private $current_template;

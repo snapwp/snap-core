@@ -4,13 +4,13 @@ use Snap\Core\Snap;
 use Snap\Core\Hookable;
 use Snap\Core\Utils;
 use Snap\Core\Router;
-use Snap\Core\View;
+use Snap\Core\Templating\View;
 
 /*
  * *********************************************************************************************************************
  * Templating functions
  *
- * Wrappers for Snap\Core\View methods.
+ * Wrappers for Snap\Core\Templating\View methods.
  * *********************************************************************************************************************
  */
 
@@ -22,7 +22,7 @@ if (! \function_exists('snap_render_partial')) {
      *
      * @since  1.0.0
      *
-     * @see Snap\Core\View::partial
+     * @see Snap\Core\Templating\View::partial
      */
     function snap_render_partial($name, $slug = '', $data = null, $extract = false)
     {
@@ -38,7 +38,7 @@ if (! \function_exists('snap_render_partial')) {
      *
      * @since  1.0.0
      *
-     * @see Snap\Core\View::render
+     * @see Snap\Core\Templating\View::render
      */
     function snap_render_view($slug, $name = '')
     {
@@ -55,7 +55,7 @@ if (! \function_exists('snap_loop')) {
      *
      * @since 1.0.0
      *
-     * @see Snap\Core\View::get_user_role
+     * @see Snap\Core\Templating\View::get_user_role
      */
     function snap_loop($partial = null, $partial_overrides = null, $wp_query = null)
     {
@@ -69,7 +69,7 @@ if (! \function_exists('snap_pagination')) {
      *
      * @since 1.0.0
      *
-     * @see Snap\Core\View::pagination
+     * @see Snap\Core\Templating\View::pagination
      */
     function snap_pagination($args = [])
     {

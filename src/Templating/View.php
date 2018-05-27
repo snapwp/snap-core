@@ -1,12 +1,11 @@
 <?php
 
-namespace Snap\Core;
+namespace Snap\Core\Templating;
 
 use Snap\Core\Snap;
 use Snap\Core\Exceptions\TemplatingException;
 use Snap\Core\Modules\Pagination;
 use Snap\Core\Modules\Related_Pages;
-use Snap\Core\Templating\Partial;
 
 /**
  * The basic view class for snap.

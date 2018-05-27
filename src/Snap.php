@@ -7,6 +7,7 @@ use wpdb;
 use Hodl\Container;
 use Snap\Core\Modules\Assets;
 use Snap\Core\Templating\Partial;
+use Snap\Core\Templating\View;
 
 /**
  * The main Snap class.
@@ -68,7 +69,7 @@ class Snap
     public static function setup()
     {
         if (! self::$setup) {
-            self::$container = new Container();
+            $container = new Container();
 
             // Boot up the config parser.
             $config = new Config();
@@ -78,30 +79,30 @@ class Snap
                 $config->add_path(get_stylesheet_directory().'/config');
             }
 
-            self::services()->addInstance($config);
+            $container->addInstance($config);
 
-            self::services()->add(
+            $container->add(
                 Router::class,
                 function () {
                     return new Router();
                 }
             );
 
-            self::services()->add(
+            $container->add(
                 Request::class,
                 function () {
                     return new Request();
                 }
             );
             
-            self::services()->add(
+            $container->add(
                 View::class,
                 function ($hodl) {
                     return $hodl->resolve(View::class);
                 }
-            ); 
+            );
 
-            self::services()->addFactory(
+            $container->addFactory(
                 Partial::class,
                 function ($hodl) {
                     return $hodl->resolve(Partial::class);
@@ -109,20 +110,21 @@ class Snap
             );
 
             // Add the assets module to avoid parsing the mix-manifest multiple times.
-            self::services()->add(
+            $container->add(
                 Assets::class,
                 function () {
                     return new Assets();
                 }
             );
 
-
             // Add global WP classes.
             global $wpdb;
             global $wp_query;
-            self::services()->addInstance($wp_query);
-            self::services()->addInstance($wpdb);
+            $container->addInstance($wp_query);
+            $container->addInstance($wpdb);
             
+            self::$container = $container;
+
             self::register_providers();
 
             // Run the loader.
