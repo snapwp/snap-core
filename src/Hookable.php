@@ -2,6 +2,10 @@
 
 namespace Snap\Core;
 
+use Closure;
+use ReflectionMethod;
+use ReflectionFunction;
+
 /**
  * Allows child classes to auto register hooks by simply defining them in an array
  * at the top of the class.
@@ -28,7 +32,23 @@ class Hookable
      * @since 1.0.0
      * @var array
      */
-    protected $actions = [];
+    protected $actions = [];    
+
+    /**
+     * Run this hookable when is_admin returns true.
+     *
+     * @since 1.0.0
+     * @var boolean
+     */
+    protected $admin = true;
+
+    /**
+     * Run this hookable when is_admin returns false.
+     *
+     * @since 1.0.0
+     * @var boolean
+     */
+    protected $public = true;
 
     /**
      * Run immediately after class instantiation.
@@ -51,6 +71,14 @@ class Hookable
      */
     final public function run()
     {
+        if ($this->admin === false && is_admin() === true) {
+            return;
+        }
+
+        if ($this->public === false && is_admin() === false) {
+            return;
+        }
+
         $this->parse_filters();
         $this->parse_actions();
         $this->boot();
@@ -208,12 +236,16 @@ class Hookable
     final private function get_argument_count($callback, $accepted_args = 1)
     {
         if (\is_string($callback) && \is_callable([ $this, $callback ])) {
-            return ( new \ReflectionMethod($this, $callback) )->getNumberOfParameters();
-        } elseif (\is_object($callback) && $callback instanceof \Closure) {
-            return ( new \ReflectionFunction($callback) )->getNumberOfParameters();
-        } else {
-            return $accepted_args ? $accepted_args : 1;
-        }
+            $reflector = new ReflectionMethod($this, $callback);
+            return $reflector->getNumberOfParameters();
+        } 
+
+        if (\is_object($callback) && $callback instanceof Closure) {
+            $reflector = new ReflectionFunction($callback);
+            return $reflector->getNumberOfParameters();
+        } 
+
+        return $accepted_args ? $accepted_args : 1;
     }
 
     /**

@@ -13,6 +13,14 @@ use Snap\Core\Snap;
 class Admin extends Hookable
 {
     /**
+     * No need to run this Hookable when on a public request.
+     *
+     * @since  1.0.0
+     * @var boolean
+     */
+    protected $public = false;
+
+    /**
      * Filters to add on init.
      *
      * @since  1.0.0
