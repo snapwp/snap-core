@@ -3,49 +3,47 @@
 namespace Snap\Core;
 
 /**
- * Initializes Snap classe and child includes.
+ * Initializes Snap classes and child includes.
  *
  * @since 1.0.0
  */
 class Loader
 {
     /**
-     * If the supplied path is of a Snap_* class, initialize the class and fire the run() method.
+     * A cache of the parent/child includes from the Theme folder.
      *
-     * @since  1.0.0
-     *
-     * @param  string $path The path to an included file.
+     * @since 1.0.0
+     * @var array
      */
-    public static function load_hookable($path)
+    private static $theme_includes = [];
+
+    /**
+     * The Snap autoloader.
+     *
+     * @since 1.0.0
+     * 
+     * @param string $class The fully qualified class name to load.
+     */
+    public static function autoload($class) 
     {
-        if (is_child_theme() && strpos($path, get_stylesheet_directory() . '/theme/') !== false) {
-            $new_path = \str_replace(get_stylesheet_directory() . '/theme/', 'Theme\\', $path);
-        } else {
-            $new_path = \str_replace(get_template_directory() . '/theme/', 'Theme\\', $path);
-        }
-
-        $class_name = \str_replace(
-            ['/', '.php'],
-            ['\\', ''],
-            $new_path
-        );
-
-        // If the included class extends the Hookable abstract.
-        if (\class_exists($class_name) && \is_subclass_of($class_name, Hookable::class)) {
-            // Boot it up and resolve dependencies.
-            Snap::services()->resolve($class_name)->run();
+        // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
+        if (isset(self::$theme_includes[$class])) {
+            require self::$theme_includes[$class];
+            return;
         }
     }
 
     /**
-     * Includes all required Snap files.
+     * Includes all required Snap and theme files and registeres the Snap autoloader.
      *
      * Initializes any Snap\Hookable classes.
      *
-     * @since  1.0.0
+     * @since 1.0.0
      */
-    public static function load_theme()
+    public function boot()
     {
+        \spl_autoload_register(__NAMESPACE__ .'\Loader::autoload');
+
         $snap_modules = [
             \Snap\Core\Modules\Admin::class,
             \Snap\Core\Modules\Assets::class,
@@ -63,15 +61,45 @@ class Loader
             Snap::services()->resolve($module)->run();
         }
 
-        self::load_widgets();
-        self::load_parent_theme();
+        $this->load_widgets();
 
-        if (is_child_theme()) {
-            self::load_child_theme();
+        // Now all core files are loaded, turn on output buffer until a view is dispatched.
+        if (\ob_get_level()) {
+            \ob_start();
         }
 
-        // Now all files are loaded, turn on output buffer until a view is dispatched.
-        \ob_start();
+        $this->load_theme();
+    }
+
+
+
+    private function load_theme()
+    {
+        // Populate $theme_includes.
+        self::$theme_includes = $this->scandir(\get_template_directory() . '/theme/', self::$theme_includes, \get_template_directory());
+        self::$theme_includes = $this->scandir(\get_stylesheet_directory() . '/theme/', self::$theme_includes, \get_stylesheet_directory());
+
+        if (! empty(self::$theme_includes)) {
+            foreach (self::$theme_includes as $class => $path) {
+                $this->load_hookable($class);
+            }
+        }
+    }
+
+    /**
+     * If the class is a Hookable, initialize the class and fire the run() method.
+     *
+     * @since 1.0.0
+     *
+     * @param string $class_name The path to an included file.
+     */
+    private function load_hookable($class_name)
+    {
+        // If the included class extends the Hookable abstract.
+        if (\class_exists($class_name) && \is_subclass_of($class_name, Hookable::class)) {
+            // Boot it up and resolve dependencies.
+            Snap::services()->resolve($class_name)->run();
+        }
     }
 
     /**
@@ -79,78 +107,14 @@ class Loader
      *
      * @since 1.0.0
      */
-    public static function load_widgets()
+    private function load_widgets()
     {
-        add_action(
+        \add_action(
             'widgets_init',
             function () {
-                register_widget(\Snap\Core\Widgets\Related_Pages::class);
+                \register_widget(\Snap\Core\Widgets\Related_Pages::class);
             }
         );
-    }
-
-    /**
-     * Includes any child includes.
-     *
-     * Initializes any Snap_Hookable classes.
-     *
-     * @since  1.0.0
-     */
-    private static function load_parent_theme()
-    {
-        // Path to child theme includes folder.
-        $theme_directory = get_template_directory() . '/theme/';
-
-
-        /**
-         * Allow the theme_includes to be modified before inclusion.
-         *
-         * @since 1.0.0
-         *
-         * @param array  $theme_includes The array of child files.
-         * @return array $theme_includes
-         */
-        $theme_includes = apply_filters('snap_theme_includes', self::scandir($theme_directory));
-
-        if (! empty($theme_includes)) {
-            foreach ($theme_includes as $file) {
-                self::load_hookable($file);
-            }
-        }
-    } 
-
-    /**
-     * Includes any child includes.
-     *
-     * Initializes any Snap_Hookable classes.
-     *
-     * @since  1.0.0
-     */
-    private static function load_child_theme()
-    {
-        // There is probably a better way to do this.
-        $loader = new \Composer\Autoload\ClassLoader();
-        $loader->addPsr4('Theme\\', get_stylesheet_directory() . '/theme');
-        $loader->register();
-
-        // Path to child theme includes folder.
-        $child_directory = get_stylesheet_directory() . '/theme/';
-
-        /**
-         * Allow the child_includes to be modified before inclusion.
-         *
-         * @since 1.0.0
-         *
-         * @param array  $child_includes The array of child files.
-         * @return array $child_includes
-         */
-        $child_includes = apply_filters('snap_child_theme_includes', self::scandir($child_directory));
-
-        if (! empty($child_includes)) {
-            foreach ($child_includes as $file) {
-                self::load_hookable($file);
-            }
-        }
     }
 
     /**
@@ -160,12 +124,13 @@ class Loader
      *
      * @param  string $folder Directory path to scan.
      * @param  array  $files  An array to append the discovered files to.
+     * @param  string $strip  Strip this text from the returned path.
      * @return array          $files array with any discovered php files appended.
      */
-    private static function scandir($folder, $files = [])
+    private function scandir($folder, $files = [], $strip = '')
     {
         // Ensure maximum portability.
-        $folder = trailingslashit($folder);
+        $folder = \trailingslashit($folder);
 
         // Check the taret exists.
         if (\is_dir($folder)) {
@@ -178,13 +143,19 @@ class Loader
             foreach ($contents as $file) {
                 $path = $folder . $file;
 
+                $class = \str_replace([$strip, '.php'], '', $path);
+                $class = \trim(
+                    \str_replace([ '/', 'theme' ], [ '\\', 'Theme' ], $class), 
+                    '\\'
+                );
+
                 if ('.' === $file || '..' === $file) {
                     continue;
                 } elseif (\pathinfo($path, PATHINFO_EXTENSION) === 'php') {
-                    $files[] = $path;
+                    $files[$class] = $path;
                 } elseif (\is_dir($path)) {
                     // Sub directory, scan this dir as well.
-                    $files = self::scandir(trailingslashit($path), $files);
+                    $files = $this->scandir(\trailingslashit($path), $files, $strip);
                 }
             }
         }

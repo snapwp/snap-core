@@ -128,7 +128,8 @@ class Snap
             self::register_providers();
 
             // Run the loader.
-            Loader::load_theme();
+            $loader = new Loader();
+            $loader->boot();
         }
 
         self::$setup = true;
