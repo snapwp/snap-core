@@ -47,7 +47,7 @@ class View
 
         $this->current_view = $this->get_template_name($slug, $name);
 
-        $path = locate_template('templates/views/' . $this->current_view);
+        $path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
 
         if ($path === '') {
             throw new TemplatingException('Could not find view: ' . $this->current_view);
@@ -188,7 +188,7 @@ class View
     public function get_template_name($slug, $name = '')
     {
         $name = (string) $name;
-        $slug = \str_replace([ 'templates/views/', '.php' ], '', $slug);
+        $slug = \str_replace([ Snap::config('theme.templates_directory') . '/views/', '.php' ], '', $slug);
 
         $template = "{$slug}.php";
 

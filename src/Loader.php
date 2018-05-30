@@ -18,10 +18,16 @@ class Loader
      */
     public static function load_hookable($path)
     {
+        if (is_child_theme() && strpos($path, get_stylesheet_directory() . '/theme/') !== false) {
+            $new_path = \str_replace(get_stylesheet_directory() . '/theme/', 'Theme\\', $path);
+        } else {
+            $new_path = \str_replace(get_template_directory() . '/theme/', 'Theme\\', $path);
+        }
+
         $class_name = \str_replace(
             ['/', '.php'],
             ['\\', ''],
-            \str_replace(get_stylesheet_directory() . '/theme/', 'Theme\\', $path)
+            $new_path
         );
 
         // If the included class extends the Hookable abstract.
@@ -58,7 +64,11 @@ class Loader
         }
 
         self::load_widgets();
-        self::load_child_theme();
+        self::load_parent_theme();
+
+        if (is_child_theme()) {
+            self::load_child_theme();
+        }
 
         // Now all files are loaded, turn on output buffer until a view is dispatched.
         \ob_start();
@@ -86,8 +96,43 @@ class Loader
      *
      * @since  1.0.0
      */
+    private static function load_parent_theme()
+    {
+        // Path to child theme includes folder.
+        $theme_directory = get_template_directory() . '/theme/';
+
+
+        /**
+         * Allow the theme_includes to be modified before inclusion.
+         *
+         * @since 1.0.0
+         *
+         * @param array  $theme_includes The array of child files.
+         * @return array $theme_includes
+         */
+        $theme_includes = apply_filters('snap_theme_includes', self::scandir($theme_directory));
+
+        if (! empty($theme_includes)) {
+            foreach ($theme_includes as $file) {
+                self::load_hookable($file);
+            }
+        }
+    } 
+
+    /**
+     * Includes any child includes.
+     *
+     * Initializes any Snap_Hookable classes.
+     *
+     * @since  1.0.0
+     */
     private static function load_child_theme()
     {
+        // There is probably a better way to do this.
+        $loader = new \Composer\Autoload\ClassLoader();
+        $loader->addPsr4('Theme\\', get_stylesheet_directory() . '/theme');
+        $loader->register();
+
         // Path to child theme includes folder.
         $child_directory = get_stylesheet_directory() . '/theme/';
 
@@ -99,7 +144,7 @@ class Loader
          * @param array  $child_includes The array of child files.
          * @return array $child_includes
          */
-        $child_includes = apply_filters('snap_theme_includes', self::scandir($child_directory));
+        $child_includes = apply_filters('snap_child_theme_includes', self::scandir($child_directory));
 
         if (! empty($child_includes)) {
             foreach ($child_includes as $file) {

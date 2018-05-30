@@ -42,7 +42,7 @@ class Post_Templates extends Hookable
     }
 
     /**
-     * Scans the custom views/templates folder and adds any templates found to the global template array
+     * Scans the templates folder and adds any templates found to the global template array.
      *
      * @since  1.0.0
      *
@@ -56,7 +56,7 @@ class Post_Templates extends Hookable
     public function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
         // Path to  templates folder.
-        $path = get_stylesheet_directory() . '/templates/views/post-templates/';
+        $path = get_stylesheet_directory() . '/' . Snap::config('theme.templates_directory') . '/views/post-templates/';
 
         $templates = \scandir($path);
 
@@ -79,7 +79,7 @@ class Post_Templates extends Hookable
                 }
 
                 if (\in_array($post_type, $types)) {
-                    $post_templates[ 'templates/views/post-templates/' . $tpl ] = \trim($header[1]);
+                    $post_templates[ Snap::config('theme.templates_directory') . '/views/post-templates/' . $tpl ] = \trim($header[1]);
                 }
             }
         }

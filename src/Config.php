@@ -33,6 +33,7 @@ class Config
      */
     private $config = [
         'theme' => [
+            'templates_directory' => 'templates/',
             'disable_xmlrpc' => true,
             'disable_comments' => false,
             'remove_asset_versions' => true,

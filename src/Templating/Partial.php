@@ -2,6 +2,7 @@
 
 namespace Snap\Core\Templating;
 
+use Snap\Core\Exceptions\TemplatingException;
 use Snap\Core\Snap;
 use Snap\Core\Request;
 
@@ -54,7 +55,7 @@ class Partial
     {
         $partial_template_name = $this->view->get_template_name($slug, $name);
         $this->current_template = $partial_template_name;
-        $file_name = locate_template('templates/partials/' . $partial_template_name);
+        $file_name = locate_template(Snap::config('theme.templates_directory') . '/partials/' . $partial_template_name);
 
         $this->data = $data;
         
