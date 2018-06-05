@@ -133,6 +133,8 @@ class Related_Pages extends WP_Widget
 
         if (isset($instance['show_parent'])) {
             $show_parent = $instance['show_parent'];
+        } else {
+            $show_parent = 0;
         }
         ?>
             <p>
@@ -153,7 +155,7 @@ class Related_Pages extends WP_Widget
      *
      * @param  array $new_instance Submitted instance args.
      * @param  array $old_instance Old instance args.
-     * @return array               New instance args to save.
+     * @return array New instance args to save.
      */
     public function update($new_instance, $old_instance)
     {
