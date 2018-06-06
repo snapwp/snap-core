@@ -21,14 +21,14 @@ class Loader
      * The Snap autoloader.
      *
      * @since 1.0.0
-     * 
+     *
      * @param string $class The fully qualified class name to load.
      */
-    public static function autoload($class) 
+    public static function autoload($class)
     {
         // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
-        if (isset(self::$theme_includes[$class])) {
-            require self::$theme_includes[$class];
+        if (isset(self::$theme_includes[ $class ])) {
+            require self::$theme_includes[ $class ];
             return;
         }
     }
@@ -145,14 +145,14 @@ class Loader
 
                 $class = \str_replace([$strip, '.php'], '', $path);
                 $class = \trim(
-                    \str_replace([ '/', 'theme' ], [ '\\', 'Theme' ], $class), 
+                    \str_replace([ '/', 'theme' ], [ '\\', 'Theme' ], $class),
                     '\\'
                 );
 
                 if ('.' === $file || '..' === $file) {
                     continue;
                 } elseif (\pathinfo($path, PATHINFO_EXTENSION) === 'php') {
-                    $files[$class] = $path;
+                    $files[ $class ] = $path;
                 } elseif (\is_dir($path)) {
                     // Sub directory, scan this dir as well.
                     $files = $this->scandir(\trailingslashit($path), $files, $strip);

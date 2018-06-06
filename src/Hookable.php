@@ -32,7 +32,7 @@ class Hookable
      * @since 1.0.0
      * @var array
      */
-    protected $actions = [];    
+    protected $actions = [];
 
     /**
      * Run this hookable when is_admin returns true.
@@ -238,12 +238,12 @@ class Hookable
         if (\is_string($callback) && \is_callable([ $this, $callback ])) {
             $reflector = new ReflectionMethod($this, $callback);
             return $reflector->getNumberOfParameters();
-        } 
+        }
 
         if (\is_object($callback) && $callback instanceof Closure) {
             $reflector = new ReflectionFunction($callback);
             return $reflector->getNumberOfParameters();
-        } 
+        }
 
         return $accepted_args ? $accepted_args : 1;
     }
