@@ -36,11 +36,13 @@ class Config
             'templates_directory' => 'templates/',
             'disable_xmlrpc' => true,
             'disable_comments' => false,
+            'disable_customizer' => false,
             'remove_asset_versions' => true,
             'defer_scripts' => true,
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
             'snap_modules' => [],
+            'snap_admin_theme' => false
         ],
         'images' => [
             'default_image_quality' => 75,

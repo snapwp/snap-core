@@ -24,6 +24,11 @@ class Snap
     const SNAPWP_HOME = 'https://snapwp.com';
 
     /**
+     * Current Snap version.
+     */
+    const VERSION = '1.0.0';
+
+    /**
      * Container instance.
      *
      * @since 1.0.0

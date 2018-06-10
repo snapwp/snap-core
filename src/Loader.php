@@ -55,6 +55,14 @@ class Loader
 
         if (Snap::config('theme.disable_comments') === true) {
             $snap_modules[] = \Snap\Core\Modules\Disable_Comments::class;
+        }               
+
+        if (Snap::config('theme.disable_customizer') === true) {
+            $snap_modules[] = \Snap\Core\Modules\Disable_Customizer::class;
+        }        
+
+        if (Snap::config('theme.snap_admin_theme') === true) {
+            $snap_modules[] = \Snap\Core\Admin\Theme::class;
         }
 
         foreach ($snap_modules as $module) {
