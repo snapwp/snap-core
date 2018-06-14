@@ -33,7 +33,7 @@ class Config
      */
     private $config = [
         'theme' => [
-            'templates_directory' => 'templates/',
+            'templates_directory' => 'resources/templates/',
             'disable_xmlrpc' => true,
             'disable_comments' => false,
             'disable_customizer' => false,
@@ -42,11 +42,11 @@ class Config
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
             'snap_modules' => [],
-            'snap_admin_theme' => false
+            'snap_admin_theme' => false,
         ],
         'images' => [
             'default_image_quality' => 75,
-            'placeholder_dir' => 'assets/images/placeholders/',
+            'placeholder_dir' => 'dist/images/placeholders/',
             'supports_featured_images' => true,
             'reset_image_sizes' => true,
             'image_sizes' => [],

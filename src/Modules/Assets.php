@@ -64,10 +64,10 @@ class Assets extends Hookable
 
         // There was no manifest or no file present.
         if ($this->manifest === null || ! isset($this->manifest[ $file ])) {
-            return get_stylesheet_directory_uri() . $file;
+            return get_stylesheet_directory_uri() . '/dist/' . $file;
         }
 
-        return get_stylesheet_directory_uri() . $this->manifest[ $file ];
+        return get_stylesheet_directory_uri() . '/dist/' . $this->manifest[ $file ];
     }
 
     /**
@@ -152,7 +152,7 @@ class Assets extends Hookable
      */
     private function parse_manifest()
     {
-        $manifest_path = get_stylesheet_directory() . '/mix-manifest.json';
+        $manifest_path = get_stylesheet_directory() . '/dist/mix-manifest.json';
 
         if (\file_exists($manifest_path)) {
             $manifest = \file_get_contents($manifest_path);

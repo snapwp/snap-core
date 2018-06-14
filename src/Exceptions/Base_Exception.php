@@ -7,7 +7,7 @@ use Exception;
 /**
  * Generic Exception which forces a message to be set.
  */
-class BaseException extends Exception
+class Base_Exception extends Exception
 {
     /**
      * Force $message to be set.

@@ -2,7 +2,7 @@
 
 namespace Snap\Core;
 
-use Snap\Core\Exceptions\ShortcodeException;
+use Snap\Core\Exceptions\Shortcode_Exception;
 
 /**
  * A simple wrapper for auto registering shortcodes.
@@ -55,7 +55,7 @@ class Shortcode extends Hookable
     final public function register_shortcode()
     {
         if (\method_exists($this, 'handle') === false) {
-            throw new ShortcodeException(\get_class($this) . ' needs to declare a handle() method');
+            throw new Shortcode_Exception(\get_class($this) . ' needs to declare a handle() method');
         }
 
         \add_shortcode($this->shortcode_name(), [$this, 'handler']);

@@ -5,7 +5,7 @@ namespace Snap\Core\Exceptions;
 /**
  * Generic Exception used by Shortcode classes.
  */
-class ShortcodeException extends BaseException
+class Shortcode_Exception extends Base_Exception
 {
     
 }

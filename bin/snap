@@ -6,8 +6,10 @@ if (! @include_once __DIR__ . '/../vendor/autoload.php') {
 }
 
 use Symfony\Component\Console\Application;
+use Snap\Core\Commands\Create_Shortcode;
 
 $application = new Application();
 
+$application->add(new Create_Shortcode());
 
 $application->run();

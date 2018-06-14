@@ -55,11 +55,11 @@ class Loader
 
         if (Snap::config('theme.disable_comments') === true) {
             $snap_modules[] = \Snap\Core\Modules\Disable_Comments::class;
-        }               
+        }
 
         if (Snap::config('theme.disable_customizer') === true) {
             $snap_modules[] = \Snap\Core\Modules\Disable_Customizer::class;
-        }        
+        }
 
         if (Snap::config('theme.snap_admin_theme') === true) {
             $snap_modules[] = \Snap\Core\Admin\Theme::class;
@@ -79,8 +79,11 @@ class Loader
         $this->load_theme();
     }
 
-
-
+    /**
+     * Load all theme files.
+     *
+     * @since 1.0.0
+     */
     private function load_theme()
     {
         // Populate $theme_includes.

@@ -4,6 +4,7 @@ use Snap\Core\Snap;
 use Snap\Core\Hookable;
 use Snap\Core\Utils;
 use Snap\Core\Router;
+use Snap\Core\Modules\Assets;
 use Snap\Core\Templating\View;
 
 /*
@@ -217,6 +218,23 @@ if (! \function_exists('snap_get_page_depth')) {
     function snap_get_page_depth($page = null)
     {
         return Utils::get_page_depth($page);
+    }
+}
+
+
+if (! \function_exists('snap_get_asset_url')) {
+    /**
+     * Get the URL for a given asset path relative to the dist folder.
+     *
+     * If a mix-manifest is present, then the versioned URL is returned instead.
+     *
+     * @since  1.0.0
+     *
+     * @see Snap\Core\Modules\Assets::get_asset_url
+     */
+    function snap_get_asset_url($asset)
+    {
+        return Snap::services()->get(Assets::class)->get_asset_url($asset);
     }
 }
 

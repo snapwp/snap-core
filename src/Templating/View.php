@@ -3,7 +3,7 @@
 namespace Snap\Core\Templating;
 
 use Snap\Core\Snap;
-use Snap\Core\Exceptions\TemplatingException;
+use Snap\Core\Exceptions\Templating_Exception;
 use Snap\Core\Modules\Pagination;
 use Snap\Core\Modules\Related_Pages;
 
@@ -27,8 +27,8 @@ class View
      *
      * @since  1.0.0
      *
-     * @throws TemplatingException If no template found.
-     * @throws TemplatingException If views are nested.
+     * @throws Templating_Exception If no template found.
+     * @throws Templating_Exception If views are nested.
      *
      * @param  string $slug The slug for the generic template.
      * @param  string $name Optional. The name of the specialised template.
@@ -42,7 +42,7 @@ class View
         \ob_end_flush();
 
         if ($this->current_view !== null) {
-            throw new TemplatingException('Views should not be nested');
+            throw new Templating_Exception('Views should not be nested');
         }
 
         $this->current_view = $this->get_template_name($slug, $name);
@@ -50,7 +50,7 @@ class View
         $path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
 
         if ($path === '') {
-            throw new TemplatingException('Could not find view: ' . $this->current_view);
+            throw new Templating_Exception('Could not find view: ' . $this->current_view);
         }
 
         require($path);
@@ -63,7 +63,7 @@ class View
      *
      * @since  1.0.0
      *
-     * @throws TemplatingException If no partial template found.
+     * @throws Templating_Exception If no partial template found.
      *
      * @param  string $slug The slug for the generic template.
      * @param  string $name Optional. The name of the specialised template.

@@ -2,7 +2,7 @@
 
 namespace Snap\Core\Templating;
 
-use Snap\Core\Exceptions\TemplatingException;
+use Snap\Core\Exceptions\Templating_Exception;
 use Snap\Core\Snap;
 use Snap\Core\Request;
 
@@ -44,7 +44,7 @@ class Partial
      *
      * @since  1.0.0
      *
-     * @throws TemplatingException If no partial template found.
+     * @throws Templating_Exception If no partial template found.
      *
      * @param  string $slug     The slug for the generic template.
      * @param  string $name     Optional. The name of the specialised template.
@@ -62,7 +62,7 @@ class Partial
         unset($slug, $name, $data);
         
         if ($file_name === '') {
-            throw new TemplatingException('Could not find partial: ' . $partial_template_name);
+            throw new Templating_Exception('Could not find partial: ' . $partial_template_name);
         }
 
         require($file_name);
@@ -75,7 +75,7 @@ class Partial
      *
      * @since  1.0.0
      *
-     * @throws TemplatingException If no partial template found.
+     * @throws Templating_Exception If no partial template found.
      *
      * @param  string $slug The slug for the generic template.
      * @param  string $name Optional. The name of the specialised template.

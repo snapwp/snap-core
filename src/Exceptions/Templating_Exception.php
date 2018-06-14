@@ -5,7 +5,7 @@ namespace Snap\Core\Exceptions;
 /**
  * Generic Exception used by View classes.
  */
-class TemplatingException extends BaseException
+class Templating_Exception extends Base_Exception
 {
     
 }

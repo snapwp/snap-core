@@ -18,14 +18,14 @@ class Disable_Customizer extends Hookable
      * @var array
      */
     protected $filters = [
-        'user_has_cap' => 'shortcircuit_customize_cap'
+        'user_has_cap' => 'shortcircuit_customize_cap',
     ];
 
     /**
      * The simplest and most thorough way to disable the customizer.
      *
      * @since  1.0.0
-     * 
+     *
      * @param array $allcaps All the capabilities of the user
      * @param array $cap     Required capability
      * @param array $args    {
@@ -38,7 +38,7 @@ class Disable_Customizer extends Hookable
     public function shortcircuit_customize_cap($allcaps, $cap, $args)
     {
         if ($args[0] == 'customize') {
-            $allcaps[$cap[0]] = false;
+            $allcaps[ $cap[0] ] = false;
         }
 
         return $allcaps;
