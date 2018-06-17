@@ -25,6 +25,7 @@ class Disable_Comments extends Hookable
             20 => '__return_false',
         ],
         'pre_option_default_pingback_flag' => '__return_zero',
+        'admin_init' => 'remove_post_type_support',
     ];
 
     /**
@@ -73,11 +74,11 @@ class Disable_Comments extends Hookable
         global $pagenow;
 
         if ($pagenow === 'comment.php' || $pagenow === 'edit-comments.php' || $pagenow === 'options-discussion.php') {
-            wp_die(__('Comments are closed.'), '', [ 'response' => 403 ]);
+            \wp_die(\__('Comments are closed.', 'snap'), '', [ 'response' => 403 ]);
         }
 
-        remove_menu_page('edit-comments.php');
-        remove_submenu_page('options-general.php', 'options-discussion.php');
+        \remove_menu_page('edit-comments.php');
+        \remove_submenu_page('options-general.php', 'options-discussion.php');
     }
 
     /**
@@ -97,7 +98,7 @@ class Disable_Comments extends Hookable
      */
     public function remove_comments_dashboard_widget()
     {
-        remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal');
+        \remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal');
     }
 
     /**
@@ -108,7 +109,7 @@ class Disable_Comments extends Hookable
     public function remove_comments_from_adminbar()
     {
         if (is_admin_bar_showing()) {
-            remove_action('admin_bar_menu', 'wp_admin_bar_comments_menu', 60);
+            \remove_action('admin_bar_menu', 'wp_admin_bar_comments_menu', 60);
         }
     }
         
@@ -119,14 +120,14 @@ class Disable_Comments extends Hookable
      */
     public function remove_comments_meta_boxes()
     {
-        if (is_admin() && current_user_can('manage_options')) {
+        if (\is_admin() && \current_user_can('manage_options')) {
             // Get all public post types.
-            $post_types = get_post_types([ 'public' => true ]);
+            $post_types = \get_post_types([ 'public' => true ]);
 
             foreach ($post_types as $post_type) {
-                remove_meta_box('commentstatusdiv', $post_type, 'normal');
-                remove_meta_box('commentsdiv', $post_type, 'normal');
-                remove_meta_box('trackbacksdiv', $post_type, 'normal');
+                \remove_meta_box('commentstatusdiv', $post_type, 'normal');
+                \remove_meta_box('commentsdiv', $post_type, 'normal');
+                \remove_meta_box('trackbacksdiv', $post_type, 'normal');
             }
         }
     }
@@ -148,8 +149,8 @@ class Disable_Comments extends Hookable
      */
     public function remove_comments_stop_bots()
     {
-        if (is_comment_feed()) {
-            wp_die(__('Comments are closed.'), '', [ 'response' => 403 ]);
+        if (\is_comment_feed()) {
+            \wp_die(\__('Comments are closed.', 'snap'), '', [ 'response' => 403 ]);
         }
     }
 
@@ -160,6 +161,18 @@ class Disable_Comments extends Hookable
      */
     public function remove_comments_widget()
     {
-        unregister_widget('WP_Widget_Recent_Comments');
+        \unregister_widget('WP_Widget_Recent_Comments');
+    }
+
+    /**
+     * Remove comment support from all built in post-types.
+     *
+     * @since  1.0.0
+     */
+    public function remove_post_type_support()
+    {
+        \remove_post_type_support('page', 'comments');
+        \remove_post_type_support('post', 'comments');
+        \remove_post_type_support('attachment', 'comments');
     }
 }
