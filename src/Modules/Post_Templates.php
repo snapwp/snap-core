@@ -6,8 +6,8 @@ use Snap\Core\Snap;
 use Snap\Core\Hookable;
 
 /**
- * Ensure all post templates found in views/templates/ folder get treated as templates by WordPress,
- * and ensure all is_page_template() requests are routed to the primary front controller (index.php).
+ * Ensure all post templates found in resources/templates/ folder get treated as templates by WordPress,
+ * and ensure all is_page_template() requests are routed to routes.php.
  *
  * @since  1.0.0
  */
@@ -56,13 +56,13 @@ class Post_Templates extends Hookable
     public function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
         // Path to  templates folder.
-        $path = get_stylesheet_directory() . '/' . Snap::config('theme.templates_directory') . '/views/post-templates/';
+        $path = \get_stylesheet_directory() . '/' . Snap::config('theme.templates_directory') . '/views/post-templates/';
 
         $templates = \scandir($path);
 
         if (! empty($templates)) {
             foreach ($templates as $tpl) {
-                $full_path = $path.$tpl;
+                $full_path = $path . $tpl;
 
                 if ($tpl === '.' || $tpl === '..' || \is_dir($full_path) || $tpl === '_example.php') {
                     continue;
@@ -75,7 +75,7 @@ class Post_Templates extends Hookable
                 $types = [ 'page' ];
 
                 if (\preg_match('|Template Post Type:(.*)$|mi', \file_get_contents($full_path), $type)) {
-                    $types = \explode(',', _cleanup_header_comment(\str_replace(' ', '', $type[1])));
+                    $types = \explode(',', \_cleanup_header_comment(\str_replace(' ', '', $type[1])));
                 }
 
                 if (\in_array($post_type, $types)) {
@@ -94,8 +94,8 @@ class Post_Templates extends Hookable
      */
     public function register_theme_template_hooks()
     {
-        foreach (get_post_types([ 'public' => true ]) as $post_type) {
-            add_filter("theme_{$post_type}_templates", [ $this, 'custom_template_locator' ], 10, 4);
+        foreach (\get_post_types([ 'public' => true ]) as $post_type) {
+            $this->add_filter("theme_{$post_type}_templates", 'custom_template_locator');
         }
     }
 
@@ -109,9 +109,14 @@ class Post_Templates extends Hookable
      */
     public function post_template_routing($template_path)
     {
-        // If current request is a post/page template, return path to main front controller.
-        if (is_page_template()) {
-            return get_stylesheet_directory() . '/index.php';
+        $routes_file = \get_template_directory() . '/resources/routes.php';
+        
+        if (is_child_theme()) {
+            $routes_file = \locate_template('resources/routes.php');
+        }
+
+        if ('' !== $routes_file) {
+            return $routes_file;
         }
         
         return $template_path;

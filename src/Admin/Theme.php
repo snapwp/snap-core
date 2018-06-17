@@ -72,7 +72,12 @@ class Theme extends Hookable
      */
     public function enqueue_snap_admin()
     {
-        wp_enqueue_style('snap_admin_theme', get_theme_file_uri('vendor/snapwp/snap-core/src/Admin/assets/snap-admin.css'), [], Snap::VERSION);
+        \wp_enqueue_style(
+            'snap_admin_theme',
+            \get_theme_file_uri('vendor/snapwp/snap-core/src/Admin/assets/snap-admin.css'),
+            [],
+            Snap::VERSION
+        );
     }
 
     /**
@@ -82,7 +87,7 @@ class Theme extends Hookable
      */
     public function clean_admin_menu()
     {
-        remove_submenu_page('index.php', 'index.php');
-        remove_submenu_page('index.php', 'update-core.php');
+        \remove_submenu_page('index.php', 'index.php');
+        \remove_submenu_page('index.php', 'update-core.php');
     }
 }

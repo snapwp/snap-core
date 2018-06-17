@@ -87,8 +87,17 @@ class Loader
     private function load_theme()
     {
         // Populate $theme_includes.
-        self::$theme_includes = $this->scandir(\get_template_directory() . '/theme/', self::$theme_includes, \get_template_directory());
-        self::$theme_includes = $this->scandir(\get_stylesheet_directory() . '/theme/', self::$theme_includes, \get_stylesheet_directory());
+        self::$theme_includes = $this->scandir(
+            \get_template_directory() . '/theme/',
+            self::$theme_includes,
+            \get_template_directory()
+        );
+
+        self::$theme_includes = $this->scandir(
+            \get_stylesheet_directory() . '/theme/',
+            self::$theme_includes,
+            \get_stylesheet_directory()
+        );
 
         if (! empty(self::$theme_includes)) {
             foreach (self::$theme_includes as $class => $path) {

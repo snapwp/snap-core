@@ -68,29 +68,29 @@ class Admin extends Hookable
     {
         $additional_mime_types = [
             'application/msword' => [
-                __('Word Docs', 'snap'),
-                __('Manage Word Docs', 'snap'),
-                _n_noop('Word Doc <span class="count">(%s)</span>', 'Word Docs <span class="count">(%s)</span>'),
+                \__('Word Docs', 'snap'),
+                \__('Manage Word Docs', 'snap'),
+                \_n_noop('Word Doc <span class="count">(%s)</span>', 'Word Docs <span class="count">(%s)</span>'),
             ],
             'application/vnd.ms-excel' => [
-                __('Excel Docs', 'snap'),
-                __('Manage Excel Docs', 'snap'),
-                _n_noop('Excel Doc <span class="count">(%s)</span>', 'Excel Docs <span class="count">(%s)</span>'),
+                \__('Excel Docs', 'snap'),
+                \__('Manage Excel Docs', 'snap'),
+                \_n_noop('Excel Doc <span class="count">(%s)</span>', 'Excel Docs <span class="count">(%s)</span>'),
             ],
             'application/pdf' => [
-                __('PDFs', 'snap'),
-                __('Manage PDFs', 'snap'),
-                _n_noop('PDF <span class="count">(%s)</span>', 'PDFs <span class="count">(%s)</span>'),
+                \__('PDFs', 'snap'),
+                \__('Manage PDFs', 'snap'),
+                \_n_noop('PDF <span class="count">(%s)</span>', 'PDFs <span class="count">(%s)</span>'),
             ],
             'application/zip' => [
-                __('ZIPs', 'snap'),
-                __('Manage ZIPs', 'snap'),
-                _n_noop('ZIP <span class="count">(%s)</span>', 'ZIPs <span class="count">(%s)</span>'),
+                \__('ZIPs', 'snap'),
+                \__('Manage ZIPs', 'snap'),
+                \_n_noop('ZIP <span class="count">(%s)</span>', 'ZIPs <span class="count">(%s)</span>'),
             ],
             'text/csv' => [
-                __('CSVs', 'snap'),
-                __('Manage CSVs', 'snap'),
-                _n_noop('CSV <span class="count">(%s)</span>', 'CSVs <span class="count">(%s)</span>'),
+                \__('CSVs', 'snap'),
+                \__('Manage CSVs', 'snap'),
+                \_n_noop('CSV <span class="count">(%s)</span>', 'CSVs <span class="count">(%s)</span>'),
             ],
         ];
 
@@ -106,9 +106,9 @@ class Admin extends Hookable
     {
         echo \sprintf(
             '%s <a href="http://wordpress.org" target="_blank">WordPress</a> %s <a href="%s" target="_blank">SnapWP</a>',
-            __('Built using', 'snap'),
-            __('and', 'snap'),
-            esc_url(Snap::SNAPWP_HOME)
+            \__('Built using', 'snap'),
+            \__('and', 'snap'),
+            \esc_url(Snap::SNAPWP_HOME)
         );
     }
 
@@ -119,7 +119,7 @@ class Admin extends Hookable
      */
     public function flush_rewrite_rules()
     {
-        flush_rewrite_rules();
+        \flush_rewrite_rules();
     }
 
     /**
@@ -150,11 +150,11 @@ class Admin extends Hookable
      */
     public function populate_columns($column, $post_id)
     {
-        $page_templates = \array_flip(get_page_templates());
+        $page_templates = \wp_get_theme()->get_page_templates($post_id);
 
         switch ($column) {
             case 'snap_template':
-                $template = get_page_template_slug($post_id);
+                $template = \get_page_template_slug($post_id);
                 echo isset($page_templates[ $template ]) ? $page_templates[ $template ] : '—';
                 break;
         }
