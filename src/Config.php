@@ -33,7 +33,7 @@ class Config
      */
     private $config = [
         'theme' => [
-            'templates_directory' => 'resources/templates/',
+            'templates_directory' => 'resources/templates',
             'disable_xmlrpc' => true,
             'disable_comments' => false,
             'disable_customizer' => false,
