@@ -12,7 +12,7 @@ class Creator extends Command
      * @since  1.0.0
      * @var string
      */
-    protected $themeDir;
+    protected $theme_dir;
 
     /**
      * The scaffolding directory.
@@ -20,7 +20,7 @@ class Creator extends Command
      * @since  1.0.0
      * @var string
      */
-    protected $scaffoldingDir;
+    protected $scaffolding_dir;
 
     /**
      * Set properties.
@@ -29,8 +29,8 @@ class Creator extends Command
      */
     public function __construct()
     {
-        $this->themeDir = \getcwd();
-        $this->scaffoldingDir = __DIR__ . '/scaffolding/';
+        $this->theme_dir = \getcwd();
+        $this->scaffolding_dir = __DIR__ . '/scaffolding/';
 
         parent::__construct();
     }
@@ -47,7 +47,7 @@ class Creator extends Command
      */
     protected function scaffold($scaffold, $filename, $args)
     {
-        $original = $this->scaffoldingDir . "{$scaffold}.php";
+        $original = $this->scaffolding_dir . "{$scaffold}.php";
 
         if (\file_exists($original)) {
             $content = \file_get_contents($original);
@@ -75,14 +75,14 @@ class Creator extends Command
      */
     protected function create_destination_dir($dir)
     {
-        $themeDir = "{$this->themeDir}/theme";
+        $theme_dir = "{$this->theme_dir}/theme";
 
-        if (! \is_dir($themeDir)) {
-            \mkdir($themeDir, 0755);
+        if (! \is_dir($theme_dir)) {
+            \mkdir($theme_dir, 0755);
         }
 
-        if (! \is_dir($themeDir . '/' . $dir)) {
-            \mkdir($themeDir . '/' . $dir, 0755);
+        if (! \is_dir($theme_dir . '/' . $dir)) {
+            \mkdir($theme_dir . '/' . $dir, 0755);
         }
     }
 
@@ -104,10 +104,13 @@ class Creator extends Command
             case 'hookable':
                 $dir = 'Hookables';
                 break;
+            case 'controller':
+                $dir = 'Controllers';
+                break;
         }
 
         $this->create_destination_dir($dir);
 
-        return $this->themeDir . '/theme/' . $dir . '/' .$filename . '.php';
+        return $this->theme_dir . '/theme/' . $dir . '/' .$filename . '.php';
     }
 }
