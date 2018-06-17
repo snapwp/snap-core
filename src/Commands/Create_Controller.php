@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Core\Commands;
+namespace Snap\Commands;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

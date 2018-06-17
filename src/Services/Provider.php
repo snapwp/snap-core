@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Core\Services;
+namespace Snap\Services;
 
 class Provider implements Interfaces\Provider
 {

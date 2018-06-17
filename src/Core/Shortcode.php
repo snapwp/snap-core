@@ -2,7 +2,7 @@
 
 namespace Snap\Core;
 
-use Snap\Core\Exceptions\Shortcode_Exception;
+use Snap\Exceptions\Shortcode_Exception;
 
 /**
  * A simple wrapper for auto registering shortcodes.

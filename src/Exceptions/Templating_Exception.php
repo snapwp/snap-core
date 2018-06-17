@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Core\Exceptions;
+namespace Snap\Exceptions;
 
 /**
  * Generic Exception used by View classes.

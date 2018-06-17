@@ -1,8 +1,8 @@
 <?php
 
-namespace Snap\Core\Templating;
+namespace Snap\Templating;
 
-use Snap\Core\Exceptions\Templating_Exception;
+use Snap\Exceptions\Templating_Exception;
 use Snap\Core\Snap;
 use Snap\Core\Request;
 
@@ -17,7 +17,7 @@ class Partial
      * The parent View.
      *
      * @since  1.0.0
-     * @var Snap\Core\View
+     * @var Snap\Templating\View
      */
     private $view;
 
@@ -80,7 +80,7 @@ class Partial
      * @param  string $slug The slug for the generic template.
      * @param  string $name Optional. The name of the specialised template.
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
-     * @return \Snap\Core\Templating\Partial
+     * @return \Snap\Templating\Partial
      */
     public function partial($slug, $name = '', $data = [])
     {
@@ -93,7 +93,7 @@ class Partial
      * Wrapper for outputting Pagination.
      *
      * @since 1.0.0
-     * @see \Snap\Core\Modules\Pagination
+     * @see \Snap\Modules\Pagination
      *
      * @param  array $args Args to pass to the Pagination instance.
      * @return bool|string If $args['echo'] then return true/false if the render is successfull,

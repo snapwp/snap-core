@@ -45,24 +45,24 @@ class Loader
         \spl_autoload_register(__NAMESPACE__ .'\Loader::autoload');
 
         $snap_modules = [
-            \Snap\Core\Modules\Admin::class,
-            \Snap\Core\Modules\Assets::class,
-            \Snap\Core\Modules\Cleanup::class,
-            \Snap\Core\Modules\I18n::class,
-            \Snap\Core\Modules\Post_Templates::class,
-            \Snap\Core\Modules\Images::class,
+            \Snap\Modules\Admin::class,
+            \Snap\Modules\Assets::class,
+            \Snap\Modules\Cleanup::class,
+            \Snap\Modules\I18n::class,
+            \Snap\Modules\Post_Templates::class,
+            \Snap\Modules\Images::class,
         ];
 
         if (Snap::config('theme.disable_comments') === true) {
-            $snap_modules[] = \Snap\Core\Modules\Disable_Comments::class;
+            $snap_modules[] = \Snap\Modules\Disable_Comments::class;
         }
 
         if (Snap::config('theme.disable_customizer') === true) {
-            $snap_modules[] = \Snap\Core\Modules\Disable_Customizer::class;
+            $snap_modules[] = \Snap\Modules\Disable_Customizer::class;
         }
 
         if (Snap::config('theme.snap_admin_theme') === true) {
-            $snap_modules[] = \Snap\Core\Admin\Theme::class;
+            $snap_modules[] = \Snap\Admin\Theme::class;
         }
 
         foreach ($snap_modules as $module) {
@@ -132,7 +132,7 @@ class Loader
         \add_action(
             'widgets_init',
             function () {
-                \register_widget(\Snap\Core\Widgets\Related_Pages::class);
+                \register_widget(\Snap\Widgets\Related_Pages::class);
             }
         );
     }

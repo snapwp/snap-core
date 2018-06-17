@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Core\Widgets;
+namespace Snap\Widgets;
 
 use WP_Widget;
 use Snap\Core\Utils;

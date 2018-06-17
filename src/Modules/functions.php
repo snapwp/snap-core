@@ -4,14 +4,14 @@ use Snap\Core\Snap;
 use Snap\Core\Hookable;
 use Snap\Core\Utils;
 use Snap\Core\Router;
-use Snap\Core\Modules\Assets;
-use Snap\Core\Templating\View;
+use Snap\Modules\Assets;
+use Snap\Templating\View;
 
 /*
  * *********************************************************************************************************************
  * Templating functions
  *
- * Wrappers for Snap\Core\Templating\View methods.
+ * Wrappers for Snap\Templating\View methods.
  * *********************************************************************************************************************
  */
 
@@ -23,7 +23,7 @@ if (! \function_exists('snap_render_partial')) {
      *
      * @since  1.0.0
      *
-     * @see Snap\Core\Templating\View::partial
+     * @see Snap\Templating\View::partial
      */
     function snap_render_partial($name, $slug = '', $data = null, $extract = false)
     {
@@ -39,7 +39,7 @@ if (! \function_exists('snap_render_partial')) {
      *
      * @since  1.0.0
      *
-     * @see Snap\Core\Templating\View::render
+     * @see Snap\Templating\View::render
      */
     function snap_render_view($slug, $name = '')
     {
@@ -56,7 +56,7 @@ if (! \function_exists('snap_loop')) {
      *
      * @since 1.0.0
      *
-     * @see Snap\Core\Templating\View::get_user_role
+     * @see Snap\Templating\View::get_user_role
      */
     function snap_loop($partial = null, $partial_overrides = null, $wp_query = null)
     {
@@ -70,7 +70,7 @@ if (! \function_exists('snap_pagination')) {
      *
      * @since 1.0.0
      *
-     * @see Snap\Core\Templating\View::pagination
+     * @see Snap\Templating\View::pagination
      */
     function snap_pagination($args = [])
     {
@@ -230,7 +230,7 @@ if (! \function_exists('snap_get_asset_url')) {
      *
      * @since  1.0.0
      *
-     * @see Snap\Core\Modules\Assets::get_asset_url
+     * @see Snap\Modules\Assets::get_asset_url
      */
     function snap_get_asset_url($asset)
     {

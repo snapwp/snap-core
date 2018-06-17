@@ -2,7 +2,7 @@
 
 namespace Snap\Core;
 
-use Snap\Core\Modules\Assets;
+use Snap\Modules\Assets;
 
 /**
  * A base class for simplifying declaring theme supports and menus.

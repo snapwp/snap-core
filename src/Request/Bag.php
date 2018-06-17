@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Core\Request;
+namespace Snap\Request;
 
 use ArrayAccess;
 

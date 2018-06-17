@@ -4,7 +4,7 @@ namespace Snap\Core;
 
 use WP_Http;
 use ArrayAccess;
-use Snap\Core\Request\Bag;
+use Snap\Request\Bag;
 
 /**
  * Gathers all request variables into one place, and provides a simple API for changes affecting the response.
@@ -17,7 +17,7 @@ class Request implements ArrayAccess
      * Request query params.
      *
      * @since 1.0.0
-     * @var Snap\Core\Request\Bag
+     * @var Snap\Request\Bag
      */
     public $query = null;
 
@@ -25,7 +25,7 @@ class Request implements ArrayAccess
      * Request post params.
      *
      * @since 1.0.0
-     * @var Snap\Core\Request\Bag
+     * @var Snap\Request\Bag
      */
     public $post = null;
 
@@ -33,7 +33,7 @@ class Request implements ArrayAccess
      * Request server params.
      *
      * @since 1.0.0
-     * @var Snap\Core\Request\Bag
+     * @var Snap\Request\Bag
      */
     public $server = null;
 
@@ -43,7 +43,7 @@ class Request implements ArrayAccess
      * POST takes precedence.
      *
      * @since 1.0.0
-     * @var Snap\Core\Request\Bag
+     * @var Snap\Request\Bag
      */
     public $request = null;
 

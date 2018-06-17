@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Core\Modules;
+namespace Snap\Modules;
 
 use WP_Query;
 use WP_User_Query;

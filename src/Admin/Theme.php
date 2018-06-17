@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Core\Admin;
+namespace Snap\Admin;
 
 use Snap\Core\Snap;
 use Snap\Core\Hookable;

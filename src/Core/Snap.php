@@ -5,9 +5,9 @@ namespace Snap\Core;
 use WP_Query;
 use wpdb;
 use Hodl\Container;
-use Snap\Core\Modules\Assets;
-use Snap\Core\Templating\Partial;
-use Snap\Core\Templating\View;
+use Snap\Modules\Assets;
+use Snap\Templating\Partial;
+use Snap\Templating\View;
 
 /**
  * The main Snap class.
