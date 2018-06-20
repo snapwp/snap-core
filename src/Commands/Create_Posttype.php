@@ -7,11 +7,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Creates a controller class in the current directory.
+ * Creates a shortcode class in the current directory.
  *
  * @since  1.0.0
  */
-class Create_Controller extends Creator
+class Create_Posttype extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -20,11 +20,11 @@ class Create_Controller extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:controller')
-            ->setDescription('Creates a new Controller.')
-            ->setHelp('Creates a new Controller class within your theme/Controllers directory');
+        $this->setName('make:posttype')
+            ->setDescription('Creates a new custom post type.')
+            ->setHelp('Creates a new Post_Type class within your theme/Shortcodes directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created controller.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created post type.');
     }
 
     /**
@@ -35,7 +35,7 @@ class Create_Controller extends Creator
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'controller',
+            'posttype',
             $input->getArgument('name'),
             [
                 'CLASSNAME' => $input->getArgument('name'),

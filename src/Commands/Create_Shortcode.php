@@ -20,7 +20,7 @@ class Create_Shortcode extends Creator
      */
     protected function configure()
     {
-        $this->setName('create:shortcode')
+        $this->setName('make:shortcode')
             ->setDescription('Creates a new Shortcode.')
             ->setHelp('Creates a new Shortcode class within your theme/Shortcodes directory');
 

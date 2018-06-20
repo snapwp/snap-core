@@ -107,6 +107,12 @@ class Creator extends Command
             case 'controller':
                 $dir = 'Controllers';
                 break;
+            case 'posttype':
+                $dir = 'Posts';
+                break;
+            case 'taxonomy':
+                $dir = 'Taxonomies';
+                break;
         }
 
         $this->create_destination_dir($dir);

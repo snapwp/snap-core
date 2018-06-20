@@ -4,6 +4,13 @@ namespace Snap\Core;
 
 use PostTypes\PostType;
 
+/**
+ * Post type base class.
+ *
+ * A wrapper around PostTypes\PostType.
+ *
+ * @see  https://github.com/jjgrainger/PostTypes
+ */
 class Post_Type extends Hookable
 {
     /**
@@ -56,15 +63,30 @@ class Post_Type extends Hookable
      */
     public $options = [];
     
+    /**
+     * Register additional admin columns for this post type.
+     *
+     * @since  1.0.0
+     * @var null|array
+     */
     public $columns = [];
 
     /**
-     * [$taxonomies description]
-     * @var array
+     * Attach Taxonomies by supplying the names to attach here.
+     *
+     * By default all taxonomies are added to the admin as filters for this post type.
+     * By supplying name => false as a value for your taxonomy, it will not be added as a filter.
+     *
+     * @since  1.0.0
+     * @var array|string[]
      */
     public $taxonomies = [];
 
-
+    /**
+     * Register the post type.
+     *
+     * @since  1.0.0
+     */
     public function __construct()
     {
         $post_type = new PostType($this->get_names(), $this->options, $this->labels);
@@ -170,21 +192,32 @@ class Post_Type extends Hookable
     {
     }
 
+    /**
+     * Define the taxonomy relationships, and whether each taxonomy can be quick filtered.
+     *
+     * @since  1.0.0
+     *
+     * @param PostTypes\PostType $post_type The current PostType instance.
+     */
     private function add_relationships($post_type)
     {
         if (! empty($this->taxonomies)) {
-            foreach ($this->taxonomies as $tax) {
-                $post_type->taxonomy($tax);
+            $filters = [];
+
+            foreach ($this->taxonomies as $k => $v) {
+                // Add all taxonomies to $filters unless explicitly declared otherwise.
+                if (\is_integer($k)) {
+                    $post_type->taxonomy($v);
+                    $filters[] = $v;
+                    continue;
+                }
+
+                if ($v === false) {
+                    $post_type->taxonomy($k);
+                }
             }
 
-
-
-
-
-
-
-            // TODO
-            $post_type->filters($this->taxonomies);
+            $post_type->filters($filters);
         }
     }
 
@@ -217,9 +250,9 @@ class Post_Type extends Hookable
     }
 
     /**
-     * Get the unqualified name of the current class and convert it to snake case for the shortcode name.
+     * Get the unqualified name of the current class and convert it to snake case for the post type name.
      *
-     * Can be overwritten by setting the $tag property.
+     * Can be overwritten by setting the $name property.
      *
      * @since  1.0.0
      *

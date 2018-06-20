@@ -20,7 +20,7 @@ class Create_Hookable extends Creator
      */
     protected function configure()
     {
-        $this->setName('create:hookable')
+        $this->setName('make:hookable')
             ->setDescription('Creates a new Hookable.')
             ->setHelp('Creates a new Hookable class within your theme/Hookables directory');
 
