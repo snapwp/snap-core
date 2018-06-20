@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<ruleset name="SnapWP">
+
+    <description>A mixture of PSR2 and WordPress standards</description>
+
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <autoload>./vendor/wp-coding-standards/wpcs/WordPress/PHPCSAliases.php</autoload>
+
+    <arg name="colors"/>
+
+    <rule ref="PSR2">
+        <exclude name="PSR1.Methods.CamelCapsMethodName"/>
+        <exclude name="Squiz.Classes.ValidClassName"/>
+    </rule>
+
+    <rule ref="WordPress.NamingConventions.ValidFunctionName"/>
+    <rule ref="WordPress.NamingConventions.ValidHookName"/>
+    <rule ref="WordPress.NamingConventions.ValidVariableName"/>
+
+    <rule ref="WordPress.Arrays.ArrayIndentation"/>
+    <rule ref="WordPress.Arrays.ArrayKeySpacingRestrictions"/>
+    <rule ref="WordPress.Arrays.CommaAfterArrayItem"/>
+    <!-- <rule ref="WordPress.Arrays.MultipleStatementAlignment"/> -->
+    <rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
+    <rule ref="WordPress.DB.RestrictedClasses"/>
+    <rule ref="WordPress.DB.RestrictedFunctions"/>
+    <rule ref="WordPress.PHP.DiscourageGoto"/>
+    <rule ref="WordPress.PHP.POSIXFunctions"/>
+    <rule ref="WordPress.PHP.RestrictedPHPFunctions"/>
+
+    <rule ref="WordPress.WP.CapitalPDangit"/>
+    <rule ref="WordPress.WP.I18n"/>
+    <rule ref="WordPress.WP.PreparedSQL"/>
+
+    <rule ref="PEAR.Functions.FunctionCallSignature"/>
+    <rule ref="PEAR.NamingConventions.ValidClassName"/>
+
+    <!-- <rule ref="Squiz.NamingConventions.ValidVariableName"/> -->
+
+</ruleset>
