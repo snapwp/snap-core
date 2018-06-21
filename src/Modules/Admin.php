@@ -29,9 +29,6 @@ class Admin extends Hookable
     protected $filters = [
         // Add additional mime types to the media filter dropdown.
         'post_mime_types' => 'additional_mime_types',
-        
-        // Add snap notice text to admin screens.
-        'admin_footer_text' => 'branding_admin_footer',
 
         // Add custom columns.
         'manage_pages_columns' => 'register_columns',
@@ -95,21 +92,6 @@ class Admin extends Hookable
         ];
 
         return \array_merge($post_mime_types, $additional_mime_types);
-    }
-
-    /**
-     * Outputs the SnapWP footer in WordPress admin.
-     *
-     * @since  1.0.0
-     */
-    public function branding_admin_footer()
-    {
-        echo \sprintf(
-            '%s <a href="http://wordpress.org" target="_blank">WordPress</a> %s <a href="%s" target="_blank">SnapWP</a>',
-            \__('Built using', 'snap'),
-            \__('and', 'snap'),
-            \esc_url(Snap::SNAPWP_HOME)
-        );
     }
 
     /**

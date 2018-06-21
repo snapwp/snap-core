@@ -51,6 +51,7 @@ class Loader
             \Snap\Modules\I18n::class,
             \Snap\Modules\Post_Templates::class,
             \Snap\Modules\Images::class,
+            \Snap\Admin\Whitelabel::class,
         ];
 
         if (Snap::config('theme.disable_comments') === true) {
@@ -61,7 +62,7 @@ class Loader
             $snap_modules[] = \Snap\Modules\Disable_Customizer::class;
         }
 
-        if (Snap::config('theme.snap_admin_theme') === true) {
+        if (Snap::config('admin.snap_admin_theme') === true) {
             $snap_modules[] = \Snap\Admin\Theme::class;
         }
 

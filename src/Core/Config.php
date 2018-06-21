@@ -32,6 +32,13 @@ class Config
      * @var array
      */
     private $config = [
+        'admin' => [
+            'snap_admin_theme' => false,
+            'footer_text' => false,
+            'show_version' => true,
+            'login_extra_css' => false,
+            'login_logo_url' => '/',
+        ],
         'theme' => [
             'templates_directory' => 'resources/templates',
             'disable_xmlrpc' => true,
@@ -42,7 +49,6 @@ class Config
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
             'snap_modules' => [],
-            'snap_admin_theme' => false,
         ],
         'images' => [
             'default_image_quality' => 75,
