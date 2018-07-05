@@ -247,7 +247,7 @@ class Router
      * @param  string $slug The slug of the view to render.
      * @param  string $name The name of the view to render.
      */
-    public function view($slug, $name = '')
+    public function view($slug)
     {
         if ($this->can_proceed()) {
             // As this is the correct route, apply middleware stack.
@@ -255,15 +255,9 @@ class Router
 
             // Passed all middleware.
             if ($this->can_proceed()) {
-                $view = "{$slug}";
-
-                if ('' !== $name) {
-                    $view = "{$slug}-{$name}";
-                }
-
-                do_action("snap_render_view_{$view}", Snap::request());
+                do_action("snap_render_view_{$slug}", Snap::request());
                 
-                Snap::view()->render($slug, $name);
+                Snap::view()->render($slug);
 
                 $this->has_matched_route = true;
             }

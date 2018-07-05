@@ -20,7 +20,15 @@ class View
      * @since  1.0.0
      * @var string|null
      */
-    private $current_view = null;
+    protected $current_view = null;
+
+    /**
+     * Variables to pass to the template and any child partials.
+     *
+     * @since  1.0.0
+     * @var array
+     */
+    protected $data = [];
 
     /**
      * Renders a view.
@@ -31,9 +39,9 @@ class View
      * @throws Templating_Exception If views are nested.
      *
      * @param  string $slug The slug for the generic template.
-     * @param  string $name Optional. The name of the specialised template.
+     * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
      */
-    public function render($slug, $name = '')
+    public function render($slug, $data = [])
     {
         /*
          * When Snap first boots up, it starts the output buffer.
@@ -45,15 +53,20 @@ class View
             throw new Templating_Exception('Views should not be nested');
         }
 
-        $this->current_view = $this->get_template_name($slug, $name);
+        $this->data = $data;
 
-        $path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
+        $this->current_view = $this->get_template_name($slug);
 
-        if ($path === '') {
+        $snap_template_path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
+
+        if ($snap_template_path === '') {
             throw new Templating_Exception('Could not find view: ' . $this->current_view);
         }
 
-        require($path);
+        unset($data, $slug);
+
+        \extract($this->data);
+        require($snap_template_path);
     }
 
     /**
@@ -66,14 +79,14 @@ class View
      * @throws Templating_Exception If no partial template found.
      *
      * @param  string $slug The slug for the generic template.
-     * @param  string $name Optional. The name of the specialised template.
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
      * @return \Snap\Templating\Partial
      */
-    public function partial($slug, $name = '', $data = [])
+    public function partial($slug, $data = [])
     {
         $partial = Snap::services()->get(Partial::class);
-        $partial->render($slug, $name, $data);
+        $data = \array_merge($this->data, $data);
+        $partial->render($slug, $data);
         return $partial;
     }
 
@@ -182,19 +195,13 @@ class View
      * @since 1.0.0
      *
      * @param  string $slug The slug for the generic template.
-     * @param  string $name Optional. The name of the specialised template.
      * @return string
      */
-    public function get_template_name($slug, $name = '')
+    public function get_template_name($slug)
     {
-        $name = (string) $name;
         $slug = \str_replace([ Snap::config('theme.templates_directory') . '/views/', '.php' ], '', $slug);
 
         $template = "{$slug}.php";
-
-        if ('' !== $name) {
-            $template = "{$slug}-{$name}.php";
-        }
 
         return $template;
     }

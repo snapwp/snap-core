@@ -86,28 +86,28 @@ class Snap
 
             $container->addInstance($config);
 
-            $container->add(
+            $container->addSingleton(
                 Router::class,
                 function () {
                     return new Router();
                 }
             );
 
-            $container->add(
+            $container->addSingleton(
                 Request::class,
                 function () {
                     return new Request();
                 }
             );
             
-            $container->add(
+            $container->addSingleton(
                 View::class,
                 function ($hodl) {
                     return $hodl->resolve(View::class);
                 }
             );
 
-            $container->addFactory(
+            $container->add(
                 Partial::class,
                 function ($hodl) {
                     return $hodl->resolve(Partial::class);
@@ -115,7 +115,7 @@ class Snap
             );
 
             // Add the assets module to avoid parsing the mix-manifest multiple times.
-            $container->add(
+            $container->addSingleton(
                 Assets::class,
                 function () {
                     return new Assets();

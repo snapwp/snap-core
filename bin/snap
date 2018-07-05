@@ -6,18 +6,18 @@ if (! @include_once __DIR__ . '/../vendor/autoload.php') {
 }
 
 use Symfony\Component\Console\Application;
-use Snap\Commands\Create_Shortcode;
-use Snap\Commands\Create_Controller;
 use Snap\Commands\Create_Hookable;
 use Snap\Commands\Create_Posttype;
+use Snap\Commands\Create_Controller;
+use Snap\Commands\Create_Shortcode;
 use Snap\Commands\Create_Taxonomy;
 
 $application = new Application();
 
-$application->add(new Create_Shortcode());
-$application->add(new Create_Controller());
 $application->add(new Create_Hookable());
+$application->add(new Create_Shortcode());
 $application->add(new Create_Posttype());
+$application->add(new Create_Controller());
 $application->add(new Create_Taxonomy());
 
 $application->run();

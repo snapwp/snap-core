@@ -4,7 +4,6 @@ namespace Snap\Templating;
 
 use Snap\Exceptions\Templating_Exception;
 use Snap\Core\Snap;
-use Snap\Core\Request;
 
 /**
  * The basic view class for snap.
@@ -19,24 +18,24 @@ class Partial
      * @since  1.0.0
      * @var Snap\Templating\View
      */
-    private $view;
+    protected $view;
 
-    /**
-     * The global request.
+     /**
+     * Variables to pass to the template and any child partials.
      *
      * @since  1.0.0
-     * @var Snap\Core\Request
+     * @var array
      */
-    private $request;
+    protected $data = [];
 
-    private $current_template;
-
-    private $data = [];
-
-    public function __construct(View $view, Request $request)
+    /**
+     * Constructor. Set reference to the parent view.
+     *
+     * @param View $view The parent view.
+     */
+    public function __construct(View $view)
     {
         $this->view = $view;
-        $this->request = $request;
     }
 
     /**
@@ -47,25 +46,25 @@ class Partial
      * @throws Templating_Exception If no partial template found.
      *
      * @param  string $slug     The slug for the generic template.
-     * @param  string $name     Optional. The name of the specialised template.
      * @param  mixed  $data     Optional. Additional data to pass to a partial. Available in the partial as $data.
      *                          It is important to note that nothing is done to destroy/restore the current loop.
      */
-    public function render($slug, $name = '', $data = [])
+    public function render($slug, $data = [])
     {
-        $partial_template_name = $this->view->get_template_name($slug, $name);
-        $this->current_template = $partial_template_name;
-        $file_name = locate_template(Snap::config('theme.templates_directory') . '/partials/' . $partial_template_name);
+        $this->current_template = $this->view->get_template_name($slug);
+        
+        $snap_template_path = locate_template(Snap::config('theme.templates_directory') . '/partials/' . $this->view->get_template_name($slug));
 
         $this->data = $data;
         
         unset($slug, $name, $data);
         
-        if ($file_name === '') {
-            throw new Templating_Exception('Could not find partial: ' . $partial_template_name);
+        if ($snap_template_path === '') {
+            throw new Templating_Exception('Could not find partial: ' . $this->view->get_template_name($slug));
         }
 
-        require($file_name);
+        \extract($this->data);
+        require($snap_template_path);
     }
 
     /**
@@ -78,14 +77,14 @@ class Partial
      * @throws Templating_Exception If no partial template found.
      *
      * @param  string $slug The slug for the generic template.
-     * @param  string $name Optional. The name of the specialised template.
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
      * @return \Snap\Templating\Partial
      */
-    public function partial($slug, $name = '', $data = [])
+    public function partial($slug, $data = [])
     {
         $partial = Snap::services()->get(Partial::class);
-        $partial->render($slug, $name, $data);
+        $data = \array_merge($this->data, $data);
+        $partial->render($slug, $data);
         return $partial;
     }
 
@@ -137,14 +136,5 @@ class Partial
     public function get_current_view()
     {
         return $this->view->get_current_view();
-    }
-
-    public function __get($name)
-    {
-        if (\array_key_exists($name, $this->data)) {
-            return $this->data[ $name ];
-        }
-
-        return null;
     }
 }

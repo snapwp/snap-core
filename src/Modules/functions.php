@@ -25,9 +25,9 @@ if (! \function_exists('snap_render_partial')) {
      *
      * @see Snap\Templating\View::partial
      */
-    function snap_render_partial($name, $slug = '', $data = null, $extract = false)
+    function snap_render_partial($slug, $data = null)
     {
-        Snap::view()->partial($name, $slug, $data, $extract);
+        Snap::view()->partial($slug, $data);
     }
 }
 
@@ -41,9 +41,9 @@ if (! \function_exists('snap_render_partial')) {
      *
      * @see Snap\Templating\View::render
      */
-    function snap_render_view($slug, $name = '')
+    function snap_render_view($slug)
     {
-        Snap::view()->render($name, $slug);
+        Snap::view()->render($slug);
     }
 }
 
