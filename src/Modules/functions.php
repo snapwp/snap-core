@@ -102,6 +102,24 @@ if (! \function_exists('snap_get_current_view')) {
  * Some useful functions to make everyday WordPress life easier.
  * *********************************************************************************************************************
  */
+if (! \function_exists('services')) {
+    /**
+     * Returns the service container, or an object within it.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $key The service to fetch.
+     * @return mixed The service container or an individual service.
+     */
+    function services($key = null)
+    {
+        if ($key !== null) {
+            return Snap::services()->get($key);
+        }
+
+        return Snap::services();
+    }
+}
 
 if (! \function_exists('config')) {
     /**
@@ -109,7 +127,7 @@ if (! \function_exists('config')) {
      *
      * @since  1.0.0
      *
-     * @param  string $option  The option name to fetch.
+     * @param  string $key     The option name to fetch.
      * @param  mixed  $default If the option was not found, the default value to be returned instead.
      * @return mixed The option value, or default if not found.
      */

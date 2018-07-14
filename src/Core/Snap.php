@@ -130,11 +130,11 @@ class Snap
             
             self::$container = $container;
 
-            self::register_providers();
-
             // Run the loader.
             $loader = new Loader();
             $loader->boot();
+
+            self::register_providers();
         }
 
         self::$setup = true;
