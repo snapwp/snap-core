@@ -117,15 +117,17 @@ class Loader
     private function load_hookable($class_name)
     {
         // If the included class extends the Hookable abstract.
-        if (\class_exists($class_name) && \is_subclass_of($class_name, Hookable::class)) {
-            // Boot it up and resolve dependencies.
-            Snap::services()->resolve($class_name)->run();
-        }
-        // If the included class extends the Hookable abstract.
-        if (\class_exists($class_name) && \is_subclass_of($class_name, \Snap\Services\Interfaces\Provider::class)) {
-            $providers = Snap::config('services.providers');
-            $providers[] = $class_name;
-            Snap::config()->set('services.providers', $providers);
+        if (\class_exists($class_name)) {
+            if (\is_subclass_of($class_name, Hookable::class)) {
+                // Boot it up and resolve dependencies.
+                Snap::services()->resolve($class_name)->run();
+            }
+
+            if (\is_subclass_of($class_name, \Snap\Services\Interfaces\Provider::class)) {
+                $providers = Snap::config('services.providers');
+                $providers[] = $class_name;
+                Snap::config()->set('services.providers', $providers);
+            }
         }
     }
 
