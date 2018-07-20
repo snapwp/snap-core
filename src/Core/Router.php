@@ -4,6 +4,7 @@ namespace Snap\Core;
 
 use Exception;
 use BadMethodCallException;
+use closure;
 
 /**
  * A wrapper which replaces the standard if/else/switch block, and provides a more fluent API for
@@ -14,7 +15,7 @@ use BadMethodCallException;
 class Router
 {
     /**
-     * Whether the current route is shortcircuited.
+     * Whether the current route is short-circuited.
      *
      * If set to true, then all remaining methods on this route are skipped.
      *
@@ -22,15 +23,7 @@ class Router
      * @var boolean
      */
     private $shortcircuit = false;
-
-    /**
-     * Whether the current route is valid.
-     *
-     * @since 1.0.0
-     * @var boolean
-     */
-    private $route_valid = false;
-
+    
     /**
      * Whether the current request has matched a route or not.
      *
@@ -72,7 +65,7 @@ class Router
      * @since 1.0.0
      *
      * @param  closure $callback A closure in which the grouped routes are registered.
-     * @return Snap\Core\Router
+     * @return Router
      */
     public function group(closure $callback)
     {
@@ -103,7 +96,7 @@ class Router
      * @since 1.0.0
      *
      * @param  bool|callable $result The result of a custom expression.
-     * @return Snap\Core\Router
+     * @return Router
      */
     public function is($result)
     {
@@ -124,7 +117,7 @@ class Router
      * @since 1.0.0
      *
      * @param  bool $result The result of a custom expression.
-     * @return Snap\Core\Router
+     * @return Router
      */
     public function is_not($result)
     {
@@ -145,7 +138,7 @@ class Router
      * @since  1.0.0
      *
      * @param  string $template Optional specific template to check for.
-     * @return Snap\Core\Router
+     * @return Router
      */
     public function is_page_template($template = '')
     {
@@ -167,7 +160,7 @@ class Router
      * @since 1.0.0
      *
      * @param  array|string $stack The middleware hooks to apply to this route.
-     * @return Snap_Route
+     * @return Router
      */
     public function using($stack = [])
     {
@@ -220,7 +213,7 @@ class Router
      *
      * @since  1.0.0
      *
-     * @return Snap\Core\Router
+     * @return Router
      */
     public function reset()
     {
@@ -245,7 +238,6 @@ class Router
      * @since  1.0.0
      *
      * @param  string $slug The slug of the view to render.
-     * @param  string $name The name of the view to render.
      */
     public function view($slug)
     {
@@ -314,7 +306,7 @@ class Router
      *
      * @param  string $name      The called method.
      * @param  mixed  $arguments The called method arguments.
-     * @return Snap\Core\Router
+     * @return Router
      */
     public function __call($name, $arguments)
     {
@@ -360,7 +352,7 @@ class Router
              *
              * @since  1.0.0
              *
-             * @param Snap_Request $request The current request for quick access.
+             * @param Request $request The current request for quick access.
              * @return  bool Whether to continue processing this route.
              */
             if (apply_filters($hook, Snap::request(), ...$args) !== true) {

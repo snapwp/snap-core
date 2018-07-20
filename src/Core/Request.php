@@ -17,7 +17,7 @@ class Request implements ArrayAccess
      * Request query params.
      *
      * @since 1.0.0
-     * @var Snap\Request\Bag
+     * @var Bag
      */
     public $query = null;
 
@@ -25,7 +25,7 @@ class Request implements ArrayAccess
      * Request post params.
      *
      * @since 1.0.0
-     * @var Snap\Request\Bag
+     * @var Bag
      */
     public $post = null;
 
@@ -33,7 +33,7 @@ class Request implements ArrayAccess
      * Request server params.
      *
      * @since 1.0.0
-     * @var Snap\Request\Bag
+     * @var Bag
      */
     public $server = null;
 
@@ -43,7 +43,7 @@ class Request implements ArrayAccess
      * POST takes precedence.
      *
      * @since 1.0.0
-     * @var Snap\Request\Bag
+     * @var Bag
      */
     public $request = null;
 
