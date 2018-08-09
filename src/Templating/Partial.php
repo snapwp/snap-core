@@ -16,7 +16,7 @@ class Partial
      * The parent View.
      *
      * @since  1.0.0
-     * @var Snap\Templating\View
+     * @var \Snap\Templating\View
      */
     protected $view;
 

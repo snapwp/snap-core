@@ -64,10 +64,10 @@ class Assets extends Hookable
 
         // There was no manifest or no file present.
         if ($this->manifest === null || ! isset($this->manifest[ $file ])) {
-            return get_stylesheet_directory_uri() . '/dist/' . $file;
+            return get_stylesheet_directory_uri() . '/dist' . $file;
         }
 
-        return get_stylesheet_directory_uri() . '/dist/' . $this->manifest[ $file ];
+        return get_stylesheet_directory_uri() . '/dist' . $this->manifest[ $file ];
     }
 
     /**
