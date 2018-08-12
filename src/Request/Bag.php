@@ -44,7 +44,7 @@ class Bag implements ArrayAccess
     {
         if ($this->has($key)) {
             if (\is_array($this->get_raw($key))) {
-                return \array_map('sanitize_text_field', $this->get_raw($key));
+                return \array_map([$this, 'sanitise_array'], $this->get_raw($key));
             }
 
             return sanitize_text_field($this->get_raw($key));
@@ -182,6 +182,15 @@ class Bag implements ArrayAccess
     public function to_json()
     {
         return \json_encode($this->data);
+    }
+
+    public function sanitise_array($value)
+    {
+        if (\is_Array($value)) {
+            return $value;
+        } else {
+            return sanitize_text_field($value);
+        }
     }
 
     /**

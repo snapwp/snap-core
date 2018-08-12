@@ -5,6 +5,7 @@ namespace Snap\Core;
 use WP_Query;
 use wpdb;
 use Hodl\Container;
+use Rakit\Validation\Validator;
 use Snap\Modules\Assets;
 use Snap\Templating\Partial;
 use Snap\Templating\View;
@@ -111,6 +112,13 @@ class Snap
                 Partial::class,
                 function ($hodl) {
                     return $hodl->resolve(Partial::class);
+                }
+            );
+
+            $container->addSingleton(
+                Validator::class,
+                function () {
+                    return new Validator();
                 }
             );
 

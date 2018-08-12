@@ -121,12 +121,24 @@ class Loader
             if (\is_subclass_of($class_name, Hookable::class)) {
                 // Boot it up and resolve dependencies.
                 Snap::services()->resolve($class_name)->run();
+                return;
             }
 
             if (\is_subclass_of($class_name, \Snap\Services\Interfaces\Provider::class)) {
                 $providers = Snap::config('services.providers');
                 $providers[] = $class_name;
                 Snap::config()->set('services.providers', $providers);
+                return;
+            }
+
+            if (\is_subclass_of($class_name, 'Rakit\Validation\Rule')) {
+                $class_parts = \explode('\\', $class_name);
+
+                Snap::services()->get('Rakit\Validation\Validator')->addValidator(
+                    \strtolower(\end($class_parts)),
+                    Snap::services()->resolve($class_name)
+                );
+                return;
             }
         }
     }
