@@ -154,7 +154,11 @@ class Images extends Hookable
      */
     public function remove_default_image_sizes($sizes = [])
     {
-        return \array_diff($sizes, self::DEFAULT_IMAGE_SIZES);
+        if (! \is_array(\current($sizes))) {
+            return \array_diff($sizes, self::DEFAULT_IMAGE_SIZES);
+        }
+
+        return \array_diff_key($sizes, \array_values(self::DEFAULT_IMAGE_SIZES));
     }
 
     /**

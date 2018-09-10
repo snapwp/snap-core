@@ -5,7 +5,7 @@ namespace Snap\Templating;
 use Snap\Core\Snap;
 use Snap\Exceptions\Templating_Exception;
 use Snap\Modules\Pagination;
-use Snap\Modules\Related_Pages;
+use WP_Query;
 
 /**
  * The basic view class for snap.
@@ -20,7 +20,15 @@ class View
      * @since  1.0.0
      * @var string|null
      */
-    private $current_view = null;
+    protected $current_view = null;
+
+    /**
+     * Variables to pass to the template and any child partials.
+     *
+     * @since  1.0.0
+     * @var array
+     */
+    protected $data = [];
 
     /**
      * Renders a view.
@@ -31,9 +39,9 @@ class View
      * @throws Templating_Exception If views are nested.
      *
      * @param  string $slug The slug for the generic template.
-     * @param  string $name Optional. The name of the specialised template.
+     * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
      */
-    public function render($slug, $name = '')
+    public function render($slug, $data = [])
     {
         /*
          * When Snap first boots up, it starts the output buffer.
@@ -45,15 +53,27 @@ class View
             throw new Templating_Exception('Views should not be nested');
         }
 
-        $this->current_view = $this->get_template_name($slug, $name);
+        global $wp_query;
 
-        $path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
+        $this->data = \array_merge(
+            $data,
+            [
+                'wp_query' => $wp_query,
+            ]
+        );
 
-        if ($path === '') {
+        $this->current_view = $this->get_template_name($slug);
+
+        $snap_template_path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
+
+        if ($snap_template_path === '') {
             throw new Templating_Exception('Could not find view: ' . $this->current_view);
         }
 
-        require($path);
+        unset($data, $slug);
+
+        \extract($this->data);
+        require($snap_template_path);
     }
 
     /**
@@ -63,17 +83,15 @@ class View
      *
      * @since  1.0.0
      *
-     * @throws Templating_Exception If no partial template found.
-     *
      * @param  string $slug The slug for the generic template.
-     * @param  string $name Optional. The name of the specialised template.
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
      * @return \Snap\Templating\Partial
      */
-    public function partial($slug, $name = '', $data = [])
+    public function partial($slug, $data = [])
     {
         $partial = Snap::services()->get(Partial::class);
-        $partial->render($slug, $name, $data);
+        $data = \array_merge($this->data, $data);
+        $partial->render($slug, $data);
         return $partial;
     }
 
@@ -97,10 +115,7 @@ class View
      */
     public function loop($partial = null, $partial_overrides = null, $wp_query = null)
     {
-        // Use either the global or supplied WP_Query object.
-        if ($wp_query instanceof WP_Query) {
-            $wp_query = $wp_query;
-        } else {
+        if (! $wp_query instanceof WP_Query) {
             global $wp_query;
         }
 
@@ -111,22 +126,26 @@ class View
             while ($wp_query->have_posts()) {
                 $wp_query->the_post();
 
+                $data = [
+                    'loop_index' => $count + 1,
+                ];
+
                 // Work out what partial to render.
                 if (\is_array($partial_overrides) && isset($partial_overrides[ $count ])) {
                     // An override is present, so load that instead.
-                    $this->partial($partial_overrides[ $count ]);
+                    $this->partial($partial_overrides[ $count ], $data);
                 } elseif (\is_array($partial_overrides)
                     && isset($partial_overrides['alternate'])
                     && $count % 2 !== 0
                 ) {
                     // An override is present, so load that instead.
-                    $this->partial($partial_overrides['alternate']);
+                    $this->partial($partial_overrides['alternate'], $data);
                 } elseif ($partial === null) {
                     // Load the default partial for this content type.
-                    $this->partial('post-type/' . get_post_type());
+                    $this->partial('post-type/' . get_post_type(), $data);
                 } else {
                     // Load the supplied default partial.
-                    $this->partial($partial);
+                    $this->partial($partial, $data);
                 }
 
                 $count++;
@@ -145,7 +164,7 @@ class View
      * @see \Snap\Modules\Pagination
      *
      * @param  array $args Args to pass to the Pagination instance.
-     * @return bool|string If $args['echo'] then return true/false if the render is successfull,
+     * @return bool|string If $args['echo'] then return true/false if the render is successful,
      *                     else return the pagination HTML.
      */
     public function pagination($args = [])
@@ -182,19 +201,13 @@ class View
      * @since 1.0.0
      *
      * @param  string $slug The slug for the generic template.
-     * @param  string $name Optional. The name of the specialised template.
      * @return string
      */
-    public function get_template_name($slug, $name = '')
+    public function get_template_name($slug)
     {
-        $name = (string) $name;
         $slug = \str_replace([ Snap::config('theme.templates_directory') . '/views/', '.php' ], '', $slug);
 
         $template = "{$slug}.php";
-
-        if ('' !== $name) {
-            $template = "{$slug}-{$name}.php";
-        }
 
         return $template;
     }

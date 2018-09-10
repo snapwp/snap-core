@@ -5,6 +5,7 @@ namespace Snap\Core;
 use WP_Query;
 use wpdb;
 use Hodl\Container;
+use Rakit\Validation\Validator;
 use Snap\Modules\Assets;
 use Snap\Templating\Partial;
 use Snap\Templating\View;
@@ -86,36 +87,43 @@ class Snap
 
             $container->addInstance($config);
 
-            $container->add(
+            $container->addSingleton(
                 Router::class,
                 function () {
                     return new Router();
                 }
             );
 
-            $container->add(
+            $container->addSingleton(
                 Request::class,
                 function () {
                     return new Request();
                 }
             );
             
-            $container->add(
+            $container->addSingleton(
                 View::class,
                 function ($hodl) {
                     return $hodl->resolve(View::class);
                 }
             );
 
-            $container->addFactory(
+            $container->add(
                 Partial::class,
                 function ($hodl) {
                     return $hodl->resolve(Partial::class);
                 }
             );
 
+            $container->addSingleton(
+                Validator::class,
+                function () {
+                    return new Validator();
+                }
+            );
+
             // Add the assets module to avoid parsing the mix-manifest multiple times.
-            $container->add(
+            $container->addSingleton(
                 Assets::class,
                 function () {
                     return new Assets();
@@ -130,11 +138,11 @@ class Snap
             
             self::$container = $container;
 
-            self::register_providers();
-
             // Run the loader.
             $loader = new Loader();
             $loader->boot();
+
+            self::register_providers();
         }
 
         self::$setup = true;

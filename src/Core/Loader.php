@@ -51,6 +51,7 @@ class Loader
             \Snap\Modules\I18n::class,
             \Snap\Modules\Post_Templates::class,
             \Snap\Modules\Images::class,
+            \Snap\Admin\Whitelabel::class,
         ];
 
         if (Snap::config('theme.disable_comments') === true) {
@@ -61,7 +62,7 @@ class Loader
             $snap_modules[] = \Snap\Modules\Disable_Customizer::class;
         }
 
-        if (Snap::config('theme.snap_admin_theme') === true) {
+        if (Snap::config('admin.snap_admin_theme') === true) {
             $snap_modules[] = \Snap\Admin\Theme::class;
         }
 
@@ -116,9 +117,29 @@ class Loader
     private function load_hookable($class_name)
     {
         // If the included class extends the Hookable abstract.
-        if (\class_exists($class_name) && \is_subclass_of($class_name, Hookable::class)) {
-            // Boot it up and resolve dependencies.
-            Snap::services()->resolve($class_name)->run();
+        if (\class_exists($class_name)) {
+            if (\is_subclass_of($class_name, Hookable::class)) {
+                // Boot it up and resolve dependencies.
+                Snap::services()->resolve($class_name)->run();
+                return;
+            }
+
+            if (\is_subclass_of($class_name, \Snap\Services\Interfaces\Provider::class)) {
+                $providers = Snap::config('services.providers');
+                $providers[] = $class_name;
+                Snap::config()->set('services.providers', $providers);
+                return;
+            }
+
+            if (\is_subclass_of($class_name, 'Rakit\Validation\Rule')) {
+                $class_parts = \explode('\\', $class_name);
+
+                Snap::services()->get('Rakit\Validation\Validator')->addValidator(
+                    \strtolower(\end($class_parts)),
+                    Snap::services()->resolve($class_name)
+                );
+                return;
+            }
         }
     }
 

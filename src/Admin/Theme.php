@@ -55,9 +55,14 @@ class Theme extends Hookable
         }
          
         $pages = \array_search('edit.php?post_type=page', $menu_order);
-        
+
         if ($pages > 0) {
             $posts = \array_search('edit.php', $menu_order);
+
+            if ($posts === false) {
+                $posts = 2;
+            }
+            
             $pages = \array_splice($menu_order, $pages, 1);
             \array_splice($menu_order, $posts, 0, $pages);
         }
