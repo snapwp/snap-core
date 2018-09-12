@@ -131,7 +131,7 @@ class Post_Type extends Hookable
      *
      * @since 1.0.0
      *
-     * @param array  $columns  Default WordPress sortable columns.
+     * @param array $columns  Default WordPress sortable columns.
      */
     public function set_sortable_columns($columns)
     {
@@ -261,10 +261,7 @@ class Post_Type extends Hookable
     private function get_name()
     {
         if ($this->name === null) {
-            $classname = \basename(\str_replace(['\\', '_'], ['/', ''], \get_class($this)));
-            $classname = \trim(\preg_replace('/([^_])(?=[A-Z])/', '$1_', $classname), '_');
-
-            return \strtolower($classname);
+            return $this->get_classname();
         }
 
         return $this->name;

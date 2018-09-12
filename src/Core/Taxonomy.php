@@ -13,7 +13,7 @@ use PostTypes\Taxonomy as Tax;
  */
 class Taxonomy extends Hookable
 {
-/**
+    /**
      * Override the Taxonomy name (defaults to snake case class name).
      *
      * @since  1.0.0
@@ -128,7 +128,7 @@ class Taxonomy extends Hookable
      *
      * @since 1.0.0
      *
-     * @param array  $columns  Default WordPress sortable columns.
+     * @param array $columns  Default WordPress sortable columns.
      */
     public function set_sortable_columns($columns)
     {
@@ -200,10 +200,8 @@ class Taxonomy extends Hookable
     private function add_relationships($taxonomy)
     {
         if (! empty($this->posttypes)) {
-            $filters = [];
-
             foreach ($this->posttypes as $k => $v) {
-                $taxonomy->posttype($k);
+                $taxonomy->posttype($v);
             }
         }
     }
@@ -248,10 +246,7 @@ class Taxonomy extends Hookable
     private function get_name()
     {
         if ($this->name === null) {
-            $classname = \basename(\str_replace(['\\', '_'], ['/', ''], \get_class($this)));
-            $classname = \trim(\preg_replace('/([^_])(?=[A-Z])/', '$1_', $classname), '_');
-
-            return \strtolower($classname);
+            return $this->get_classname();
         }
 
         return $this->name;

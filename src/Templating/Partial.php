@@ -20,7 +20,7 @@ class Partial
      */
     protected $view;
 
-     /**
+    /**
      * Variables to pass to the template and any child partials.
      *
      * @since  1.0.0

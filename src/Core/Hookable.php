@@ -197,6 +197,21 @@ class Hookable
     }
 
     /**
+     * Returns the snake case version of the current Hookable class name.
+     *
+     * @since  1.0.0
+     *
+     * @return string
+     */
+    final protected function get_classname()
+    {
+        $classname = \basename(\str_replace(['\\', '_'], ['/', ''], \get_class($this)));
+        $classname = \trim(\preg_replace('/([^_])(?=[A-Z])/', '$1_', $classname), '_');
+
+        return \strtolower($classname);
+    }
+
+    /**
      * Add the hooks defined in $filters and $actions.
      *
      * @since 1.0.0

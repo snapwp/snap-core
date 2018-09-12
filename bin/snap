@@ -11,6 +11,7 @@ use Snap\Commands\Create_Posttype;
 use Snap\Commands\Create_Controller;
 use Snap\Commands\Create_Shortcode;
 use Snap\Commands\Create_Taxonomy;
+use Snap\Commands\Create_Ajax;
 
 $application = new Application();
 
@@ -19,5 +20,6 @@ $application->add(new Create_Shortcode());
 $application->add(new Create_Posttype());
 $application->add(new Create_Controller());
 $application->add(new Create_Taxonomy());
+$application->add(new Create_Ajax());
 
 $application->run();

@@ -101,6 +101,9 @@ class Creator extends Command
             case 'shortcode':
                 $dir = 'Shortcodes';
                 break;
+            case 'ajax':
+                $dir = 'Ajax';
+                break;
             case 'hookable':
                 $dir = 'Hookables';
                 break;

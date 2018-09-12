@@ -29,8 +29,8 @@ class Middleware extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  Request      $request  The current request.
-     * @param  string|null  $redirect The middleware argument. How to redirect this request.
+     * @param  Request     $request  The current request.
+     * @param  string|null $redirect The middleware argument. How to redirect this request.
      * @return boolean
      */
     public function is_logged_in(Request $request, $redirect = null)

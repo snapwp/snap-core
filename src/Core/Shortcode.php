@@ -33,7 +33,7 @@ class Shortcode extends Hookable
      * If not present, then the snake cased class name is used instead.
      *
      * @since 1.0.0
-     * @var null
+     * @var null|string
      */
     protected $tag = null;
 
@@ -58,7 +58,7 @@ class Shortcode extends Hookable
             throw new Shortcode_Exception(\get_class($this) . ' needs to declare a handle() method');
         }
 
-        \add_shortcode($this->shortcode_name(), [$this, 'handler']);
+        \add_shortcode($this->get_shortcode_name(), [$this, 'handler']);
     }
 
     /**
@@ -66,8 +66,8 @@ class Shortcode extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  array  $atts    Shortcode attributes.
-     * @param  sting  $content Any encapsulated shortcode content.
+     * @param  array $atts    Shortcode attributes.
+     * @param  sting $content Any encapsulated shortcode content.
      * @return string Shortcode output.
      */
     public function handler($atts, $content)
@@ -86,13 +86,10 @@ class Shortcode extends Hookable
      *
      * @return string
      */
-    private function shortcode_name()
+    private function get_shortcode_name()
     {
         if ($this->tag === null) {
-            $classname = \basename(\str_replace(['\\', '_'], ['/', ''], \get_class($this)));
-            $classname = \trim(\preg_replace('/([^_])(?=[A-Z])/', '$1_', $classname), '_');
-
-            return \strtolower($classname);
+            return $this->get_classname();
         }
 
         return $this->tag;

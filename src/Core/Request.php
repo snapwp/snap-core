@@ -197,7 +197,7 @@ class Request implements ArrayAccess
      */
     public function get_path_segments()
     {
-        return \array_filter(\explode('/', $this->path));
+        return \array_values(\array_filter(\explode('/', $this->path)));
     }
 
     /**
@@ -284,7 +284,7 @@ class Request implements ArrayAccess
         return $this;
     }
 
-     /**
+    /**
      * Set the validation rules.
      *
      * @since  1.0.0
@@ -324,8 +324,8 @@ class Request implements ArrayAccess
      *
      * @since  1.0.0
      *
-     * @param  array  $rules    Optional. Rules to use. Defaults to rules set via set_rules().
-     * @param  array  $messages Optional. Messages to use. Defaults to rules set via set_messages().
+     * @param  array $rules    Optional. Rules to use. Defaults to rules set via set_rules().
+     * @param  array $messages Optional. Messages to use. Defaults to rules set via set_messages().
      */
     public function validate_ajax_request(array $rules = [], array $messages = [])
     {
@@ -378,9 +378,9 @@ class Request implements ArrayAccess
      *
      * @since  1.0.0
      *
-     * @param  array  $inputs   The array of data to validate as key value pairs.
-     * @param  array  $rules    The rules to run against the data.
-     * @param  array  $messages Messages to
+     * @param  array $inputs   The array of data to validate as key value pairs.
+     * @param  array $rules    The rules to run against the data.
+     * @param  array $messages Messages to
      * @return bool|array Returns true if data validates, or an array of error messages.
      */
     public function validate_data(array $inputs, array $rules = [], array $messages = [])

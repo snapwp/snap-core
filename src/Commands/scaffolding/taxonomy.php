@@ -23,7 +23,7 @@ class CLASSNAME extends Taxonomy
      * @var null|array
      */
     public $options = [
-        //'public' => true,
-        //'hierarchical' => true,
+        // 'public' => true,
+        // 'hierarchical' => true,
     ];
 }
