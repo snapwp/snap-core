@@ -23,10 +23,10 @@ class CLASSNAME extends Post_Type
      * @var null|array
      */
     public $options = [
-        // 'public' => true,
-        // 'hierarchical' => true,
-        // 'has_archive' => true,
-        // 'menu_icon' => null,
+        //'public' => true,
+        //'hierarchical' => true,
+        //'has_archive' => true,
+        //'menu_icon' => null,
     ];
 
     /**
@@ -38,6 +38,6 @@ class CLASSNAME extends Post_Type
      * @var array|string[]
      */
     public $taxonomies = [
-        // 'example_taxonomy'
+        //'example_taxonomy'
     ];
 }

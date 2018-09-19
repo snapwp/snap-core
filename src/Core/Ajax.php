@@ -48,6 +48,14 @@ class Ajax extends Hookable
     ];
 
     /**
+     * Run this hookable when is_admin returns false.
+     *
+     * @since 1.0.0
+     * @var boolean
+     */
+    protected $public = false;
+
+    /**
      * Boot the AJAX Hookable, and register the handler.
      *
      * @since  1.0.0
