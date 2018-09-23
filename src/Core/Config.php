@@ -63,7 +63,7 @@ class Config
     ];
 
     /**
-     * A new config folder path.
+     * Add a new config folder path.
      *
      * @since  1.0.0
      *
@@ -74,6 +74,22 @@ class Config
         $path = trailingslashit($path);
         $this->paths[] = $path;
         $this->parse_files($path);
+    }
+
+    /**
+     * Add a new config folder path, but any found config keys will not overwrite an existing entry.
+     *
+     * New keys are added as per normal.
+     *
+     * @since  1.0.0
+     *
+     * @param string $path Path to config directory.
+     */
+    public function add_default_path(string $path)
+    {
+        $path = trailingslashit($path);
+        $this->paths[] = $path;
+        $this->parse_files($path, false);
     }
 
     /**
@@ -146,8 +162,9 @@ class Config
      * @since  1.0.0
      *
      * @param  string $path Directory path to scan.
+     * @param  string $overwrite If true, then the config within the $path will overwrite existing config keys.
      */
-    private function parse_files($path)
+    private function parse_files($path, $overwrite = false)
     {
         if (\is_dir($path)) {
             $files = \glob($path . '*.php');
@@ -164,7 +181,11 @@ class Config
                 }
 
                 if (isset($this->config[ $option_set ])) {
-                    $this->config[ $option_set ] = \array_merge($this->config[ $option_set ], $parsed_options);
+                    if ($overwrite) {
+                        $this->config[ $option_set ] = \array_merge($this->config[ $option_set ], $parsed_options);
+                    } else {
+                        $this->config[ $option_set ] = \array_merge($parsed_options, $this->config[ $option_set ]);
+                    }
                 } else {
                     $this->config[ $option_set ] = $parsed_options;
                 }
@@ -178,7 +199,7 @@ class Config
      * @since  1.0.0
      *
      * @param  string $path Full file path.
-     * @return string       Filename.
+     * @return string Filename.
      */
     private function get_filename($path)
     {

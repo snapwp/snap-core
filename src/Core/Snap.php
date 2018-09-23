@@ -75,47 +75,38 @@ class Snap
     public static function setup()
     {
         if (! self::$setup) {
-            $container = new Container();
+            self::create_container();
+            self::init_config();
 
-            // Boot up the config parser.
-            $config = new Config();
-            $config->add_path(get_template_directory().'/config');
-
-            if (is_child_theme()) {
-                $config->add_path(get_stylesheet_directory().'/config');
-            }
-
-            $container->addInstance($config);
-
-            $container->addSingleton(
+            self::$container->addSingleton(
                 Router::class,
                 function () {
                     return new Router();
                 }
             );
 
-            $container->addSingleton(
+            self::$container->addSingleton(
                 Request::class,
                 function () {
                     return new Request();
                 }
             );
             
-            $container->addSingleton(
+            self::$container->addSingleton(
                 View::class,
                 function ($hodl) {
                     return $hodl->resolve(View::class);
                 }
             );
 
-            $container->add(
+            self::$container->add(
                 Partial::class,
                 function ($hodl) {
                     return $hodl->resolve(Partial::class);
                 }
             );
 
-            $container->addSingleton(
+            self::$container->addSingleton(
                 Validator::class,
                 function () {
                     return new Validator();
@@ -123,7 +114,7 @@ class Snap
             );
 
             // Add the assets module to avoid parsing the mix-manifest multiple times.
-            $container->addSingleton(
+            self::$container->addSingleton(
                 Assets::class,
                 function () {
                     return new Assets();
@@ -133,10 +124,8 @@ class Snap
             // Add global WP classes.
             global $wpdb;
             global $wp_query;
-            $container->addInstance($wp_query);
-            $container->addInstance($wpdb);
-            
-            self::$container = $container;
+            self::$container->addInstance($wp_query);
+            self::$container->addInstance($wpdb);
 
             // Run the loader.
             $loader = new Loader();
@@ -146,6 +135,33 @@ class Snap
         }
 
         self::$setup = true;
+    }
+
+    /**
+     * Create the static Container instance.
+     *
+     * @since 1.0.0
+     */
+    public static function create_container()
+    {
+        self::$container = new Container();
+    }
+
+    /**
+     * Create a config instance, provide config directories, and add to the container.
+     *
+     * @since 1.0.0
+     */
+    public static function init_config()
+    {
+        $config = new Config();
+        $config->add_path(get_template_directory().'/config');
+
+        if (is_child_theme()) {
+            $config->add_path(get_stylesheet_directory().'/config');
+        }
+
+        self::$container->addInstance($config);
     }
 
     /**
