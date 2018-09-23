@@ -193,22 +193,6 @@ if (! \function_exists('snap_get_user_role')) {
     }
 }
 
-if (! \function_exists('snap_debug_hook')) {
-    /**
-     * Lists debug info about all callbacks for a given hook.
-     *
-     * Returns information for all callbacks in order of execution and priority.
-     *
-     * @since  1.0.0
-     *
-     * @see Snap\Core\Utils::debug_hook
-     */
-    function snap_debug_hook($hook)
-    {
-        return Utils::debug_hook($hook);
-    }
-}
-
 if (! \function_exists('snap_get_top_parent_page_id')) {
     /**
      * Get value of top level hierarchical post ID.

@@ -186,7 +186,7 @@ class Loader
 
                 $class = \str_replace([$strip, '.php'], '', $path);
                 $class = \trim(
-                    \str_replace([ '/', 'theme' ], [ '\\', 'Theme' ], $class),
+                    \str_replace(['/', 'theme'], ['\\', 'Theme'], $class),
                     '\\'
                 );
 
