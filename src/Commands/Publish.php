@@ -59,6 +59,20 @@ class Publish extends Command
             InputOption::VALUE_NONE,
             'Overwrite any published files if they already exist.'
         );
+
+        $this->addOption(
+            'all',
+            'a',
+            InputOption::VALUE_NONE,
+            'Publish files from all packages.'
+        );
+
+        $this->addOption(
+            'package',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Chose the specific package to publish.'
+        );
     }
 
     /**
@@ -68,28 +82,12 @@ class Publish extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->init();
-
+        $this->init($input, $output);
         $this->force_prompt();
+                
+        $this->publish_packages($this->get_packages());
         
-        $question = new ChoiceQuestion(
-            "\nPlease choose a package to publish:",
-            Snap::config('services.providers')
-        );
-
-        $question->setErrorMessage('[%s] is invalid.');
-
-        $package = $this->helper->ask($this->input, $this->output, $question);
-
-        $directories_to_publish = $package::$publishes['directories'];
-
-        if (empty($directories_to_publish)) {
-            $this->output->writeln("<comment>$package has no files to publish!</comment>");
-            exit;
-        }
-
-        $this->publish_directories($directories_to_publish);
-
+        // Feedback how many files were copied.
         if (\count($this->copied)) {
             $this->output->writeln(
                 \sprintf(
@@ -103,7 +101,6 @@ class Publish extends Command
         }
         
         $this->output->writeln("\n<info>Nothing needed to be published</info>");
-        exit;
     }
 
     /**
@@ -111,7 +108,7 @@ class Publish extends Command
      *
      * @since 1.0.0
      */
-    private function init()
+    private function init($input, $output)
     {
         $this->helper = $this->getHelper('question');
         $this->input = $input;
@@ -128,6 +125,67 @@ class Publish extends Command
 
         // Setup WP filesystem helper.
         $this->setup_filesystem();
+    }
+
+    /**
+     * Gets a list of packages and their files to publish.
+     *
+     * @since  1.0.0
+     *
+     * @return array
+     */
+    private function get_packages()
+    {
+        if ($this->input->getOption('all') === true) {
+            $packages = [];
+            
+            // Add all package files to $packages array.
+            foreach (Snap::config('services.providers') as $package) {
+                $packages[ $package ] = $package::get_files_to_publish('directories');
+            }
+
+            return $packages;
+        }
+
+        $package = $this->input->getOption('package');
+
+        // If no package specified.
+        if ($package === null) {
+            $package = $this->package_prompt();
+        }
+
+        // If the package chosen does not exist.
+        if (! \class_exists($package)) {
+            $this->output->writeln("<error>The package [$package] could not be found.</error>");
+            exit;
+        }
+
+        return [
+            $package => $package::get_files_to_publish('directories'),
+        ];
+    }
+
+    /**
+     * Loop through all user selected packages, and publish the package files.
+     *
+     * @since  1.0.0
+     *
+     * @param  array $packages Array of package provider => files to publish.
+     */
+    private function publish_packages($packages)
+    {
+        if (empty($packages)) {
+            return;
+        }
+
+        foreach ($packages as $package => $directories_to_publish) {
+            if (empty($directories_to_publish)) {
+                $this->output->writeln("<comment>$package has no files to publish!</comment>");
+                continue;
+            }
+
+            $this->publish_directories($directories_to_publish);
+        }
     }
 
     /**
@@ -293,5 +351,24 @@ class Publish extends Command
         if (! $this->helper->ask($this->input, $this->output, $question)) {
             exit;
         }
+    }
+
+    /**
+     * Prompts the user to pick a package from the list.
+     *
+     * @since  1.0.0
+     *
+     * @return  string The chosen package provider.
+     */
+    private function package_prompt()
+    {
+        $question = new ChoiceQuestion(
+            "\nPlease choose a package to publish:",
+            Snap::config('services.providers')
+        );
+
+        $question->setErrorMessage('[%s] is invalid.');
+
+        return $this->helper->ask($this->input, $this->output, $question);
     }
 }

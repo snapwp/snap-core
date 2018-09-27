@@ -15,7 +15,7 @@ class Provider implements Interfaces\Provider
      * @since 1.0.0
      * @var array
      */
-    public static $publishes = [
+    protected static $publishes = [
         'directories' => [],
     ];
 
@@ -38,7 +38,24 @@ class Provider implements Interfaces\Provider
     }
 
     /**
-     * Register a config location for a service.
+     * Returns the package's files to publish.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $type Default null. The subset of files to return.
+     * @return array
+     */
+    public static function get_files_to_publish($type = null)
+    {
+        if ($type !== null) {
+            return static::$publishes[ $type ];
+        }
+        
+        return static::$publishes;
+    }
+
+    /**
+     * Register a config location for a package.
      *
      * This config will be overwritten by any matching theme config keys.
      *
