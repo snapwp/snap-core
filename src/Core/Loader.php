@@ -72,11 +72,6 @@ class Loader
 
         $this->load_widgets();
 
-        // Now all core files are loaded, turn on output buffer until a view is dispatched.
-        if (! \ob_get_level()) {
-            \ob_start();
-        }
-
         $this->load_theme();
     }
 

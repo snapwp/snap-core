@@ -43,12 +43,6 @@ class View
      */
     public function render($slug, $data = [])
     {
-        /*
-         * When Snap first boots up, it starts the output buffer.
-         * Now we have a matched view, we can flush any partials (such as the page <head>).
-         */
-        \ob_end_flush();
-
         if ($this->current_view !== null) {
             throw new Templating_Exception('Views should not be nested');
         }
