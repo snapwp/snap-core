@@ -234,7 +234,7 @@ class Snap
     }
 
     /**
-     * Registers any service providers define din theme config.
+     * Registers any service providers defined in theme config.
      *
      * @since 1.0.0
      */

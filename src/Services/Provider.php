@@ -24,31 +24,27 @@ class Provider implements Interfaces\Provider
      *
      * @since 1.0.0
      */
-    public function boot()
-    {
-    }
+    public function boot() {}
 
     /**
      * Register any services into the container.
      *
      * @since 1.0.0
      */
-    public function register()
-    {
-    }
+    public function register() {} 
 
     /**
      * Returns the package's files to publish.
      *
      * @since  1.0.0
-     *
+     * 
      * @param  string $type Default null. The subset of files to return.
      * @return array
      */
     public static function get_files_to_publish($type = null)
     {
         if ($type !== null) {
-            return static::$publishes[ $type ];
+            return static::$publishes[$type];
         }
         
         return static::$publishes;
