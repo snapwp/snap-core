@@ -74,7 +74,7 @@ class Provider implements Interfaces\Provider
      */
     protected function publishes_directory($source, $target)
     {
-        static::$publishes['directories'][ $source ] = $target;
+        static::$publishes['directories'][$source] = $target;
     }
 
     /**
@@ -86,6 +86,6 @@ class Provider implements Interfaces\Provider
      */
     protected function publishes_config($source)
     {
-        static::$publishes['directories'][ $source ] = '/config';
+        static::$publishes['directories'][$source] = '/config';
     }
 }
