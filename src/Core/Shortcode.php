@@ -66,8 +66,8 @@ class Shortcode extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  array $atts    Shortcode attributes.
-     * @param  sting $content Any encapsulated shortcode content.
+     * @param  array  $atts    Shortcode attributes.
+     * @param  sting  $content Any encapsulated shortcode content.
      * @return string Shortcode output.
      */
     public function handler($atts, $content)

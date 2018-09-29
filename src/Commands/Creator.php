@@ -45,13 +45,41 @@ class Creator extends Command
      * @param  array  $args     Any replacement args.
      * @return boolean
      */
-    protected function scaffold($scaffold, $filename, $args)
+    protected function scaffold($scaffold, $filename, $args = [], $options = [])
     {
-        $original = $this->scaffolding_dir . "{$scaffold}.php";
+        $original = $this->scaffolding_dir . "{$scaffold}.txt";
 
         if (\file_exists($original)) {
             $content = \file_get_contents($original);
 
+            if (! empty($options)) {
+                foreach ($options as $option => $value) {
+                    if ($value !== null) {
+                        \preg_match_all("/%IF\|$option%([^%]*)%END%/m", $content, $matches);
+
+                        if (! empty($matches)) {
+                            $content = \str_replace(
+                                $matches[0],
+                                \str_replace($option, $value, $matches[1]),
+                                $content
+                            );
+                        }
+                    }
+                }
+            }
+
+            \preg_match_all("/%IF[^%]*%([^%]*)%END%/m", $content, $matches);
+
+            // clean up any IF tags
+            if (! empty($matches)) {
+                foreach ($matches as $match) {
+                    if (! empty($match)) {
+                        $content = \str_replace($match[0], '', $content);
+                    }
+                }
+            }
+
+            // Substitute arguments
             $content = \str_replace(
                 \array_keys($args),
                 \array_values($args),

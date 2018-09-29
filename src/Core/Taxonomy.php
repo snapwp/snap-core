@@ -128,7 +128,7 @@ class Taxonomy extends Hookable
      *
      * @since 1.0.0
      *
-     * @param array $columns  Default WordPress sortable columns.
+     * @param array  $columns  Default WordPress sortable columns.
      */
     public function set_sortable_columns($columns)
     {
