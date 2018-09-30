@@ -41,6 +41,7 @@ class Config
         ],
         'theme' => [
             'templates_directory' => 'resources/templates',
+            'cache_directory' => 'cache',
             'disable_xmlrpc' => true,
             'disable_comments' => false,
             'disable_customizer' => false,

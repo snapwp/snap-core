@@ -26,7 +26,7 @@ class Controller
      *
      * @since  1.0.0
      *
-     * @param Snap\Templating\View $view View instance
+     * @param View $view Templating management.
      */
     public function __construct(View $view)
     {
