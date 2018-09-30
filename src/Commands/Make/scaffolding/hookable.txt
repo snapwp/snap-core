@@ -5,7 +5,7 @@ namespace Theme\Hookables;
 use Snap\Core\Hookable;
 
 /**
- * [Hookable description]
+ * [CLASSNAME description]
  */
 class CLASSNAME extends Hookable
 {

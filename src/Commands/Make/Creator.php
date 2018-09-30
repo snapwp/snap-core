@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Commands;
+namespace Snap\Commands\Make;
 
 use Symfony\Component\Console\Command\Command;
 

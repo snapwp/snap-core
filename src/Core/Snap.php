@@ -22,7 +22,7 @@ class Snap
     /**
      * SnapWP website.
      */
-    const SNAPWP_HOME = 'https://snapwp.com';
+    const SNAPWP_HOME = 'https://snapwp.io';
 
     /**
      * Current Snap version.

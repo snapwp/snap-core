@@ -22,7 +22,7 @@ class Publish extends Command
      * Store the Command Helper instance.
      *
      * @since  1.0.0
-     * @var Symfony\Component\Console\Helper\QuestionHelper
+     * @var QuestionHelper
      */
     private $helper;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Commands;
+namespace Snap\Commands\Make;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
  *
  * @since  1.0.0
  */
-class Create_Taxonomy extends Creator
+class Hookable extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -20,11 +20,11 @@ class Create_Taxonomy extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:taxonomy')
-            ->setDescription('Creates a new Taxonomy.')
-            ->setHelp('Creates a new Taxonomy class within your theme/Taxonomies directory');
+        $this->setName('make:hookable')
+            ->setDescription('Creates a new Hookable.')
+            ->setHelp('Creates a new Hookable class within your theme/Hookables directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Taxonomy.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Hookable.');
     }
 
     /**
@@ -35,7 +35,7 @@ class Create_Taxonomy extends Creator
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'taxonomy',
+            'hookable',
             $input->getArgument('name'),
             [
                 'CLASSNAME' => $input->getArgument('name'),

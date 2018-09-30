@@ -2,17 +2,17 @@
 
 namespace Theme\Posts;
 
-use Snap\Core\Post_Type;
+use Snap\Hookables\Post_Type;
 
 /**
- * [Post_Type desciption]
+ * [CLASSNAME desciption]
  */
 class CLASSNAME extends Post_Type
 {
     /**
      * Override the plural name.
      *
-     * @var null|string
+     * @var string
      */
     public $plural = 'CLASSNAMEs';
 

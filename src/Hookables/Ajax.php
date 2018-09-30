@@ -1,7 +1,10 @@
 <?php
 
-namespace Snap\Core;
+namespace Snap\Hookables;
 
+use Snap\Core\Snap;
+use Snap\Core\Utils;
+use Snap\Core\Hookable;
 use Snap\Exceptions\Shortcode_Exception;
 
 /**

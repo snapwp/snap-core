@@ -1,18 +1,17 @@
 <?php
 
-namespace Snap\Commands;
+namespace Snap\Commands\Make;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Creates an Ajax class in the current directory.
+ * Creates a shortcode class in the current directory.
  *
  * @since  1.0.0
  */
-class Create_Ajax extends Creator
+class Shortcode extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -21,17 +20,11 @@ class Create_Ajax extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:ajax')
-            ->setDescription('Creates a new Ajax Hookable.')
-            ->setHelp('Creates a new Ajax class within your theme/Ajax directory');
+        $this->setName('make:shortcode')
+            ->setDescription('Creates a new Shortcode.')
+            ->setHelp('Creates a new Shortcode class within your theme/Shortcodes directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created ajax hookable.');
-        $this->addOption(
-            'action',
-            'a',
-            InputOption::VALUE_REQUIRED,
-            'The action for the created AJAX hook. Defaults to the snake_case class name.'
-        );
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created shortcode.');
     }
 
     /**
@@ -42,13 +35,10 @@ class Create_Ajax extends Creator
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'ajax',
+            'shortcode',
             $input->getArgument('name'),
             [
                 'CLASSNAME' => $input->getArgument('name'),
-            ],
-            [
-                'ACTION' => $input->getOption('action'),
             ]
         );
 

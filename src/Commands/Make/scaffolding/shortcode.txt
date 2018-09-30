@@ -2,10 +2,10 @@
 
 namespace Theme\Shortcodes;
 
-use Snap\Core\Shortcode;
+use Snap\Hookables\Shortcode;
 
 /**
- * [Shortcode description]
+ * [CLASSNAME description]
  */
 class CLASSNAME extends Shortcode
 {

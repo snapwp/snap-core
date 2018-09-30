@@ -2,17 +2,17 @@
 
 namespace Theme\Taxonomies;
 
-use Snap\Core\Taxonomy;
+use Snap\Hookables\Taxonomy;
 
 /**
- * [Taxonomy desciption]
+ * [CLASSNAME desciption]
  */
 class CLASSNAME extends Taxonomy
 {
     /**
      * Override the plural name.
      *
-     * @var null|string
+     * @var string
      */
     public $plural = 'CLASSNAMEs';
 

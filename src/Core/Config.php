@@ -164,7 +164,7 @@ class Config
      * @param  string $path Directory path to scan.
      * @param  string $overwrite If true, then the config within the $path will overwrite existing config keys.
      */
-    private function parse_files($path, $overwrite = false)
+    private function parse_files($path, $overwrite = true)
     {
         if (\is_dir($path)) {
             $files = \glob($path . '*.php');
