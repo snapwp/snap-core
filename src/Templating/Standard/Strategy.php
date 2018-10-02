@@ -10,7 +10,7 @@ use WP_Query;
 
 class Strategy implements Templating_Interface
 {
-	    /**
+    /**
      * The current view name being displayed.
      *
      * @since  1.0.0
@@ -186,7 +186,7 @@ class Strategy implements Templating_Interface
     }
 
     /**
-     * Generate the template file name from the slug and name.
+     * Generate the template file name from the slug.
      *
      * @since 1.0.0
      *

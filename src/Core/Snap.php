@@ -157,7 +157,7 @@ class Snap
     public static function init_templating()
     {
         // If no templating strategy has already been registered.
-        if (! self::$container->has(Templating_Interface::class)) {   
+        if (! self::$container->has(Templating_Interface::class)) {
             // Add the default rendering engine.
             self::$container->add(
                 \Snap\Templating\Standard\Strategy::class,

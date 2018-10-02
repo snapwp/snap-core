@@ -77,7 +77,7 @@ class Pagination
     public function __construct($args = [], WP_Query $global_query)
     {
         $this->args = wp_parse_args(
-            $this->args,
+            $args,
             /**
              * Filter the default arguments.
              *

@@ -232,7 +232,7 @@ class Utils
      * @param int|WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
      * @return integer
      */
-    public function get_page_depth($page = null)
+    public static function get_page_depth($page = null)
     {
         if ($page === null) {
             global $wp_query;
@@ -252,5 +252,67 @@ class Utils
         }
      
         return $depth;
+    }
+
+    /**
+     * Returns a multi dimensional array of nav items for a given navigation menu.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $theme_location The theme location the menu was registered with.
+     * @return array {
+     *      @type string $ID               The ID of the post.
+     *      @type string $text             The link text.
+     *      @type string $title            The title attribute.
+     *      @type string $description      Any description text added via the nav-menus admin.
+     *      @type string $target           The link target.
+     *      @type string $custom_classes   Any clases added via the nav-menus admin.
+     *      @type string $url              The href of this link.
+     *      @type array  $children         The link's children.
+     *      @type bool   $has_children     Whether this link has children.
+     *      @type bool   $is_active        Whether this link is the current link.
+     *      @type bool   $has_active_child Whether a child link is the current link.
+     * }
+     */
+    public static function get_nav_menu($theme_location = 'primary')
+    {
+        $menu = [];
+
+        if (($theme_location) && ($locations = get_nav_menu_locations()) && isset($locations[ $theme_location ])) {
+            $term = get_term($locations[ $theme_location ], 'nav_menu');
+
+            $array_menu = wp_get_nav_menu_items($term->term_id);
+
+            $current_id = get_the_id();
+
+            foreach ($array_menu as $m) {
+                $menu[ $m->ID ] = (object) [];
+                $menu[ $m->ID ]->ID = $m->object_id;
+                $menu[ $m->ID ]->text = $m->title;
+                $menu[ $m->ID ]->title = $m->attr_title;
+                $menu[ $m->ID ]->description = $m->description;
+                $menu[ $m->ID ]->target = $m->target;
+                $menu[ $m->ID ]->custom_classes = \implode(' ', $m->classes);
+                $menu[ $m->ID ]->url = $m->url;
+                $menu[ $m->ID ]->children = [];
+                $menu[ $m->ID ]->has_children = false;
+                $menu[ $m->ID ]->is_active = $m->object_id == $current_id;
+                $menu[ $m->ID ]->has_active_child = false;
+            }
+
+            foreach (\array_reverse($array_menu) as $m) {
+                if ($m->menu_item_parent !== '0') {
+                    $menu[ $m->menu_item_parent ]->children[ $m->ID ] = $menu[ $m->ID ];
+
+                    if ($menu[ $m->ID ]->is_active || $menu[ $m->ID ]->has_active_child) {
+                        $menu[ $m->menu_item_parent ]->has_active_child = true;
+                    }
+
+                    unset($menu[ $m->ID ]);
+                }
+            }
+        }
+
+        return $menu;
     }
 }
