@@ -7,8 +7,8 @@ use wpdb;
 use Hodl\Container;
 use Rakit\Validation\Validator;
 use Snap\Modules\Assets;
-use Snap\Templating\Partial;
 use Snap\Templating\View;
+use Snap\Templating\Templating_Interface;
 
 /**
  * The main Snap class.
@@ -92,19 +92,6 @@ class Snap
                 }
             );
             
-            self::$container->addSingleton(
-                View::class,
-                function ($hodl) {
-                    return $hodl->resolve(View::class);
-                }
-            );
-
-            self::$container->add(
-                Partial::class,
-                function ($hodl) {
-                    return $hodl->resolve(Partial::class);
-                }
-            );
 
             self::$container->addSingleton(
                 Validator::class,
@@ -132,6 +119,9 @@ class Snap
             $loader->boot();
 
             self::register_providers();
+
+            // Init after the providers to allow switching of templating strategy.
+            self::init_templating();
         }
 
         self::$setup = true;
@@ -162,6 +152,36 @@ class Snap
         }
 
         self::$container->addInstance($config);
+    }
+
+    public static function init_templating()
+    {
+        // If no templating strategy has already been registered.
+        if (! self::$container->has(Templating_Interface::class)) {
+            // Add the default rendering engine.
+            self::$container->add(
+                \Snap\Templating\Standard\Strategy::class,
+                function () {
+                    return new \Snap\Templating\Standard\Strategy;
+                }
+            );
+
+            self::$container->bind(\Snap\Templating\Standard\Strategy::class, Templating_Interface::class);
+
+            self::$container->add(
+                \Snap\Templating\Standard\Partial::class,
+                function ($hodl) {
+                    return $hodl->resolve(\Snap\Templating\Standard\Partial::class);
+                }
+            );
+        }
+
+        self::$container->addSingleton(
+            View::class,
+            function ($hodl) {
+                return $hodl->resolve(View::class);
+            }
+        );
     }
 
     /**

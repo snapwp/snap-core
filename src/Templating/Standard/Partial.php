@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Templating;
+namespace Snap\Templating\Standard;
 
 use Snap\Exceptions\Templating_Exception;
 use Snap\Core\Snap;
@@ -33,7 +33,7 @@ class Partial
      *
      * @param View $view The parent view.
      */
-    public function __construct(View $view)
+    public function __construct(Strategy $view)
     {
         $this->view = $view;
     }

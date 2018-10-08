@@ -3,206 +3,207 @@
 namespace Snap\Templating;
 
 use Snap\Core\Snap;
-use Snap\Exceptions\Templating_Exception;
-use Snap\Modules\Pagination;
-use WP_Query;
 
 /**
- * The basic view class for snap.
- *
- * Renders templates and provides handy methods to reduce repeating common template tasks.
+ * Deals with rendering templates and passing data to them.
  */
 class View
 {
     /**
-     * The current view name being displayed.
+     * The current template rendering strategy.
      *
      * @since  1.0.0
-     * @var string|null
+     * @var Templating_Interface
      */
-    protected $current_view = null;
+    private $strategy = null;
 
     /**
-     * Variables to pass to the template and any child partials.
+     * Holds all shared (global) data.
      *
      * @since  1.0.0
      * @var array
      */
-    protected $data = [];
+    private static $global_data = [];
 
     /**
-     * Renders a view.
+     * Holds all callbacks registered via when().
+     *
+     * @since  1.0.0
+     * @var array
+     */
+    private static $composers = [];
+
+    /**
+     * Holds all additional data added via add_data().
+     *
+     * @since  1.0.0
+     * @var array
+     */
+    private static $additional_data = [];
+
+    /**
+     * The current template.
+     *
+     * @since  1.0.0
+     * @var array
+     */
+    private static $context = null;
+
+    /**
+     * Set the current strategy provided by the service container.
      *
      * @since  1.0.0
      *
-     * @throws Templating_Exception If no template found.
-     * @throws Templating_Exception If views are nested.
-     *
-     * @param  string $slug The slug for the generic template.
-     * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
+     * @param Templating_Interface $strategy The current template rendering strategy.
      */
-    public function render($slug, $data = [])
+    public function __construct(Templating_Interface $strategy)
     {
-        if ($this->current_view !== null) {
-            throw new Templating_Exception('Views should not be nested');
-        }
-
-        global $wp_query;
-
-        $this->data = \array_merge(
-            $data,
-            [
-                'wp_query' => $wp_query,
-            ]
-        );
-
-        $this->current_view = $this->get_template_name($slug);
-
-        $snap_template_path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
-
-        if ($snap_template_path === '') {
-            throw new Templating_Exception('Could not find view: ' . $this->current_view);
-        }
-
-        unset($data, $slug);
-
-        \extract($this->data);
-        require($snap_template_path);
+        $this->strategy = $strategy;
     }
 
     /**
-     * Fetch and display a template partial.
+     * Adds any global data and dispatches the current strategy's render() method.
      *
-     * It is important to note that nothing is done to destroy/restore the current loop.
+     * It is important to note that any data provided to this method takes precedence over global data.
      *
      * @since  1.0.0
      *
-     * @param  string $slug The slug for the generic template.
-     * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
-     * @return \Snap\Templating\Partial
+     * @param  string $view The view to render.
+     * @param  array  $data An array of data to pass through.
      */
-    public function partial($slug, $data = [])
+    public function render($view, $data = [])
     {
-        $partial = Snap::services()->get(Partial::class);
-        $data = \array_merge($this->data, $data);
-        $partial->render($slug, $data);
-        return $partial;
+        $this->strategy->render($view, \array_merge(static::$global_data, $data));
     }
 
     /**
-     * Runs the standard WP loop, and renders a partial for each post.
+     * Adds any global data and dispatches the current strategy's partial() method.
      *
-     * A replacement for the standard have_posts loop that also works on custom WP_Query objects,
-     * and allows easy partial choice for each iteration.
+     * It is important to note that any data provided to this method takes precedence over global data.
      *
-     * @since 1.0.0
+     * @since  1.0.0
      *
-     * @param string   $partial           Optional. The partial name to render for each post.
-     *                                    If null, then defaults to post-type/{post type}.php.
-     * @param array    $partial_overrides Optional. An array of overrides.
-     *                                    Keys = iteration to apply the override to
-     *                                    values = the partial to load instead of $partial.
-     *                                    There is also a special key 'alternate', which will load the value on every
-     *                                    other iteration.
-     * @param WP_Query $wp_query          Optional. An optional custom WP_Query to loop through.
-     *                                    Defaults to the global WP_Query instance.
+     * @param  string $partial The partial to render.
+     * @param  array  $data    An array of data to pass through.
      */
-    public function loop($partial = null, $partial_overrides = null, $wp_query = null)
+    public function partial($partial, $data = [])
     {
-        if (! $wp_query instanceof WP_Query) {
-            global $wp_query;
-        }
-
-        $count = 0;
-
-        // Render normal loop using our $wp_query value.
-        if ($wp_query->have_posts()) {
-            while ($wp_query->have_posts()) {
-                $wp_query->the_post();
-
-                $data = [
-                    'loop_index' => $count + 1,
-                ];
-
-                // Work out what partial to render.
-                if (\is_array($partial_overrides) && isset($partial_overrides[ $count ])) {
-                    // An override is present, so load that instead.
-                    $this->partial($partial_overrides[ $count ], $data);
-                } elseif (\is_array($partial_overrides)
-                    && isset($partial_overrides['alternate'])
-                    && $count % 2 !== 0
-                ) {
-                    // An override is present, so load that instead.
-                    $this->partial($partial_overrides['alternate'], $data);
-                } elseif ($partial === null) {
-                    // Load the default partial for this content type.
-                    $this->partial('post-type/' . get_post_type(), $data);
-                } else {
-                    // Load the supplied default partial.
-                    $this->partial($partial, $data);
-                }
-
-                $count++;
-            }
-        } else {
-            $this->partial('post-type/none');
-        }
-
-        wp_reset_postdata();
+        $this->strategy->partial($partial, \array_merge(static::$global_data, $data));
     }
 
     /**
-     * Wrapper for outputting Pagination.
+     * Adds data to the current context.
      *
-     * @since 1.0.0
-     * @see \Snap\Modules\Pagination
+     * Must be used within a when() callback.
      *
-     * @param  array $args Args to pass to the Pagination instance.
-     * @return bool|string If $args['echo'] then return true/false if the render is successful,
-     *                     else return the pagination HTML.
+     * @param string $key   The key of the data to add.
+     * @param string $value The data value.
      */
-    public function pagination($args = [])
+    public function add_data($key, $value)
     {
-        $pagination = Snap::services()->resolve(
-            Pagination::class,
-            [
-                'args' => $args,
-            ]
-        );
-
-        if (isset($args['echo']) && $args['echo'] !== true) {
-            return $pagination->get();
-        }
-        
-        return $pagination->render();
+        static::$additional_data[ static::$context ][ $key ] = $value;
     }
 
     /**
-     * Returns the current view template name.
+     * Returns all shared data which is passed to all templates.
      *
-     * @since 1.0.0
+     * @since  1.0.0
      *
-     * @return string|null Returns null if called before a view has been dispatched.
+     * @return array
+     */
+    public function get_shared_data()
+    {
+        return static::$global_data;
+    }
+
+    /**
+     * Gets the current parent view name.
+     *
+     * @since  1.0.0
+     *
+     * @return string
      */
     public function get_current_view()
     {
-        return $this->current_view;
+        return $this->strategy->get_current_view();
     }
 
     /**
-     * Generate the template file name from the slug and name.
+     * Adds data to specific templates only.
      *
-     * @since 1.0.0
+     * The callback is run just before the template is rendered, so could feasibly be used for
+     * purposes other than adding data.
      *
-     * @param  string $slug The slug for the generic template.
-     * @return string
+     * The callback is passed the current view instance, and the current data for the template being rendered.
+     *
+     * @since  1.0.0
+     *
+     * @param  string|array $template The template(s) to add the callback to.
+     * @param  callable     $callback The callback function run before the $template is rendered.
      */
-    public function get_template_name($slug)
+    public static function when($template, callable $callback)
     {
-        $slug = \str_replace([ Snap::config('theme.templates_directory') . '/views/', '.php' ], '', $slug);
+        if (\is_array($template)) {
+            foreach ($template as $current) {
+                static::$composers[ $current ] = $callback;
+            }
 
-        $template = "{$slug}.php";
+            return;
+        }
 
-        return $template;
+        static::$composers[ $template ] = $callback;
+    }
+
+    /**
+     * Adds shared data which is passed to all templates.
+     *
+     * @since  1.0.0
+     *
+     * @param string|array $key   The key of the data to add.
+     *                            Can also be an array of key => values to set multiple data at once.
+     * @param mixed        $value Data value if a single key is being added.
+     */
+    public static function add_shared_data($key, $value = null)
+    {
+        if (\is_array($key)) {
+            static::$global_data = \array_merge(static::$global_data, $key);
+            return;
+        }
+
+        static::$global_data[ $key ] = $value;
+    }
+
+    /**
+     * Executes any callbacks added via when() for the current template, and returns any additional data
+     * registered by the callbacks.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $template The template to fetch the additional data for.
+     * @param  array  $data     The data manually passed to the current template.
+     * @return array
+     */
+    public static function get_additional_data($template, $data = [])
+    {
+        if (isset(static::$composers[ $template ])) {
+            static::$composers[ $template ](Snap::view()->set_context($template), $data);
+
+            return static::$additional_data[ static::$context ];
+        }
+
+        return [];
+    }
+
+    /**
+     * sets the current template context.
+     * @since  1.0.0
+     *
+     * @param string $template The template context to set.
+     * @return  $this
+     */
+    private function set_context($template)
+    {
+        static::$context = $template;
+        return $this;
     }
 }

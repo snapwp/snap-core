@@ -45,6 +45,17 @@ class Application extends Hookable
     }
 
     /**
+     * Run immediately after class instantiation.
+     *
+     * To be overridden by the child class.
+     *
+     * @since 1.0.0
+     */
+    protected function boot()
+    {
+    }
+
+    /**
      * Loop through the $supports array, and declare theme support.
      *
      * @since  1.0.0

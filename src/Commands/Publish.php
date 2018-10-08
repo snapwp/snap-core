@@ -141,7 +141,7 @@ class Publish extends Command
             
             // Add all package files to $packages array.
             foreach (Snap::config('services.providers') as $package) {
-                $packages[ $package ] = $package::get_files_to_publish('directories');
+                $packages[ $package ] = $package::get_files_to_publish();
             }
 
             return $packages;
@@ -161,7 +161,7 @@ class Publish extends Command
         }
 
         return [
-            $package => $package::get_files_to_publish('directories'),
+            $package => $package::get_files_to_publish(),
         ];
     }
 
