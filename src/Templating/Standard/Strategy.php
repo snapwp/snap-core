@@ -3,6 +3,7 @@
 namespace Snap\Templating\Standard;
 
 use Snap\Core\Snap;
+use Snap\Templating\View;
 use Snap\Templating\Templating_Interface;
 use Snap\Exceptions\Templating_Exception;
 use Snap\Modules\Pagination;
@@ -43,16 +44,17 @@ class Strategy implements Templating_Interface
             throw new Templating_Exception('Views should not be nested');
         }
 
+        $this->current_view = $this->get_template_name($slug);
+
         global $wp_query;
 
         $this->data = \array_merge(
-            $data,
+            View::get_additional_data("views/$slug", $data),
             [
                 'wp_query' => $wp_query,
-            ]
+            ],
+            $data
         );
-
-        $this->current_view = $this->get_template_name($slug);
 
         $snap_template_path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
 
@@ -63,6 +65,7 @@ class Strategy implements Templating_Interface
         unset($data, $slug);
 
         \extract($this->data);
+        
         require($snap_template_path);
     }
 
@@ -80,8 +83,15 @@ class Strategy implements Templating_Interface
     public function partial($slug, $data = [])
     {
         $partial = Snap::services()->get(Partial::class);
-        $data = \array_merge($this->data, $data);
+
+        $data = \array_merge(
+            $this->data, 
+            View::get_additional_data('partials/'.$slug, $data), 
+            $data
+        );
+
         $partial->render($slug, $data);
+
         return $partial;
     }
 
