@@ -34,8 +34,18 @@ class Post_Templates extends Hookable
      */
     public function get_search_form($old_form)
     {
+        if (\function_exists('random_int')) {
+            $data = [
+                'searchform_id' => 'search_' . \random_int(1000, 8000),
+            ];
+        } else {
+            $data = [
+                'searchform_id' => \uniqid('search_', true),
+            ];
+        }
+
         \ob_start();
-        Snap::view()->partial('searchform');
+        Snap::view()->partial('searchform', $data);
         $form = \ob_get_clean();
 
         return $form;

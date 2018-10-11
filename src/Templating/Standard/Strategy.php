@@ -85,8 +85,8 @@ class Strategy implements Templating_Interface
         $partial = Snap::services()->get(Partial::class);
 
         $data = \array_merge(
-            $this->data, 
-            View::get_additional_data('partials/'.$slug, $data), 
+            $this->data,
+            View::get_additional_data('partials/'.$slug, $data),
             $data
         );
 
