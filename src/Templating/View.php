@@ -195,7 +195,8 @@ class View
     }
 
     /**
-     * sets the current template context.
+     * Sets the current template context.
+     *
      * @since  1.0.0
      *
      * @param string $template The template context to set.

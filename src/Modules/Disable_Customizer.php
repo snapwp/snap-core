@@ -26,8 +26,8 @@ class Disable_Customizer extends Hookable
      *
      * @since  1.0.0
      *
-     * @param array $allcaps All the capabilities of the user
-     * @param array $cap     Required capability
+     * @param array $allcaps All the capabilities of the user.
+     * @param array $cap     Required capability.
      * @param array $args    {
      *     [0] Requested capability
      *     [1] User ID

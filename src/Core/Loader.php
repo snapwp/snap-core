@@ -119,7 +119,7 @@ class Loader
                 return;
             }
 
-            if (\is_subclass_of($class_name, \Snap\Services\Interfaces\Provider::class)) {
+            if (\is_subclass_of($class_name, \Snap\Services\Provider::class)) {
                 $providers = Snap::config('services.providers');
                 $providers[] = $class_name;
                 Snap::config()->set('services.providers', $providers);

@@ -4,6 +4,9 @@ namespace Snap\Commands\Make;
 
 use Symfony\Component\Console\Command\Command;
 
+/**
+ * Case class for all make:* commands.
+ */
 class Creator extends Command
 {
     /**
@@ -42,7 +45,8 @@ class Creator extends Command
      *
      * @param  string $scaffold The file to scaffold.
      * @param  string $filename The name of the new file to be generated.
-     * @param  array  $args     Any replacement args.
+     * @param  array  $args     Any replacement arguments.
+     * @param  array  $options  Any replacement options. Used for toggling sections of the scaffold.
      * @return boolean
      */
     protected function scaffold($scaffold, $filename, $args = [], $options = [])
@@ -70,7 +74,7 @@ class Creator extends Command
 
             \preg_match_all("/%IF[^%]*%([^%]*)%END%/m", $content, $matches);
 
-            // clean up any IF tags
+            // Clean up any IF tags.
             if (! empty($matches)) {
                 foreach ($matches as $match) {
                     if (! empty($match)) {
@@ -79,7 +83,7 @@ class Creator extends Command
                 }
             }
 
-            // Substitute arguments
+            // Substitute arguments.
             $content = \str_replace(
                 \array_keys($args),
                 \array_values($args),

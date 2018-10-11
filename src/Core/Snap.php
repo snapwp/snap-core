@@ -154,6 +154,13 @@ class Snap
         self::$container->addInstance($config);
     }
 
+    /**
+     * Add the templating definitions to the container.
+     *
+     * Adds the View class, and if no other templating strategy is present, adds and binds the default.
+     *
+     * @since  1.0.0
+     */
     public static function init_templating()
     {
         // If no templating strategy has already been registered.

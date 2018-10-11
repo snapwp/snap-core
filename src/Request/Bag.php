@@ -5,7 +5,7 @@ namespace Snap\Request;
 use ArrayAccess;
 
 /**
- *
+ * Parameter bag.
  */
 class Bag implements ArrayAccess
 {
@@ -184,6 +184,14 @@ class Bag implements ArrayAccess
         return \json_encode($this->data);
     }
 
+    /**
+     * Callback for performing recursive sanitisation on an array of values.
+     *
+     * @since  1.0.0
+     *
+     * @param  array $value The array to sanitise.
+     * @return mixed
+     */
     public function sanitise_array($value)
     {
         if (\is_Array($value)) {
@@ -194,13 +202,12 @@ class Bag implements ArrayAccess
     }
 
     /**
-     * Set a item.
+     * Set an item.
      *
      * @since  1.0.0
      *
      * @param  mixed $offset The offset to set.
      * @param  mixed $value  The value to set.
-     * @return boolean
      */
     public function offsetSet($offset, $value)
     {

@@ -9,6 +9,9 @@ use Snap\Exceptions\Templating_Exception;
 use Snap\Modules\Pagination;
 use WP_Query;
 
+/**
+ * The default vanilla PHP templating engine.
+ */
 class Strategy implements Templating_Interface
 {
     /**

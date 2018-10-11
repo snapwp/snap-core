@@ -20,7 +20,6 @@ class Application extends Hookable
      * @var array
      */
     protected $supports = [
-        //
     ];
 
     /**

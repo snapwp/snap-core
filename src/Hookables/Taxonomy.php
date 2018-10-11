@@ -97,7 +97,7 @@ class Taxonomy extends Hookable
             $taxonomy->columns()->add($this->columns);
 
             foreach ($this->columns as $key => $title) {
-                // If a getter has been set
+                // If a getter has been set.
                 if (\is_callable([$this, "get_{$key}_column"])) {
                     $taxonomy->columns()->populate($key, [$this, "output_column"]);
                 }
@@ -129,7 +129,7 @@ class Taxonomy extends Hookable
      *
      * @since 1.0.0
      *
-     * @param array  $columns  Default WordPress sortable columns.
+     * @param array $columns  Default WordPress sortable columns.
      */
     public function set_sortable_columns($columns)
     {
@@ -185,9 +185,9 @@ class Taxonomy extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  PostTypes\Taxonomy $taxonomy The current Taxonomy instance.
+     * @param  \PostTypes\Taxonomy $taxonomy The current Taxonomy instance.
      */
-    protected function modify(Tax $taxonomy)
+    protected function modify(\PostTypes\Taxonomy $taxonomy)
     {
     }
 

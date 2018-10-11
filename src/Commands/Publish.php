@@ -79,6 +79,9 @@ class Publish extends Command
      * Run the command.
      *
      * @since  1.0.0
+     *
+     * @param  InputInterface  $input Command input.
+     * @param  OutputInterface $output Command output.
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -107,8 +110,11 @@ class Publish extends Command
      * Set up class properties and initialise Snap.
      *
      * @since 1.0.0
+     *
+     * @param  InputInterface  $input Command input.
+     * @param  OutputInterface $output Command output.
      */
-    private function init($input, $output)
+    private function init(InputInterface $input, OutputInterface $output)
     {
         $this->helper = $this->getHelper('question');
         $this->input = $input;

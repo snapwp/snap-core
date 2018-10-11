@@ -9,7 +9,7 @@ use RecursiveArrayIterator;
 /**
  * Base Provider class.
  */
-class Provider implements Interfaces\Provider
+class Provider
 {
     /**
      * List of files and folders published.
@@ -83,6 +83,7 @@ class Provider implements Interfaces\Provider
      *
      * @param  string $source Full path to the source directory.
      * @param  string $target Path to copy the source to - relative to the theme root.
+     * @param  string $tag    Optional. The tag to add this directory under.
      */
     protected function publishes_directory($source, $target, $tag = 'directories')
     {

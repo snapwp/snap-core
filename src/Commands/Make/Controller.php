@@ -31,6 +31,9 @@ class Controller extends Creator
      * Run the command.
      *
      * @since  1.0.0
+     *
+     * @param  InputInterface  $input Command input.
+     * @param  OutputInterface $output Command output.
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

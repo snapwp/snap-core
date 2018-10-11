@@ -27,11 +27,14 @@ class Shortcode extends Creator
         $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created shortcode.');
     }
 
-    /**
-     * Run the command.
-     *
-     * @since  1.0.0
-     */
+   /**
+    * Run the command.
+    *
+    * @since  1.0.0
+    *
+    * @param  InputInterface  $input Command input.
+    * @param  OutputInterface $output Command output.
+    */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(

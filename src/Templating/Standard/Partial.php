@@ -31,7 +31,7 @@ class Partial
     /**
      * Constructor. Set reference to the parent view.
      *
-     * @param View $view The parent view.
+     * @param \Snap\Templating\Strategy $view The parent view.
      */
     public function __construct(Strategy $view)
     {
