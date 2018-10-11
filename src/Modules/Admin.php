@@ -132,7 +132,7 @@ class Admin extends Hookable
      */
     public function populate_columns($column, $post_id)
     {
-        $page_templates = \wp_get_theme()->get_page_templates($post_id);
+        $page_templates = \wp_get_theme()->get_page_templates(\get_post($post_id));
 
         switch ($column) {
             case 'snap_template':
