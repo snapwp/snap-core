@@ -7,9 +7,9 @@ namespace Snap\Templating;
  */
 interface Templating_Interface
 {
-	/**
+    /**
      * Renders a view template.
-     * 
+     *
      * @param  string $slug The current slug to render relative to the views directory.
      * @param  array  $data Data to pass to this template.
      * @return void
@@ -18,7 +18,7 @@ interface Templating_Interface
     
     /**
      * Renders a partial template.
-     * 
+     *
      * @param  string $slug The current slug to render relative to the partials directory.
      * @param  array  $data Data to pass to this template.
      * @return void
@@ -27,7 +27,7 @@ interface Templating_Interface
 
     /**
      * Should return the parent view for the current request.
-     * 
+     *
      * @return string
      */
     public function get_current_view();
