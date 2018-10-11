@@ -34,6 +34,7 @@ class Creator extends Command
     {
         $this->theme_dir = \getcwd();
         $this->scaffolding_dir = __DIR__ . '/scaffolding/';
+        $this->init_wordpress();
 
         parent::__construct();
     }
@@ -52,6 +53,8 @@ class Creator extends Command
     protected function scaffold($scaffold, $filename, $args = [], $options = [])
     {
         $original = $this->scaffolding_dir . "{$scaffold}.txt";
+
+        $filename = $this->sanitise_filename($filename);
 
         if (\file_exists($original)) {
             $content = \file_get_contents($original);
@@ -83,13 +86,15 @@ class Creator extends Command
                 }
             }
 
+            $args = $this->parse_args($args);
+
             // Substitute arguments.
             $content = \str_replace(
                 \array_keys($args),
                 \array_values($args),
                 $content
             );
-            
+
             if (\file_put_contents($this->get_destination($scaffold, $filename), $content) !== false) {
                 return true;
             }
@@ -109,13 +114,7 @@ class Creator extends Command
     {
         $theme_dir = "{$this->theme_dir}/theme";
 
-        if (! \is_dir($theme_dir)) {
-            \mkdir($theme_dir, 0755);
-        }
-
-        if (! \is_dir($theme_dir . '/' . $dir)) {
-            \mkdir($theme_dir . '/' . $dir, 0755);
-        }
+        wp_mkdir_p($theme_dir . '/' . $dir);
     }
 
     /**
@@ -150,8 +149,89 @@ class Creator extends Command
                 break;
         }
 
-        $this->create_destination_dir($dir);
+        \preg_match('/(.*)\/[^\/]*$/', $dir . '/' . $filename, $match);
 
-        return $this->theme_dir . '/theme/' . $dir . '/' .$filename . '.php';
+        if (isset($match[1])) {
+            $this->create_destination_dir($match[1]);
+        } else {
+            $this->create_destination_dir($dir);
+        }
+
+        return $this->theme_dir . '/theme/' . $dir . '/' . $filename . '.php';
+    }
+
+    /**
+     * Include and boot up WordPress.
+     *
+     * @since  1.0.0
+     */
+    private function init_wordpress()
+    {
+        global $wp, $wp_query, $wp_the_query, $wp_rewrite, $wp_did_header;
+
+        // Trick WP into thinking this is an AJAX request. Helps quieten certain plugins.
+        \define('DOING_AJAX', true);
+        \define('SHORTINIT', true);
+
+        \define('BASE_PATH', $this->find_wordpress_base_path());
+        \define('WP_USE_THEMES', false);
+        require(BASE_PATH . 'wp-load.php');
+    }
+
+    /**
+     * Traverse up the cirectory structure looking for the current WP base path.
+     *
+     * @since  1.0.0
+     *
+     * @return string The base path.
+     */
+    private function find_wordpress_base_path()
+    {
+        $dir = \dirname(__FILE__);
+
+        do {
+            if (\file_exists($dir . "/wp-config.php") || \file_exists($dir . "/wp-config-sample.php")) {
+                return $dir . '/';
+            }
+        } while ($dir = \realpath("$dir/.."));
+
+        return null;
+    }
+
+    /**
+     * Ensure a namepsaced $filename can be created as a directory.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $filename The (poissbly) namespaced Hookable class name to create.
+     * @return string
+     */
+    private function sanitise_filename($filename)
+    {
+        return \str_replace('\\', '/', $filename);
+    }
+
+    /**
+     * Populates the NAMESPACE argument based off the passed CLASSNAME.
+     *
+     * @since  1.0.0
+     *
+     * @param  array  $args The args passed to the creator.
+     * @return array
+     */
+    private function parse_args($args = [])
+    {
+        $args['NAMESPACE'] = '';
+
+        $classname = $this->sanitise_filename($args['CLASSNAME']);
+
+        if (\strpos($classname, '/') !== false) {
+            \preg_match('/(.*)\/[^\/]*$/', $classname, $match);
+
+            $args['NAMESPACE'] = '\\' . $match[1];
+            $args['CLASSNAME'] = \end(\explode('/', $args['CLASSNAME']));
+        }
+
+        return $args;
     }
 }

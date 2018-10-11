@@ -1,6 +1,6 @@
 <?php
 
-namespace Theme\Controllers;
+namespace Theme\ControllersNAMESPACE;
 
 use Snap\Core\Controller;
 use Snap\Core\Request;
