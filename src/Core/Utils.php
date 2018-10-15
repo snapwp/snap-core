@@ -119,6 +119,17 @@ class Utils
         }
     }
 
+    public static function get_active_theme_path($path)
+    {
+        return trailingslashit(get_stylesheet_directory()) . $path;
+    }      
+
+    public static function get_active_theme_uri($path)
+    {
+        return trailingslashit(get_stylesheet_directory_uri()) . $path;
+    }    
+
+
     /**
      * Get size information for all currently registered image sizes.
      *

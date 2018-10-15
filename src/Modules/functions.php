@@ -104,20 +104,30 @@ if (! \function_exists('snap_get_current_view')) {
  */
 if (! \function_exists('services')) {
     /**
+     * Returns the service container
+     *
+     * @since  1.0.0
+     *
+     * @return mixed The service container or an individual service.
+     */
+    function services()
+    {
+        return Snap::services();
+    }
+}
+
+if (! \function_exists('get_service')) {
+    /**
      * Returns the service container, or an object within it.
      *
      * @since  1.0.0
      *
      * @param  string $key The service to fetch.
-     * @return mixed The service container or an individual service.
+     * @return mixed An individual service.
      */
-    function services($key = null)
+    function get_service($key)
     {
-        if ($key !== null) {
-            return Snap::services()->get($key);
-        }
-
-        return Snap::services();
+        return Snap::services()->get($key);
     }
 }
 

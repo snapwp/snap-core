@@ -9,6 +9,7 @@ use Rakit\Validation\Validator;
 use Snap\Modules\Assets;
 use Snap\Templating\View;
 use Snap\Templating\Templating_Interface;
+use \Snap\Services\Image_Service;
 
 /**
  * The main Snap class.
@@ -100,6 +101,9 @@ class Snap
                 }
             );
 
+            self::init_services();
+
+
             // Add the assets module to avoid parsing the mix-manifest multiple times.
             self::$container->addSingleton(
                 Assets::class,
@@ -189,6 +193,25 @@ class Snap
                 return $hodl->resolve(View::class);
             }
         );
+    }
+
+    /**
+     * Add Snap services to the container.
+     *
+     * @since  1.0.0
+     */
+    public static function init_services()
+    {
+        // Add Image service.
+        self::$container->addSingleton(
+            Image_Service::class,
+            function () {
+                return new Image_Service();
+            }
+        );
+        
+        // Bind Image service to alias.
+        self::$container->alias(Image_Service::class, 'image');
     }
 
     /**
