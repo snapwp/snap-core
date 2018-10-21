@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Images;
+namespace Snap\Media;
 
 use Snap\Core\Snap;
 use Snap\Core\Hookable;
@@ -17,6 +17,7 @@ class Admin extends Hookable
      * @var array
      */
     public $filters = [
+        'post_mime_types' => 'add_additional_mime_type_support',
         'media_meta' => 'add_image_sizes_meta_to_media',
         'attachment_fields_to_edit' => 'add_intermediate_fields',
         'attachment_fields_to_save' => 'handle_delete_intermediate_ajax',
@@ -56,6 +57,47 @@ class Admin extends Hookable
                 true
             );
         }
+    }
+
+    /**
+     * Add some additional mime type filters to media pages.
+     *
+     * @since  1.0.0
+     *
+     * @param  array $post_mime_types The current list of mime types.
+     * @return array The original list with our additional types.
+     */
+    public function add_additional_mime_type_support($post_mime_types)
+    {
+        $additional_mime_types = [
+            'application/msword' => [
+                \__('Word Docs', 'snap'),
+                \__('Manage Word Docs', 'snap'),
+                \_n_noop('Word Doc <span class="count">(%s)</span>', 'Word Docs <span class="count">(%s)</span>'),
+            ],
+            'application/vnd.ms-excel' => [
+                \__('Excel Docs', 'snap'),
+                \__('Manage Excel Docs', 'snap'),
+                \_n_noop('Excel Doc <span class="count">(%s)</span>', 'Excel Docs <span class="count">(%s)</span>'),
+            ],
+            'application/pdf' => [
+                \__('PDFs', 'snap'),
+                \__('Manage PDFs', 'snap'),
+                \_n_noop('PDF <span class="count">(%s)</span>', 'PDFs <span class="count">(%s)</span>'),
+            ],
+            'application/zip' => [
+                \__('ZIPs', 'snap'),
+                \__('Manage ZIPs', 'snap'),
+                \_n_noop('ZIP <span class="count">(%s)</span>', 'ZIPs <span class="count">(%s)</span>'),
+            ],
+            'text/csv' => [
+                \__('CSVs', 'snap'),
+                \__('Manage CSVs', 'snap'),
+                \_n_noop('CSV <span class="count">(%s)</span>', 'CSVs <span class="count">(%s)</span>'),
+            ],
+        ];
+
+        return \array_merge($post_mime_types, $additional_mime_types);
     }
 
     /**

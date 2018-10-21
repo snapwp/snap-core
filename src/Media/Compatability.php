@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Images;
+namespace Snap\Media;
 
 use Snap\Core\Hookable;
 
