@@ -11,7 +11,7 @@ use Snap\Core\Utils;
 class Image_Service
 {
     /**
-     * The file extensions to check when finding palceholders.
+     * The file extensions to check when finding placeholders.
      *
      * @since  1.0.0
      * @var array
@@ -90,13 +90,13 @@ class Image_Service
         // Search for a size specific placeholder first.
         $placeholder_url = $this->search_for_placeholder('placeholder-' . $size);
 
+        // Then the post type placeholder.
         if ($placeholder_url === false) {
-            // Then the post type placeholder.
             $placeholder_url = $this->search_for_placeholder('placeholder-' . get_post_type($post_id));
         }
 
+        // Finally a generic placeholder.
         if ($placeholder_url === false) {
-            // Finally a generic placeholder.
             $placeholder_url = $this->search_for_placeholder('placeholder');
         }
 
