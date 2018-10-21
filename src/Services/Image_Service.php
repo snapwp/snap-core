@@ -76,10 +76,12 @@ class Image_Service
      * @param  string       $attr              Query string of attributes.
      * @return string The image HTML
      */
-    public function get_placeholder_image($post_id, $post_thumbnail_id, $size, $attr = [])
+    public function get_placeholder_image($post_id = null, $post_thumbnail_id, $size, $attr = [])
     {
         $placeholder_url = false;
         $original_size = $size;
+
+        $post_id = $post_id ?? get_the_id();
 
         if (Utils::get_image_size($size) === false) {
             $size = 'full';
@@ -93,7 +95,6 @@ class Image_Service
             $placeholder_url = $this->search_for_placeholder('placeholder-' . get_post_type($post_id));
         }
 
-        dump($placeholder_url, get_post_type($post_id), $post_id, $post_thumbnail_id, $size, $attr);
         if ($placeholder_url === false) {
             // Finally a generic placeholder.
             $placeholder_url = $this->search_for_placeholder('placeholder');
@@ -126,11 +127,11 @@ class Image_Service
     /**
      * Generate a dynamic image.
      *
-     * Snap tries to save server space by only generating images needed for admin use. 
+     * Snap tries to save server space by only generating images needed for admin use.
      * All other theme images are generated dynamically by this method.
      *
      * @since  1.0.0
-     * 
+     *
      * @param mixed $image Image array to pass on from this filter.
      * @param int          $id   Attachment ID for image.
      * @param array|string $size Optional. Image size to scale to. Accepts any valid image size,
@@ -141,13 +142,17 @@ class Image_Service
      */
     public function generate_dynamic_image($image, $id, $size)
     {
+        if (! wp_attachment_is_image($id)) {
+            return $image;
+        }
+
         // Get parent image meta data.
         $meta = wp_get_attachment_metadata($id);
 
         // Set initial crop value.
         $crop = false;
 
-        if (is_array($size)) {
+        if (\is_array($size)) {
             list($width, $height) = $size;
 
             if ($meta['width'] < $width) {
@@ -165,34 +170,40 @@ class Image_Service
             global $_wp_additional_image_sizes;
 
             // Shortcircuit if $size has not been registered.
-            if (! isset($_wp_additional_image_sizes[$size])) {
+            if (! isset($_wp_additional_image_sizes[ $size ])) {
                 return $image;
             }
 
-            $width = $_wp_additional_image_sizes[$size]['width'];
-            $height = $_wp_additional_image_sizes[$size]['height'];
-            $crop = $_wp_additional_image_sizes[$size]['crop'];
+            $width = $_wp_additional_image_sizes[ $size ]['width'];
+            $height = $_wp_additional_image_sizes[ $size ]['height'];
+            $crop = $_wp_additional_image_sizes[ $size ]['crop'];
         }
 
         $check = image_get_intermediate_size($id, $size);
-
         // Bail early if we can.
         if ($check !== false) {
             return [$check['url'], $check['width'], $check['height'], false];
         }
 
-        if ($check === false || ! file_exists(wp_upload_dir()['basedir']. '/' .$check['path'])) {
+        
+        $parent_image_path = apply_filters(
+            'snap_dynamic_image_source',
+            wp_upload_dir()['basedir'] .'/'. $meta['file'],
+            $id
+        );
+
+        if ($check === false || ! \file_exists(wp_upload_dir()['basedir']. '/' .$check['path'])) {
             $new_meta = image_make_intermediate_size(
-                wp_upload_dir()['basedir'] .'/'. $meta['file'],
-                $width, 
+                $parent_image_path,
+                $width,
                 $height,
                 $crop
             );
 
-            if (is_array($size)) {
-                $meta['sizes'][implode('x', [$width, $height])] = $new_meta;
+            if (\is_array($size)) {
+                $meta['sizes'][ \implode('x', [$width, $height]) ] = $new_meta;
             } else {
-                $meta['sizes'][$size] = $new_meta;
+                $meta['sizes'][ $size ] = $new_meta;
             }
 
             wp_update_attachment_metadata($id, $meta);

@@ -50,7 +50,9 @@ class Loader
             \Snap\Modules\Cleanup::class,
             \Snap\Modules\I18n::class,
             \Snap\Modules\Post_Templates::class,
-            \Snap\Modules\Images::class,
+            \Snap\Images\Compatability::class,
+            \Snap\Images\Size_Manager::class,
+            \Snap\Images\Admin::class,
             \Snap\Admin\Whitelabel::class,
         ];
 

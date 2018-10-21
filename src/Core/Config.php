@@ -154,7 +154,7 @@ class Config
      */
     public function set($key, $value)
     {
-        $this->cache[$key] = $value;
+        $this->cache[ $key ] = $value;
     }
 
     /**

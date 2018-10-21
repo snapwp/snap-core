@@ -10,8 +10,6 @@ use Snap\Core\Hookable;
  *
  * Based on Slate admin theme.
  * <https://wordpress.org/plugins/slate-admin-theme/>
- *
- * @since  1.0.0
  */
 class Theme extends Hookable
 {

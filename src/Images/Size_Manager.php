@@ -1,9 +1,8 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Images;
 
 use Snap\Core\Snap;
-use Snap\Images\Service;
 use Snap\Core\Hookable;
 use Snap\Core\Utils;
 use \Snap\Services\Image_Service;
@@ -11,7 +10,7 @@ use \Snap\Services\Image_Service;
 /**
  * Controls custom image sizes and thumbnail support.
  */
-class Images extends Hookable
+class Size_Manager extends Hookable
 {
     /**
      * Default WordPress image sizes.
@@ -26,12 +25,20 @@ class Images extends Hookable
     ];
 
     /**
+     * Holds any defined image sizes intended for theme use only.
+     *
+     * @since  1.0.0
+     * @var array
+     */
+    private static $dynamic_sizes = [];
+    
+    /**
      * Holds any defined image dropdown names.
      *
      * @since  1.0.0
      * @var array
      */
-    public static $size_dropdown_names = [];
+    public $size_dropdown_names = [];
 
     /**
      * The filters to run when booted.
@@ -46,12 +53,13 @@ class Images extends Hookable
     ];
 
     /**
-     * Inject Snap\Images\Service
+     * Inject Snap\Services\Image_Service
      * @param Service $image_service [description]
      */
     public function __construct(Image_Service $image_service)
     {
         $this->image_service = $image_service;
+        $this->set_dynamic_sizes();
     }
 
     /**
@@ -74,7 +82,7 @@ class Images extends Hookable
             $this->add_filter('intermediate_image_sizes', 'remove_default_image_sizes');
         }
 
-        if (! empty(self::$size_dropdown_names)) {
+        if (! empty($this->size_dropdown_names)) {
             $this->add_filter('image_size_names_choose', 'enable_custom_image_sizes');
         }
     
@@ -82,6 +90,18 @@ class Images extends Hookable
         if (! empty(Snap::config('images.insert_image_default_size'))) {
             $this->add_filter('after_setup_theme', 'set_insert_image_default_size');
         }
+    }
+
+    /**
+     * Return the theme dynamic image sizes.
+     *
+     * @since  1.0.0
+     *
+     * @return array
+     */
+    public static function get_dynamic_sizes()
+    {
+        return \array_keys(self::$dynamic_sizes);
     }
 
     /**
@@ -142,7 +162,7 @@ class Images extends Hookable
     public function enable_custom_image_sizes($sizes)
     {
         // Merge custom sizes into $sizes.
-        $sizes = \array_merge($sizes, self::$size_dropdown_names);
+        $sizes = \array_merge($sizes, $this->size_dropdown_names);
 
         // Ensure 'Full size' is always at end.
         unset($sizes['full']);
@@ -191,7 +211,7 @@ class Images extends Hookable
     /**
      * Removes all custom image sizes that do not have dropdown names.
      *
-     * This allows develoeprs to specify which image sizes are choosable within an editor context, and which
+     * This allows developers to specify which image sizes are choosable within an editor context, and which
      * should only be generated if actually needed.
      *
      * @since  1.0.0
@@ -201,14 +221,7 @@ class Images extends Hookable
      */
     public function remove_custom_image_sizes($sizes = [])
     {
-        $not_defaults = [];
-
-        foreach (Snap::config('images.image_sizes') as $size => $data) {
-            if (! isset($data[3]) || ! $data[3]) {
-                $not_defaults[ $size ] = true;
-            }
-        }
-        return \array_diff_key($sizes, $not_defaults);
+        return \array_diff_key($sizes, self::$dynamic_sizes);
     }
 
     /**
@@ -225,8 +238,21 @@ class Images extends Hookable
         update_option('image_default_size', Snap::config('images.insert_image_default_size'));
     }
 
-
-
+    /**
+     * Set the dynamic_sizes array.
+     *
+     * Adds image sizes declared in config that are not usable in the editor as dynamic sizes.
+     *
+     * @since  1.0.0
+     */
+    private function set_dynamic_sizes()
+    {
+        foreach (Snap::config('images.image_sizes') as $size => $data) {
+            if (! isset($data[3]) || ! $data[3]) {
+                self::$dynamic_sizes[ $size ] = true;
+            }
+        }
+    }
 
     /**
      * Enabled theme support for thumbnails.
@@ -276,7 +302,7 @@ class Images extends Hookable
                     update_option($name . '_crop', $crop);
                 } else {
                     $callback = function ($sizes = []) use ($name) {
-                        return \array_diff($sizes, [ $name ]);
+                        return \array_diff($sizes, [$name]);
                     };
 
                     // Remove the size.
@@ -290,7 +316,7 @@ class Images extends Hookable
 
             // If a custom dropdown name has been definaed.
             if (isset($size_info[3]) && ! empty($size_info[3])) {
-                self::$size_dropdown_names[ $name ] = $size_info[3];
+                $this->size_dropdown_names[ $name ] = $size_info[3];
             }
         }
     }
