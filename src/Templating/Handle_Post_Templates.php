@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Templating;
 
 use Snap\Core\Snap;
 use Snap\Core\Hookable;
@@ -11,7 +11,7 @@ use Snap\Core\Hookable;
  *
  * @since  1.0.0
  */
-class Post_Templates extends Hookable
+class Handle_Post_Templates extends Hookable
 {
     /**
      * Filters to add on init.
@@ -82,7 +82,7 @@ class Post_Templates extends Hookable
                     continue;
                 }
 
-                $types = [ 'page' ];
+                $types = ['page'];
 
                 if (\preg_match('|Template Post Type:(.*)$|mi', \file_get_contents($full_path), $type)) {
                     $types = \explode(',', \_cleanup_header_comment(\str_replace(' ', '', $type[1])));
