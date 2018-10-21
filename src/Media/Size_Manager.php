@@ -234,8 +234,8 @@ class Size_Manager extends Hookable
      */
     public function set_insert_image_default_size()
     {
-        update_option('image_default_align', 'center');
-        update_option('image_default_size', Snap::config('images.insert_image_default_size'));
+        \update_option('image_default_align', 'center');
+        \update_option('image_default_size', Snap::config('images.insert_image_default_size'));
     }
 
     /**
@@ -297,21 +297,21 @@ class Size_Manager extends Hookable
             if (\in_array($name, self::DEFAULT_IMAGE_SIZES)) {
                 if ($size_info !== false) {
                     // Set other built-in sizes.
-                    update_option($name . '_size_w', $width);
-                    update_option($name . '_size_h', $height);
-                    update_option($name . '_crop', $crop);
+                    \update_option($name . '_size_w', $width);
+                    \update_option($name . '_size_h', $height);
+                    \update_option($name . '_crop', $crop);
                 } else {
                     $callback = function ($sizes = []) use ($name) {
                         return \array_diff($sizes, [$name]);
                     };
 
                     // Remove the size.
-                    add_filter('intermediate_image_sizes_advanced', $callback);
-                    add_filter('intermediate_image_sizes', $callback);
+                    \add_filter('intermediate_image_sizes_advanced', $callback);
+                    \add_filter('intermediate_image_sizes', $callback);
                 }
             } else {
                 // Add custom image size.
-                add_image_size($name, $width, $height, $crop);
+                \add_image_size($name, $width, $height, $crop);
             }
 
             // If a custom dropdown name has been definaed.

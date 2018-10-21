@@ -35,7 +35,7 @@ class Compatability extends Hookable
 
             if ($as3cf->get_setting('remove-local-file') == true) {
                 $provider_object = $as3cf->get_attachment_provider_info($id);
-                $file = get_attached_file($id, true);
+                $file = \get_attached_file($id, true);
 
                 // Copy original to server
                 return $as3cf->plugin_compat->copy_provider_file_to_server($provider_object, $file);
