@@ -82,7 +82,7 @@ class Admin extends Hookable
     public function add_intermediate_fields($form_fields, $post = null)
     {
         // Only display for admin level users, and only if an image.
-        if ($this->is_media_screen() && wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
+        if (wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
             $meta = wp_get_attachment_metadata($post->ID);
 
             $public_sizes = \array_diff(get_intermediate_image_sizes(), Size_Manager::get_dynamic_sizes());
