@@ -45,16 +45,23 @@ class Loader
         \spl_autoload_register(__NAMESPACE__ .'\Loader::autoload');
 
         $snap_modules = [
-            \Snap\Modules\Admin::class,
             \Snap\Modules\Assets::class,
             \Snap\Modules\Cleanup::class,
             \Snap\Modules\I18n::class,
-            \Snap\Modules\Post_Templates::class,
-            \Snap\Images\Compatability::class,
-            \Snap\Images\Size_Manager::class,
-            \Snap\Images\Admin::class,
-            \Snap\Admin\Whitelabel::class,
+            \Snap\Media\Compatability::class,
+            \Snap\Media\Size_Manager::class,
+            \Snap\Templating\Handle_Post_Templates::class,
         ];
+
+        if (is_admin() || $this->is_wplogin()) {
+            $snap_modules[] = \Snap\Admin\Whitelabel::class;
+            $snap_modules[] = \Snap\Admin\Columns\Post_Template::class;
+            $snap_modules[] = \Snap\Media\Admin::class;
+            
+            if (Snap::config('admin.snap_admin_theme') === true) {
+                $snap_modules[] = \Snap\Admin\Theme::class;
+            }
+        }
 
         if (Snap::config('theme.disable_comments') === true) {
             $snap_modules[] = \Snap\Modules\Disable_Comments::class;
@@ -62,10 +69,6 @@ class Loader
 
         if (Snap::config('theme.disable_customizer') === true) {
             $snap_modules[] = \Snap\Modules\Disable_Customizer::class;
-        }
-
-        if (Snap::config('admin.snap_admin_theme') === true) {
-            $snap_modules[] = \Snap\Admin\Theme::class;
         }
 
         foreach ($snap_modules as $module) {
@@ -199,5 +202,26 @@ class Loader
         }
 
         return $files;
+    }
+
+    private function is_wplogin()
+    {
+        $abspath = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
+
+        $files = \get_included_files();
+
+        if (\in_array($abspath.'wp-login.php', $files) || \in_array($abspath.'wp-register.php', $files)) {
+            return true;
+        }
+
+        if (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') {
+            return true;
+        }
+
+        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF']== '/wp-login.php') {
+            return true;
+        }
+
+        return false;
     }
 }

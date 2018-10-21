@@ -7,8 +7,6 @@ use Snap\Core\Hookable;
 
 /**
  * Admin changes for whitelabel/branding purposes.
- *
- * @since  1.0.0
  */
 class Whitelabel extends Hookable
 {

@@ -75,6 +75,13 @@ class Snap
      */
     public static function setup()
     {
+        add_action(
+            'after_switch_theme',
+            function () {
+                \flush_rewrite_rules();
+            }
+        );
+
         if (! self::$setup) {
             self::create_container();
             self::init_config();

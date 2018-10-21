@@ -77,7 +77,7 @@ class Theme extends Hookable
     {
         \wp_enqueue_style(
             'snap_admin_theme',
-            \get_theme_file_uri('vendor/snapwp/snap-core/src/Admin/assets/snap-admin.css'),
+            \get_theme_file_uri('vendor/snapwp/snap-core/assets/snap-theme.css'),
             [],
             Snap::VERSION
         );
