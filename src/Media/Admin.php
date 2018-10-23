@@ -112,8 +112,8 @@ class Admin extends Hookable
      */
     public function add_image_sizes_meta_to_media($form_meta, $post = null)
     {
-        if (\wp_attachment_is_image($post->ID) && \current_user_can('manage_options')) {
-            $meta = \wp_get_attachment_metadata($post->ID);
+        if (wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
+            $meta = wp_get_attachment_metadata($post->ID);
 
             $form_meta .= '<strong>Available sizes: </strong>' . \count($meta['sizes']);
         }
@@ -124,23 +124,23 @@ class Admin extends Hookable
     public function add_intermediate_fields($form_fields, $post = null)
     {
         // Only display for admin level users, and only if an image.
-        if (\wp_attachment_is_image($post->ID) && \current_user_can('manage_options')) {
-            $meta = \wp_get_attachment_metadata($post->ID);
+        if (wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
+            $meta = wp_get_attachment_metadata($post->ID);
 
-            $public_sizes = \array_diff(\get_intermediate_image_sizes(), Size_Manager::get_dynamic_sizes());
+            $public_sizes = \array_diff(get_intermediate_image_sizes(), Size_Manager::get_dynamic_sizes());
 
             $output = '<hr><p><strong>Generated sizes:</strong></p>';
 
             if (!empty($meta['sizes'])) {
                 $output .= '<table class="wp-list-table widefat fixed striped media">
-	            <thead>
-	                <tr style="display:table-row;">
-	                    <td class="manage-column column-cb check-column"><input id="delete-intermediate-all" type="checkbox"></td>
-	                    <th>Name</th>
-	                    <th>Width</th>
-	                </tr>
-	            </thead>
-	            <tbody>';
+                <thead>
+                    <tr style="display:table-row;">
+                        <td class="manage-column column-cb check-column"><input id="delete-intermediate-all" type="checkbox"></td>
+                        <th>Name</th>
+                        <th>Width</th>
+                    </tr>
+                </thead>
+                <tbody>';
 
                 foreach ($meta['sizes'] as $key => $value) {
                     if (\in_array($key, $public_sizes)) {
@@ -153,7 +153,7 @@ class Admin extends Hookable
                 }
 
                 $output .= '</tbody></table>
-	                <button type="button" class="button-link delete-intermediate-button">Delete Permanently</button>';
+                    <button type="button" class="button-link delete-intermediate-button">Delete Permanently</button>';
             }
 
 
@@ -170,8 +170,8 @@ class Admin extends Hookable
     {
 
         if (isset($attachment_data['delete-intermediate']) && !empty($attachment_data['delete-intermediate'])) {
-            $meta = \wp_get_attachment_metadata($post['ID']);
-            $upload_path = \wp_get_upload_dir();
+            $meta = wp_get_attachment_metadata($post['ID']);
+            $upload_path = wp_get_upload_dir();
             $dir = \pathinfo(get_attached_file($post['ID']), PATHINFO_DIRNAME);
 
             foreach ($attachment_data['delete-intermediate'] as $size) {
@@ -180,12 +180,15 @@ class Admin extends Hookable
 
                     // Remove size meta from attachment
                     unset($meta['sizes'][ $size ]);
-                    \wp_delete_file_from_directory(trailingslashit($dir) . $file, $dir);
-                    do_action('delete_attachment', $post['ID']);
+                    wp_delete_file_from_directory(trailingslashit($dir) . $file, $dir);
                 }
             }
+            
+            do_action('snap_dynamic_image_before_delete', $attachment_data['delete-intermediate'], $post['ID']);
+            do_action('delete_attachment', $post['ID']);
+            do_action('snap_dynamic_image_after_delete', $attachment_data['delete-intermediate'], $post['ID']);
 
-            \wp_update_attachment_metadata($post['ID'], $meta);
+            wp_update_attachment_metadata($post['ID'], $meta);
         }
 
         return $post;
@@ -193,7 +196,7 @@ class Admin extends Hookable
 
     private function is_media_screen()
     {
-        $current_screen = \get_current_screen();
+        $current_screen = get_current_screen();
 
         if (isset($current_screen->base) && $current_screen->base === 'upload') {
             return true;
