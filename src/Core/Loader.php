@@ -45,10 +45,10 @@ class Loader
         \spl_autoload_register(__NAMESPACE__ .'\Loader::autoload');
 
         $snap_modules = [
+            \Snap\Compatability\Loader::class,
             \Snap\Modules\Assets::class,
             \Snap\Modules\Cleanup::class,
             \Snap\Modules\I18n::class,
-            \Snap\Media\Compatability::class,
             \Snap\Media\Size_Manager::class,
             \Snap\Templating\Handle_Post_Templates::class,
         ];
