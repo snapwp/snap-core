@@ -10,7 +10,8 @@ use PostTypes\Taxonomy as Tax;
  *
  * A wrapper around PostTypes\Taxonomy.
  *
- * @see  https://github.com/jjgrainger/PostTypes
+ * @see https://github.com/jjgrainger/PostTypes
+ * @since 1.0.0
  */
 class Taxonomy extends Hookable
 {
@@ -73,6 +74,14 @@ class Taxonomy extends Hookable
     public $columns = [];
 
     /**
+     * Register which columns should be sortable for Taxonomy.
+     *
+     * @since  1.0.0
+     * @var null|array
+     */
+    public $sortable_columns = [];
+
+    /**
      * Attach post types by supplying the names to attach here.
      *
      * @since  1.0.0
@@ -84,6 +93,8 @@ class Taxonomy extends Hookable
      * Register the Taxonomy.
      *
      * @since  1.0.0
+     *
+     * @throws \ReflectionException
      */
     public function __construct()
     {
@@ -129,7 +140,8 @@ class Taxonomy extends Hookable
      *
      * @since 1.0.0
      *
-     * @param array $columns  Default WordPress sortable columns.
+     * @param array $columns Default WordPress sortable columns.
+     * @return array
      */
     public function set_sortable_columns($columns)
     {
@@ -145,7 +157,7 @@ class Taxonomy extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  WP_Query $query The global WP_Query object.
+     * @param  \WP_Query $query The global WP_Query object.
      */
     public function sort_columns($query)
     {
@@ -157,7 +169,7 @@ class Taxonomy extends Hookable
         $order_by = $query->get('orderby');
 
         // Check if the current sorted column has a sort callback defined.
-        if (isset($this->sortable_columns[ $orderby ])) {
+        if (isset($this->sortable_columns[ $order_by ])) {
             $callback = "sort_{$order_by}_column";
             $this->{$callback}($query);
         }
@@ -170,8 +182,9 @@ class Taxonomy extends Hookable
      * @see  https://github.com/jjgrainger/PostTypes/ For all possible options.
      *
      * @param  string $content The content to return.
-     * @param  string $column  The current column key.
-     * @param  int    $term_id The current term ID.
+     * @param  string $column The current column key.
+     * @param  int $term_id The current term ID.
+     * @return string
      */
     public function output_column($content, $column, $term_id)
     {
@@ -187,7 +200,7 @@ class Taxonomy extends Hookable
      *
      * @param  \PostTypes\Taxonomy $taxonomy The current Taxonomy instance.
      */
-    protected function modify(\PostTypes\Taxonomy $taxonomy)
+    protected function modify(Tax $taxonomy)
     {
     }
 
@@ -196,9 +209,9 @@ class Taxonomy extends Hookable
      *
      * @since  1.0.0
      *
-     * @param PostTypes\Taxonomy $taxonomy The current Taxonomy instance.
+     * @param \PostTypes\Taxonomy $taxonomy The current Taxonomy instance.
      */
-    private function add_relationships($taxonomy)
+    private function add_relationships(Tax $taxonomy)
     {
         if (! empty($this->posttypes)) {
             foreach ($this->posttypes as $k => $v) {

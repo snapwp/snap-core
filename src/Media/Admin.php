@@ -107,8 +107,9 @@ class Admin extends Hookable
      *
      * @since  1.0.0
      *
-     * @param string  $form_meta The form meta html.
-     * @param WP_Post $post      The current attachment post object.
+     * @param string $form_meta The form meta html.
+     * @param \WP_Post $post The current attachment post object.
+     * @return string
      */
     public function add_image_sizes_meta_to_media($form_meta, $post = null)
     {
@@ -133,14 +134,14 @@ class Admin extends Hookable
 
             if (!empty($meta['sizes'])) {
                 $output .= '<table class="wp-list-table widefat fixed striped media">
-                <thead>
-                    <tr style="display:table-row;">
-                        <td class="manage-column column-cb check-column"><input id="delete-intermediate-all" type="checkbox"></td>
-                        <th>Name</th>
-                        <th>Width</th>
-                    </tr>
-                </thead>
-                <tbody>';
+	            <thead>
+	                <tr style="display:table-row;">
+	                    <td class="manage-column column-cb check-column"><input id="delete-intermediate-all" type="checkbox"></td>
+	                    <th>Name</th>
+	                    <th>Width</th>
+	                </tr>
+	            </thead>
+	            <tbody>';
 
                 foreach ($meta['sizes'] as $key => $value) {
                     if (\in_array($key, $public_sizes)) {
@@ -153,7 +154,7 @@ class Admin extends Hookable
                 }
 
                 $output .= '</tbody></table>
-                    <button type="button" class="button-link delete-intermediate-button">Delete Permanently</button>';
+	                <button type="button" class="button-link delete-intermediate-button">Delete Permanently</button>';
             }
 
 
@@ -171,7 +172,6 @@ class Admin extends Hookable
 
         if (isset($attachment_data['delete-intermediate']) && !empty($attachment_data['delete-intermediate'])) {
             $meta = wp_get_attachment_metadata($post['ID']);
-            $upload_path = wp_get_upload_dir();
             $dir = \pathinfo(get_attached_file($post['ID']), PATHINFO_DIRNAME);
 
             foreach ($attachment_data['delete-intermediate'] as $size) {

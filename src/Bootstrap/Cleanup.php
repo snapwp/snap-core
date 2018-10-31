@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Bootstrap;
 
 use Snap\Core\Hookable;
 use Snap\Core\Snap;
@@ -21,16 +21,25 @@ class Cleanup extends Hookable
     protected $actions = [
         'widgets_init' => 'remove_pointless_widgets',
         'init' => 'clean_wp_head',
-        'style_loader_tag' => 'clean_asset_tags',
-        'admin_bar_init' => 'move_adminbar_inline_styles',
+        'admin_bar_init' => 'move_admin_bar_inline_styles',
         'admin_menu' => [
             999 => 'remove_editor_links',
         ],
         'load-theme-editor.php' => 'restrict_access',
         'load-plugin-editor.php' => 'restrict_access',
         'admin_bar_menu' => [
-            99 => 'clean_adminbar',
+            99 => 'clean_admin_bar',
         ],
+    ];
+
+    /**
+     * Filters to add on init.
+     *
+     * @since  1.0.0
+     * @var array
+     */
+    protected $filters = [
+        'style_loader_tag' => 'clean_asset_tags',
     ];
 
     /**
@@ -51,7 +60,7 @@ class Cleanup extends Hookable
      *
      * @since  1.0.0
      */
-    public function move_adminbar_inline_styles()
+    public function move_admin_bar_inline_styles()
     {
         if (! is_admin()) {
             // Remove the inline styles normally added by the admin bar and move to the footer.
@@ -92,9 +101,9 @@ class Cleanup extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  WP_Admin_Bar $wp_admin_bar Global WP_Admin_Bar instance.
+     * @param  \WP_Admin_Bar $wp_admin_bar Global WP_Admin_Bar instance.
      */
-    public function clean_adminbar($wp_admin_bar)
+    public function clean_admin_bar($wp_admin_bar)
     {
         $wp_admin_bar->remove_node('wp-logo');
     }
@@ -123,7 +132,11 @@ class Cleanup extends Hookable
      */
     public function clean_asset_tags($tag)
     {
-        \preg_match_all("!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $tag, $matches);
+        \preg_match_all(
+            "!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!",
+            $tag,
+            $matches
+        );
        
         if (empty($matches[2])) {
             return $tag;

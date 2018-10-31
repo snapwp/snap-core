@@ -6,6 +6,8 @@ use Snap\Core\Hookable;
 
 /**
  * Add post template column to post types.
+ *
+ * @since 1.0.0
  */
 class Post_template extends Hookable
 {

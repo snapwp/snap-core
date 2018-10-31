@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Compatability;
+namespace Snap\Compatibility;
 
 use Snap\Core\Snap;
 use Snap\Core\Hookable;

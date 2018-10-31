@@ -17,7 +17,7 @@ class Controller
      * Snap View instance.
      *
      * @since  1.0.0
-     * @var Snap\Templating\View
+     * @var View
      */
     protected $view = null;
 

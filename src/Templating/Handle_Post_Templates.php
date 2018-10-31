@@ -56,12 +56,12 @@ class Handle_Post_Templates extends Hookable
      *
      * @since  1.0.0
      *
-     * @param array        $post_templates Array of page templates. Keys are filenames,
-     *                                     values are translated names.
-     * @param WP_Theme     $wp_theme       The theme object.
-     * @param WP_Post|null $post           The post being edited, provided for context, or null.
-     * @param string       $post_type      Post type to get the templates for.
-     * @return array                       Modified array of page templates
+     * @param array         $post_templates Array of page templates. Keys are filenames,
+     *                                      values are translated names.
+     * @param \WP_Theme     $wp_theme       The theme object.
+     * @param \WP_Post|null $post           The post being edited, provided for context, or null.
+     * @param string        $post_type      Post type to get the templates for.
+     * @return array                        Modified array of page templates
      */
     public function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
@@ -101,6 +101,8 @@ class Handle_Post_Templates extends Hookable
      * Register the page-template loader for all available public post types
      *
      * @since  1.0.0
+     *
+     * @throws \ReflectionException
      */
     public function register_theme_template_hooks()
     {

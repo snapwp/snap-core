@@ -189,7 +189,7 @@ class Bag implements ArrayAccess
      *
      * @since  1.0.0
      *
-     * @param  array $value The array to sanitise.
+     * @param  array|string $value The array to sanitise.
      * @return mixed
      */
     public function sanitise_array($value)
@@ -237,7 +237,6 @@ class Bag implements ArrayAccess
      * @since  1.0.0
      *
      * @param  mixed $offset The offset to unset.
-     * @return mixed
      */
     public function offsetUnset($offset)
     {

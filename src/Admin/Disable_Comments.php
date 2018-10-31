@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Admin;
 
 use Snap\Core\Hookable;
 
@@ -58,10 +58,10 @@ class Disable_Comments extends Hookable
     public function boot()
     {
         // Remove admin bar references to comments.
-        $this->add_action([ 'admin_init', 'template_redirect' ], 'remove_comments_from_adminbar');
+        $this->add_action(['admin_init', 'template_redirect'], 'remove_comments_from_adminbar');
 
         // Ensures all new posts are set to comments closed by default.
-        $this->add_action([ 'edit_form_advanced', 'edit_page_form' ], 'remove_comments_set_closed_status');
+        $this->add_action(['edit_form_advanced', 'edit_page_form'], 'remove_comments_set_closed_status');
     }
 
     /**
@@ -88,7 +88,9 @@ class Disable_Comments extends Hookable
      */
     public function remove_comments_dashboard_css()
     {
-        echo '<style>#dashboard_right_now .comment-count, #latest-comments, #welcome-panel .welcome-comments {display: none;}</style>';
+        echo '<style>',
+            '#dashboard_right_now .comment-count,#latest-comments, #welcome-panel .welcome-comments {display: none;}',
+            '</style>';
     }
 
     /**
@@ -139,7 +141,8 @@ class Disable_Comments extends Hookable
      */
     public function remove_comments_set_closed_status()
     {
-        echo '<input type="hidden" name="comment_status" value="closed" /><input type="hidden" name="ping_status" value="closed" />';
+        echo '<input type="hidden" name="comment_status" value="closed" />',
+            '<input type="hidden" name="ping_status" value="closed" />';
     }
     
     /**

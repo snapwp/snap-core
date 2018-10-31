@@ -162,8 +162,8 @@ class Config
      *
      * @since  1.0.0
      *
-     * @param  string $path Directory path to scan.
-     * @param  string $overwrite If true, then the config within the $path will overwrite existing config keys.
+     * @param string $path      Directory path to scan.
+     * @param bool   $overwrite If true, then the config within the $path will overwrite existing config keys.
      */
     private function parse_files($path, $overwrite = true)
     {

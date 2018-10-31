@@ -4,6 +4,8 @@ namespace Snap\Services;
 
 use Snap\Core\Snap;
 use Snap\Core\Utils;
+use Snap\Utils\Image_Utils;
+use Snap\Utils\Theme_Utils;
 
 /**
  * Image service for providing placeholder and dynamic image sizes.
@@ -51,11 +53,11 @@ class Image_Service
          */
         $this->placeholder_extensions = apply_filters('snap_placeholder_img_extensions', ['.jpg', '.svg', '.png']);
 
-        $this->placeholder_directory = Utils::get_active_theme_path(
+        $this->placeholder_directory = Theme_Utils::get_active_theme_path(
             trailingslashit(Snap::config('images.placeholder_dir'))
         );
 
-        $this->placeholder_directory_uri = Utils::get_active_theme_uri(
+        $this->placeholder_directory_uri = Theme_Utils::get_active_theme_uri(
             trailingslashit(Snap::config('images.placeholder_dir'))
         );
     }
@@ -73,17 +75,16 @@ class Image_Service
      * @param  string       $post_thumbnail_id The post thumbnail ID.
      * @param  string|array $size              The post thumbnail size. Image size or array of width and height
      *                                         values (in that order). Default 'post-thumbnail'.
-     * @param  string       $attr              Query string of attributes.
+     * @param  array        $attr              Array string of attributes.
      * @return string The image HTML
      */
-    public function get_placeholder_image($post_id = null, $post_thumbnail_id, $size, $attr = [])
+    public function get_placeholder_image($post_id, $post_thumbnail_id, $size, $attr = [])
     {
-        $placeholder_url = false;
         $original_size = $size;
 
         $post_id = $post_id ?? get_the_id();
 
-        if (Utils::get_image_size($size) === false) {
+        if (Image_Utils::get_image_size($size) === false) {
             $size = 'full';
         }
 
@@ -105,8 +106,8 @@ class Image_Service
                 '<img src="%s" alt="%s" width="%d" height="%d" %s>',
                 $placeholder_url,
                 get_the_title($post_id),
-                \is_array($original_size) ? $original_size[0] : Utils::get_image_width($size),
-                \is_array($original_size) ? $original_size[1] : Utils::get_image_height($size),
+                \is_array($original_size) ? $original_size[0] : Image_Utils::get_image_width($size),
+                \is_array($original_size) ? $original_size[1] : Image_Utils::get_image_height($size),
                 $this->parse_attributes($attr)
             );
 
@@ -149,9 +150,6 @@ class Image_Service
         // Get parent image meta data.
         $meta = wp_get_attachment_metadata($id);
 
-        // Set initial crop value.
-        $crop = false;
-
         if (\is_array($size)) {
             list($width, $height) = $size;
 
@@ -169,7 +167,7 @@ class Image_Service
         } else {
             global $_wp_additional_image_sizes;
 
-            // Shortcircuit if $size has not been registered.
+            // Short-circuit if $size has not been registered.
             if (! isset($_wp_additional_image_sizes[ $size ])) {
                 return $image;
             }
@@ -180,11 +178,11 @@ class Image_Service
         }
 
         $check = image_get_intermediate_size($id, $size);
+
         // Bail early if we can.
         if ($check !== false) {
             return [$check['url'], $check['width'], $check['height'], false];
         }
-
         
         $parent_image_path = apply_filters(
             'snap_dynamic_image_source',

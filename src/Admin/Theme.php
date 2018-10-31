@@ -9,7 +9,9 @@ use Snap\Core\Hookable;
  * Enables the Snap admin theme.
  *
  * Based on Slate admin theme.
- * <https://wordpress.org/plugins/slate-admin-theme/>
+ * @See https://wordpress.org/plugins/slate-admin-theme/
+ *
+ * @since 1.0.0
  */
 class Theme extends Hookable
 {
@@ -44,7 +46,7 @@ class Theme extends Hookable
      * @since  1.0.0
      *
      * @param  array $menu_order The current top level menu order.
-     * @return array
+     * @return array|bool
      */
     public function move_page_link_above_posts($menu_order)
     {

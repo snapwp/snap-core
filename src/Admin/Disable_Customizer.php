@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Admin;
 
 use Snap\Core\Hookable;
 
@@ -26,21 +26,21 @@ class Disable_Customizer extends Hookable
      *
      * @since  1.0.0
      *
-     * @param array $allcaps All the capabilities of the user.
+     * @param array $all_caps All the capabilities of the user.
      * @param array $cap     Required capability.
      * @param array $args    {
      *     [0] Requested capability
      *     [1] User ID
      *     [2] Associated object ID
      * }
-     * @return array $allcaps
+     * @return array $all_caps
      */
-    public function shortcircuit_customize_cap($allcaps, $cap, $args)
+    public function shortcircuit_customize_cap($all_caps, $cap, $args)
     {
         if ($args[0] == 'customize') {
-            $allcaps[ $cap[0] ] = false;
+            $all_caps[ $cap[0] ] = false;
         }
 
-        return $allcaps;
+        return $all_caps;
     }
 }

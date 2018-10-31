@@ -252,6 +252,8 @@ class Router
                 Snap::view()->render($slug);
 
                 $this->has_matched_route = true;
+
+                \ob_end_flush();
             }
         }
     }
@@ -259,14 +261,14 @@ class Router
     /**
      * Dispatch a controller action.
      *
-     * The dispatched action and the controller class are autowired.
+     * The dispatched action and the controller class are auto-wired.
      *
      * @since  1.0.0
      *
      * @throws Exception If the supplied controller doesn't exist.
      *
-     * @param  string $controller The controller name followed by the action, seperated by an @.
-     *                            eg. MyController@MyAction
+     * @param  string $controller The controller name followed by the action, separated by an @.
+     *                            eg. "MyController@MyAction"
      *                            If no action is supplied, then 'index' is presumed.
      */
     public function dispatch($controller)
@@ -291,10 +293,12 @@ class Router
                         $action
                     );
                 } else {
-                    throw new Exception("The controller $fqn could not be found.");
+                    throw new Exception("The controller {$fqn} could not be found.");
                 }
 
                 $this->has_matched_route = true;
+
+                \ob_end_flush();
             }
         }
     }
@@ -340,7 +344,7 @@ class Router
     private function apply_middleware()
     {
         if (empty($this->middleware)) {
-            return true;
+            return;
         }
 
         foreach ($this->middleware as $hook => $args) {
@@ -355,7 +359,7 @@ class Router
              * @param Request $request The current request for quick access.
              * @return  bool Whether to continue processing this route.
              */
-            if (apply_filters($hook, Snap::request(), ...$args) !== true) {
+            if (\apply_filters($hook, Snap::request(), ...$args) !== true) {
                 $this->shortcircuit = true;
             }
         }

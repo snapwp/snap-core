@@ -31,7 +31,7 @@ class Partial
     /**
      * Constructor. Set reference to the parent view.
      *
-     * @param \Snap\Templating\Strategy $view The parent view.
+     * @param Strategy $view The parent view.
      */
     public function __construct(Strategy $view)
     {
@@ -53,17 +53,21 @@ class Partial
     {
         $this->current_template = $this->view->get_template_name($slug);
         
-        $snap_template_path = locate_template(Snap::config('theme.templates_directory') . '/partials/' . $this->view->get_template_name($slug));
+        $snap_template_path = locate_template(
+            Snap::config('theme.templates_directory') . '/partials/' . $this->view->get_template_name($slug)
+        );
 
         $this->data = $data;
-        
-        unset($slug, $name, $data);
-        
+
+
         if ($snap_template_path === '') {
             throw new Templating_Exception('Could not find partial: ' . $this->view->get_template_name($slug));
         }
 
+        unset($slug, $name, $data);
+
         \extract($this->data);
+
         require($snap_template_path);
     }
 
@@ -74,29 +78,30 @@ class Partial
      *
      * @since  1.0.0
      *
-     * @throws Templating_Exception If no partial template found.
-     *
      * @param  string $slug The slug for the generic template.
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
-     * @return \Snap\Templating\Partial
+     *
+     * @throws \Hodl\Exceptions\ContainerException
+     * @throws \Hodl\Exceptions\NotFoundException
      */
     public function partial($slug, $data = [])
     {
         $partial = Snap::services()->get(Partial::class);
         $data = \array_merge($this->data, $data);
         $partial->render($slug, $data);
-        return $partial;
     }
 
     /**
      * Wrapper for outputting Pagination.
      *
      * @since 1.0.0
-     * @see \Snap\Modules\Pagination
+     * @see   Pagination
      *
      * @param  array $args Args to pass to the Pagination instance.
-     * @return bool|string If $args['echo'] then return true/false if the render is successfull,
+     * @return bool|string If $args['echo'] then return true/false if the render is successful,
      *                     else return the pagination HTML.
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
     public function pagination($args = [])
     {
@@ -118,8 +123,11 @@ class Partial
      *                                    values = the partial to load instead of $partial.
      *                                    There is also a special key 'alternate', which will load the value on every
      *                                    other iteration.
-     * @param WP_Query $wp_query          Optional. An optional custom WP_Query to loop through.
+     * @param \WP_Query $wp_query         Optional. An optional custom WP_Query to loop through.
      *                                    Defaults to the global WP_Query instance.
+     *
+     * @throws \Hodl\Exceptions\ContainerException
+     * @throws \Hodl\Exceptions\NotFoundException
      */
     public function loop($partial = null, $partial_overrides = null, $wp_query = null)
     {

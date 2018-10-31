@@ -1,11 +1,11 @@
 <?php
 
-namespace Snap\Compatability;
+namespace Snap\Compatibility;
 
 use Snap\Core\Hookable;
 
 /**
- * Add dynamic image compatability fixes for various plugins.
+ * Add dynamic image compatibility fixes for various plugins.
  */
 class Compat_Offload_Media extends Hookable
 {

@@ -3,6 +3,7 @@
 namespace Snap\Core;
 
 use Closure;
+use ReflectionException;
 use ReflectionMethod;
 use ReflectionFunction;
 
@@ -51,17 +52,6 @@ class Hookable
     protected $public = true;
 
     /**
-     * Run immediately after class instantiation.
-     *
-     * To be overridden by the child class.
-     *
-     * @since 1.0.0
-     */
-    protected function boot()
-    {
-    }
-
-    /**
      * Boot up the class.
      *
      * The hooks are registered, then boot is run.
@@ -71,17 +61,20 @@ class Hookable
      */
     final public function run()
     {
-        if ($this->admin === false && is_admin() === true) {
+        if ($this->admin === false && \is_admin() === true) {
             return;
         }
 
-        if ($this->public === false && is_admin() === false) {
+        if ($this->public === false && \is_admin() === false) {
             return;
         }
 
         $this->parse_filters();
         $this->parse_actions();
-        $this->boot();
+
+        if (\method_exists($this, 'boot')) {
+            $this->boot();
+        }
     }
 
     /**
@@ -89,10 +82,11 @@ class Hookable
      *
      * @since 1.0.0
      *
-     * @param string   $tag             The name of the filter to hook the $function_to_add callback to.
-     * @param callable $function_to_add The callback to be run when the filter is applied.
-     * @param integer  $priority        The priority of the callback.
-     * @param integer  $accepted_args   The amount of arguments the callback accepts.
+     * @param string|array $tag             The name of the filter to hook the $function_to_add callback to.
+     * @param callable     $function_to_add The callback to be run when the filter is applied.
+     * @param integer      $priority        The priority of the callback.
+     * @param integer      $accepted_args   The amount of arguments the callback accepts.
+     *
      */
     final public function add_action($tag, $function_to_add, $priority = 10, $accepted_args = 1)
     {
@@ -117,24 +111,19 @@ class Hookable
     {
         $callback = $function_to_add;
 
-        if (\is_string($function_to_add) && \is_callable([ $this, $function_to_add ])) {
+        if (\is_string($function_to_add) && \is_callable([$this, $function_to_add])) {
             // Bind the callback to the current child class.
-            $callback = [ $this, $function_to_add ];
+            $callback = [$this, $function_to_add];
         }
 
-        if (\is_array($tag)) {
-            // Add the callback to all provided hooks.
-            foreach ($tag as $hook) {
-                add_filter(
-                    $hook,
-                    $callback,
-                    $priority ? $priority : 10,
-                    $this->get_argument_count($function_to_add, $accepted_args)
-                );
-            }
-        } else {
-            add_filter(
-                $tag,
+        if (!\is_array($tag)) {
+            $tag = [$tag];
+        }
+
+        // Add the callback to all provided hooks.
+        foreach ($tag as $hook) {
+            \add_filter(
+                $hook,
                 $callback,
                 $priority ? $priority : 10,
                 $this->get_argument_count($function_to_add, $accepted_args)
@@ -145,7 +134,7 @@ class Hookable
     /**
      * Syntactic sugar around remove_hook.
      *
-     * @see  \Snap\Core\Hookable::remove_hook
+     * @see    Hookable::remove_hook
      * @since  1.0.0
      *
      * @param  string|array $tag                The hook(s) to remove the callback from.
@@ -160,7 +149,7 @@ class Hookable
     /**
      * Syntactic sugar around remove_hook.
      *
-     * @see  \Snap\Core\Hookable::remove_hook
+     * @see    Hookable::remove_hook
      * @since  1.0.0
      *
      * @param  string|array $tag                The hook(s) to remove the callback from.
@@ -183,8 +172,8 @@ class Hookable
      */
     final public function remove_hook($tag, $function_to_remove, $priority = 10)
     {
-        if (\is_string($function_to_remove) && \is_callable([ $this, $function_to_remove ])) {
-            $function_to_remove = [ $this, $function_to_remove ];
+        if (\is_string($function_to_remove) && \is_callable([$this, $function_to_remove])) {
+            $function_to_remove = [$this, $function_to_remove];
         }
 
         if (\is_array($tag)) {
@@ -244,20 +233,24 @@ class Hookable
      *
      * @since 1.0.0
      *
-     * @param  callable $callback      Closure or function name.
-     * @param  integer  $accepted_args The amount of arguments passed into the hook.
+     * @param  callable|string $callback      Closure or function name.
+     * @param  integer         $accepted_args The amount of arguments passed into the hook.
      * @return integer
      */
     final private function get_argument_count($callback, $accepted_args = 1)
     {
-        if (\is_string($callback) && \is_callable([ $this, $callback ])) {
-            $reflector = new ReflectionMethod($this, $callback);
-            return $reflector->getNumberOfParameters();
-        }
+        try {
+            if (\is_string($callback) && \is_callable([$this, $callback])) {
+                $reflector = new ReflectionMethod($this, $callback);
+                return $reflector->getNumberOfParameters();
+            }
 
-        if (\is_object($callback) && $callback instanceof Closure) {
-            $reflector = new ReflectionFunction($callback);
-            return $reflector->getNumberOfParameters();
+            if (\is_object($callback) && $callback instanceof Closure) {
+                $reflector = new ReflectionFunction($callback);
+                return $reflector->getNumberOfParameters();
+            }
+        } catch (ReflectionException $exception) {
+            \error_log($exception->getMessage());
         }
 
         return $accepted_args ? $accepted_args : 1;
@@ -270,7 +263,7 @@ class Hookable
      */
     final private function parse_actions()
     {
-        if (isset($this->actions) && \is_array($this->actions) && ! empty($this->actions)) {
+        if (isset($this->actions) && \is_array($this->actions) && !empty($this->actions)) {
             $this->add_hooks($this->actions);
         }
     }
@@ -282,7 +275,7 @@ class Hookable
      */
     final private function parse_filters()
     {
-        if (isset($this->filters) && \is_array($this->filters) && ! empty($this->filters)) {
+        if (isset($this->filters) && \is_array($this->filters) && !empty($this->filters)) {
             $this->add_hooks($this->filters);
         }
     }

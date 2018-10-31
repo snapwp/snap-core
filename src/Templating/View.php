@@ -45,7 +45,7 @@ class View
      * The current template.
      *
      * @since  1.0.0
-     * @var array
+     * @var string
      */
     private static $context = null;
 

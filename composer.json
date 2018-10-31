@@ -15,7 +15,7 @@
         "psr-4": {
             "Snap\\": "src/"
         },
-        "files": ["src/Modules/functions.php"]
+        "files": ["src/Core/functions.php"]
     },
     "require": {
         "php": ">=7",

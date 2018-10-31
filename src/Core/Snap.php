@@ -2,11 +2,8 @@
 
 namespace Snap\Core;
 
-use WP_Query;
-use wpdb;
 use Hodl\Container;
 use Rakit\Validation\Validator;
-use Snap\Modules\Assets;
 use Snap\Templating\View;
 use Snap\Templating\Templating_Interface;
 use \Snap\Services\Image_Service;
@@ -34,9 +31,9 @@ class Snap
      * Container instance.
      *
      * @since 1.0.0
-     * @var Hodl\Container|null
+     * @var Container
      */
-    private static $container = null;
+    private static $container;
 
     /**
      * Whether Snap has been setup yet.
@@ -111,14 +108,6 @@ class Snap
             self::init_services();
 
 
-            // Add the assets module to avoid parsing the mix-manifest multiple times.
-            self::$container->addSingleton(
-                Assets::class,
-                function () {
-                    return new Assets();
-                }
-            );
-
             // Add global WP classes.
             global $wpdb;
             global $wp_query;
@@ -152,6 +141,7 @@ class Snap
      * Create a config instance, provide config directories, and add to the container.
      *
      * @since 1.0.0
+     * @throws \Hodl\Exceptions\ContainerException
      */
     public static function init_config()
     {
@@ -188,7 +178,7 @@ class Snap
 
             self::$container->add(
                 \Snap\Templating\Standard\Partial::class,
-                function ($hodl) {
+                function (Container $hodl) {
                     return $hodl->resolve(\Snap\Templating\Standard\Partial::class);
                 }
             );
@@ -196,7 +186,7 @@ class Snap
 
         self::$container->addSingleton(
             View::class,
-            function ($hodl) {
+            function (Container $hodl) {
                 return $hodl->resolve(View::class);
             }
         );
@@ -226,7 +216,7 @@ class Snap
      *
      * @since  1.0.0
      *
-     * @return Hodl\Container
+     * @return \Hodl\Container
      */
     public static function services()
     {
@@ -238,17 +228,22 @@ class Snap
      *
      * @since  1.0.0
      *
-     * @param string $option The option name to fetch.
+     * @param string $option  The option name to fetch.
      * @param mixed  $default If the option was not found, the default value to be returned instead.
-     * @return mixed|Snap\Core\Config
+     * @return mixed|Config
      */
     public static function config($option = null, $default = null)
     {
-        if ($option === null) {
-            return self::services()->get(Config::class);
-        }
+        try {
+            if ($option === null) {
+                return self::services()->get(Config::class);
+            }
 
-        return self::services()->get(Config::class)->get($option, $default);
+            return self::services()->get(Config::class)->get($option, $default);
+        } catch (\Exception $exception) {
+            \error_log($exception->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -256,7 +251,10 @@ class Snap
      *
      * @since  1.0.0
      *
-     * @return Snap\Core\Router
+     * @return Router
+     *
+     * @throws \Hodl\Exceptions\ContainerException
+     * @throws \Hodl\Exceptions\NotFoundException
      */
     public static function route()
     {
@@ -271,11 +269,16 @@ class Snap
      *
      * @since  1.0.0
      *
-     * @return Snap\Core\Request
+     * @return object The Request instance from the container.
      */
     public static function request()
     {
-        return self::services()->get(Request::class);
+        try {
+            return self::services()->get(Request::class);
+        } catch (\Exception $exception) {
+            \error_log($exception->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -283,17 +286,25 @@ class Snap
      *
      * @since  1.0.0
      *
-     * @return Snap\Core\Request
+     * @return object The View instance from the container.
      */
     public static function view()
     {
-        return self::services()->get(View::class);
+        try {
+            return self::services()->get(View::class);
+        } catch (\Exception $exception) {
+            \error_log($exception->getMessage());
+            return null;
+        }
     }
 
     /**
      * Registers any service providers defined in theme config.
      *
      * @since 1.0.0
+     *
+     * @throws \Hodl\Exceptions\ContainerException
+     * @throws \ReflectionException
      */
     private static function register_providers()
     {

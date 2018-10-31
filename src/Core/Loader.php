@@ -27,83 +27,9 @@ class Loader
     public static function autoload($class)
     {
         // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
-        if (isset(self::$theme_includes[ $class ])) {
-            require self::$theme_includes[ $class ];
+        if (isset(static::$theme_includes[ $class ])) {
+            require static::$theme_includes[ $class ];
             return;
-        }
-    }
-
-    /**
-     * Includes all required Snap and theme files and registeres the Snap autoloader.
-     *
-     * Initializes any Snap\Hookable classes.
-     *
-     * @since 1.0.0
-     */
-    public function boot()
-    {
-        \spl_autoload_register(__NAMESPACE__ .'\Loader::autoload');
-
-        $snap_modules = [
-            \Snap\Compatability\Loader::class,
-            \Snap\Modules\Assets::class,
-            \Snap\Modules\Cleanup::class,
-            \Snap\Modules\I18n::class,
-            \Snap\Media\Size_Manager::class,
-            \Snap\Templating\Handle_Post_Templates::class,
-        ];
-
-        if (is_admin() || $this->is_wplogin()) {
-            $snap_modules[] = \Snap\Admin\Whitelabel::class;
-            $snap_modules[] = \Snap\Admin\Columns\Post_Template::class;
-            $snap_modules[] = \Snap\Media\Admin::class;
-            
-            if (Snap::config('admin.snap_admin_theme') === true) {
-                $snap_modules[] = \Snap\Admin\Theme::class;
-            }
-        }
-
-        if (Snap::config('theme.disable_comments') === true) {
-            $snap_modules[] = \Snap\Modules\Disable_Comments::class;
-        }
-
-        if (Snap::config('theme.disable_customizer') === true) {
-            $snap_modules[] = \Snap\Modules\Disable_Customizer::class;
-        }
-
-        foreach ($snap_modules as $module) {
-            Snap::services()->resolve($module)->run();
-        }
-
-        $this->load_widgets();
-
-        $this->load_theme();
-    }
-
-    /**
-     * Load all theme files.
-     *
-     * @since 1.0.0
-     */
-    private function load_theme()
-    {
-        // Populate $theme_includes.
-        self::$theme_includes = $this->scandir(
-            \get_template_directory() . '/theme/',
-            self::$theme_includes,
-            \get_template_directory()
-        );
-
-        self::$theme_includes = $this->scandir(
-            \get_stylesheet_directory() . '/theme/',
-            self::$theme_includes,
-            \get_stylesheet_directory()
-        );
-
-        if (! empty(self::$theme_includes)) {
-            foreach (self::$theme_includes as $class => $path) {
-                $this->load_hookable($class);
-            }
         }
     }
 
@@ -113,6 +39,8 @@ class Loader
      * @since 1.0.0
      *
      * @param string $class_name The path to an included file.
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
     private function load_hookable($class_name)
     {
@@ -144,6 +72,89 @@ class Loader
     }
 
     /**
+     * Includes all required Snap and theme files and registers the Snap autoloader.
+     *
+     * Initializes any Snap\Hookable classes.
+     *
+     * @since 1.0.0
+     *
+     * @throws \Exception
+     */
+    public function boot()
+    {
+        \spl_autoload_register(__NAMESPACE__ .'\Loader::autoload');
+
+        $snap_modules = [
+            \Snap\Compatibility\Loader::class,
+            \Snap\Bootstrap\Assets::class,
+            \Snap\Bootstrap\Cleanup::class,
+            \Snap\Bootstrap\I18n::class,
+            \Snap\Media\Size_Manager::class,
+            \Snap\Templating\Handle_Post_Templates::class,
+        ];
+
+        if (is_admin() || $this->is_wplogin()) {
+            $snap_modules[] = \Snap\Admin\Whitelabel::class;
+            $snap_modules[] = \Snap\Admin\Columns\Post_Template::class;
+            $snap_modules[] = \Snap\Media\Admin::class;
+
+            if (Snap::config('admin.snap_admin_theme') === true) {
+                $snap_modules[] = \Snap\Admin\Theme::class;
+            }
+        } else {
+            $snap_modules[] = \Snap\Request\Middleware\Is_Logged_In::class;
+        }
+
+        if (Snap::config('theme.disable_comments') === true) {
+            $snap_modules[] = \Snap\Admin\Disable_Comments::class;
+        }
+
+        if (Snap::config('theme.disable_customizer') === true) {
+            $snap_modules[] = \Snap\Admin\Disable_Customizer::class;
+        }
+
+        foreach ($snap_modules as $module) {
+            Snap::services()->resolve($module)->run();
+        }
+
+        $this->load_widgets();
+
+        // Now all core files are loaded, turn on output buffer until a view is dispatched.
+        \ob_start();
+
+        $this->load_theme();
+    }
+
+    /**
+     * Load all theme files.
+     *
+     * @since 1.0.0
+     *
+     * @throws \Hodl\Exceptions\ContainerException
+     */
+    private function load_theme()
+    {
+        // Populate $theme_includes.
+        self::$theme_includes = $this->scan_dir(
+            \get_template_directory() . '/theme/',
+            self::$theme_includes,
+            \get_template_directory()
+        );
+
+        self::$theme_includes = $this->scan_dir(
+            \get_stylesheet_directory() . '/theme/',
+            self::$theme_includes,
+            \get_stylesheet_directory()
+        );
+
+        if (! empty(self::$theme_includes)) {
+            foreach (self::$theme_includes as $class => $path) {
+                $this->load_hookable($class);
+            }
+        }
+    }
+
+    /**
      * Register additional Snap widgets.
      *
      * @since 1.0.0
@@ -168,7 +179,7 @@ class Loader
      * @param  string $strip  Strip this text from the returned path.
      * @return array          $files array with any discovered php files appended.
      */
-    private function scandir($folder, $files = [], $strip = '')
+    private function scan_dir($folder, $files = [], $strip = '')
     {
         // Ensure maximum portability.
         $folder = \trailingslashit($folder);
@@ -196,7 +207,7 @@ class Loader
                     $files[ $class ] = $path;
                 } elseif (\is_dir($path)) {
                     // Sub directory, scan this dir as well.
-                    $files = $this->scandir(\trailingslashit($path), $files, $strip);
+                    $files = $this->scan_dir(\trailingslashit($path), $files, $strip);
                 }
             }
         }

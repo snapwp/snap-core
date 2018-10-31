@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Bootstrap;
 
 use Snap\Core\Hookable;
 
@@ -22,6 +22,6 @@ class I18n extends Hookable
      */
     public function load_theme_textdomain()
     {
-        load_theme_textdomain('snap', get_stylesheet_directory() . '/languages');
+        \load_theme_textdomain('snap', \get_stylesheet_directory() . '/languages');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Templating;
 
 use WP_Query;
 use WP_User_Query;
