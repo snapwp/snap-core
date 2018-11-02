@@ -3,7 +3,7 @@
 namespace Snap\Bootstrap;
 
 use Snap\Core\Hookable;
-use Snap\Core\Snap;
+use Snap\Services\Config;
 
 /**
  * All asset (script and style) related functionality.
@@ -12,6 +12,14 @@ use Snap\Core\Snap;
  */
 class Assets extends Hookable
 {
+    /**
+     * Don't run on admin requests.
+     *
+     * @since 1.0.0
+     * @var boolean
+     */
+    protected $admin = false;
+
     /**
      * Actions to add on init.
      *
@@ -30,13 +38,14 @@ class Assets extends Hookable
     public function boot()
     {
         // Whether to add 'defer' to enqueued scripts.
-        if (Snap::config('theme.defer_scripts') && ! \is_admin()) {
+        if (Config::get('theme.defer_scripts')) {
             $this->add_filter('script_loader_tag', 'defer_scripts', 10, 2);
         }
 
         // Whether to remove asset version strings.
-        if (Snap::config('theme.remove_asset_versions')) {
-            $this->add_filter([ 'style_loader_src', 'script_loader_src' ], 'remove_versions_from_assets', 15);
+        if (Config::get('theme.remove_asset_versions')) {
+            $this->add_filter('style_loader_src', 'remove_versions_from_assets', 15);
+            $this->add_filter('script_loader_src', 'remove_versions_from_assets', 15);
         }
     }
 
@@ -49,15 +58,15 @@ class Assets extends Hookable
     public function enqueue_scripts()
     {
         // Get specified jQuery version.
-        $jquery_version = Snap::config('theme.use_jquery_cdn');
+        $jquery_version = Config::get('theme.use_jquery_cdn');
 
         // if a valid jQuery version has been specified.
-        if (! \is_admin()
+        if (Config::get('theme.disable_jquery') !== true
             && $jquery_version !== false
             && \version_compare($jquery_version, '0.0.1', '>=') === true
         ) {
             // get all non-deferred scripts, to check for jQuery.
-            $defer_exclude_list = Snap::config('theme.defer_scripts_skip');
+            $defer_exclude_list = Config::get('theme.defer_scripts_skip');
 
             \wp_deregister_script('jquery');
 
@@ -70,6 +79,19 @@ class Assets extends Hookable
             );
 
             \wp_enqueue_script('jquery');
+        }
+
+        // Completely remove jQuery
+        if (Config::get('theme.disable_jquery') === true) {
+            \wp_deregister_script('jquery');
+        }
+
+        // Threaded comments JS.
+        if ((! Config::get('theme.disable_comments'))
+            && comments_open()
+            && get_option('thread_comments')
+        ) {
+            wp_enqueue_script('comment-reply');
         }
     }
 
@@ -84,7 +106,7 @@ class Assets extends Hookable
      */
     public function defer_scripts($tag, $handle)
     {
-        $excludes = Snap::config('theme.defer_scripts_skip');
+        $excludes = Config::get('theme.defer_scripts_skip');
 
         // Get the script handles to exclude.
         if (empty($excludes)) {

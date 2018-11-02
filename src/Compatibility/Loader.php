@@ -2,15 +2,15 @@
 
 namespace Snap\Compatibility;
 
-use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Services\Container;
 
 class Loader extends Hookable
 {
     public function boot()
     {
         if ($this->is_offload_media_present()) {
-            Snap::services()->resolve(Compat_Offload_Media::class)->run();
+            Container::resolve(Compat_Offload_Media::class)->run();
         }
     }
 

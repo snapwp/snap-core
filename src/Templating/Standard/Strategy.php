@@ -2,12 +2,13 @@
 
 namespace Snap\Templating\Standard;
 
-use Snap\Core\Snap;
+use WP_Query;
+use Snap\Services\Config;
+use Snap\Services\Container;
 use Snap\Templating\Pagination;
 use Snap\Templating\View;
 use Snap\Templating\Templating_Interface;
 use Snap\Exceptions\Templating_Exception;
-use WP_Query;
 
 /**
  * The default vanilla PHP templating engine.
@@ -41,8 +42,6 @@ class Strategy implements Templating_Interface
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
      *
      * @throws Templating_Exception If views are nested.
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \Hodl\Exceptions\NotFoundException
      */
     public function render($slug, $data = [])
     {
@@ -62,7 +61,7 @@ class Strategy implements Templating_Interface
             $data
         );
 
-        $snap_template_path = locate_template(Snap::config('theme.templates_directory') . '/views/' . $this->current_view);
+        $snap_template_path = locate_template(Config::get('theme.templates_directory') . '/views/' . $this->current_view);
 
         if ($snap_template_path === '') {
             throw new Templating_Exception('Could not find view: ' . $this->current_view);
@@ -71,7 +70,12 @@ class Strategy implements Templating_Interface
         unset($data, $slug);
 
         \extract($this->data);
-        
+
+        /**
+         * Keep PHPStorm quiet. 
+         *
+         * @noinspection PhpIncludeInspection
+         */
         require($snap_template_path);
     }
 
@@ -84,13 +88,10 @@ class Strategy implements Templating_Interface
      *
      * @param  string $slug The slug for the generic template.
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \Hodl\Exceptions\NotFoundException
      */
     public function partial($slug, $data = [])
     {
-        $partial = Snap::services()->get(Partial::class);
+        $partial = Container::get(Partial::class);
 
         $data = \array_merge(
             $this->data,
@@ -118,9 +119,6 @@ class Strategy implements Templating_Interface
      *                                    other iteration.
      * @param WP_Query $wp_query          Optional. An optional custom WP_Query to loop through.
      *                                    Defaults to the global WP_Query instance.
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \Hodl\Exceptions\NotFoundException
      */
     public function loop($partial = null, $partial_overrides = null, $wp_query = null)
     {
@@ -175,12 +173,10 @@ class Strategy implements Templating_Interface
      * @param  array $args Args to pass to the Pagination instance.
      * @return bool|string If $args['echo'] then return true/false if the render is successful,
      *                     else return the pagination HTML.
-     *
-     * @throws \Hodl\Exceptions\ContainerException
      */
     public function pagination($args = [])
     {
-        $pagination = Snap::services()->resolve(
+        $pagination = Container::resolve(
             Pagination::class,
             [
                 'args' => $args,
@@ -218,7 +214,7 @@ class Strategy implements Templating_Interface
     {
         $slug = \str_replace(
             [
-                Snap::config('theme.templates_directory') . '/views/', '.php',
+                Config::get('theme.templates_directory') . '/views/', '.php',
             ],
             '',
             $slug

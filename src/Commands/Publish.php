@@ -3,10 +3,10 @@
 namespace Snap\Commands;
 
 use Snap\Core\Snap;
+use Snap\Services\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -102,8 +102,10 @@ class Publish extends Command
      *
      * @since  1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -133,8 +135,10 @@ class Publish extends Command
      *
      * @since 1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
     private function init(InputInterface $input, OutputInterface $output)
     {
@@ -168,7 +172,7 @@ class Publish extends Command
             $packages = [];
             
             // Add all package files to $packages array.
-            foreach (Snap::config('services.providers') as $package) {
+            foreach (Config::get('services.providers') as $package) {
                 $packages[ $package ] = $package::get_files_to_publish();
             }
 
@@ -392,7 +396,7 @@ class Publish extends Command
     {
         $question = new ChoiceQuestion(
             "\nPlease choose a package to publish:",
-            Snap::config('services.providers')
+            Config::get('services.providers')
         );
 
         $question->setErrorMessage('[%s] is invalid.');

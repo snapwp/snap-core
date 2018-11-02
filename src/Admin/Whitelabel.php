@@ -4,6 +4,7 @@ namespace Snap\Admin;
 
 use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Services\Config;
 
 /**
  * Admin changes for whitelabel/branding purposes.
@@ -34,7 +35,7 @@ class Whitelabel extends Hookable
      */
     public function boot()
     {
-        if (Snap::config('admin.login_extra_css') !== false) {
+        if (Config::get('admin.login_extra_css') !== false) {
             $this->add_action('login_enqueue_scripts', 'enqueue_login_css');
         }
     }
@@ -46,11 +47,15 @@ class Whitelabel extends Hookable
      */
     public function branding_admin_footer()
     {
-        if (Snap::config('admin.footer_text')) {
-            echo Snap::config('admin.footer_text');
+        if (Config::get('admin.footer_text')) {
+            echo Config::get('admin.footer_text');
             return;
         }
 
+        /**
+         * Keep PHPStorm happy. 
+         * @noinspection HtmlUnknownTarget
+         */
         echo \sprintf(
             '%s <a href="https://wordpress.org" target="_blank">WordPress</a> %s <a href="%s" target="_blank">SnapWP</a>',
             \__('Built using', 'snap'),
@@ -68,7 +73,7 @@ class Whitelabel extends Hookable
      */
     public function set_login_logo_url()
     {
-        return Snap::config('admin.login_logo_url');
+        return Config::get('admin.login_logo_url');
     }
 
     /**
@@ -81,7 +86,7 @@ class Whitelabel extends Hookable
      */
     public function remove_version_text($version)
     {
-        if (true === Snap::config('admin.show_version')) {
+        if (true === Config::get('admin.show_version')) {
             return $version;
         }
 
@@ -95,6 +100,6 @@ class Whitelabel extends Hookable
      */
     public function enqueue_login_css()
     {
-        \wp_enqueue_style('theme_custom_login_css', Snap::config('admin.login_extra_css'));
+        \wp_enqueue_style('theme_custom_login_css', Config::get('admin.login_extra_css'));
     }
 }

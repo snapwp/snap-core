@@ -2,8 +2,9 @@
 
 namespace Snap\Templating;
 
-use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Services\Config;
+use Snap\Services\View;
 
 /**
  * Ensure all post templates found in resources/templates/ folder get treated as templates by WordPress,
@@ -29,23 +30,28 @@ class Handle_Post_Templates extends Hookable
      *
      * @since 1.0.0
      *
-     * @param  string $old_form WP default searchform.php markup.
-     * @return string Markup for modules/searchform.php.
+     * @return string Markup for parials/searchform.php.
      */
-    public function get_search_form($old_form)
+    public function get_search_form()
     {
+        $data = [];
+
         if (\function_exists('random_int')) {
-            $data = [
-                'searchform_id' => 'search_' . \random_int(1000, 8000),
-            ];
-        } else {
+            try {
+                $data['searchform_id'] = 'search_' . \random_int(1000, 8000);
+            } catch (\Exception $e) {
+                // Fail silently.
+            }
+        }
+
+        if (! isset($data['searchform_id'])) {
             $data = [
                 'searchform_id' => \uniqid('search_', true),
             ];
         }
 
         \ob_start();
-        Snap::view()->partial('searchform', $data);
+        View::partial('searchform', $data);
         $form = \ob_get_clean();
 
         return $form;
@@ -66,7 +72,7 @@ class Handle_Post_Templates extends Hookable
     public function custom_template_locator($post_templates, $wp_theme, $post, $post_type)
     {
         // Path to  templates folder.
-        $path = \get_stylesheet_directory() . '/' . Snap::config('theme.templates_directory') . '/views/post-templates/';
+        $path = \get_stylesheet_directory() . '/' . Config::get('theme.templates_directory') . '/views/post-templates/';
 
         $templates = \scandir($path);
 
@@ -89,7 +95,7 @@ class Handle_Post_Templates extends Hookable
                 }
 
                 if (\in_array($post_type, $types)) {
-                    $post_templates[ Snap::config('theme.templates_directory') . '/views/post-templates/' . $tpl ] = \trim($header[1]);
+                    $post_templates[ Config::get('theme.templates_directory') . '/views/post-templates/' . $tpl ] = \trim($header[1]);
                 }
             }
         }
@@ -101,8 +107,6 @@ class Handle_Post_Templates extends Hookable
      * Register the page-template loader for all available public post types
      *
      * @since  1.0.0
-     *
-     * @throws \ReflectionException
      */
     public function register_theme_template_hooks()
     {

@@ -43,13 +43,14 @@ class Config
             'templates_directory' => 'resources/templates',
             'cache_directory' => 'cache',
             'disable_xmlrpc' => true,
-            'disable_comments' => false,
-            'disable_customizer' => false,
+            'disable_comments' => true,
+            'disable_tags' => true,
+            'disable_customizer' => true,
             'remove_asset_versions' => true,
             'defer_scripts' => true,
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
-            'snap_modules' => [],
+            'disable_jquery' => false,
         ],
         'images' => [
             'default_image_quality' => 75,
@@ -57,10 +58,14 @@ class Config
             'supports_featured_images' => true,
             'reset_image_sizes' => true,
             'image_sizes' => [],
+            'dynamic_image_sizes' => [],
             'insert_image_default_size' => 'medium',
             'insert_image_allow_full_size' => true,
         ],
-        'services' => [],
+        'services' => [
+            'providers' => [],
+            'aliases' => [],
+        ],
     ];
 
     /**
@@ -173,6 +178,7 @@ class Config
 
         if (! empty($files)) {
             foreach ($files as $file) {
+                /** @noinspection PhpIncludeInspection */
                 $parsed_options = require $file;
 
                 $option_set = $this->get_filename($file);

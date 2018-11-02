@@ -2,10 +2,11 @@
 
 namespace Snap\Core;
 
-use Snap\Utils\Theme_Utils;
 use WP_Http;
 use ArrayAccess;
 use Snap\Request\Bag;
+use Snap\Services\Container;
+use Snap\Utils\Theme_Utils;
 
 /**
  * Gathers all request variables into one place, and provides a simple API for changes affecting the response.
@@ -76,7 +77,7 @@ class Request implements ArrayAccess
      * The Validator instance.
      *
      * @since 1.0.0
-     * @var \Rakit\Validation\Validator|\Rakit\Validation\Validator
+     * @var \Rakit\Validation\Validator|\Rakit\Validation\Validation
      */
     public $validation = null;
 
@@ -334,13 +335,13 @@ class Request implements ArrayAccess
      * @since  1.0.0
      * @see  https://github.com/rakit/validation#available-rules for format.
      *
-     * @param array $rules Rules as key value pairs.
+     * @param array $rule_set Rules as key value pairs.
      * @return Request
      */
-    public function set_rules(array $rules = [])
+    public function set_rules(array $rule_set = [])
     {
-        foreach ($rules as $attributeKey => $rules) {
-            $this->validation->addAttribute($attributeKey, $rules);
+        foreach ($rule_set as $attribute_key => $rules) {
+            $this->validation->addAttribute($attribute_key, $rules);
         }
 
         return $this;
@@ -371,9 +372,6 @@ class Request implements ArrayAccess
      *
      * @param  array $rules Optional. Rules to use. Defaults to rules set via set_rules().
      * @param  array $messages Optional. Messages to use. Defaults to rules set via set_messages().
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \Hodl\Exceptions\NotFoundException
      */
     public function validate_ajax_request(array $rules = [], array $messages = [])
     {
@@ -430,13 +428,11 @@ class Request implements ArrayAccess
      * @param  array $rules The rules to run against the data.
      * @param  array $messages Messages to display when a value fails.
      * @return bool|array Returns true if data validates, or an array of error messages.
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \Hodl\Exceptions\NotFoundException
      */
     public function validate_data(array $inputs, array $rules = [], array $messages = [])
     {
-        $validation = Snap::services()->get('Rakit\Validation\Validator')->validate($inputs, $rules, $messages);
+        /** @var \Rakit\Validation\Validation $validation */
+        $validation = Container::get('Rakit\Validation\Validator')->validate($inputs, $rules, $messages);
 
         if ($validation->fails()) {
             return $validation->errors()->toArray();
@@ -450,13 +446,10 @@ class Request implements ArrayAccess
      * Set the internal instance of the Validator.
      *
      * @since  1.0.0
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \Hodl\Exceptions\NotFoundException
      */
     private function set_validation()
     {
-        $validator = Snap::services()->get('Rakit\Validation\Validator');
+        $validator = Container::get('Rakit\Validation\Validator');
 
         $this->validation = $validator->make(
             $this->request->to_array(),

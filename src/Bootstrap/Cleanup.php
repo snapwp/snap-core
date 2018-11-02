@@ -3,7 +3,7 @@
 namespace Snap\Bootstrap;
 
 use Snap\Core\Hookable;
-use Snap\Core\Snap;
+use Snap\Services\Config;
 
 /**
  * Cleanup WordPress output and functionality.
@@ -50,7 +50,7 @@ class Cleanup extends Hookable
     public function boot()
     {
         // xmlrpc is a potential security weakness. Most of the time it is completely irrelevant.
-        if (Snap::config('disable_xmlrpc')) {
+        if (Config::get('disable_xmlrpc')) {
             $this->add_filter('xmlrpc_enabled', '__return_false');
         }
     }
@@ -90,10 +90,10 @@ class Cleanup extends Hookable
     public function remove_pointless_widgets()
     {
         // Just why?
-        unregister_widget('WP_Widget_Meta');
+        \unregister_widget('WP_Widget_Meta');
 
         // There are better ways of doing this.
-        unregister_widget('WP_Widget_RSS');
+        \unregister_widget('WP_Widget_RSS');
     }
 
     /**

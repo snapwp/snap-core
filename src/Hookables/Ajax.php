@@ -2,9 +2,8 @@
 
 namespace Snap\Hookables;
 
-use Snap\Core\Snap;
-use Snap\Core\Utils;
 use Snap\Core\Hookable;
+use Snap\Services\Container;
 use Snap\Utils\User_Utils;
 
 /**
@@ -78,14 +77,11 @@ class Ajax extends Hookable
      * Auto-wire and call the child class's handle method.
      *
      * @since 1.0.0
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \ReflectionException
      */
     public function handler()
     {
         if (\in_array(User_Utils::get_user_role_name(), $this->restrict_to_roles) || $this->allow_public_access) {
-            Snap::services()->resolveMethod($this, 'handle');
+            Container::resolve_method($this, 'handle');
         }
 
         wp_send_json_error('You do not have sufficient permissions to perform this action', 403);

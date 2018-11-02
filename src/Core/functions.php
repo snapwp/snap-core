@@ -1,42 +1,7 @@
 <?php
 
 use Snap\Core\Snap;
-
-/*
- * *********************************************************************************************************************
- * Utility functions
- *
- * Some useful functions to make everyday WordPress life easier.
- * *********************************************************************************************************************
- */
-if (! \function_exists('services')) {
-    /**
-     * Returns the service container
-     *
-     * @since  1.0.0
-     *
-     * @return mixed The service container or an individual service.
-     */
-    function services()
-    {
-        return Snap::services();
-    }
-}
-
-if (! \function_exists('get_service')) {
-    /**
-     * Returns the service container, or an object within it.
-     *
-     * @since  1.0.0
-     *
-     * @param  string $key The service to fetch.
-     * @return mixed An individual service.
-     */
-    function get_service($key)
-    {
-        return Snap::services()->get($key);
-    }
-}
+use Snap\Services\Config;
 
 /*
  * *********************************************************************************************************************
@@ -58,7 +23,7 @@ if (! \function_exists('collect')) {
     }
 }
 
-if (! \function_exists('config')) {
+if (! \function_exists('snap_config')) {
     /**
      * Returns a key from the Config service.
      *
@@ -68,9 +33,52 @@ if (! \function_exists('config')) {
      * @param  mixed  $default If the option was not found, the default value to be returned instead.
      * @return mixed The option value, or default if not found.
      */
-    function config($key, $default = null)
+    function snap_config($key, $default = null)
     {
-        return Snap::config()->get($key, $default);
+        return Config::get($key, $default);
+    }
+}
+
+if (! \function_exists('container')) {
+    /**
+     * Returns the service container
+     *
+     * @since  1.0.0
+     *
+     * @return mixed The service container or an individual service.
+     */
+    function container()
+    {
+        return Snap::get_container();
+    }
+}
+
+if (! \function_exists('get_service')) {
+    /**
+     * Returns an object within the service container.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $key The service to fetch.
+     * @return object An individual service.
+     */
+    function get_service($key)
+    {
+        return Snap::get_container()->get($key);
+    }
+}
+
+if (! \function_exists('get_request')) {
+    /**
+     * Returns the current request instance.
+     *
+     * @since  1.0.0
+     *
+     * @return \Snap\Core\Request
+     */
+    function get_request()
+    {
+        return Snap::get_container()->get('request');
     }
 }
 

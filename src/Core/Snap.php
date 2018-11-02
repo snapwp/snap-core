@@ -2,16 +2,15 @@
 
 namespace Snap\Core;
 
-use Hodl\Container;
+use Exception;
 use Rakit\Validation\Validator;
+use Snap\Exceptions\Startup_Exception;
 use Snap\Templating\View;
 use Snap\Templating\Templating_Interface;
-use \Snap\Services\Image_Service;
+use \Snap\Media\Image_Service;
 
 /**
  * The main Snap class.
- *
- * Provides theme wide access to the service container and provides handy accessors for Core classes.
  *
  * @since 1.0.0
  */
@@ -69,6 +68,8 @@ class Snap
      * Must be run in order for anything to work.
      *
      * @since  1.0.0
+     *
+     * @throws Startup_Exception
      */
     public static function setup()
     {
@@ -79,80 +80,105 @@ class Snap
             }
         );
 
-        if (! self::$setup) {
-            self::create_container();
-            self::init_config();
+        if (static::$setup === false) {
+            try {
+                static::create_container();
+                static::init_config();
+                static::init_routing();
+                static::init_services();
 
-            self::$container->addSingleton(
-                Router::class,
-                function () {
-                    return new Router();
-                }
-            );
+                // Add global WP classes.
+                global $wpdb, $wp_query;
+                static::$container->add_instance($wp_query);
+                static::$container->add_instance($wpdb);
 
-            self::$container->addSingleton(
-                Request::class,
-                function () {
-                    return new Request();
-                }
-            );
-            
+                static::init_templating();
 
-            self::$container->addSingleton(
-                Validator::class,
-                function () {
-                    return new Validator();
-                }
-            );
+                // Run the loader.
+                $loader = new Loader();
+                $loader->boot();
 
-            self::init_services();
-
-
-            // Add global WP classes.
-            global $wpdb;
-            global $wp_query;
-            self::$container->addInstance($wp_query);
-            self::$container->addInstance($wpdb);
-
-            // Run the loader.
-            $loader = new Loader();
-            $loader->boot();
-
-            self::register_providers();
-
-            // Init after the providers to allow switching of templating strategy.
-            self::init_templating();
+                static::register_providers();
+            } catch (Exception $e) {
+                throw new Startup_Exception($e->getMessage());
+            }
         }
 
-        self::$setup = true;
+        static::$setup = true;
     }
 
     /**
      * Create the static Container instance.
      *
      * @since 1.0.0
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
     public static function create_container()
     {
-        self::$container = new Container();
+        if (static::$setup === false) {
+            static::$container = new Container();
+
+            static::$container->add_instance(static::$container);
+        }
     }
 
     /**
      * Create a config instance, provide config directories, and add to the container.
      *
      * @since 1.0.0
+     *
      * @throws \Hodl\Exceptions\ContainerException
      */
     public static function init_config()
     {
-        $config = new Config();
-        $config->add_path(get_template_directory().'/config');
+        if (static::$setup === false) {
+            $config = new Config();
 
-        if (is_child_theme()) {
-            $config->add_path(get_stylesheet_directory().'/config');
+            $config->add_path(\get_template_directory() . '/config');
+
+            if (\is_child_theme()) {
+                $config->add_path(\get_stylesheet_directory() . '/config');
+            }
+
+            static::$container->add_instance($config);
+            static::$container->alias(Config::class, 'config');
+        }
+    }
+
+    /**
+     * Return the Container object.
+     *
+     * @since  1.0.0
+     *
+     * @return Container
+     */
+    public static function get_container()
+    {
+        return static::$container;
+    }
+
+    /**
+     * Registers any service providers defined in theme config.
+     *
+     * @since 1.0.0
+     *
+     * @throws \Hodl\Exceptions\ContainerException
+     */
+    private static function register_providers()
+    {
+        $provider_instances = [];
+
+        foreach (static::$container->get(Config::class)->get('services.providers') as $provider) {
+            $provider = static::$container->resolve($provider);
+            $provider->register();
+
+            $provider_instances[] = $provider;
         }
 
-        self::$container->addInstance($config);
+        foreach ($provider_instances as $provider) {
+            static::$container->resolve_method($provider, 'boot');
+        }
     }
 
     /**
@@ -161,22 +187,25 @@ class Snap
      * Adds the View class, and if no other templating strategy is present, adds and binds the default.
      *
      * @since  1.0.0
+     *
+     * @throws \Hodl\Exceptions\InvalidKeyException
+     * @throws \Hodl\Exceptions\KeyExistsException
      */
-    public static function init_templating()
+    private static function init_templating()
     {
         // If no templating strategy has already been registered.
-        if (! self::$container->has(Templating_Interface::class)) {
+        if (! static::$container->has(Templating_Interface::class)) {
             // Add the default rendering engine.
-            self::$container->add(
+            static::$container->add(
                 \Snap\Templating\Standard\Strategy::class,
                 function () {
                     return new \Snap\Templating\Standard\Strategy;
                 }
             );
 
-            self::$container->bind(\Snap\Templating\Standard\Strategy::class, Templating_Interface::class);
+            static::$container->bind(\Snap\Templating\Standard\Strategy::class, Templating_Interface::class);
 
-            self::$container->add(
+            static::$container->add(
                 \Snap\Templating\Standard\Partial::class,
                 function (Container $hodl) {
                     return $hodl->resolve(\Snap\Templating\Standard\Partial::class);
@@ -184,7 +213,7 @@ class Snap
             );
         }
 
-        self::$container->addSingleton(
+        static::$container->add_singleton(
             View::class,
             function (Container $hodl) {
                 return $hodl->resolve(View::class);
@@ -197,126 +226,49 @@ class Snap
      *
      * @since  1.0.0
      */
-    public static function init_services()
+    private static function init_services()
     {
         // Add Image service.
-        self::$container->addSingleton(
+        static::$container->add_singleton(
             Image_Service::class,
             function () {
                 return new Image_Service();
             }
         );
-        
+
         // Bind Image service to alias.
-        self::$container->alias(Image_Service::class, 'image');
+        static::$container->alias(Image_Service::class, 'image');
     }
 
     /**
-     * Return the Container object.
+     * Add Snap routing, request, and validation services to the container.
      *
      * @since  1.0.0
-     *
-     * @return \Hodl\Container
      */
-    public static function services()
+    private static function init_routing()
     {
-        return self::$container;
-    }
-
-    /**
-     * Fetches the config object from the container, or optionally fetches a config option directly.
-     *
-     * @since  1.0.0
-     *
-     * @param string $option  The option name to fetch.
-     * @param mixed  $default If the option was not found, the default value to be returned instead.
-     * @return mixed|Config
-     */
-    public static function config($option = null, $default = null)
-    {
-        try {
-            if ($option === null) {
-                return self::services()->get(Config::class);
+        static::$container->add_singleton(
+            Router::class,
+            function () {
+                return new Router();
             }
+        );
 
-            return self::services()->get(Config::class)->get($option, $default);
-        } catch (\Exception $exception) {
-            \error_log($exception->getMessage());
-            return null;
-        }
-    }
+        static::$container->add_singleton(
+            Request::class,
+            function () {
+                return new Request();
+            }
+        );
 
-    /**
-     * Fetch the Router object from the container.
-     *
-     * @since  1.0.0
-     *
-     * @return Router
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \Hodl\Exceptions\NotFoundException
-     */
-    public static function route()
-    {
-        $router = self::services()->get(Router::class);
-        $router->reset();
+        static::$container->add_singleton(
+            Validator::class,
+            function () {
+                return new Validator();
+            }
+        );
 
-        return $router;
-    }
-
-    /**
-     * Fetch the Request object from the container.
-     *
-     * @since  1.0.0
-     *
-     * @return object The Request instance from the container.
-     */
-    public static function request()
-    {
-        try {
-            return self::services()->get(Request::class);
-        } catch (\Exception $exception) {
-            \error_log($exception->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Fetch the Request object from the container.
-     *
-     * @since  1.0.0
-     *
-     * @return object The View instance from the container.
-     */
-    public static function view()
-    {
-        try {
-            return self::services()->get(View::class);
-        } catch (\Exception $exception) {
-            \error_log($exception->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Registers any service providers defined in theme config.
-     *
-     * @since 1.0.0
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \ReflectionException
-     */
-    private static function register_providers()
-    {
-        $providers = self::config('services.providers');
-
-        foreach ($providers as $provider) {
-            $provider = self::services()->resolve($provider);
-            $provider->register();
-        }
-
-        foreach ($providers as $provider) {
-            self::services()->resolveMethod($provider, 'boot');
-        }
+        static::$container->alias(Router::class, 'router');
+        static::$container->alias(Request::class, 'request');
     }
 }

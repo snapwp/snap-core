@@ -2,9 +2,8 @@
 
 namespace Snap\Hookables;
 
-use http\Exception\BadMethodCallException;
-use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Services\Container;
 
 /**
  * A simple wrapper for auto registering Middleware.
@@ -45,13 +44,10 @@ class Middleware extends Hookable
      * Auto-wire and call the child class's handle method.
      *
      * @since 1.0.0
-     *
-     * @throws \Hodl\Exceptions\ContainerException
-     * @throws \ReflectionException
      */
     public function handler()
     {
-        return Snap::services()->resolveMethod($this, 'handle');
+        return Container::resolve_method($this, 'handle');
     }
 
     /**

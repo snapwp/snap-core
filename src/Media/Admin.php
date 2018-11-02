@@ -4,9 +4,12 @@ namespace Snap\Media;
 
 use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Services\Config;
 
 /**
  * Adds the ability to delete dynamic intermediate image sizes from the media admin screen.
+ *
+ * @since 1.0.0
  */
 class Admin extends Hookable
 {
@@ -18,19 +21,6 @@ class Admin extends Hookable
      */
     public $filters = [
         'post_mime_types' => 'add_additional_mime_type_support',
-        'media_meta' => 'add_image_sizes_meta_to_media',
-        'attachment_fields_to_edit' => 'add_intermediate_fields',
-        'attachment_fields_to_save' => 'handle_delete_intermediate_ajax',
-    ];
-    
-    /**
-     * The actions to run when booted.
-     *
-     * @since  1.0.0
-     * @var array
-     */
-    public $actions = [
-        'admin_enqueue_scripts' => 'enqueue_image_admin_scripts',
     ];
 
     /**
@@ -42,6 +32,22 @@ class Admin extends Hookable
     protected $public = false;
 
     /**
+     * Only enable dynamic image sizes if sizes have been defined.
+     *
+     * @since 1.0.0
+     */
+    public function boot()
+    {
+        if (Config::get('images.dynamic_image_sizes') !== false) {
+            $this->add_filter('media_meta', 'add_image_sizes_meta_to_media');
+            $this->add_filter('attachment_fields_to_edit', 'add_intermediate_mgmt_fields');
+            $this->add_filter('attachment_fields_to_save', 'handle_delete_intermediate_ajax');
+
+            $this->add_action('admin_enqueue_scripts', 'enqueue_image_admin_scripts');
+        }
+    }
+
+    /**
      * Enqueue images.js on the admin media view.
      *
      * @since  1.0.0
@@ -51,7 +57,7 @@ class Admin extends Hookable
         if ($this->is_media_screen()) {
             \wp_enqueue_script(
                 'snap_images_admin_js',
-                \get_theme_file_uri('vendor/snapwp/snap-core/assets/images.js'),
+                \get_theme_file_uri('vendor/snapwp/snap-core/assets/images.min.js'),
                 [],
                 Snap::VERSION,
                 true
@@ -107,7 +113,7 @@ class Admin extends Hookable
      *
      * @since  1.0.0
      *
-     * @param string $form_meta The form meta html.
+     * @param string   $form_meta The form meta html.
      * @param \WP_Post $post The current attachment post object.
      * @return string
      */
@@ -122,10 +128,28 @@ class Admin extends Hookable
         return $form_meta;
     }
 
-    public function add_intermediate_fields($form_fields, $post = null)
+    /**
+     * Output the HTML for the dynamic image management.
+     *
+     * @since 1.0.0
+     *
+     * @param  array    $form_fields The current output.
+     * @param \WP_Post $post The current attachment.
+     * @return mixed
+     */
+    public function add_intermediate_mgmt_fields($form_fields, $post = null)
     {
+        $current_screen = \get_current_screen();
+
+        if (isset($current_screen->base) && $current_screen->base === 'post') {
+            return $form_fields;
+        }
+
         // Only display for admin level users, and only if an image.
-        if (wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
+        if (\strpos(\wp_get_referer(), 'upload.php') !== false
+            && \wp_attachment_is_image($post->ID)
+            && \current_user_can('manage_options')
+        ) {
             $meta = wp_get_attachment_metadata($post->ID);
 
             $public_sizes = \array_diff(get_intermediate_image_sizes(), Size_Manager::get_dynamic_sizes());
@@ -133,15 +157,17 @@ class Admin extends Hookable
             $output = '<hr><p><strong>Generated sizes:</strong></p>';
 
             if (!empty($meta['sizes'])) {
-                $output .= '<table class="wp-list-table widefat fixed striped media">
-	            <thead>
-	                <tr style="display:table-row;">
-	                    <td class="manage-column column-cb check-column"><input id="delete-intermediate-all" type="checkbox"></td>
-	                    <th>Name</th>
-	                    <th>Width</th>
-	                </tr>
-	            </thead>
-	            <tbody>';
+                $output .= '<table class="widefat fixed striped media">
+                    <thead>
+                        <tr style="display:table-row;">
+                            <td class="manage-column column-cb check-column">
+                                <input id="delete-intermediate-all" type="checkbox">
+                            </td>
+                            <th>Name</th>
+                            <th>Width</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
 
                 foreach ($meta['sizes'] as $key => $value) {
                     if (\in_array($key, $public_sizes)) {
@@ -154,12 +180,11 @@ class Admin extends Hookable
                 }
 
                 $output .= '</tbody></table>
-	                <button type="button" class="button-link delete-intermediate-button">Delete Permanently</button>';
+	                <button type="button" style="margin-top: 5px;" class="button-link delete-intermediate-button">Delete selected sizes</button>';
             }
 
-
             $form_fields['generated_sizes'] = [
-                'input'      => 'html',
+                'input' => 'html',
                 'tr' => $output,
             ];
         }
@@ -167,9 +192,17 @@ class Admin extends Hookable
         return $form_fields;
     }
 
+    /**
+     * DThe AJAX handler for deleting a dynamic image size.
+     *
+     * @since 1.0.0
+     *
+     * @param \WP_Post $post The current attachment.
+     * @param array    $attachment_data The POST data passed from the quest.
+     * @return \WP_Post
+     */
     public function handle_delete_intermediate_ajax($post, $attachment_data)
     {
-
         if (isset($attachment_data['delete-intermediate']) && !empty($attachment_data['delete-intermediate'])) {
             $meta = wp_get_attachment_metadata($post['ID']);
             $dir = \pathinfo(get_attached_file($post['ID']), PATHINFO_DIRNAME);
@@ -194,9 +227,16 @@ class Admin extends Hookable
         return $post;
     }
 
+    /**
+     * A simple utility for checking whether to render the media JS or not.
+     *
+     * @since 1.0.0
+     *
+     * @return bool
+     */
     private function is_media_screen()
     {
-        $current_screen = get_current_screen();
+        $current_screen = \get_current_screen();
 
         if (isset($current_screen->base) && $current_screen->base === 'upload') {
             return true;

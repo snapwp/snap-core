@@ -93,8 +93,6 @@ class Taxonomy extends Hookable
      * Register the Taxonomy.
      *
      * @since  1.0.0
-     *
-     * @throws \ReflectionException
      */
     public function __construct()
     {
@@ -183,14 +181,18 @@ class Taxonomy extends Hookable
      *
      * @param  string $content The content to return.
      * @param  string $column The current column key.
-     * @param  int $term_id The current term ID.
+     * @param  int    $term_id The current term ID.
      * @return string
      */
     public function output_column($content, $column, $term_id)
     {
         $method = "get_{$column}_column";
 
-        return $this->{$method}($term_id);
+        if (\method_exists($this, $method)) {
+            return $this->{$method}($term_id);
+        }
+
+        return $content;
     }
 
     /**

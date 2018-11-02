@@ -2,6 +2,8 @@
 
 namespace Snap\Utils;
 
+use Snap\Services\Config;
+
 /**
  * Sidebar and widget utilities.
  *
@@ -82,6 +84,27 @@ class Theme_Utils
         }
 
         return get_stylesheet_directory_uri() . '/dist' . static::$manifest[ $file ];
+    }
+
+    /**
+     * Transforms a partial name and returns the path to the partial relative to theme root.
+     *
+     * @since  1.0.0
+     * 
+     * @param  string $partial The partial name.
+     * @return string
+     */
+    public static function get_path_to_partial($partial)
+    {
+        $partial = \str_replace(
+            ['.php', '.'],
+            ['', '/'],
+            $partial
+        );
+
+        $path = \trailingslashit(Config::get('theme.templates_directory')) . 'partials/' . $partial . '.php';
+
+        return $path;
     }
 
     /**
