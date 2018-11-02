@@ -9,6 +9,7 @@ use Snap\Core\Hookable;
  * Enables the Snap admin theme.
  *
  * Based on Slate admin theme.
+ *
  * @See https://wordpress.org/plugins/slate-admin-theme/
  *
  * @since 1.0.0

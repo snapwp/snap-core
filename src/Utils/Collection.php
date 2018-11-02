@@ -53,7 +53,7 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
      *
      * @since 1.0.0
      *
-     * @param int|string $field     Field from the object to place instead of the entire object
+     * @param int|string $field     Field from the object to place instead of the entire object.
      * @param int|string $index_key Optional. Field from the object to use as keys for the new array.
      *                              Default null.
      * @return Collection If `$index_key` is set, an array of found values with keys
@@ -133,7 +133,7 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
      *
      * @since 1.0.0
      *
-     * @param  mixed  $items
+     * @param  mixed $items The items being added to the collection.
      * @return array
      */
     protected function getItems($items)
@@ -192,7 +192,7 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
      * @since 1.0.0
      *
      * @param mixed $offset Key to set.
-     * @param mixed $value
+     * @param mixed $value The value to set.
      */
     public function offsetSet($offset, $value)
     {
@@ -208,7 +208,7 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
      *
      * @since 1.0.0
      *
-     * @param mixed $offset
+     * @param mixed $offset The offset to retrieve.
      */
     public function offsetUnset($offset)
     {

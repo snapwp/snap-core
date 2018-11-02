@@ -2,6 +2,11 @@
 
 namespace Snap\Utils;
 
+/**
+ * Utilities for nav menus.
+ *
+ * @since  1.0.0
+ */
 class Menu_Utils
 {
     /**
@@ -87,10 +92,10 @@ class Menu_Utils
      *
      * @since 1.0.0
      *
-     * @param  string $theme_location Menu name
+     * @param  string $theme_location Menu name.
      * @return \WP_Term|false Menu Object on success, false on failure.
      */
-    static function get_menu_object($theme_location)
+    public static function get_menu_object($theme_location)
     {
         $locations = \get_nav_menu_locations();
 
@@ -107,10 +112,10 @@ class Menu_Utils
      *
      * @since 1.0.0
      *
-     * @param  string $theme_location Menu name, ID or slug
-     * @return string|bool The name of the menu, or false if no menu was found
+     * @param  string $theme_location Menu name, ID or slug.
+     * @return string|bool The name of the menu, or false if no menu was found.
      */
-    static function get_menu_name($theme_location)
+    public static function get_menu_name($theme_location)
     {
         $menu_obj = static::get_menu_object($theme_location);
 

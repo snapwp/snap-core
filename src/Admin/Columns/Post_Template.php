@@ -9,7 +9,7 @@ use Snap\Core\Hookable;
  *
  * @since 1.0.0
  */
-class Post_template extends Hookable
+class Post_Template extends Hookable
 {
     /**
      * No need to run this Hookable when on a public request.
