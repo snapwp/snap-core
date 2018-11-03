@@ -3,18 +3,16 @@
 namespace Snap\Commands;
 
 use Snap\Core\Snap;
+use Snap\Services\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Creates an Ajax class in the current directory.
- *
- * @since  1.0.0
  */
 class Publish extends Command
 {
@@ -22,7 +20,7 @@ class Publish extends Command
      * Store the Command Helper instance.
      *
      * @since  1.0.0
-     * @var QuestionHelper
+     * @var \Symfony\Component\Console\Helper\QuestionHelper
      */
     private $helper;
 
@@ -41,6 +39,30 @@ class Publish extends Command
      * @var boolean
      */
     private $force = false;
+
+    /**
+     * The input interface.
+     *
+     * @since 1.0.0
+     * @var InputInterface
+     */
+    private $input;
+
+    /**
+     * The output interface.
+     *
+     * @since 1.0.0
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
+     * The wp filesystem class.
+     *
+     * @since 1.0.0
+     * @var \WP_Filesystem_Direct
+     */
+    private $file;
 
     /**
      * Setup the command signature and help text.
@@ -80,8 +102,10 @@ class Publish extends Command
      *
      * @since  1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -111,8 +135,10 @@ class Publish extends Command
      *
      * @since 1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
     private function init(InputInterface $input, OutputInterface $output)
     {
@@ -146,7 +172,7 @@ class Publish extends Command
             $packages = [];
             
             // Add all package files to $packages array.
-            foreach (Snap::config('services.providers') as $package) {
+            foreach (Config::get('services.providers') as $package) {
                 $packages[ $package ] = $package::get_files_to_publish();
             }
 
@@ -319,7 +345,7 @@ class Publish extends Command
     }
 
     /**
-     * Traverse up the cirectory structure looking for the current WP base path.
+     * Traverse up the directory structure looking for the current WP base path.
      *
      * @since  1.0.0
      *
@@ -339,7 +365,7 @@ class Publish extends Command
     }
 
     /**
-     * Ask if the user wishes to continure with the force flag enabled.
+     * Ask if the user wishes to continue with the force flag enabled.
      *
      * @since  1.0.0
      */
@@ -370,7 +396,7 @@ class Publish extends Command
     {
         $question = new ChoiceQuestion(
             "\nPlease choose a package to publish:",
-            Snap::config('services.providers')
+            Config::get('services.providers')
         );
 
         $question->setErrorMessage('[%s] is invalid.');

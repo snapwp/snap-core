@@ -2,7 +2,7 @@
 
 namespace Snap\Templating;
 
-use Snap\Core\Snap;
+use Snap\Services\View as Facade;
 
 /**
  * Deals with rendering templates and passing data to them.
@@ -45,7 +45,7 @@ class View
      * The current template.
      *
      * @since  1.0.0
-     * @var array
+     * @var string
      */
     private static $context = null;
 
@@ -141,17 +141,17 @@ class View
      * @param  string|array $template The template(s) to add the callback to.
      * @param  callable     $callback The callback function run before the $template is rendered.
      */
-    public static function when($template, callable $callback)
+    public function when($template, callable $callback)
     {
         if (\is_array($template)) {
             foreach ($template as $current) {
-                static::$composers[ $current ] = $callback;
+                static::$composers[ $current ][] = $callback;
             }
 
             return;
         }
 
-        static::$composers[ $template ] = $callback;
+        static::$composers[ $template ][] = $callback;
     }
 
     /**
@@ -163,7 +163,7 @@ class View
      *                            Can also be an array of key => values to set multiple data at once.
      * @param mixed        $value Data value if a single key is being added.
      */
-    public static function add_shared_data($key, $value = null)
+    public function add_shared_data($key, $value = null)
     {
         if (\is_array($key)) {
             static::$global_data = \array_merge(static::$global_data, $key);
@@ -186,7 +186,11 @@ class View
     public static function get_additional_data($template, $data = [])
     {
         if (isset(static::$composers[ $template ])) {
-            static::$composers[ $template ](Snap::view()->set_context($template), $data);
+            $composers = static::$composers[ $template ];
+
+            foreach ($composers as $composer) {
+                $composer(Facade::get_root_instance()->set_context($template), $data);
+            }
 
             return static::$additional_data[ static::$context ];
         }

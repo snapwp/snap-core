@@ -2,8 +2,8 @@
 
 namespace Snap\Widgets;
 
+use Snap\Utils\View_Utils;
 use WP_Widget;
-use Snap\Core\Utils;
 
 /**
  * Outputs a one dimensional list of related pages.
@@ -64,11 +64,11 @@ class Related_Pages extends WP_Widget
      */
     public function widget($args, $instance)
     {
-        $this->parent_page_id = Utils::get_top_level_parent_id();
+        $this->parent_page_id = View_Utils::get_top_level_parent_id();
 
         // We are on a 404 or search route.
         if ($this->parent_page_id === null) {
-            return false;
+            return;
         }
 
         $this->args = wp_parse_args(
@@ -233,7 +233,7 @@ class Related_Pages extends WP_Widget
      *
      * @since  1.0.0
      *
-     * @param WP_Post $page The current post object.
+     * @param \WP_Post $page The current post object.
      * @return string
      */
     private function get_link_html($page)

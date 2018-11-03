@@ -8,9 +8,10 @@ use PostTypes\PostType;
 /**
  * Post type base class.
  *
- * A wrapper around PostTypes\PostType.
+ * A wrapper around \PostTypes\PostType.
  *
- * @see  https://github.com/jjgrainger/PostTypes
+ * @see https://github.com/jjgrainger/PostTypes
+ * @since 1.0.0
  */
 class Post_Type extends Hookable
 {
@@ -73,6 +74,14 @@ class Post_Type extends Hookable
     public $columns = [];
 
     /**
+     * Register which columns should be sortable for post type.
+     *
+     * @since  1.0.0
+     * @var null|array
+     */
+    public $sortable_columns = [];
+
+    /**
      * Attach Taxonomies by supplying the names to attach here.
      *
      * By default all taxonomies are added to the admin as filters for this post type.
@@ -132,7 +141,8 @@ class Post_Type extends Hookable
      *
      * @since 1.0.0
      *
-     * @param array $columns  Default WordPress sortable columns.
+     * @param array $columns Default WordPress sortable columns.
+     * @return array
      */
     public function set_sortable_columns($columns)
     {
@@ -148,7 +158,7 @@ class Post_Type extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  WP_Query $query The global WP_Query object.
+     * @param  \WP_Query $query The global WP_Query object.
      */
     public function sort_columns($query)
     {
@@ -160,7 +170,7 @@ class Post_Type extends Hookable
         $order_by = $query->get('orderby');
 
         // Check if the current sorted column has a sort callback defined.
-        if (isset($this->sortable_columns[ $orderby ])) {
+        if (isset($this->sortable_columns[ $order_by ])) {
             $callback = "sort_{$order_by}_column";
             $this->{$callback}($query);
         }
@@ -187,7 +197,7 @@ class Post_Type extends Hookable
      *
      * @since  1.0.0
      *
-     * @param  PostTypes\PostType $post_type The current PostType instance.
+     * @param  PostType $post_type The current PostType instance.
      */
     protected function modify(PostType $post_type)
     {
@@ -198,7 +208,7 @@ class Post_Type extends Hookable
      *
      * @since  1.0.0
      *
-     * @param PostTypes\PostType $post_type The current PostType instance.
+     * @param PostType $post_type The current PostType instance.
      */
     private function add_relationships($post_type)
     {

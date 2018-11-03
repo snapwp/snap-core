@@ -1,27 +1,17 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Request\Middleware;
 
-use Snap\Core\Hookable;
 use Snap\Core\Request;
+use Snap\Hookables\Middleware;
 
 /**
  * Some basic middleware.
  *
  * @since  1.0.0
  */
-class Middleware extends Hookable
+class Is_Logged_In extends Middleware
 {
-    /**
-     * Filters to add on init.
-     *
-     * @since 1.0.0
-     * @var array
-     */
-    protected $filters = [
-        'snap_middleware_is_logged_in' => 'is_logged_in',
-    ];
-
     /**
      * Check if the current user is logged in, and perform the redirect if not.
      *
@@ -33,27 +23,25 @@ class Middleware extends Hookable
      * @param  string|null $redirect The middleware argument. How to redirect this request.
      * @return boolean
      */
-    public function is_logged_in(Request $request, $redirect = null)
+    public function handle(Request $request, $redirect = null)
     {
-        if (is_user_logged_in()) {
+        if (is_user_logged_in() === true) {
             return true;
         }
 
         if ($redirect === 'login') {
-            Request::redirect_to_login();
-        }
-
-        if ($redirect === '404') {
-            Request::set_404();
+            $request->redirect_to_login();
         }
 
         if ($redirect === 'admin') {
-            Request::redirect_to_admin();
+            $request->redirect_to_admin();
         }
 
         if ($redirect !== null) {
-            Request::redirect($redirect);
+            $request->redirect($redirect);
         }
+
+        $request->set_404();
 
         return false;
     }

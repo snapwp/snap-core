@@ -2,6 +2,9 @@
 
 namespace Snap\Core;
 
+use Snap\Services\Config;
+use Snap\Services\Container;
+
 /**
  * Initializes Snap classes and child includes.
  *
@@ -18,87 +21,43 @@ class Loader
     private static $theme_includes = [];
 
     /**
+     * Hold all current class aliases.
+     *
+     * @sicne 1.0.0
+     * @var array
+     */
+    private static $aliases = [];
+
+    /**
      * The Snap autoloader.
+     *
+     * @since   1.0.0
+     *
+     * @param string $class The fully qualified class name to load.
+     * @return bool
+     */
+    public static function class_autoload($class)
+    {
+        // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
+        if (isset(static::$theme_includes[ $class ])) {
+            /** @noinspection PhpIncludeInspection */
+            require static::$theme_includes[ $class ];
+            return true;
+        }
+    }
+
+    /**
+     * The alias autoloader.
      *
      * @since 1.0.0
      *
      * @param string $class The fully qualified class name to load.
+     * @return bool|null
      */
-    public static function autoload($class)
+    public static function alias_autoload($class)
     {
-        // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
-        if (isset(self::$theme_includes[ $class ])) {
-            require self::$theme_includes[ $class ];
-            return;
-        }
-    }
-
-    /**
-     * Includes all required Snap and theme files and registeres the Snap autoloader.
-     *
-     * Initializes any Snap\Hookable classes.
-     *
-     * @since 1.0.0
-     */
-    public function boot()
-    {
-        \spl_autoload_register(__NAMESPACE__ .'\Loader::autoload');
-
-        $snap_modules = [
-            \Snap\Modules\Admin::class,
-            \Snap\Modules\Assets::class,
-            \Snap\Modules\Cleanup::class,
-            \Snap\Modules\I18n::class,
-            \Snap\Modules\Post_Templates::class,
-            \Snap\Modules\Images::class,
-            \Snap\Admin\Whitelabel::class,
-        ];
-
-        if (Snap::config('theme.disable_comments') === true) {
-            $snap_modules[] = \Snap\Modules\Disable_Comments::class;
-        }
-
-        if (Snap::config('theme.disable_customizer') === true) {
-            $snap_modules[] = \Snap\Modules\Disable_Customizer::class;
-        }
-
-        if (Snap::config('admin.snap_admin_theme') === true) {
-            $snap_modules[] = \Snap\Admin\Theme::class;
-        }
-
-        foreach ($snap_modules as $module) {
-            Snap::services()->resolve($module)->run();
-        }
-
-        $this->load_widgets();
-
-        $this->load_theme();
-    }
-
-    /**
-     * Load all theme files.
-     *
-     * @since 1.0.0
-     */
-    private function load_theme()
-    {
-        // Populate $theme_includes.
-        self::$theme_includes = $this->scandir(
-            \get_template_directory() . '/theme/',
-            self::$theme_includes,
-            \get_template_directory()
-        );
-
-        self::$theme_includes = $this->scandir(
-            \get_stylesheet_directory() . '/theme/',
-            self::$theme_includes,
-            \get_stylesheet_directory()
-        );
-
-        if (! empty(self::$theme_includes)) {
-            foreach (self::$theme_includes as $class => $path) {
-                $this->load_hookable($class);
-            }
+        if (\in_array($class, \array_keys(static::$aliases))) {
+            return \class_alias(static::$aliases[ $class ], $class);
         }
     }
 
@@ -115,25 +74,115 @@ class Loader
         if (\class_exists($class_name)) {
             if (\is_subclass_of($class_name, Hookable::class)) {
                 // Boot it up and resolve dependencies.
-                Snap::services()->resolve($class_name)->run();
+                Container::resolve($class_name)->run();
                 return;
             }
 
-            if (\is_subclass_of($class_name, \Snap\Services\Provider::class)) {
-                $providers = Snap::config('services.providers');
+            // TODO There is no reason to check each file like this. Use a config instead.
+            if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
+                $providers = Config::get('services.providers');
                 $providers[] = $class_name;
-                Snap::config()->set('services.providers', $providers);
+                Config::set('services.providers', $providers);
                 return;
             }
 
             if (\is_subclass_of($class_name, 'Rakit\Validation\Rule')) {
                 $class_parts = \explode('\\', $class_name);
 
-                Snap::services()->get('Rakit\Validation\Validator')->addValidator(
+                Container::get('Rakit\Validation\Validator')->addValidator(
                     \strtolower(\end($class_parts)),
-                    Snap::services()->resolve($class_name)
+                    Container::resolve($class_name)
                 );
                 return;
+            }
+        }
+    }
+
+    /**
+     * Includes all required Snap and theme files and registers the Snap autoloader.
+     *
+     * Initializes any Snap\Hookable classes.
+     *
+     * @since 1.0.0
+     *
+     * @throws \Exception
+     */
+    public function boot()
+    {
+        \spl_autoload_register(__NAMESPACE__ . '\Loader::class_autoload', true);
+        \spl_autoload_register(__NAMESPACE__ . '\Loader::alias_autoload', true);
+
+        static::$aliases = Config::get('services.aliases');
+
+        $snap_modules = [
+            \Snap\Compatibility\Loader::class,
+            \Snap\Bootstrap\Assets::class,
+            \Snap\Bootstrap\Cleanup::class,
+            \Snap\Bootstrap\Comments::class,
+            \Snap\Bootstrap\I18n::class,
+            \Snap\Media\Size_Manager::class,
+            \Snap\Templating\Handle_Post_Templates::class,
+        ];
+
+        if (\is_admin() || $this->is_wplogin()) {
+            $snap_modules[] = \Snap\Admin\Whitelabel::class;
+            $snap_modules[] = \Snap\Admin\Columns\Post_Template::class;
+            $snap_modules[] = \Snap\Media\Admin::class;
+
+            if (Config::get('admin.snap_admin_theme') === true) {
+                $snap_modules[] = \Snap\Admin\Theme::class;
+            }
+        } else {
+            $snap_modules[] = \Snap\Request\Middleware\Is_Logged_In::class;
+        }
+
+        if (Config::get('theme.disable_comments') === true) {
+            $snap_modules[] = \Snap\Admin\Disable_Comments::class;
+        }
+
+        if (Config::get('theme.disable_customizer') === true) {
+            $snap_modules[] = \Snap\Admin\Disable_Customizer::class;
+        }
+
+        if (Config::get('theme.disable_tags') === true) {
+            $snap_modules[] = \Snap\Admin\Disable_Tags::class;
+        }
+
+        foreach ($snap_modules as $module) {
+            Container::resolve($module)->run();
+        }
+
+        $this->load_widgets();
+
+        // Now all core files are loaded, turn on output buffer until a view is dispatched.
+        \ob_start();
+
+        $this->load_theme();
+    }
+
+    /**
+     * Load all theme files.
+     *
+     * @since 1.0.0
+     */
+    private function load_theme()
+    {
+        // Populate $theme_includes.
+        self::$theme_includes = $this->scan_dir(
+            \get_template_directory() . '/theme/',
+            self::$theme_includes,
+            \get_template_directory()
+        );
+
+        self::$theme_includes = $this->scan_dir(
+            \get_stylesheet_directory() . '/theme/',
+            self::$theme_includes,
+            \get_stylesheet_directory()
+        );
+
+        if (! empty(self::$theme_includes)) {
+            foreach (self::$theme_includes as $class => $path) {
+                $this->load_hookable($class);
             }
         }
     }
@@ -163,12 +212,12 @@ class Loader
      * @param  string $strip  Strip this text from the returned path.
      * @return array          $files array with any discovered php files appended.
      */
-    private function scandir($folder, $files = [], $strip = '')
+    private function scan_dir($folder, $files = [], $strip = '')
     {
         // Ensure maximum portability.
         $folder = \trailingslashit($folder);
 
-        // Check the taret exists.
+        // Check the target exists.
         if (\is_dir($folder)) {
             // Scan the directory for files to include.
             $contents = \scandir($folder);
@@ -191,11 +240,32 @@ class Loader
                     $files[ $class ] = $path;
                 } elseif (\is_dir($path)) {
                     // Sub directory, scan this dir as well.
-                    $files = $this->scandir(\trailingslashit($path), $files, $strip);
+                    $files = $this->scan_dir(\trailingslashit($path), $files, $strip);
                 }
             }
         }
 
         return $files;
+    }
+
+    private function is_wplogin()
+    {
+        $abspath = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
+
+        $files = \get_included_files();
+
+        if (\in_array($abspath.'wp-login.php', $files) || \in_array($abspath.'wp-register.php', $files)) {
+            return true;
+        }
+
+        if (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') {
+            return true;
+        }
+
+        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF']== '/wp-login.php') {
+            return true;
+        }
+
+        return false;
     }
 }

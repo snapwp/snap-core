@@ -2,8 +2,6 @@
 
 namespace Snap\Core;
 
-use Snap\Modules\Assets;
-
 /**
  * A base class for simplifying declaring theme supports and menus.
  *
@@ -41,17 +39,6 @@ class Application extends Hookable
     {
         $this->add_theme_support();
         $this->register_theme_menus();
-    }
-
-    /**
-     * Run immediately after class instantiation.
-     *
-     * To be overridden by the child class.
-     *
-     * @since 1.0.0
-     */
-    protected function boot()
-    {
     }
 
     /**

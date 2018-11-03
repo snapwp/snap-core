@@ -1,9 +1,9 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Bootstrap;
 
 use Snap\Core\Hookable;
-use Snap\Core\Snap;
+use Snap\Services\Config;
 
 /**
  * All asset (script and style) related functionality.
@@ -13,12 +13,12 @@ use Snap\Core\Snap;
 class Assets extends Hookable
 {
     /**
-     * Mix-manifest.json contents stored as array.
+     * Don't run on admin requests.
      *
      * @since 1.0.0
-     * @var array|null
+     * @var boolean
      */
-    protected $manifest = null;
+    protected $admin = false;
 
     /**
      * Actions to add on init.
@@ -27,9 +27,9 @@ class Assets extends Hookable
      * @var array
      */
     protected $actions = [
-        'wp_enqueue_scripts' => 'script_enqueuer',
+        'wp_enqueue_scripts' => 'enqueue_scripts',
     ];
-    
+
     /**
      * Adds optional filters if required.
      *
@@ -38,36 +38,15 @@ class Assets extends Hookable
     public function boot()
     {
         // Whether to add 'defer' to enqueued scripts.
-        if (Snap::config('theme.defer_scripts') && ! is_admin()) {
+        if (Config::get('theme.defer_scripts')) {
             $this->add_filter('script_loader_tag', 'defer_scripts', 10, 2);
         }
 
         // Whether to remove asset version strings.
-        if (Snap::config('theme.remove_asset_versions')) {
-            $this->add_filter([ 'style_loader_src', 'script_loader_src' ], 'remove_versions_from_assets', 15);
+        if (Config::get('theme.remove_asset_versions')) {
+            $this->add_filter('style_loader_src', 'remove_versions_from_assets', 15);
+            $this->add_filter('script_loader_src', 'remove_versions_from_assets', 15);
         }
-    }
-
-    /**
-     * Retrieves a filename public URL with Webpack version ID if present.
-     *
-     * @since  1.0.0
-     *
-     * @param  string $file The asset file to look for.
-     * @return string The (possibly versioned) asset URL.
-     */
-    public function get_asset_url($file)
-    {
-        if ($this->manifest === null) {
-            $this->parse_manifest();
-        }
-
-        // There was no manifest or no file present.
-        if ($this->manifest === null || ! isset($this->manifest[ $file ])) {
-            return get_stylesheet_directory_uri() . '/dist' . $file;
-        }
-
-        return get_stylesheet_directory_uri() . '/dist' . $this->manifest[ $file ];
     }
 
     /**
@@ -76,19 +55,22 @@ class Assets extends Hookable
      *
      * @since 1.0.0
      */
-    public function script_enqueuer()
+    public function enqueue_scripts()
     {
         // Get specified jQuery version.
-        $jquery_version = Snap::config('theme.use_jquery_cdn');
+        $jquery_version = Config::get('theme.use_jquery_cdn');
 
         // if a valid jQuery version has been specified.
-        if (! is_admin() && $jquery_version !== false && \version_compare($jquery_version, '0.0.1', '>=') === true) {
+        if (Config::get('theme.disable_jquery') !== true
+            && $jquery_version !== false
+            && \version_compare($jquery_version, '0.0.1', '>=') === true
+        ) {
             // get all non-deferred scripts, to check for jQuery.
-            $defer_exclude_list = Snap::config('theme.defer_scripts_skip');
-            
-            wp_deregister_script('jquery');
+            $defer_exclude_list = Config::get('theme.defer_scripts_skip');
 
-            wp_register_script(
+            \wp_deregister_script('jquery');
+
+            \wp_register_script(
                 'jquery',
                 "//ajax.googleapis.com/ajax/libs/jquery/{$jquery_version}/jquery.min.js",
                 [],
@@ -96,7 +78,20 @@ class Assets extends Hookable
                 ( \is_array($defer_exclude_list) && \in_array('jquery', $defer_exclude_list) ) ? false : true
             );
 
-            wp_enqueue_script('jquery');
+            \wp_enqueue_script('jquery');
+        }
+
+        // Completely remove jQuery
+        if (Config::get('theme.disable_jquery') === true) {
+            \wp_deregister_script('jquery');
+        }
+
+        // Threaded comments JS.
+        if ((! Config::get('theme.disable_comments'))
+            && comments_open()
+            && get_option('thread_comments')
+        ) {
+            wp_enqueue_script('comment-reply');
         }
     }
 
@@ -111,7 +106,7 @@ class Assets extends Hookable
      */
     public function defer_scripts($tag, $handle)
     {
-        $excludes = Snap::config('theme.defer_scripts_skip');
+        $excludes = Config::get('theme.defer_scripts_skip');
 
         // Get the script handles to exclude.
         if (empty($excludes)) {
@@ -142,22 +137,6 @@ class Assets extends Hookable
      */
     public function remove_versions_from_assets($src)
     {
-        return $src ? esc_url(remove_query_arg('ver', $src)) : false;
-    }
-
-    /**
-     * Parse the contents of mix-manifest.json and store as array.
-     *
-     * @since  1.0.0
-     */
-    private function parse_manifest()
-    {
-        $manifest_path = get_stylesheet_directory() . '/dist/mix-manifest.json';
-
-        if (\file_exists($manifest_path)) {
-            $manifest = \file_get_contents($manifest_path);
-
-            $this->manifest = (array) \json_decode($manifest);
-        }
+        return $src ? \esc_url(\remove_query_arg('ver', $src)) : false;
     }
 }

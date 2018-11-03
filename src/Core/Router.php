@@ -5,6 +5,8 @@ namespace Snap\Core;
 use Exception;
 use BadMethodCallException;
 use closure;
+use Snap\Services\View;
+use Snap\Services\Container;
 
 /**
  * A wrapper which replaces the standard if/else/switch block, and provides a more fluent API for
@@ -98,7 +100,7 @@ class Router
      * @param  bool|callable $result The result of a custom expression.
      * @return Router
      */
-    public function is($result)
+    public function when($result)
     {
         if (\is_callable($result)) {
             $result = $result();
@@ -119,30 +121,13 @@ class Router
      * @param  bool $result The result of a custom expression.
      * @return Router
      */
-    public function is_not($result)
+    public function not($result)
     {
         if (\is_callable($result)) {
             $result = $result();
         }
 
         if ($this->can_proceed() && $result === true) {
-            $this->shortcircuit = true;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Wrapper for is_page_template so it can be used when defining a route.
-     *
-     * @since  1.0.0
-     *
-     * @param  string $template Optional specific template to check for.
-     * @return Router
-     */
-    public function is_page_template($template = '')
-    {
-        if ($this->can_proceed() && is_page_template($template) === false) {
             $this->shortcircuit = true;
         }
 
@@ -159,16 +144,16 @@ class Router
      *
      * @since 1.0.0
      *
-     * @param  array|string $stack The middleware hooks to apply to this route.
+     * @param  array|string $middleware The middleware hooks to apply to this route.
      * @return Router
      */
-    public function using($stack = [])
+    public function using($middleware = [])
     {
-        if (! \is_array($stack)) {
-            $stack = [ $stack ];
+        if (! \is_array($middleware)) {
+            $middleware = [ $middleware ];
         }
 
-        foreach ($stack as $callback) {
+        foreach ($middleware as $callback) {
             $parts = \explode('|', $callback);
             $args = [];
 
@@ -190,21 +175,73 @@ class Router
     }
 
     /**
-     * Returns the hook name for a given middleware.
+     * Render a view and stop any other routes from processing.
      *
      * @since  1.0.0
      *
-     * @throws BadMethodCallException If the hook was not found.
-     *
-     * @param  string $middleware_name The name of the middleware.
-     * @return string
+     * @param  string $slug The slug of the view to render.
      */
-    private function get_middleware_action($middleware_name)
+    public function view($slug)
     {
-        if (has_action("snap_middleware_{$middleware_name}")) {
-            return "snap_middleware_{$middleware_name}";
-        } else {
-            throw new BadMethodCallException("No middleware called '{$middleware_name}' found");
+        if ($this->can_proceed()) {
+            // As this is the correct route, apply middleware stack.
+            $this->apply_middleware();
+
+            // Passed all middleware.
+            if ($this->can_proceed()) {
+                do_action("snap_render_view_{$slug}", Container::get('request'));
+                
+                View::render($slug);
+
+                $this->has_matched_route = true;
+
+                \ob_end_flush();
+            }
+        }
+    }
+
+    /**
+     * Dispatch a controller action.
+     *
+     * The dispatched action and the controller class are auto-wired.
+     *
+     * @since  1.0.0
+     *
+     * @throws Exception If the supplied controller doesn't exist.
+     *
+     * @param  string $controller The controller name followed by the action, separated by an @.
+     *                            eg. "My_Controller@MyAction"
+     *                            If no action is supplied, then 'index' is presumed.
+     */
+    public function dispatch($controller)
+    {
+        if ($this->can_proceed()) {
+            // As this is the correct route, apply middleware stack.
+            $this->apply_middleware();
+
+            // Passed all middleware.
+            if ($this->can_proceed()) {
+                list($class, $action) = \explode('@', $controller);
+
+                if ($action === null) {
+                    $action = 'index';
+                }
+
+                $fqn = '\\Theme\\Controllers\\' . $class;
+
+                if (\class_exists($fqn)) {
+                    Container::resolve_method(
+                        Container::resolve($fqn),
+                        $action
+                    );
+                } else {
+                    throw new Exception("The controller {$fqn} could not be found.");
+                }
+
+                $this->has_matched_route = true;
+
+                \ob_end_flush();
+            }
         }
     }
 
@@ -230,106 +267,22 @@ class Router
     }
 
     /**
-     * Render a view and stop any other routes from processing.
-     *
-     * Views (like template parts) are loaded as {name}{-slug}.php.
-     * If a slug cannot be found, then {view}.php is loaded instead.
+     * Returns the hook name for a given middleware.
      *
      * @since  1.0.0
      *
-     * @param  string $slug The slug of the view to render.
+     * @throws BadMethodCallException If the hook was not found.
+     *
+     * @param  string $middleware_name The name of the middleware.
+     * @return string
      */
-    public function view($slug)
+    private function get_middleware_action($middleware_name)
     {
-        if ($this->can_proceed()) {
-            // As this is the correct route, apply middleware stack.
-            $this->apply_middleware();
-
-            // Passed all middleware.
-            if ($this->can_proceed()) {
-                do_action("snap_render_view_{$slug}", Snap::request());
-                
-                Snap::view()->render($slug);
-
-                $this->has_matched_route = true;
-            }
+        if (\has_action("snap_middleware_{$middleware_name}")) {
+            return "snap_middleware_{$middleware_name}";
+        } else {
+            throw new BadMethodCallException("No middleware called '{$middleware_name}' found");
         }
-    }
-
-    /**
-     * Dispatch a controller action.
-     *
-     * The dispatched action and the controller class are autowired.
-     *
-     * @since  1.0.0
-     *
-     * @throws Exception If the supplied controller doesn't exist.
-     *
-     * @param  string $controller The controller name followed by the action, seperated by an @.
-     *                            eg. MyController@MyAction
-     *                            If no action is supplied, then 'index' is presumed.
-     */
-    public function dispatch($controller)
-    {
-        if ($this->can_proceed()) {
-            // As this is the correct route, apply middleware stack.
-            $this->apply_middleware();
-
-            // Passed all middleware.
-            if ($this->can_proceed()) {
-                list($class, $action) = \explode('@', $controller);
-
-                if ($action === null) {
-                    $action = 'index';
-                }
-
-                $fqn = '\\Theme\\Controllers\\' . $class;
-
-                if (\class_exists($fqn)) {
-                    Snap::services()->resolveMethod(
-                        Snap::services()->resolve($fqn),
-                        $action
-                    );
-                } else {
-                    throw new Exception("The controller $fqn could not be found.");
-                }
-
-                $this->has_matched_route = true;
-            }
-        }
-    }
-
-    /**
-     * Magic method to wrap any undefined routes to the global WP_Query.
-     *
-     * @since  1.0.0
-     *
-     * @param  string $name      The called method.
-     * @param  mixed  $arguments The called method arguments.
-     * @return Router
-     */
-    public function __call($name, $arguments)
-    {
-        global $wp_query;
-
-        // WP_Query also uses call, which can lead to unwanted negatives.
-        if (\is_callable([ $wp_query, $name ]) && \method_exists($wp_query, $name)) {
-            if ($this->can_proceed() && $wp_query->{$name}($arguments) === false) {
-                $this->shortcircuit = true;
-            }
-
-            return $this;
-        }
-
-        if (\function_exists($name)) {
-            if ($this->can_proceed() && $name($arguments) !== true) {
-                $this->shortcircuit = true;
-            }
-
-            return $this;
-        }
-
-        return $this;
     }
 
     /**
@@ -340,7 +293,7 @@ class Router
     private function apply_middleware()
     {
         if (empty($this->middleware)) {
-            return true;
+            return;
         }
 
         foreach ($this->middleware as $hook => $args) {
@@ -355,7 +308,7 @@ class Router
              * @param Request $request The current request for quick access.
              * @return  bool Whether to continue processing this route.
              */
-            if (apply_filters($hook, Snap::request(), ...$args) !== true) {
+            if (\apply_filters($hook, Container::get('request'), ...$args) !== true) {
                 $this->shortcircuit = true;
             }
         }

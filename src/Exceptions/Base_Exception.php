@@ -16,7 +16,7 @@ class Base_Exception extends Exception
      *
      * @param string         $message  Exception message.
      * @param integer        $code     Exception code.
-     * @param Exception|null $previous Previous EXception.
+     * @param Exception|null $previous Previous Exception.
      */
     public function __construct($message, $code = 0, Exception $previous = null)
     {

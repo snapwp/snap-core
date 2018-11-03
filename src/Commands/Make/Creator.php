@@ -216,7 +216,7 @@ class Creator extends Command
      *
      * @since  1.0.0
      *
-     * @param  array  $args The args passed to the creator.
+     * @param  array $args The args passed to the creator.
      * @return array
      */
     private function parse_args($args = [])

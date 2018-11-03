@@ -5,6 +5,8 @@ namespace Snap\Core;
 use WP_Http;
 use ArrayAccess;
 use Snap\Request\Bag;
+use Snap\Services\Container;
+use Snap\Utils\Theme_Utils;
 
 /**
  * Gathers all request variables into one place, and provides a simple API for changes affecting the response.
@@ -48,30 +50,6 @@ class Request implements ArrayAccess
     public $request = null;
 
     /**
-     * The current request URL.
-     *
-     * @since 1.0.0
-     * @var string
-     */
-    public $url;
-
-    /**
-     * The current request path.
-     *
-     * @since 1.0.0
-     * @var string
-     */
-    public $path;
-
-    /**
-     * The current request scheme.
-     *
-     * @since 1.0.0
-     * @var string
-     */
-    public $scheme;
-
-    /**
      * The current query being run by WordPress.
      *
      * @since 1.0.0
@@ -99,9 +77,33 @@ class Request implements ArrayAccess
      * The Validator instance.
      *
      * @since 1.0.0
-     * @var \Rakit\Validation\Validator
+     * @var \Rakit\Validation\Validator|\Rakit\Validation\Validation
      */
     public $validation = null;
+
+    /**
+     * The current request URL.
+     *
+     * @since 1.0.0
+     * @var string
+     */
+    protected $url;
+
+    /**
+     * The current request path.
+     *
+     * @since 1.0.0
+     * @var string
+     */
+    protected $path;
+
+    /**
+     * The current request scheme.
+     *
+     * @since 1.0.0
+     * @var string
+     */
+    protected $scheme;
 
     /**
      * Populate request variables and properties.
@@ -145,7 +147,7 @@ class Request implements ArrayAccess
      */
     public function redirect_to_admin($path = null, $status = 302)
     {
-        self::redirect(admin_url($path), $status);
+        $this->redirect(admin_url($path), $status);
     }
 
     /**
@@ -161,10 +163,10 @@ class Request implements ArrayAccess
     public function redirect_to_login($redirect_after = null, $status = 302)
     {
         if ($redirect_after === null) {
-            $redirect_after = Utils::get_current_url();
+            $redirect_after = Theme_Utils::get_current_url();
         }
 
-        self::redirect(wp_login_url($redirect_after), $status);
+        $this->redirect(wp_login_url($redirect_after), $status);
     }
 
     /**
@@ -178,7 +180,7 @@ class Request implements ArrayAccess
     {
         global $wp_query;
         $wp_query->set_404();
-        status_header(WP_Http::NOT_FOUND);
+        status_header(WP_Http::NOT_FOUND, 'Content not found');
         nocache_headers();
     }
 
@@ -192,6 +194,42 @@ class Request implements ArrayAccess
     public function get_method()
     {
         return $this->server('REQUEST_METHOD');
+    }
+
+    /**
+     * Returns the current URL.
+     *
+     * @since 1.0.0
+     *
+     * @return string
+     */
+    public function get_url()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Returns the current URL path.
+     *
+     * @since 1.0.0
+     *
+     * @return string
+     */
+    public function get_scheme()
+    {
+        return $this->scheme;
+    }
+
+    /**
+     * Returns the current URL path.
+     *
+     * @since 1.0.0
+     *
+     * @return string
+     */
+    public function get_path()
+    {
+        return $this->path;
     }
 
     /**
@@ -282,6 +320,7 @@ class Request implements ArrayAccess
      * @see  https://github.com/rakit/validation#custom-validation-message for format.
      *
      * @param array $messages Error messages as key value pairs.
+     * @return Request
      */
     public function set_error_messages(array $messages = [])
     {
@@ -296,12 +335,13 @@ class Request implements ArrayAccess
      * @since  1.0.0
      * @see  https://github.com/rakit/validation#available-rules for format.
      *
-     * @param array $rules Rules as key value pairs.
+     * @param array $rule_set Rules as key value pairs.
+     * @return Request
      */
-    public function set_rules(array $rules = [])
+    public function set_rules(array $rule_set = [])
     {
-        foreach ($rules as $attributeKey => $rules) {
-            $this->validation->addAttribute($attributeKey, $rules);
+        foreach ($rule_set as $attribute_key => $rules) {
+            $this->validation->addAttribute($attribute_key, $rules);
         }
 
         return $this;
@@ -310,7 +350,7 @@ class Request implements ArrayAccess
     /**
      * Set aliases for use in your error messages.
      *
-     * In error messages :attribute can be used to subsitute with the input array key into the message.
+     * In error messages :attribute can be used to substitute with the input array key into the message.
      * The key might not be ideal, so you can provide a better substitute as an alias.
      *
      * @since  1.0.0
@@ -330,7 +370,7 @@ class Request implements ArrayAccess
      *
      * @since  1.0.0
      *
-     * @param  array $rules    Optional. Rules to use. Defaults to rules set via set_rules().
+     * @param  array $rules Optional. Rules to use. Defaults to rules set via set_rules().
      * @param  array $messages Optional. Messages to use. Defaults to rules set via set_messages().
      */
     public function validate_ajax_request(array $rules = [], array $messages = [])
@@ -384,14 +424,15 @@ class Request implements ArrayAccess
      *
      * @since  1.0.0
      *
-     * @param  array $inputs   The array of data to validate as key value pairs.
-     * @param  array $rules    The rules to run against the data.
+     * @param  array $inputs The array of data to validate as key value pairs.
+     * @param  array $rules The rules to run against the data.
      * @param  array $messages Messages to display when a value fails.
      * @return bool|array Returns true if data validates, or an array of error messages.
      */
     public function validate_data(array $inputs, array $rules = [], array $messages = [])
     {
-        $validation = Snap::services()->get('Rakit\Validation\Validator')->validate($inputs, $rules, $messages);
+        /** @var \Rakit\Validation\Validation $validation */
+        $validation = Container::get('Rakit\Validation\Validator')->validate($inputs, $rules, $messages);
 
         if ($validation->fails()) {
             return $validation->errors()->toArray();
@@ -408,8 +449,8 @@ class Request implements ArrayAccess
      */
     private function set_validation()
     {
-        $validator = Snap::services()->get('Rakit\Validation\Validator');
-        
+        $validator = Container::get('Rakit\Validation\Validator');
+
         $this->validation = $validator->make(
             $this->request->to_array(),
             []
@@ -469,7 +510,7 @@ class Request implements ArrayAccess
         $this->matched_query = $wp->matched_query;
         $this->matched_rule = $wp->matched_rule;
 
-        $this->url = Utils::get_current_url();
+        $this->url = Theme_Utils::get_current_url();
 
         $this->path = \rtrim(\parse_url($this->url, PHP_URL_PATH), '/');
     }
@@ -542,7 +583,6 @@ class Request implements ArrayAccess
      * @since  1.0.0
      *
      * @param  mixed $offset The offset to unset.
-     * @return mixed
      */
     public function offsetUnset($offset)
     {

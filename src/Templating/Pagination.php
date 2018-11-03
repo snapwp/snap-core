@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Modules;
+namespace Snap\Templating;
 
 use WP_Query;
 use WP_User_Query;
@@ -95,7 +95,7 @@ class Pagination
             $this->wp_query = $global_query;
         }
 
-        $this->set_page_count();
+        $this->page_count = $this->get_page_count();
         $this->set_current_page();
         $this->set_ranges();
     }
@@ -164,7 +164,7 @@ class Pagination
             'show_first_last'     => true,
             'show_previous_next'  => true,
             'active_link_wrapper' => '<li class="active">%s</li>',
-            'link_wrapper'        => '<li><a href="%s" itemprop="url">><span itemprop="name">%s</span></a></li>',
+            'link_wrapper'        => '<li><a href="%s" itemprop="url"><span itemprop="name">%s</span></a></li>',
             'first_wrapper'       => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('First page', 'snap') . '</span></a></li>',
             'previous_wrapper'    => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Previous', 'snap') . '</span></a></li>',
             'next_wrapper'        => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Next', 'snap') . '</span></a></li>',
@@ -178,14 +178,20 @@ class Pagination
      * Sets the page_count variable from $this->wp_query.
      *
      * @since  1.0.0
+     *
+     * @return int
      */
-    private function set_page_count()
+    private function get_page_count()
     {
         if ($this->wp_query instanceof WP_User_Query) {
-            $this->page_count = (int) empty($this->wp_query->get_results()) ? 0 : \ceil($this->wp_query->get_total() / $this->wp_query->query_vars['number']);
-        } else {
-            $this->page_count = (int) $this->wp_query->max_num_pages;
+            if (empty($this->wp_query->get_results())) {
+                return 0;
+            }
+
+            return \ceil($this->wp_query->get_total() / $this->wp_query->query_vars['number']);
         }
+
+        return (int) $this->wp_query->max_num_pages;
     }
 
     /**
@@ -224,20 +230,26 @@ class Pagination
                     1,
                     $this->args['range'] + 1,
                 ];
-            } elseif ($this->current_page >= ($this->page_count - $this->args['ceil'])) {
+            }
+
+            if ($this->current_page >= ($this->page_count - $this->args['ceil'])) {
                 return [
                     $this->page_count - $this->args['range'],
                     $this->page_count,
                 ];
-            } elseif ($this->current_page >= $this->args['range'] && $this->current_page < ($this->page_count - $this->args['ceil'])) {
+            }
+
+            if ($this->current_page >= $this->args['range']
+                && $this->current_page < ($this->page_count - $this->args['ceil'])
+            ) {
                  return [
                      $this->current_page - $this->args['ceil'],
                      $this->current_page + $this->args['ceil'],
                  ];
             }
-        } else {
-            return [1, $this->page_count];
         }
+
+        return [1, $this->page_count];
     }
 
     /**
@@ -245,7 +257,7 @@ class Pagination
      *
      * @since  1.0.0
      *
-     * @return sting
+     * @return string
      */
     private function get_opening_links()
     {
@@ -270,7 +282,7 @@ class Pagination
      *
      * @since  1.0.0
      *
-     * @return sting
+     * @return string
      */
     private function get_links()
     {
@@ -301,7 +313,7 @@ class Pagination
      *
      * @since  1.0.0
      *
-     * @return sting
+     * @return string
      */
     private function get_closing_links()
     {
