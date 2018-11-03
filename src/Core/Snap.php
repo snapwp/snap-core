@@ -130,15 +130,19 @@ class Snap
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    public static function init_config()
+    public static function init_config($theme_root = null)
     {
         if (static::$setup === false) {
             $config = new Config();
 
-            $config->add_path(\get_template_directory() . '/config');
+            if ($theme_root === null) {
+                $config->add_path(\get_template_directory() . '/config');
 
-            if (\is_child_theme()) {
-                $config->add_path(\get_stylesheet_directory() . '/config');
+                if (\is_child_theme()) {
+                    $config->add_path(\get_stylesheet_directory() . '/config');
+                }
+            } else {
+                $config->add_path($theme_root . '/config');
             }
 
             static::$container->add_instance($config);
@@ -165,7 +169,7 @@ class Snap
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    private static function register_providers()
+    public static function register_providers()
     {
         $provider_instances = [];
 
