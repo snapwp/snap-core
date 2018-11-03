@@ -4,6 +4,7 @@ namespace Snap\Commands;
 
 use Snap\Core\Snap;
 use Snap\Services\Config;
+use Snap\Services\Service_Provider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,6 +40,14 @@ class Publish extends Command
      * @var boolean
      */
     private $force = false;
+
+    /**
+     * Used instead of get_template_directory if present.
+     *
+     * @since 1.0.0
+     * @var boolean
+     */
+    private $root;
 
     /**
      * The input interface.
@@ -95,6 +104,13 @@ class Publish extends Command
             InputOption::VALUE_REQUIRED,
             'Chose the specific package to publish.'
         );
+
+        $this->addOption(
+            'root',
+            'r',
+            InputOption::VALUE_OPTIONAL,
+            'To override the current theme directory.'
+        );
     }
 
     /**
@@ -110,6 +126,7 @@ class Publish extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->init($input, $output);
+
         $this->force_prompt();
                 
         $this->publish_packages($this->get_packages());
@@ -148,12 +165,13 @@ class Publish extends Command
 
         // Set whether target files should be overwritten or not.
         $this->force = $input->getOption('force');
+        $this->root = $input->getOption('root');
 
         $this->init_wordpress();
 
         // Setup Snap.
         Snap::create_container();
-        Snap::init_config();
+        Snap::init_config($this->root);
 
         // Setup WP filesystem helper.
         $this->setup_filesystem();
@@ -190,6 +208,15 @@ class Publish extends Command
         if (! \class_exists($package)) {
             $this->output->writeln("<error>The package [$package] could not be found.</error>");
             exit;
+        }
+
+        // When running publish via the theme installer, the current theme isn't active yet.
+        //  We need to trick WP into thinking it is.
+        if (isset($this->root)) {
+            add_filter( 'stylesheet', function() { return 'snap-theme-bootstrap';} );
+            add_filter( 'template', function() { return 'snap-theme-bootstrap';} );
+
+            Snap::register_providers();
         }
 
         return [
@@ -233,6 +260,10 @@ class Publish extends Command
 
         if (\is_child_theme()) {
             $root = \get_stylesheet_directory();
+        }
+
+        if (isset($this->root)) {
+            $root = $this->root;
         }
 
         foreach ($directories as $source => $target) {
@@ -335,6 +366,7 @@ class Publish extends Command
     private function init_wordpress()
     {
         global $wp, $wp_query, $wp_the_query, $wp_rewrite, $wp_did_header;
+
 
         // Trick WP into thinking this is an AJAX request. Helps quieten certain plugins.
         \define('DOING_AJAX', true);

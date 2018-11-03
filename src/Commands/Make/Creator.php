@@ -34,7 +34,6 @@ class Creator extends Command
     {
         $this->theme_dir = \getcwd();
         $this->scaffolding_dir = __DIR__ . '/scaffolding/';
-        $this->init_wordpress();
 
         parent::__construct();
     }
@@ -52,6 +51,7 @@ class Creator extends Command
      */
     protected function scaffold($scaffold, $filename, $args = [], $options = [])
     {
+        $this->init_wordpress();
         $original = $this->scaffolding_dir . "{$scaffold}.txt";
 
         $filename = $this->sanitise_filename($filename);
