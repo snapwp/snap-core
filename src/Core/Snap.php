@@ -92,13 +92,15 @@ class Snap
                 static::$container->add_instance($wp_query);
                 static::$container->add_instance($wpdb);
 
-                static::init_templating();
-
                 // Run the loader.
                 $loader = new Loader();
                 $loader->boot();
 
+                static::init_templating();
                 static::register_providers();
+
+                $loader->load_theme();
+
             } catch (Exception $e) {
                 throw new Startup_Exception($e->getMessage());
             }
@@ -191,9 +193,6 @@ class Snap
      * Adds the View class, and if no other templating strategy is present, adds and binds the default.
      *
      * @since  1.0.0
-     *
-     * @throws \Hodl\Exceptions\InvalidKeyException
-     * @throws \Hodl\Exceptions\KeyExistsException
      */
     private static function init_templating()
     {
