@@ -80,9 +80,9 @@ class Loader
 
             // TODO There is no reason to check each file like this. Use a config instead.
             if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
-                $providers = Config::get('services.providers');
-                $providers[] = $class_name;
-                Config::set('services.providers', $providers);
+                $provider = Container::resolve($class_name);
+                $provider->register();
+                Container::resolve_method($provider, 'boot');
                 return;
             }
 
@@ -156,8 +156,6 @@ class Loader
 
         // Now all core files are loaded, turn on output buffer until a view is dispatched.
         \ob_start();
-
-        $this->load_theme();
     }
 
     /**
@@ -165,7 +163,7 @@ class Loader
      *
      * @since 1.0.0
      */
-    private function load_theme()
+    public function load_theme()
     {
         // Populate $theme_includes.
         self::$theme_includes = $this->scan_dir(
