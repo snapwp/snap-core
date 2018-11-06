@@ -73,34 +73,25 @@ class Snap
      */
     public static function setup()
     {
-        add_action(
-            'after_switch_theme',
-            function () {
-                \flush_rewrite_rules();
-            }
-        );
-
         if (static::$setup === false) {
             try {
                 static::create_container();
                 static::init_config();
                 static::init_routing();
                 static::init_services();
-
-                // Add global WP classes.
-                global $wpdb, $wp_query;
-                static::$container->add_instance($wp_query);
-                static::$container->add_instance($wpdb);
+                static::add_wordpress_globals();
 
                 // Run the loader.
                 $loader = new Loader();
                 $loader->boot();
 
-                static::init_templating();
+
                 static::register_providers();
+                static::init_templating();
+
+                static::init_view();
 
                 $loader->load_theme();
-
             } catch (Exception $e) {
                 throw new Startup_Exception($e->getMessage());
             }
@@ -129,6 +120,8 @@ class Snap
      * Create a config instance, provide config directories, and add to the container.
      *
      * @since 1.0.0
+     *
+     * @param string $theme_root Used by the publish command when not the current active theme.
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
@@ -215,13 +208,23 @@ class Snap
                 }
             );
         }
+    }
 
+    /**
+     * Add the View class ot the container.
+     *
+     * @since 1.0.0
+     */
+    private static function init_view()
+    {
         static::$container->add_singleton(
             View::class,
             function (Container $hodl) {
                 return $hodl->resolve(View::class);
             }
         );
+
+        static::$container->alias(View::class, 'view');
     }
 
     /**
@@ -273,5 +276,20 @@ class Snap
 
         static::$container->alias(Router::class, 'router');
         static::$container->alias(Request::class, 'request');
+    }
+
+    /**
+     * Add WordPress globals into container.
+     *
+     * @Since 1.0.0
+     *
+     * @throws \Hodl\Exceptions\ContainerException
+     */
+    private static function add_wordpress_globals()
+    {
+        // Add global WP classes.
+        global $wpdb, $wp_query;
+        static::$container->add_instance($wp_query);
+        static::$container->add_instance($wpdb);
     }
 }

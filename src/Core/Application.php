@@ -10,6 +10,16 @@ namespace Snap\Core;
 class Application extends Hookable
 {
     /**
+     * Actions to add on init.
+     *
+     * @var array
+     */
+    protected $actions = [
+        'widgets_init' => 'register_theme_widgets',
+        'wp_enqueue_scripts' => 'enqueue_theme_assets',
+    ];
+
+    /**
      * Declare theme support.
      *
      * Keys are the feature to enable, and values are any additional arguments to pass to add_theme_support().
@@ -54,9 +64,9 @@ class Application extends Hookable
 
         foreach ($this->supports as $feature => $args) {
             if (\is_integer($feature)) {
-                add_theme_support($args);
+                \add_theme_support($args);
             } else {
-                add_theme_support($feature, $args);
+                \add_theme_support($feature, $args);
             }
         }
     }
@@ -73,5 +83,25 @@ class Application extends Hookable
         }
 
         register_nav_menus($this->menus);
+    }
+
+    /**
+     * Enqueue the theme CSS files.
+     *
+     * @since 1.0.0
+     */
+    public function enqueue_theme_assets()
+    {
+
+    }
+
+    /**
+     * Register the theme's widgets.
+     *
+     * @since 1.0.0
+     */
+    public function register_theme_widgets()
+    {
+
     }
 }

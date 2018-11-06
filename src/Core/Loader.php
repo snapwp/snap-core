@@ -44,6 +44,8 @@ class Loader
             require static::$theme_includes[ $class ];
             return true;
         }
+
+        return false;
     }
 
     /**
@@ -59,6 +61,8 @@ class Loader
         if (\in_array($class, \array_keys(static::$aliases))) {
             return \class_alias(static::$aliases[ $class ], $class);
         }
+
+        return false;
     }
 
     /**
@@ -78,11 +82,10 @@ class Loader
                 return;
             }
 
-            // TODO There is no reason to check each file like this. Use a config instead.
+             // TODO There is no reason to check each file like this. Use a config instead.
             if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
                 $provider = Container::resolve($class_name);
-                $provider->register();
-                Container::resolve_method($provider, 'boot');
+                Container::resolve_method($provider, 'register');
                 return;
             }
 

@@ -98,9 +98,9 @@ class Creator extends Command
             if (\file_put_contents($this->get_destination($scaffold, $filename), $content) !== false) {
                 return true;
             }
-
-            return false;
         }
+
+        return false;
     }
 
     /**
