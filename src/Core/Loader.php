@@ -23,7 +23,7 @@ class Loader
     /**
      * Hold all current class aliases.
      *
-     * @sicne 1.0.0
+     * @since 1.0.0
      * @var array
      */
     private static $aliases = [];
@@ -118,7 +118,6 @@ class Loader
         static::$aliases = Config::get('services.aliases');
 
         $snap_modules = [
-            \Snap\Compatibility\Loader::class,
             \Snap\Bootstrap\Assets::class,
             \Snap\Bootstrap\Cleanup::class,
             \Snap\Bootstrap\Comments::class,

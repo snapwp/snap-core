@@ -204,24 +204,43 @@ class Admin extends Hookable
     public function handle_delete_intermediate_ajax($post, $attachment_data)
     {
         if (isset($attachment_data['delete-intermediate']) && !empty($attachment_data['delete-intermediate'])) {
-            $meta = wp_get_attachment_metadata($post['ID']);
+            $sizes = $attachment_data['delete-intermediate'];
+            $meta = \wp_get_attachment_metadata($post['ID']);
             $dir = \pathinfo(get_attached_file($post['ID']), PATHINFO_DIRNAME);
 
-            foreach ($attachment_data['delete-intermediate'] as $size) {
+            foreach ($sizes as $size) {
                 if ($meta['sizes'][ $size ]) {
                     $file = $meta['sizes'][ $size ]['file'];
 
                     // Remove size meta from attachment
                     unset($meta['sizes'][ $size ]);
-                    wp_delete_file_from_directory(trailingslashit($dir) . $file, $dir);
+                    \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
                 }
             }
-            
-            do_action('snap_dynamic_image_before_delete', $attachment_data['delete-intermediate'], $post['ID']);
-            do_action('delete_attachment', $post['ID']);
-            do_action('snap_dynamic_image_after_delete', $attachment_data['delete-intermediate'], $post['ID']);
 
-            wp_update_attachment_metadata($post['ID'], $meta);
+            /**
+             * Fires just before 'delete_attachment' is fired when an intermediate image size is deleted via the
+             * dynamic sizes admin UI.
+             *
+             * @since 1.0.0
+             * @param array $sizes List of sizes to be deleted
+             * @param int $id The ID of the current attachment.
+             */
+            \do_action('snap_dynamic_image_before_delete', $sizes, $post['ID']);
+
+            \do_action('delete_attachment', $post['ID']);
+
+            /**
+             * Fires just after 'delete_attachment' is fired when an intermediate image size is deleted via the
+             * dynamic sizes admin UI.
+             *
+             * @since 1.0.0
+             * @param array $sizes List of sizes to be deleted
+             * @param int $id The ID of the current attachment.
+             */
+            \do_action('snap_dynamic_image_after_delete', $sizes, $post['ID']);
+
+            \wp_update_attachment_metadata($post['ID'], $meta);
         }
 
         return $post;
