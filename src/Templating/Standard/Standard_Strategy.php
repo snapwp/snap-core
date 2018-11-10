@@ -15,7 +15,7 @@ use Snap\Exceptions\Templating_Exception;
  *
  * @since 1.0.0
  */
-class Strategy implements Templating_Interface
+class Standard_Strategy implements Templating_Interface
 {
     /**
      * The current view name being displayed.
@@ -23,7 +23,7 @@ class Strategy implements Templating_Interface
      * @since  1.0.0
      * @var string|null
      */
-    protected $current_view = null;
+    private $current_view = null;
 
     /**
      * Variables to pass to the template and any child partials.
@@ -31,7 +31,23 @@ class Strategy implements Templating_Interface
      * @since  1.0.0
      * @var array
      */
-    protected $data = [];
+    private $data = [];
+
+    /**
+     * Holds the current layout to extend.
+     *
+     * @since  1.0.0
+     * @var bool|string
+     */
+    private $extends = false;
+
+    /**
+     * Holds the output of the current view when extending.
+     *
+     * @since  1.0.0
+     * @var string
+     */
+    private $view = '';
 
     /**
      * Renders a view.
@@ -71,12 +87,26 @@ class Strategy implements Templating_Interface
 
         \extract($this->data);
 
+        // Start output buffering in case we are extending a layout.
+        \ob_start();
+
         /**
          * Keep PHPStorm quiet. 
          *
          * @noinspection PhpIncludeInspection
          */
-        require($snap_template_path);
+        require $snap_template_path;
+
+        $view = \ob_get_clean();
+
+        if ($this->extends == false) {
+            // As we are not extending, just output.
+            echo $view;
+            return;
+        }
+
+        $this->view = $view;
+        $this->render_layout();
     }
 
     /**
@@ -161,7 +191,7 @@ class Strategy implements Templating_Interface
             $this->partial('post-type/none');
         }
 
-        wp_reset_postdata();
+        \wp_reset_postdata();
     }
 
     /**
@@ -203,6 +233,18 @@ class Strategy implements Templating_Interface
     }
 
     /**
+     * Returns whether the current view template extends a layout.
+     *
+     * @since 1.0.0
+     *
+     * @return bool
+     */
+    public function extends_layout()
+    {
+        return !$this->extends === false;
+    }
+
+    /**
      * Generate the template file name from the slug.
      *
      * @since 1.0.0
@@ -215,13 +257,69 @@ class Strategy implements Templating_Interface
         $slug = \str_replace(
             [
                 Config::get('theme.templates_directory') . '/views/', '.php',
+                '.'
             ],
-            '',
+            [
+                '',
+                '/'
+            ],
             $slug
         );
 
         $template = "{$slug}.php";
 
         return $template;
+    }
+
+    /**
+     * Sets a layout to extend.
+     *
+     * @since 1.0.0
+     *
+     * @param string $layout The name of the layout to extend. Relative to theme.templates_directory config item.
+     *
+     * @throws Templating_Exception If the current view is trying to extend multiple layouts.
+     */
+    protected function extends($layout)
+    {
+        if ($this->extends !== false) {
+            throw new Templating_Exception($this->current_view . ' is attempting to extend multiple layouts.');
+        }
+
+        $this->extends = $this->get_template_name($layout);
+    }
+
+    /**
+     * Outputs the current view template within a layout.
+     *
+     * @since 1.0.0
+     */
+    protected function output_view()
+    {
+        echo $this->view;
+        $this->view = '';
+    }
+
+    /**
+     * Render a layout if the current view requires it.
+     *
+     * @since 1.0.0
+     *
+     * @throws Templating_Exception
+     */
+    private function render_layout()
+    {
+        $snap_layout_path = \locate_template(Config::get('theme.templates_directory') . '/' . $this->extends);
+
+        if ($snap_layout_path === '') {
+            throw new Templating_Exception('Could not find layout: ' . $this->extends);
+        }
+
+        /**
+         * Keep PHPStorm quiet.
+         *
+         * @noinspection PhpIncludeInspection
+         */
+        include $snap_layout_path;
     }
 }

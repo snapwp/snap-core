@@ -192,14 +192,14 @@ class Snap
         // If no templating strategy has already been registered.
         if (! static::$container->has(Templating_Interface::class)) {
             // Add the default rendering engine.
-            static::$container->add(
-                \Snap\Templating\Standard\Strategy::class,
+            static::$container->add_singleton(
+                \Snap\Templating\Standard\Standard_Strategy::class,
                 function () {
-                    return new \Snap\Templating\Standard\Strategy;
+                    return new \Snap\Templating\Standard\Standard_Strategy;
                 }
             );
 
-            static::$container->bind(\Snap\Templating\Standard\Strategy::class, Templating_Interface::class);
+            static::$container->bind(\Snap\Templating\Standard\Standard_Strategy::class, Templating_Interface::class);
 
             static::$container->add(
                 \Snap\Templating\Standard\Partial::class,

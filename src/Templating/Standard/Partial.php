@@ -40,9 +40,9 @@ class Partial
     /**
      * Constructor. Set reference to the parent view.
      *
-     * @param Strategy $view The parent view.
+     * @param Standard_Strategy $view The parent view.
      */
-    public function __construct(Strategy $view)
+    public function __construct(Standard_Strategy $view)
     {
         $this->view = $view;
     }
@@ -149,5 +149,17 @@ class Partial
     public function get_current_view()
     {
         return $this->view->get_current_view();
+    }
+
+    /**
+     * Returns the current view template name.
+     *
+     * @since 1.0.0
+     *
+     * @return string|null Returns null if called before a view has been dispatched.
+     */
+    public function extends_layout()
+    {
+        return $this->view->extends_layout();
     }
 }

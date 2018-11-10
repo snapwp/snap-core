@@ -181,7 +181,7 @@ class Router
      *
      * @param  string $slug The slug of the view to render.
      */
-    public function view($slug)
+    public function view($slug, $data = [])
     {
         if ($this->can_proceed()) {
             // As this is the correct route, apply middleware stack.
@@ -189,13 +189,13 @@ class Router
 
             // Passed all middleware.
             if ($this->can_proceed()) {
-                do_action("snap_render_view_{$slug}", Container::get('request'));
+                do_action("snap_render_view_{$slug}", Container::get('request'), $data);
                 
-                View::render($slug);
+                View::render($slug, $data);
 
                 $this->has_matched_route = true;
 
-                \ob_end_flush();
+                echo \ob_get_clean();
             }
         }
     }
@@ -240,7 +240,7 @@ class Router
 
                 $this->has_matched_route = true;
 
-                \ob_end_flush();
+                echo \ob_get_clean();
             }
         }
     }
