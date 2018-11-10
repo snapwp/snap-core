@@ -53,7 +53,7 @@ class Whitelabel extends Hookable
         }
 
         /**
-         * Keep PHPStorm happy. 
+         * Keep PHPStorm happy.
          * @noinspection HtmlUnknownTarget
          */
         echo \sprintf(

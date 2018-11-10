@@ -92,7 +92,6 @@ class Application extends Hookable
      */
     public function enqueue_theme_assets()
     {
-
     }
 
     /**
@@ -102,6 +101,5 @@ class Application extends Hookable
      */
     public function register_theme_widgets()
     {
-
     }
 }

@@ -84,7 +84,7 @@ class Ajax extends Hookable
             Container::resolve_method($this, 'handle');
         }
 
-        wp_send_json_error('You do not have sufficient permissions to perform this action', 403);
+        \wp_send_json_error('You do not have sufficient permissions to perform this action', 403);
     }
 
     /**

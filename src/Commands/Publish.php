@@ -213,8 +213,26 @@ class Publish extends Command
         // When running publish via the theme installer, the current theme isn't active yet.
         //  We need to trick WP into thinking it is.
         if (isset($this->root)) {
-            add_filter( 'stylesheet', function() { return 'snap-theme-bootstrap';} );
-            add_filter( 'template', function() { return 'snap-theme-bootstrap';} );
+            $parts = \explode('/', $this->root);
+
+            if ($parts[0] == $this->root) {
+                $parts = \explode('\\', $this->root);
+            }
+
+            $theme_name = \end($parts);
+
+            \add_filter(
+                'stylesheet',
+                function () use ($theme_name) {
+                    return $theme_name;
+                }
+            );
+            \add_filter(
+                'template',
+                function () use ($theme_name) {
+                    return $theme_name;
+                }
+            );
 
             Snap::register_providers();
         }

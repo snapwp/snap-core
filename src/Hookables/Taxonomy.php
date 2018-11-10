@@ -160,7 +160,7 @@ class Taxonomy extends Hookable
     public function sort_columns($query)
     {
         // Bail if we are not on the correct admin page.
-        if (! is_admin() || !\in_array($this->name, $query->query_vars['taxonomy'])) {
+        if (! \is_admin() || !\in_array($this->name, $query->query_vars['taxonomy'])) {
             return;
         }
 
