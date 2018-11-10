@@ -91,7 +91,7 @@ class Standard_Strategy implements Templating_Interface
         \ob_start();
 
         /**
-         * Keep PHPStorm quiet. 
+         * Keep PHPStorm quiet.
          *
          * @noinspection PhpIncludeInspection
          */
@@ -257,11 +257,11 @@ class Standard_Strategy implements Templating_Interface
         $slug = \str_replace(
             [
                 Config::get('theme.templates_directory') . '/views/', '.php',
-                '.'
+                '.',
             ],
             [
                 '',
-                '/'
+                '/',
             ],
             $slug
         );

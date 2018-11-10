@@ -77,7 +77,7 @@ class Partial
         \extract($this->data);
 
         /**
-         * Keep PHPStorm quiet. 
+         * Keep PHPStorm quiet.
          *
          * @noinspection PhpIncludeInspection
          */

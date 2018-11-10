@@ -90,7 +90,7 @@ class Theme_Utils
      * Transforms a partial name and returns the path to the partial relative to theme root.
      *
      * @since  1.0.0
-     * 
+     *
      * @param  string $partial The partial name.
      * @return string
      */
