@@ -4,6 +4,7 @@ namespace Snap\Commands;
 
 use Snap\Core\Snap;
 use Snap\Services\Config;
+use Snap\Services\Container;
 use Snap\Services\Service_Provider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -234,7 +235,9 @@ class Publish extends Command
                 }
             );
 
-            Snap::register_providers();
+            // Resolve the package manually.
+            $provider = Container::resolve($package);
+            $provider->register();
         }
 
         return [
