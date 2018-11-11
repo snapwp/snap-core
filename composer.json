@@ -1,6 +1,6 @@
 {
     "name": "snapwp/snap-core",
-    "license": "MIT",
+    "license": "GPL-3.0-or-later",
     "description": "Core files for Snap",
     "authors": [
         {
