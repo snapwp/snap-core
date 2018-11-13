@@ -2,6 +2,8 @@
 
 namespace Snap\Utils;
 
+use Snap\Media\Size_Manager;
+
 /**
  * Class Image_Utils
  *
@@ -24,12 +26,15 @@ class Image_Utils
 
         $sizes = [];
 
+        $dynamic_sizes = Size_Manager::get_dynamic_sizes();
+
         foreach (\get_intermediate_image_sizes() as $size) {
             if (\in_array($size, ['thumbnail', 'medium', 'medium_large', 'large'])) {
                 $sizes[ $size ] = [
                     'width' => \get_option("{$size}_size_w"),
                     'height' => \get_option("{$size}_size_h"),
                     'crop' => (bool) \get_option("{$size}_crop"),
+                    'generated_on_upload' => ! \in_array($size, $dynamic_sizes)
                 ];
             }
 
@@ -38,6 +43,7 @@ class Image_Utils
                     'width'  => $_wp_additional_image_sizes[ $size ]['width'],
                     'height' => $_wp_additional_image_sizes[ $size ]['height'],
                     'crop'   => $_wp_additional_image_sizes[ $size ]['crop'],
+                    'generated_on_upload' => ! \in_array($size, $dynamic_sizes)
                 ];
             }
         }
