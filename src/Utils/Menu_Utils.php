@@ -37,16 +37,16 @@ class Menu_Utils
         $term = static::get_menu_object($theme_location);
 
         if ($term !== false) {
-            $menu_items =\ wp_get_nav_menu_items($term->term_id);
-
-            // Apply WP classes to the menu items. Subject to change.
-            \_wp_menu_item_classes_by_context($menu_items);
+            $menu_items_raw = \wp_get_nav_menu_items($term->term_id);
 
             // Collect the menu items.
-            $menu_items = new Collection($menu_items);
+            $menu_items = new Collection($menu_items_raw);
 
             // Create a flat array of non WP classes on these menu items.
             $custom_classes = $menu_items->pluck('classes')->flatten()->filter()->all();
+
+            // Apply WP classes to the menu items. Subject to change.
+            \_wp_menu_item_classes_by_context($menu_items_raw);
 
             foreach ($menu_items as $menu_item) {
                 $is_active = false;
