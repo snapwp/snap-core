@@ -40,6 +40,14 @@ class Request implements ArrayAccess
     public $server = null;
 
     /**
+     * Request file params.
+     *
+     * @since 1.0.0
+     * @var Bag
+     */
+    public $files = null;
+
+    /**
      * Holds both POST and GET params when both are present.
      *
      * POST takes precedence.
@@ -115,6 +123,7 @@ class Request implements ArrayAccess
         $this->populate_server();
         $this->populate_query();
         $this->populate_post();
+        $this->populate_files();
         $this->populate_request();
         $this->populate_properties();
         $this->set_validation();
@@ -470,7 +479,7 @@ class Request implements ArrayAccess
             $this->request = new Bag($this->query->to_array());
         } else {
             $this->request = new Bag(
-                \array_merge($this->query->to_array(), $this->post->to_array())
+                \array_merge($this->query->to_array(), $this->post->to_array(), $this->files->to_array())
             );
         }
     }
@@ -493,6 +502,16 @@ class Request implements ArrayAccess
     private function populate_post()
     {
         $this->post = new Bag($_POST);
+    }
+
+    /**
+     * Creates and fills the query bag with $_FILES parameters.
+     *
+     * @since 1.0.0
+     */
+    private function populate_files()
+    {
+        $this->files = new Bag($_FILES);
     }
 
     /**
