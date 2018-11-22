@@ -80,10 +80,10 @@ class Theme_Utils
 
         // There was no manifest or no file present.
         if (static::$manifest === null || ! isset(static::$manifest[ $file ])) {
-            return get_stylesheet_directory_uri() . '/dist' . $file;
+            return get_stylesheet_directory_uri() . '/public' . $file;
         }
 
-        return get_stylesheet_directory_uri() . '/dist' . static::$manifest[ $file ];
+        return get_stylesheet_directory_uri() . '/public' . static::$manifest[ $file ];
     }
 
     /**
@@ -114,7 +114,7 @@ class Theme_Utils
      */
     private static function parse_manifest()
     {
-        $manifest_path = get_stylesheet_directory() . '/dist/mix-manifest.json';
+        $manifest_path = get_stylesheet_directory() . '/public/mix-manifest.json';
 
         if (\file_exists($manifest_path)) {
             $manifest = \file_get_contents($manifest_path);
