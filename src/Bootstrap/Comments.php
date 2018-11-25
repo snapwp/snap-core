@@ -14,14 +14,6 @@ use Snap\Utils\Theme_Utils;
 class Comments extends Hookable
 {
     /**
-     * Don't run on admin requests.
-     *
-     * @since 1.0.0
-     * @var boolean
-     */
-    protected $admin = true;
-
-    /**
      * Adds optional filters if required.
      *
      * @since 1.0.0
