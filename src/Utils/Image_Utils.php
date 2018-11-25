@@ -34,7 +34,7 @@ class Image_Utils
                     'width' => \get_option("{$size}_size_w"),
                     'height' => \get_option("{$size}_size_h"),
                     'crop' => (bool) \get_option("{$size}_crop"),
-                    'generated_on_upload' => ! \in_array($size, $dynamic_sizes)
+                    'generated_on_upload' => ! \in_array($size, $dynamic_sizes),
                 ];
             }
 
@@ -43,7 +43,7 @@ class Image_Utils
                     'width'  => $_wp_additional_image_sizes[ $size ]['width'],
                     'height' => $_wp_additional_image_sizes[ $size ]['height'],
                     'crop'   => $_wp_additional_image_sizes[ $size ]['crop'],
-                    'generated_on_upload' => ! \in_array($size, $dynamic_sizes)
+                    'generated_on_upload' => ! \in_array($size, $dynamic_sizes),
                 ];
             }
         }
