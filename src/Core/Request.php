@@ -323,6 +323,20 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Returns a parameter from the files bag, or a default if not present.
+     *
+     * @since  1.0.0
+     *
+     * @param  string $key     The parameter key to look for.
+     * @param  mixed  $default A default value to return if not present.
+     * @return mixed
+     */
+    public function file($key, $default = null)
+    {
+        return $this->files->get($key, $default);
+    }
+
+    /**
      * Set the validation error messages.
      *
      * @since  1.0.0
@@ -387,7 +401,7 @@ class Request implements ArrayAccess
         // Validation is not using $this->validation so overwrite rules and messages.
         if ($rules !== []) {
             $validation = $this->validate_data($this->request->to_array(), $rules, $messages);
-            
+
             if ($validation === true) {
                 wp_send_json_success('Success');
             }
