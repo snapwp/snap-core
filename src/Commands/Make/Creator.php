@@ -144,6 +144,9 @@ class Creator extends Command
             case 'posttype':
                 $dir = 'Posts';
                 break;
+            case 'cron':
+                $dir = 'Cron';
+                break;
             case 'taxonomy':
                 $dir = 'Taxonomies';
                 break;

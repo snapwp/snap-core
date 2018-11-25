@@ -85,8 +85,13 @@ class Hookable
      */
     final protected function get_classname()
     {
-        $classname = \basename(\str_replace(['\\', '_'], ['/', ''], \get_class($this)));
-        $classname = \trim(\preg_replace('/([^_])(?=[A-Z])/', '$1_', $classname), '_');
+        $classname = \basename(\get_class($this));
+
+        if (\ctype_lower($classname)) {
+            return $classname;
+        }
+
+        $classname = \trim(\preg_replace('/([^_A-Z])(?=[A-Z])/', '$1_', $classname), '_');
 
         return \strtolower($classname);
     }

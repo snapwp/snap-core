@@ -6,7 +6,7 @@ use Snap\Hookables\Ajax;
 use Snap\Core\Request;
 
 /**
- * [CLASSNAME description]
+ * CLASSNAME description
  */
 class CLASSNAME extends Ajax
 {

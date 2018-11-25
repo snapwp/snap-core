@@ -5,7 +5,7 @@ namespace Theme\TaxonomiesNAMESPACE;
 use Snap\Hookables\Taxonomy;
 
 /**
- * [CLASSNAME desciption]
+ * CLASSNAME desciption
  */
 class CLASSNAME extends Taxonomy
 {
