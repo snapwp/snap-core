@@ -41,6 +41,7 @@ class Config
         ],
         'theme' => [
             'templates_directory' => 'resources/templates',
+            'hookables_directory' => 'Hookables/',
             'cache_directory' => 'cache',
             'disable_xmlrpc' => true,
             'disable_comments' => true,
@@ -64,6 +65,7 @@ class Config
         ],
         'services' => [
             'providers' => [],
+            'theme_providers' => [\Theme\Theme_Provider::class],
             'aliases' => [],
         ],
     ];

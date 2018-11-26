@@ -66,42 +66,6 @@ class Loader
     }
 
     /**
-     * If the class is a Hookable, initialize the class and fire the run() method.
-     *
-     * @since 1.0.0
-     *
-     * @param string $class_name The path to an included file.
-     */
-    private function load_hookable($class_name)
-    {
-        // If the included class extends the Hookable abstract.
-        if (\class_exists($class_name)) {
-            if (\is_subclass_of($class_name, Hookable::class)) {
-                // Boot it up and resolve dependencies.
-                Container::resolve($class_name)->run();
-                return;
-            }
-
-             // TODO There is no reason to check each file like this. Use a config instead.
-            if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
-                $provider = Container::resolve($class_name);
-                Container::resolve_method($provider, 'register');
-                return;
-            }
-
-            if (\is_subclass_of($class_name, 'Rakit\Validation\Rule')) {
-                $class_parts = \explode('\\', $class_name);
-
-                Container::get('Rakit\Validation\Validator')->addValidator(
-                    \strtolower(\end($class_parts)),
-                    Container::resolve($class_name)
-                );
-                return;
-            }
-        }
-    }
-
-    /**
      * Includes all required Snap and theme files and registers the Snap autoloader.
      *
      * Initializes any Snap\Hookable classes.
@@ -154,7 +118,7 @@ class Loader
             Container::resolve($module)->run();
         }
 
-        $this->load_widgets();
+        $this->init_widgets();
 
         // Now all core files are loaded, turn on output buffer until a view is dispatched.
         \ob_start();
@@ -167,24 +131,36 @@ class Loader
      */
     public function load_theme()
     {
+        $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
+
         // Populate $theme_includes.
         self::$theme_includes = $this->scan_dir(
-            \get_template_directory() . '/theme/',
+            \get_template_directory() . '/theme/' . $hookables_dir,
             self::$theme_includes,
             \get_template_directory()
         );
 
         self::$theme_includes = $this->scan_dir(
-            \get_stylesheet_directory() . '/theme/',
+            \get_stylesheet_directory() . '/theme/' . $hookables_dir,
             self::$theme_includes,
             \get_stylesheet_directory()
         );
 
         if (! empty(self::$theme_includes)) {
             foreach (self::$theme_includes as $class => $path) {
-                $this->load_hookable($class);
+                $this->init_hookable($class);
             }
         }
+
+        // Todo this is still kind of messy
+        self::$theme_includes = $this->scan_dir(
+            \get_stylesheet_directory() . '/theme/',
+            self::$theme_includes,
+            \get_stylesheet_directory()
+        );
+
+        $this->init_theme_providers();
+        $this->init_theme_setup();
     }
 
     /**
@@ -192,7 +168,7 @@ class Loader
      *
      * @since 1.0.0
      */
-    private function load_widgets()
+    private function init_widgets()
     {
         \add_action(
             'widgets_init',
@@ -200,6 +176,51 @@ class Loader
                 \register_widget(\Snap\Widgets\Related_Pages::class);
             }
         );
+    }
+
+    /**
+     * If the class is a Hookable, initialize the class and fire the run() method.
+     *
+     * @since 1.0.0
+     *
+     * @param string $class_name The path to an included file.
+     */
+    private function init_hookable($class_name)
+    {
+        // If the included class extends the Hookable abstract.
+        if (\class_exists($class_name)) {
+            if (\is_subclass_of($class_name, Hookable::class)) {
+                // Boot it up and resolve dependencies.
+                Container::resolve($class_name)->run();
+                return;
+            }
+
+            if (\is_subclass_of($class_name, 'Rakit\Validation\Rule')) {
+                $class_parts = \explode('\\', $class_name);
+
+                Container::get('Rakit\Validation\Validator')->addValidator(
+                    \strtolower(\end($class_parts)),
+                    Container::resolve($class_name)
+                );
+                return;
+            }
+        }
+    }
+
+    /**
+     * Initialize any theme service providers.
+     *
+     * @since 1.0.0
+     */
+    private function init_theme_providers()
+    {
+        foreach (Config::get('services.theme_providers') as $class_name) {
+            if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
+                $provider = Container::resolve($class_name);
+                Container::resolve_method($provider, 'register');
+                return;
+            }
+        }
     }
 
     /**
@@ -248,6 +269,13 @@ class Loader
         return $files;
     }
 
+    /**
+     * Detect whether the current request is to the login page.
+     *
+     * @since 1.0.0
+     *
+     * @return bool
+     */
     private function is_wplogin()
     {
         $abspath = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
@@ -267,5 +295,17 @@ class Loader
         }
 
         return false;
+    }
+
+    /**
+     * Include Theme\Theme_Setup
+     *
+     * @since 1.0.0
+     */
+    private function init_theme_setup()
+    {
+        if (isset(static::$theme_includes['Theme\Theme_Setup'])) {
+            $this->init_hookable('Theme\Theme_Setup');
+        }
     }
 }
