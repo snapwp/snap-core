@@ -85,7 +85,7 @@ class Hookable
      */
     final protected function get_classname()
     {
-        $classname = \basename(\get_class($this));
+        $classname = \basename(\str_replace('\\', '/', \get_class($this)));
 
         if (\ctype_lower($classname)) {
             return $classname;
