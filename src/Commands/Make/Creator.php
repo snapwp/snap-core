@@ -2,6 +2,8 @@
 
 namespace Snap\Commands\Make;
 
+use Snap\Core\Snap;
+use Snap\Services\Config;
 use Symfony\Component\Console\Command\Command;
 
 /**
@@ -52,6 +54,8 @@ class Creator extends Command
     protected function scaffold($scaffold, $filename, $args = [], $options = [])
     {
         $this->init_wordpress();
+        Snap::create_container();
+        Snap::init_config();
         $original = $this->scaffolding_dir . "{$scaffold}.txt";
 
         $filename = $this->sanitise_filename($filename);
@@ -112,9 +116,11 @@ class Creator extends Command
      */
     protected function create_destination_dir($dir)
     {
-        $theme_dir = "{$this->theme_dir}/theme";
+        $hookables_directory = \trim(Config::get('theme.hookables_directory'),'/');
 
-        wp_mkdir_p($theme_dir . '/' . $dir);
+        $theme_dir = "{$this->theme_dir}/theme/{$hookables_directory}";
+
+        \wp_mkdir_p($theme_dir . '/' . $dir);
     }
 
     /**
@@ -160,7 +166,9 @@ class Creator extends Command
             $this->create_destination_dir($dir);
         }
 
-        return $this->theme_dir . '/theme/' . $dir . '/' . $filename . '.php';
+        $hookables_directory = \trim(Config::get('theme.hookables_directory'),'/');
+
+        return $this->theme_dir . '/theme/' . $hookables_directory . '/' . $dir . '/' . $filename . '.php';
     }
 
     /**
@@ -174,7 +182,7 @@ class Creator extends Command
 
         // Trick WP into thinking this is an AJAX request. Helps quieten certain plugins.
         \define('DOING_AJAX', true);
-        \define('SHORTINIT', true);
+        //\define('SHORTINIT', true);
 
         \define('BASE_PATH', $this->find_wordpress_base_path());
         \define('WP_USE_THEMES', false);
@@ -182,7 +190,7 @@ class Creator extends Command
     }
 
     /**
-     * Traverse up the cirectory structure looking for the current WP base path.
+     * Traverse up the directory structure looking for the current WP base path.
      *
      * @since  1.0.0
      *
@@ -202,11 +210,11 @@ class Creator extends Command
     }
 
     /**
-     * Ensure a namepsaced $filename can be created as a directory.
+     * Ensure a name-spaced $filename can be created as a directory.
      *
      * @since  1.0.0
      *
-     * @param  string $filename The (poissbly) namespaced Hookable class name to create.
+     * @param  string $filename The (possibly) name-spaced Hookable class name to create.
      * @return string
      */
     private function sanitise_filename($filename)
@@ -226,10 +234,10 @@ class Creator extends Command
     {
         $args['NAMESPACE'] = '';
 
-        $classname = $this->sanitise_filename($args['CLASSNAME']);
+        $class_name = $this->sanitise_filename($args['CLASSNAME']);
 
-        if (\strpos($classname, '/') !== false) {
-            \preg_match('/(.*)\/[^\/]*$/', $classname, $match);
+        if (\strpos($class_name, '/') !== false) {
+            \preg_match('/(.*)\/[^\/]*$/', $class_name, $match);
 
             $args['NAMESPACE'] = '\\' . $match[1];
             $args['CLASSNAME'] = \end(\explode('/', $args['CLASSNAME']));
