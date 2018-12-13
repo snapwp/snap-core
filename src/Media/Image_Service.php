@@ -151,6 +151,11 @@ class Image_Service
 
         // Get parent image meta data.
         $meta = \wp_get_attachment_metadata($id);
+        
+        // Very rarely the image has no meta - Like if added via fakerpress. Bail early.
+        if (! isset($meta['file'])) {
+            return $image;
+        }
 
         if (\is_array($size)) {
             list($width, $height) = $size;
