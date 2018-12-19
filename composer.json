@@ -21,7 +21,7 @@
         "php": ">=7",
         "jakewhiteley/hodl": "~1.3",
         "jjgrainger/posttypes": "~2.0.1",
-        "rakit/validation": "~0.22",
+        "rakit/validation": "~1.0",
         "symfony/console": "4.1.0",
         "symfony/process": "^4.1"
     },
