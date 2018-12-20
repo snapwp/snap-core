@@ -15,7 +15,7 @@ class Bag implements ArrayAccess
      * @since  1.0.0
      * @var array
      */
-    private $data = [];
+    protected $data = [];
 
     /**
      * Creates the bag.

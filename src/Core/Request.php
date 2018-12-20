@@ -2,6 +2,7 @@
 
 namespace Snap\Core;
 
+use Snap\Request\File_Bag;
 use WP_Http;
 use ArrayAccess;
 use Snap\Request\Bag;
@@ -525,7 +526,7 @@ class Request implements ArrayAccess
      */
     private function populate_files()
     {
-        $this->files = new Bag($_FILES);
+        $this->files = new File_Bag($_FILES);
     }
 
     /**
