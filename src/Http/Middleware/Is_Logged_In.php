@@ -1,9 +1,10 @@
 <?php
 
-namespace Snap\Request\Middleware;
+namespace Snap\Http\Middleware;
 
-use Snap\Core\Request;
+use Snap\Http\Request;
 use Snap\Hookables\Middleware;
+use Snap\Services\Response;
 
 /**
  * Some basic middleware.
@@ -19,29 +20,29 @@ class Is_Logged_In extends Middleware
      *
      * @since  1.0.0
      *
-     * @param  Request     $request  The current request.
-     * @param  string|null $redirect The middleware argument. How to redirect this request.
+     * @param  \Snap\Http\Request $request  The current request.
+     * @param  string|null        $redirect The middleware argument. How to redirect this request.
      * @return boolean
      */
     public function handle(Request $request, $redirect = null)
     {
-        if (is_user_logged_in() === true) {
+        if (\is_user_logged_in() === true) {
             return true;
         }
 
         if ($redirect === 'login') {
-            $request->redirect_to_login();
+            Response::redirect_to_login();
         }
 
         if ($redirect === 'admin') {
-            $request->redirect_to_admin();
+            Response::redirect_to_admin();
         }
 
         if ($redirect !== null) {
-            $request->redirect($redirect);
+            Response::redirect($redirect);
         }
 
-        $request->set_404();
+        Response::set_404();
 
         return false;
     }
