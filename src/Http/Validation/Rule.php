@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Request;
+namespace Snap\Http\Validation;
 
 use Rakit\Validation\Rule as ValidationRule;
 
@@ -17,7 +17,7 @@ class Rule extends ValidationRule
      * @param  mixed $input The $input to validate.
      * @return bool whether tha $input passed or failed.
      */
-    public function check($input)
+    public function check($input): bool
     {
         return $this->handle($input);
     }

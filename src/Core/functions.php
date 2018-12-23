@@ -74,7 +74,7 @@ if (! \function_exists('get_request')) {
      *
      * @since  1.0.0
      *
-     * @return \Snap\Core\Request
+     * @return \Snap\Http\Request
      */
     function get_request()
     {

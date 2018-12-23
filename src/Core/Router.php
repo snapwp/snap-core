@@ -5,6 +5,7 @@ namespace Snap\Core;
 use Exception;
 use BadMethodCallException;
 use closure;
+use Snap\Http\Request;
 use Snap\Services\View;
 use Snap\Services\Container;
 
@@ -179,7 +180,8 @@ class Router
      *
      * @since  1.0.0
      *
-     * @param  string $slug The slug of the view to render.
+     * @param string $slug The slug of the view to render.
+     * @param array  $data Array of data to apss to the view.
      */
     public function view($slug, $data = [])
     {
