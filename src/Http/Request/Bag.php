@@ -73,8 +73,8 @@ class Bag implements ArrayAccess
      */
     public function get_raw($key, $default = null)
     {
-        if (isset($this->data[$key]) && '' !== $this->data[$key]) {
-            return $this->data[$key];
+        if (isset($this->data[ $key ]) && '' !== $this->data[ $key ]) {
+            return $this->data[ $key ];
         }
 
         return $default;
@@ -90,7 +90,7 @@ class Bag implements ArrayAccess
      */
     public function has($key)
     {
-        return isset($this->data[$key]);
+        return isset($this->data[ $key ]);
     }
 
     /**
@@ -227,7 +227,7 @@ class Bag implements ArrayAccess
         if (\is_null($offset)) {
             $this->data[] = $value;
         } else {
-            $this->data[$offset] = $value;
+            $this->data[ $offset ] = $value;
         }
     }
 
@@ -253,7 +253,7 @@ class Bag implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->data[$offset]);
+        unset($this->data[ $offset ]);
     }
 
     /**

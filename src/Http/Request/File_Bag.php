@@ -11,12 +11,18 @@ use Snap\Http\Request\File\File;
  */
 class File_Bag extends Bag
 {
+    /**
+     * Expected file keys.
+     *
+     * @since 1.0.0
+     * @var array
+     */
     private $file_keys = [
         'error',
         'name',
         'size',
         'tmp_name',
-        'type'
+        'type',
     ];
 
     /**
@@ -29,7 +35,7 @@ class File_Bag extends Bag
     protected function set_data($contents = [])
     {
         foreach ($contents as $key => $file) {
-            $this->data[$key] = $this->add_file($file);
+            $this->data[ $key ] = $this->add_file($file);
         }
     }
 
@@ -83,6 +89,8 @@ class File_Bag extends Bag
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
+     * @since 1.0.0
+     *
      * @param $data
      * @return array
      */
@@ -102,20 +110,38 @@ class File_Bag extends Bag
         $files = $data;
 
         foreach ($this->file_keys as $k) {
-            unset($files[$k]);
+            unset($files[ $k ]);
         }
 
         foreach ($data['name'] as $key => $name) {
-            $files[$key] = $this->format_files_array([
-                'error' => $data['error'][$key],
-                'name' => $name,
-                'type' => $data['type'][$key],
-                'tmp_name' => $data['tmp_name'][$key],
-                'size' => $data['size'][$key],
-            ]);
+            $files[ $key ] = $this->format_files_array(
+                [
+                    'error' => $data['error'][ $key ],
+                    'name' => $name,
+                    'type' => $data['type'][ $key ],
+                    'tmp_name' => $data['tmp_name'][ $key ],
+                    'size' => $data['size'][ $key ],
+                ]
+            );
         }
 
         return $files;
+    }
+
+    /**
+     * Gets a sanitized value from the bag, or a supplied default if not present.
+     *
+     * Use get_raw to get an un-sanitized version (should you need to).
+     *
+     * @since 1.0.0
+     *
+     * @param  string $key     Item key to fetch.
+     * @param  mixed  $default Default value if the key is not present.
+     * @return File|array|null
+     */
+    public function get($key, $default = null)
+    {
+        return parent::get($key, $default);
     }
 
     /**
@@ -128,6 +154,6 @@ class File_Bag extends Bag
      */
     public function has($key)
     {
-        return isset($this->data[$key]) && !empty($this->data[$key]);
+        return isset($this->data[ $key ]) && !empty($this->data[ $key ]);
     }
 }
