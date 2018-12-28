@@ -73,4 +73,30 @@ class Response
         \status_header(WP_Http::NOT_FOUND, 'Content not found');
         \nocache_headers();
     }
+
+    /**
+     * Send a JSON success response.
+     *
+     * @since 1.0.0
+     *
+     * @param mixed data        Data to JSON encode.
+     * @param null $status_code Optional. Status code to send with the response.
+     */
+    public function send_json_success($data, $status_code = null)
+    {
+        \wp_send_json_success($data, $status_code);
+    }
+
+    /**
+     * Send a JSON error response.
+     *
+     * @since 1.0.0
+     *
+     * @param mixed data        Data to JSON encode.
+     * @param null $status_code Optional. Status code to send with the response.
+     */
+    public function send_json_error($data, $status_code = null)
+    {
+        \wp_send_json_error($data, $status_code);
+    }
 }

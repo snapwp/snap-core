@@ -3,14 +3,16 @@
 namespace Snap\Services;
 
 /**
- * Allow static access to the Config service.
+ * Allow static access to the Response service.
  *
  * @method static  redirect($url, $status = 302)
  * @method static  redirect_to_admin($path = null, $status = 302)
  * @method static  redirect_to_login($redirect_after = null, $status = 302)
  * @method static  set_404()
+ * @method static  send_json_success($data, $status_code = null)
+ * @method static  send_json_error($data, $status_code = null)
  *
- * @see \Snap\Core\Router
+ * @see \Snap\Http\Response
  */
 class Response extends Service_Facade
 {
