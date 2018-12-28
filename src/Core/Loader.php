@@ -99,7 +99,7 @@ class Loader
                 $snap_modules[] = \Snap\Admin\Theme::class;
             }
         } else {
-            $snap_modules[] = \Snap\Request\Middleware\Is_Logged_In::class;
+            $snap_modules[] = \Snap\Http\Middleware\Is_Logged_In::class;
         }
 
         if (Config::get('theme.disable_comments') === true) {

@@ -37,17 +37,7 @@ class Middleware extends Hookable
      */
     public function boot()
     {
-        $this->add_filter("snap_middleware_{$this->get_name()}", 'handler');
-    }
-
-    /**
-     * Auto-wire and call the child class's handle method.
-     *
-     * @since 1.0.0
-     */
-    public function handler()
-    {
-        return Container::resolve_method($this, 'handle');
+        $this->add_filter("snap_middleware_{$this->get_name()}", 'handle');
     }
 
     /**

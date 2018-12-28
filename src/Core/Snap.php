@@ -5,6 +5,8 @@ namespace Snap\Core;
 use Exception;
 use Rakit\Validation\Validator;
 use Snap\Exceptions\Startup_Exception;
+use Snap\Http\Request;
+use Snap\Http\Response;
 use Snap\Templating\View;
 use Snap\Templating\Templating_Interface;
 use \Snap\Media\Image_Service;
@@ -84,7 +86,6 @@ class Snap
                 // Run the loader.
                 $loader = new Loader();
                 $loader->boot();
-
 
                 static::register_providers();
                 static::init_templating();
@@ -268,6 +269,13 @@ class Snap
         );
 
         static::$container->add_singleton(
+            Response::class,
+            function () {
+                return new Response();
+            }
+        );
+
+        static::$container->add_singleton(
             Validator::class,
             function () {
                 return new Validator();
@@ -276,6 +284,7 @@ class Snap
 
         static::$container->alias(Router::class, 'router');
         static::$container->alias(Request::class, 'request');
+        static::$container->alias(Response::class, 'response');
     }
 
     /**

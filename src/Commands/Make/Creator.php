@@ -116,7 +116,7 @@ class Creator extends Command
      */
     protected function create_destination_dir($dir)
     {
-        $hookables_directory = \trim(Config::get('theme.hookables_directory'),'/');
+        $hookables_directory = \trim(Config::get('theme.hookables_directory'), '/');
 
         $theme_dir = "{$this->theme_dir}/theme/{$hookables_directory}";
 
@@ -166,7 +166,7 @@ class Creator extends Command
             $this->create_destination_dir($dir);
         }
 
-        $hookables_directory = \trim(Config::get('theme.hookables_directory'),'/');
+        $hookables_directory = \trim(Config::get('theme.hookables_directory'), '/');
 
         return $this->theme_dir . '/theme/' . $hookables_directory . '/' . $dir . '/' . $filename . '.php';
     }

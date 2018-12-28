@@ -1,8 +1,9 @@
 <?php
 
-namespace Snap\Request;
+namespace Snap\Http\Request;
 
 use ArrayAccess;
+use Snap\Http\Request\File\File;
 
 /**
  * Parameter bag.
@@ -15,7 +16,7 @@ class Bag implements ArrayAccess
      * @since  1.0.0
      * @var array
      */
-    private $data = [];
+    protected $data = [];
 
     /**
      * Creates the bag.
@@ -24,30 +25,38 @@ class Bag implements ArrayAccess
      *
      * @param array $contents Array of items (key => value pairs) to add to the bag.
      */
-    public function __construct($contents)
+    public function __construct($contents = [])
     {
-        $this->data = $contents;
+        $this->set_data($contents);
     }
 
     /**
      * Gets a sanitized value from the bag, or a supplied default if not present.
      *
-     * Use get_raw to get an unsanitized version (should you need to).
+     * Use get_raw to get an un-sanitized version (should you need to).
      *
      * @since 1.0.0
      *
-     * @param  string $key    Item key to fetch.
+     * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
      * @return mixed
      */
     public function get($key, $default = null)
     {
         if ($this->has($key)) {
+            if ($this->get_raw($key) === null) {
+                return null;
+            }
+            
             if (\is_array($this->get_raw($key))) {
                 return \array_map([$this, 'sanitise_array'], $this->get_raw($key));
             }
 
-            return sanitize_text_field($this->get_raw($key));
+            if ($this->get_raw($key) instanceof File) {
+                return $this->get_raw($key);
+            }
+
+            return \sanitize_text_field($this->get_raw($key));
         }
 
         return $default;
@@ -58,13 +67,13 @@ class Bag implements ArrayAccess
      *
      * @since 1.0.0
      *
-     * @param  string $key    Item key to fetch.
+     * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
      * @return mixed
      */
     public function get_raw($key, $default = null)
     {
-        if (isset($this->data[ $key ])) {
+        if (isset($this->data[ $key ]) && '' !== $this->data[ $key ]) {
             return $this->data[ $key ];
         }
 
@@ -92,13 +101,17 @@ class Bag implements ArrayAccess
      *
      * @since 1.0.0
      *
-     * @param  string $key    Item key to fetch.
+     * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
      * @return string
      */
     public function get_numeric($key, $default = null)
     {
-        return \filter_var($this->get($key, $default), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        return \filter_var(
+            $this->get($key, $default),
+            FILTER_SANITIZE_NUMBER_FLOAT,
+            FILTER_FLAG_ALLOW_FRACTION
+        );
     }
 
     /**
@@ -112,7 +125,7 @@ class Bag implements ArrayAccess
      */
     public function get_int($key, $default = null)
     {
-        return (int) $this->get($key, $default);
+        return (int)$this->get($key, $default);
     }
 
     /**
@@ -120,13 +133,13 @@ class Bag implements ArrayAccess
      *
      * @since 1.0.0
      *
-     * @param  string $key    Item key to fetch.
+     * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
      * @return float
      */
     public function get_float($key, $default = null)
     {
-        return (float) $this->get($key, $default);
+        return (float)$this->get($key, $default);
     }
 
     /**
@@ -197,7 +210,7 @@ class Bag implements ArrayAccess
         if (\is_Array($value)) {
             return $value;
         } else {
-            return sanitize_text_field($value);
+            return \sanitize_text_field($value);
         }
     }
 
@@ -254,5 +267,17 @@ class Bag implements ArrayAccess
     public function offsetGet($offset)
     {
         return $this->get($offset, null);
+    }
+
+    /**
+     * Add the contents into the bag.
+     *
+     * @since 1.0.0
+     *
+     * @param array $contents
+     */
+    protected function set_data($contents = [])
+    {
+        $this->data = $contents;
     }
 }
