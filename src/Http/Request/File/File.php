@@ -6,17 +6,55 @@ namespace Snap\Http\Request\File;
 
 class File
 {
+    /**
+     * The raw $_FILES array.
+     *
+     * @since 1.0.0
+     * @var array
+     */
     protected $data = [];
 
+    /**
+     * The filename as provided by the user. 
+     * 
+     * This is not necessarily the final uploaded file name, and should be treated as unsafe.
+     *
+     * @since 1.0.0
+     * @var string
+     */
     protected $client_name;
+
+    /**
+     * The client mime type of the uploaded file.
+     *
+     * @since 1.0.0
+     * @var string
+     */
     protected $client_type;
+
+    /**
+     * The file extension as derived from the client name.
+     *
+     * This is not necessarily correct, and should not be trusted.
+     *
+     * @since 1.0.0
+     * @var string
+     */
     protected $client_extension;
-    //protected $name;
-    protected $path;
-    protected $size;
-    protected $error;
-    // protected $type;
-    // $extension;
+
+    protected $upload_path = null;
+    protected $upload_url = null;
+    protected $upload_type = null;
+    protected $upload_error = null;
+
+    /**
+     * Whether the uploaded file is allowed to be uploaded by the current user.
+     *
+     * Use the upload_mimes filter to add additional types.
+     *
+     * @since 1.0.0
+     * @var boolean
+     */
     protected $is_allowed = false;
 
     /**
@@ -30,16 +68,10 @@ class File
 
         $this->client_name = $file['name'];
         $this->client_type = $file['type'];
-        $this->client_extension = $this->get_ext();
-
-        $this->path = $file['tmp_name'];
-        $this->size = $file['size'];
-        $this->error = $file['error'];
+        $this->client_extension = $this->set_client_extension();
 
 
         $this->is_allowed = $this->check_if_allowed();
-
-        $this->check_upload();
     }
 
     /**
@@ -51,12 +83,31 @@ class File
      */
     public function is_valid()
     {
-        return UPLOAD_ERR_OK === $this->error && \is_uploaded_file($this->path);
+        return UPLOAD_ERR_OK === $this->data['error'] && \is_uploaded_file($this->data['tmp_name']);
     }
 
-    public function rename_file($new_name)
+    /**
+     * Whether the file can be uploaded by the current user.
+     *
+     * @since 1.0.0
+     * 
+     * @return bool
+     */
+    public function user_can_upload()
     {
-        $this->data['name'] = $new_name . ".{$this->client_extension}";
+        return (bool) $this->is_valid() && $this->is_allowed;
+    }
+
+    /**
+     * Get the original $_FILES array.
+     *
+     * @since 1.0.0
+     * 
+     * @return array
+     */
+    public function get_original_data()
+    {
+        return $this->data;
     }
 
     /**
@@ -70,7 +121,7 @@ class File
      */
     public function get_formatted_size(int $precision = 2)
     {
-        return \size_format($this->size, $precision);
+        return \size_format($this->data['size'], $precision);
     }
 
     /**
@@ -82,7 +133,85 @@ class File
      */
     public function get_size()
     {
-        return (int) $this->size;
+        return (int) $this->data['size'];
+    }
+
+    /**
+     * Get the upload error code.
+     *
+     * @since 1.0.0
+     * 
+     * @return int
+     */
+    public function get_error()
+    {
+        return (int) $this->data['error'];
+    }
+
+    /**
+     * Get the client name for the uploaded file.
+     *
+     * This is not to be considered a safe or trusted value.
+     *
+     * @since 1.0.0
+     * 
+     * @return string
+     */
+    public function get_client_name()
+    {
+        return (string) $this->client_name;
+    }
+
+    /**
+     * Get the client mime type.
+     *
+     * This is not necessarily correct, and should not be trusted.
+     *
+     * @since 1.0.0
+     * 
+     * @return string
+     */
+    public function get_client_type()
+    {
+        return (string) $this->client_type;
+    }
+
+    /**
+     * Get the client file extension.
+     *
+     * This is not necessarily correct, and should not be trusted.
+     *
+     * @since 1.0.0
+     * 
+     * @return string
+     */
+    public function get_client_extension()
+    {
+        return (string) $this->client_extension;
+    }
+
+    /**
+     * Get the uploaded file path.
+     *
+     * @since 1.0.0
+     * 
+     * @return string|null
+     */
+    public function get_upload_path()
+    {
+        return $this->upload_path;
+    }
+
+    /**
+     * Get the uploaded file URL.
+     *
+     * @since 1.0.0
+     * 
+     * @return string|null
+     */
+    public function get_upload_url()
+    {
+        return $this->upload_url;
     }
 
     /**
@@ -90,12 +219,12 @@ class File
      *
      * @since 1.0.0
      *
-     * @return bool|string Returns false if no error.
+     * @return null|string Returns null if no error.
      */
     public function get_error_message()
     {
         if ($this->is_valid()) {
-            return false;
+            return null;
         }
 
         static $errors = [
@@ -110,31 +239,43 @@ class File
 
         $message = 'The file "%s" was not uploaded due to an unknown error.';
 
-        if (isset($errors[$this->error])) {
-            $message = $errors[$this->error];
+        if (isset($errors[$this->data['error']])) {
+            $message = $errors[$this->data['error']];
         }
 
         return \sprintf($message, $this->client_name, \size_format(\wp_max_upload_size()));
     }
 
-
-
     /**
-     * Get the client ext of the uploaded file.
+     * Rename the uploaded file before further processing.
+     *
+     * This will change the filename only, not the extension.
      *
      * @since 1.0.0
+     * 
+     * @param  string $new_name The new filename.
+     * @return File
      */
-    private function get_ext()
+    public function rename($new_name)
     {
-        $ext = \pathinfo($this->client_name, PATHINFO_EXTENSION);
+        $this->data['name'] = \trim($new_name) . ".{$this->client_extension}";
 
-        if (!empty($ext)) {
-            return $ext;
-        }
-
-        return null;
+        return $this;
     }
 
+    /**
+     * Move the file to the uploads folder.
+     *
+     * Defaults to standard WP behavior, such as uploading the file to the year/month
+     * subfolder.
+     *
+     * @param  string  $target          Optional. Subfolder within the uploads directory to upload to.
+     *                                  Will be created if it doesn't exist.
+     * @param  boolean $append_sub_dirs Optional. Whether to include the year/month folders when using
+     *                                  a custom target directory.
+     *                                  Defaults to false.
+     * @return bool                     Whether the upload was successful.
+     */
     public function upload($target = null, $append_sub_dirs = false)
     {
         if (!\function_exists('wp_handle_upload')) {
@@ -166,64 +307,92 @@ class File
             \remove_filter('upload_dir', $closure);
         }
 
-        return $result;
+        if (isset($result['file'])) {
+            $this->upload_path = $result['file'];
+            $this->upload_url = $result['url'];
+            $this->upload_type = $result['type'];
+
+            return true;
+        }
+
+        if (isset($result['error'])) {
+            $this->upload_error = $result['error'];
+        }
+
+        return false;
     }
+
+    /**
+     * Get the client ext of the uploaded file.
+     *
+     * @since 1.0.0
+     */
+    private function set_client_extension()
+    {
+        $ext = \pathinfo($this->client_name, PATHINFO_EXTENSION);
+
+        if (!empty($ext)) {
+            return $ext;
+        }
+
+        return null;
+    }
+
+
+
 
     public function add_to_media_library()
     {
-        /*
-         * $attachment = array(
-	'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
-	'post_mime_type' => $filetype['type'],
-	'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
-	'post_content'   => '',
-	'post_status'    => 'inherit'
-);
+        if ($this->upload_path === false) {
+            return false;
+        }
 
-// Insert the attachment.
-$attach_id = wp_insert_attachment( $attachment, $filename, $parent_post_id );
 
-// Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
-require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-// Generate the metadata for the attachment, and update the database record.
-$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-wp_update_attachment_metadata( $attach_id, $attach_data );
-         */
+        $attachment = [
+            'guid'           => $this->upload_url,
+            'post_mime_type' => $this->upload_type,
+            'post_title'     => \pathinfo($filename, PATHINFO_FILENAME),
+            'post_content'   => '',
+            'post_status'    => 'inherit'
+        ];
+
+        // Insert the attachment.
+        $attach_id = \wp_insert_attachment($attachment);
+
+        if ($attach_id == 0 || $attach_id instanceof \WP_Error) {
+            return false;
+        }
+
+        // Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
+        require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+        // Generate the meta for the attachment.
+        $attach_data = \wp_generate_attachment_metadata( $attach_id, $this->upload_path );
+
+        // Update attachment meta.
+        \wp_update_attachment_metadata($attach_id, $attach_data);
+        \update_attached_file($attach_id, $this->upload_path);
+
+        return true;
     }
 
-    public function get_original_data()
-    {
-        return $this->data;
-    }
+
+
 
     private function check_if_allowed()
     {
+        $check = \wp_check_filetype_and_ext($this->data['tmp_name'], $this->client_name);
+
+        if (
+            ($check['type'] === false || $check['ext'] === false)
+            && ! \current_user_can( 'unfiltered_upload' )
+        ) {
+            return false;
+        }
+
         $allowed_types = \get_allowed_mime_types();
 
         return \in_array($this->client_type, $allowed_types);
-    }
-
-
-    private function check_upload()
-    {
-        $check = \wp_check_filetype_and_ext($this->path, $this->client_name);
-
-        if ($check['type'] === false || $check['ext'] === false) {
-            $this->is_allowed = false;
-            return;
-        }
-
-        //if ($check['ext'] !== $this->extension) {
-        //    $this->extension = $check['ext'];
-        //}
-
-        //if ($check['proper_filename'] !== false && $check['proper_filename'] !== $this->name) {
-        //    $this->name = $check['proper_filename'];
-        //}
-
-        //if ($check['type'] !== $this->type) {
-        //    $this->type = $check['type'];
-        //}
     }
 }

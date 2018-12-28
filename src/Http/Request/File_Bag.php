@@ -117,4 +117,17 @@ class File_Bag extends Bag
 
         return $files;
     }
+
+    /**
+     * Checks if a key is present in the bag.
+     *
+     * @since 1.0.0
+     *
+     * @param  string $key Item key to check.
+     * @return boolean
+     */
+    public function has($key)
+    {
+        return isset($this->data[$key]) && !empty($this->data[$key]);
+    }
 }

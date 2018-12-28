@@ -44,6 +44,10 @@ class Bag implements ArrayAccess
     public function get($key, $default = null)
     {
         if ($this->has($key)) {
+            if ($this->get_raw($key) === null) {
+                return null;
+            }
+            
             if (\is_array($this->get_raw($key))) {
                 return \array_map([$this, 'sanitise_array'], $this->get_raw($key));
             }
@@ -69,7 +73,7 @@ class Bag implements ArrayAccess
      */
     public function get_raw($key, $default = null)
     {
-        if (isset($this->data[$key])) {
+        if (isset($this->data[$key]) && '' !== $this->data[$key]) {
             return $this->data[$key];
         }
 
