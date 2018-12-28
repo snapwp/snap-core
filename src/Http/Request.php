@@ -2,20 +2,20 @@
 
 namespace Snap\Http;
 
-use Snap\Http\Request\File_Bag;
 use ArrayAccess;
 use Snap\Http\Request\Bag;
+use Snap\Http\Request\File_Bag;
 use Snap\Http\Request\Server_Bag;
-use Snap\Services\Container;
+use Snap\Http\Validation\Traits\Validates_Input;
 use Snap\Utils\Theme_Utils;
 
 /**
  * Gathers all request variables into one place, and provides a simple API for changes affecting the response.
- *
- * @since 1.0.0
  */
 class Request implements ArrayAccess
 {
+    use Validates_Input;
+
     /**
      * Request query params.
      *
@@ -83,14 +83,6 @@ class Request implements ArrayAccess
     public $is_mobile = false;
 
     /**
-     * The Validator instance.
-     *
-     * @since 1.0.0
-     * @var \Rakit\Validation\Validator|\Rakit\Validation\Validation
-     */
-    public $validation = null;
-
-    /**
      * The current request URL.
      *
      * @since 1.0.0
@@ -128,6 +120,7 @@ class Request implements ArrayAccess
 
         $this->populate_request();
         $this->populate_properties();
+        $this->setup_validation($_GET + $_POST + $_FILES);
     }
 
     /**
@@ -286,7 +279,7 @@ class Request implements ArrayAccess
         if (\is_null($offset)) {
             $this->input[] = $value;
         } else {
-            $this->input[$offset] = $value;
+            $this->input[ $offset ] = $value;
         }
     }
 
@@ -312,7 +305,7 @@ class Request implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->input[$offset]);
+        unset($this->input[ $offset ]);
     }
 
     /**
