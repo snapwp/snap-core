@@ -87,7 +87,6 @@ class Snap
                 $loader = new Loader();
                 $loader->boot();
 
-
                 static::register_providers();
                 static::init_templating();
 

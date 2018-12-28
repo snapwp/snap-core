@@ -5,7 +5,7 @@ namespace Snap\Http\Validation;
 use Rakit\Validation\Rule as ValidationRule;
 
 /**
- * Simple extension to Rakit\Validation\Rule to keep withing the Snap namespace.
+ * Simple extension to Rakit\Validation\Rule to keep within the Snap namespace.
  */
 class Rule extends ValidationRule
 {

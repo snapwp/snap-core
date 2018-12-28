@@ -212,7 +212,7 @@ class Admin extends Hookable
                 if ($meta['sizes'][ $size ]) {
                     $file = $meta['sizes'][ $size ]['file'];
 
-                    // Remove size meta from attachment
+                    // Remove size meta from attachment.
                     unset($meta['sizes'][ $size ]);
                     \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
                 }
