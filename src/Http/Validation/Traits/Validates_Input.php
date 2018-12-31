@@ -43,6 +43,21 @@ trait Validates_Input
 
         return $this;
     }
+    
+    /**
+     * Set the validation error messages.
+     *
+     * @since  1.0.0
+     *
+     * @param array $messages Error messages as key value pairs.
+     * @return $this
+     */
+    public function set_error_messages(array $messages = [])
+    {
+        $this->validation->set_error_messages($messages);
+
+        return $this;
+    }
 
     /**
      * Validates the request using the rules and messages set on the internal Validation instance.
