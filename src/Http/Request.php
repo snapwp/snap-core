@@ -203,7 +203,7 @@ class Request implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed
+     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
      */
     public function get($key, $default = null)
     {
@@ -261,7 +261,7 @@ class Request implements ArrayAccess
      * @param  mixed  $default A default value to return if not present.
      * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
      */
-    public function file($key, $default = null)
+    public function files($key, $default = null)
     {
         return $this->files->get($key, $default);
     }

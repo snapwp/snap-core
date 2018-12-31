@@ -26,7 +26,7 @@ class File
     protected $client_name;
 
     /**
-     * The client mime type of the uploaded file.
+     * The client MIME type of the uploaded file.
      *
      * @since 1.0.0
      * @var string
@@ -226,7 +226,7 @@ class File
     }
 
     /**
-     * Get the client mime type.
+     * Get the client MIME type.
      *
      * This is not necessarily correct, and should not be trusted.
      *
@@ -251,6 +251,30 @@ class File
     public function get_client_extension()
     {
         return (string)$this->client_extension;
+    }
+
+    /**
+     * Get the guessed MIME type.
+     *
+     * @since 1.0.0
+     *
+     * @return string|null
+     */
+    public function get_guessed_type()
+    {
+        return $this->guessed_type;
+    }
+
+    /**
+     * Get the guessed file extension.
+     *
+     * @since 1.0.0
+     *
+     * @return string|null
+     */
+    public function get_guessed_extension()
+    {
+        return $this->guessed_extension;
     }
 
     /**
@@ -468,7 +492,7 @@ class File
      * Remove the uploaded version of the file, and delete from the media library if added.
      *
      * @since 1.0.0
-     *        
+     *
      * @param bool $force Skip trash and completely delete file and data.
      * @return bool
      */
