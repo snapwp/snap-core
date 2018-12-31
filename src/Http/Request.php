@@ -118,7 +118,7 @@ class Request implements ArrayAccess
         $this->post = new Bag($_POST);
         $this->files = new File_Bag($_FILES);
 
-        $this->populate_request();
+        $this->populate_input();
         $this->populate_properties();
         $this->setup_validation($_GET + $_POST + $_FILES);
     }
@@ -267,6 +267,45 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Check if the $key exists within the post or query bags.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key The key to check for.
+     * @return bool
+     */
+    public function has($key)
+    {
+        return $this->post->has($key) ?: $this->query->has($key) ?: false;
+    }
+
+    /**
+     * Check if the $key exists within the file bag.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key The key to check for.
+     * @return bool
+     */
+    public function has_file($key)
+    {
+        return $this->files->has($key);
+    }
+
+    /**
+     * Determine if an input is present and not empty within the query or post bags.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key The key to check for.
+     * @return bool
+     */
+    public function filled($key)
+    {
+        return $this->has($key) && !empty($this->get($key));
+    }
+
+    /**
      * Set a item on the request bag.
      *
      * @since  1.0.0
@@ -361,7 +400,7 @@ class Request implements ArrayAccess
      *
      * @since  1.0.0
      */
-    private function populate_request()
+    private function populate_input()
     {
         if ($this->get_method() === 'GET') {
             $this->input = new Bag($this->query->to_array());

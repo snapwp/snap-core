@@ -11,7 +11,7 @@ class Validation
 {
     /**
      * Holds the Validator singleton.
-     * 
+     *
      * @since 1.0.0
      * @var \Rakit\Validation\Validator
      */
@@ -19,7 +19,7 @@ class Validation
 
     /**
      * Holds the Validation instance.
-     * 
+     *
      * @since 1.0.0
      * @var \Rakit\Validation\Validation
      */

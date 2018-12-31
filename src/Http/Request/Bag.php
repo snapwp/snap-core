@@ -207,9 +207,13 @@ class Bag implements ArrayAccess
      */
     public function sanitise_array($value)
     {
-        if (\is_Array($value)) {
+        if (\is_array($value)) {
             return $value;
         } else {
+            if ($value instanceof File) {
+                return $value;
+            }
+
             return \sanitize_text_field($value);
         }
     }

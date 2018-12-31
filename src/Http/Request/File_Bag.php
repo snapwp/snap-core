@@ -26,6 +26,56 @@ class File_Bag extends Bag
     ];
 
     /**
+     * Gets a sanitized value from the bag, or a supplied default if not present.
+     *
+     * Use get_raw to get an un-sanitized version (should you need to).
+     *
+     * @since 1.0.0
+     *
+     * @param  string $key     Item key to fetch.
+     * @param  mixed  $default Default value if the key is not present.
+     * @return File|array|null
+     */
+    public function get($key, $default = null)
+    {
+        return parent::get($key, $default);
+    }
+
+    /**
+     * Checks if a key is present in the bag.
+     *
+     * @since 1.0.0
+     *
+     * @param  string $key Item key to check.
+     * @return boolean
+     */
+    public function has($key)
+    {
+        return isset($this->data[ $key ]) && !empty($this->data[ $key ]);
+    }
+
+    /**
+     * Return how many files were uploaded for a given key.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key Item key to check.
+     * @return int
+     */
+    public function count($key)
+    {
+        if ($this->has($key)) {
+            if (\is_array($this->get($key))) {
+                return \count($this->get($key));
+            }
+
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
      * Add the individual files to the bag.
      *
      * @since 1.0.0
@@ -126,34 +176,5 @@ class File_Bag extends Bag
         }
 
         return $files;
-    }
-
-    /**
-     * Gets a sanitized value from the bag, or a supplied default if not present.
-     *
-     * Use get_raw to get an un-sanitized version (should you need to).
-     *
-     * @since 1.0.0
-     *
-     * @param  string $key     Item key to fetch.
-     * @param  mixed  $default Default value if the key is not present.
-     * @return File|array|null
-     */
-    public function get($key, $default = null)
-    {
-        return parent::get($key, $default);
-    }
-
-    /**
-     * Checks if a key is present in the bag.
-     *
-     * @since 1.0.0
-     *
-     * @param  string $key Item key to check.
-     * @return boolean
-     */
-    public function has($key)
-    {
-        return isset($this->data[ $key ]) && !empty($this->data[ $key ]);
     }
 }
