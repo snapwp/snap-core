@@ -1,16 +1,16 @@
 <?php
 
-namespace Theme\CronNAMESPACE;
+namespace Theme\EventsNAMESPACE;
 
-use Snap\Hookables\Cron;
+use Snap\Hookables\Cron_Event;
 
 /**
  * CLASSNAME description
  */
-class CLASSNAME extends Cron
+class CLASSNAME extends Cron_Event
 {
     /**
-     * The schedule to run this cron at.
+     * The schedule to run this event at.
      *
      * @since 1.0.0
      * @var string
@@ -24,6 +24,6 @@ class CLASSNAME extends Cron
      */
     public function handle()
     {
-        // Cron task.
+        // Cron Event task...
     }
 }

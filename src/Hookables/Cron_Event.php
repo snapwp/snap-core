@@ -10,7 +10,7 @@ use Snap\Services\Container;
  *
  * @since 1.0.0
  */
-class Cron extends Hookable
+class Cron_Event extends Hookable
 {
     /**
      * The action to register.

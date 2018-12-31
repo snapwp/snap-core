@@ -11,7 +11,7 @@ use Snap\Utils\User_Utils;
  *
  * @since 1.0.0
  */
-class Ajax extends Hookable
+class Ajax_Handler extends Hookable
 {
     /**
      * The action to register.

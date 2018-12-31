@@ -1,14 +1,14 @@
 <?php
 
-namespace Theme\AjaxNAMESPACE;
+namespace Theme\Http\AjaxNAMESPACE;
 
-use Snap\Hookables\Ajax;
-use Snap\Core\Request;
+use Snap\Hookables\Ajax_Handler;
+use Snap\Http\Request;
 
 /**
  * CLASSNAME description
  */
-class CLASSNAME extends Ajax
+class CLASSNAME extends Ajax_Handler
 {
 	/**
      * If true then the AJAX action can be used by all users - logged in and otherwise.

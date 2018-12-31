@@ -32,23 +32,23 @@ class Hookable extends Creator
      *
      * @since  1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @throws \Hodl\Exceptions\ContainerException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
             'hookable',
-            $input->getArgument('name'),
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]
         );
 
         if ($created === true) {
-            $output->writeln('<info>'.$input->getArgument('name').' was created successfully</info>');
+            $output->writeln("<info>{$input->getArgument('name')} was created successfully</info>");
         } else {
-            $output->writeln('<error>'.$input->getArgument('name').' could not be created</error>');
+            $output->writeln("<error>{$input->getArgument('name')} could not be created</error>");
         }
     }
 }

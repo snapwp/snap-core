@@ -22,10 +22,10 @@ class Ajax extends Creator
     protected function configure()
     {
         $this->setName('make:ajax')
-            ->setDescription('Creates a new Ajax Hookable.')
-            ->setHelp('Creates a new Ajax class within your theme/Ajax directory');
+            ->setDescription('Creates a new Ajax_Handler Hookable.')
+            ->setHelp('Creates a new Ajax_Handler class within your theme/Http/Ajax directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created ajax hookable.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Ajax_Handler.');
         
         $this->addOption(
             'action',
@@ -40,14 +40,14 @@ class Ajax extends Creator
      *
      * @since  1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @throws \Hodl\Exceptions\ContainerException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
             'ajax',
-            $input->getArgument('name'),
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ],
@@ -57,9 +57,9 @@ class Ajax extends Creator
         );
 
         if ($created === true) {
-            $output->writeln('<info>'.$input->getArgument('name').' was created successfully</info>');
+            $output->writeln("<info>{$input->getArgument('name')} was created successfully</info>");
         } else {
-            $output->writeln('<error>'.$input->getArgument('name').' could not be created</error>');
+            $output->writeln("<error>{$input->getArgument('name')} could not be created</error>");
         }
     }
 }

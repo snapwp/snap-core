@@ -1,9 +1,9 @@
 <?php
 
-namespace Theme\ControllersNAMESPACE;
+namespace Theme\Http\ControllersNAMESPACE;
 
 use Snap\Core\Controller;
-use Snap\Core\Request;
+use Snap\Http\Request;
 
 /**
  * CLASSNAME description

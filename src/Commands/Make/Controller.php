@@ -22,7 +22,7 @@ class Controller extends Creator
     {
         $this->setName('make:controller')
             ->setDescription('Creates a new Controller.')
-            ->setHelp('Creates a new Controller class within your theme/Controllers directory');
+            ->setHelp('Creates a new Controller class within your theme/Http/Controllers directory');
 
         $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created controller.');
     }
@@ -32,23 +32,23 @@ class Controller extends Creator
      *
      * @since  1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @throws \Hodl\Exceptions\ContainerException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
             'controller',
-            $input->getArgument('name'),
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]
         );
 
         if ($created === true) {
-            $output->writeln('<info>'.$input->getArgument('name').' was created successfully</info>');
+            $output->writeln("<info>{$input->getArgument('name')} was created successfully</info>");
         } else {
-            $output->writeln('<error>'.$input->getArgument('name').' could not be created</error>');
+            $output->writeln("<error>{$input->getArgument('name')} could not be created</error>");
         }
     }
 }
