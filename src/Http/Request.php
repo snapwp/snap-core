@@ -259,7 +259,7 @@ class Request implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed
+     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
      */
     public function file($key, $default = null)
     {
@@ -318,7 +318,7 @@ class Request implements ArrayAccess
         if (\is_null($offset)) {
             $this->input[] = $value;
         } else {
-            $this->input[ $offset ] = $value;
+            $this->input[$offset] = $value;
         }
     }
 
@@ -344,7 +344,7 @@ class Request implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->input[ $offset ]);
+        unset($this->input[$offset]);
     }
 
     /**
@@ -366,7 +366,7 @@ class Request implements ArrayAccess
      * @since  1.0.0
      *
      * @param  mixed $name The offset to get.
-     * @return mixed
+     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
      */
     public function __get($name)
     {

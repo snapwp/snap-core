@@ -34,7 +34,7 @@ class File_Bag extends Bag
      *
      * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
-     * @return File|array|null
+     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
      */
     public function get($key, $default = null)
     {

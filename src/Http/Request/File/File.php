@@ -92,6 +92,14 @@ class File
     protected $upload_error = null;
 
     /**
+     * The attachment ID if added into WordPress media library.
+     *
+     * @since 1.0.0
+     * @var null|int
+     */
+    protected $attachment_id = null;
+
+    /**
      * Whether the uploaded file is allowed to be uploaded by the current user.
      *
      * Use the upload_mimes filter to add additional types.
@@ -113,7 +121,6 @@ class File
         $this->client_name = $file['name'];
         $this->client_type = $file['type'];
         $this->client_extension = $this->set_client_extension();
-
 
         $this->is_allowed = $this->check_if_allowed();
     }
@@ -181,6 +188,18 @@ class File
     }
 
     /**
+     * Get temporary file path.
+     *
+     * @since 1.0.0
+     *
+     * @return string
+     */
+    public function get_tmp_path()
+    {
+        return $this->data['tmp_name'];
+    }
+
+    /**
      * Get the upload error code.
      *
      * @since 1.0.0
@@ -232,6 +251,18 @@ class File
     public function get_client_extension()
     {
         return (string)$this->client_extension;
+    }
+
+    /**
+     * Get the attachment ID after adding to the media library.
+     *
+     * @since 1.0.0
+     *
+     * @return int|null
+     */
+    public function get_id()
+    {
+        return $this->attachment_id;
     }
 
     /**
@@ -428,7 +459,58 @@ class File
         \wp_update_attachment_metadata($attach_id, $attach_data);
         \update_attached_file($attach_id, $this->upload_path);
 
+        $this->attachment_id = $attach_id;
+
         return true;
+    }
+
+    /**
+     * Remove the uploaded version of the file, and delete from the media library if added.
+     *
+     * @since 1.0.0
+     *        
+     * @param bool $force Skip trash and completely delete file and data.
+     * @return bool
+     */
+    public function delete_upload($force = true)
+    {
+        // Bail early if not uploaded.
+        if ($this->get_upload_path() === null) {
+            return false;
+        }
+
+        if ($this->get_id() !== null) {
+            $result = !\wp_delete_attachment($this->get_id(), $force) === false;
+        } else {
+            \wp_delete_file($this->get_upload_path());
+            $result = !file_exists($this->get_upload_path());
+        }
+
+        if ($result === true) {
+            $this->attachment_id = null;
+            $this->upload_path = null;
+            $this->upload_error = null;
+            $this->upload_type = null;
+            $this->upload_url = null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return a base64 encoded representation of the upload.
+     *
+     * @since 1.0.0
+     *
+     * @return string
+     */
+    public function to_base64()
+    {
+        if (!empty($this->get_upload_path())) {
+            return \base64_encode(\file_get_contents($this->get_upload_path()));
+        }
+
+        return \base64_encode(\file_get_contents($this->get_tmp_path()));
     }
 
     /**
