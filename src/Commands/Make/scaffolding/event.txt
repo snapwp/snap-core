@@ -12,15 +12,14 @@ class CLASSNAME extends Cron_Event
     /**
      * The schedule to run this event at.
      *
-     * @since 1.0.0
      * @var string
      */
     protected $schedule = 'hourly';
 
     /**
-     * Auto-wire and call the child class's handle method.
+     * Handle this event.
      *
-     * @since 1.0.0
+     * This method is auto-wired.
      */
     public function handle()
     {

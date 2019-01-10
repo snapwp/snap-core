@@ -39,9 +39,9 @@ class Loader
     public static function class_autoload($class)
     {
         // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
-        if (isset(static::$theme_includes[ $class ])) {
+        if (isset(static::$theme_includes[$class])) {
             /** @noinspection PhpIncludeInspection */
-            require static::$theme_includes[ $class ];
+            require static::$theme_includes[$class];
             return true;
         }
 
@@ -59,7 +59,7 @@ class Loader
     public static function alias_autoload($class)
     {
         if (\in_array($class, \array_keys(static::$aliases))) {
-            return \class_alias(static::$aliases[ $class ], $class);
+            return \class_alias(static::$aliases[$class], $class);
         }
 
         return false;
@@ -133,30 +133,38 @@ class Loader
     {
         $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
 
-        // Populate $theme_includes.
-        self::$theme_includes = $this->scan_dir(
+        $hookable_locations = [
             \get_template_directory() . '/theme/' . $hookables_dir,
-            self::$theme_includes,
-            \get_template_directory()
-        );
+            \get_template_directory() . '/theme/Http/Ajax',
+            \get_template_directory() . '/theme/Http/Validation/Rules',
+            \get_template_directory() . '/theme/Content',
+            \get_template_directory() . '/theme/Events',
+        ];
 
-        self::$theme_includes = $this->scan_dir(
-            \get_stylesheet_directory() . '/theme/' . $hookables_dir,
-            self::$theme_includes,
-            \get_stylesheet_directory()
-        );
+        if (\is_child_theme()) {
+            $hookable_locations[] = \get_stylesheet_directory() . '/theme/' . $hookables_dir;
+            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Ajax';
+            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Validation/Rules';
+            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Content';
+            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Events';
+        }
 
-        if (! empty(self::$theme_includes)) {
+        // Gather all possible Hookables.
+        foreach ($hookable_locations as $dir) {
+            self::$theme_includes = $this->scan_dir($dir, self::$theme_includes);
+        }
+
+        if (!empty(self::$theme_includes)) {
             foreach (self::$theme_includes as $class => $path) {
                 $this->init_hookable($class);
             }
         }
 
         // Todo this is still kind of messy
+        // TODO add cache of visited folders to avoid duplicate sweeps
         self::$theme_includes = $this->scan_dir(
             \get_stylesheet_directory() . '/theme/',
-            self::$theme_includes,
-            \get_stylesheet_directory()
+            self::$theme_includes
         );
 
         $this->init_theme_providers();
@@ -230,10 +238,9 @@ class Loader
      *
      * @param  string $folder Directory path to scan.
      * @param  array  $files  An array to append the discovered files to.
-     * @param  string $strip  Strip this text from the returned path.
      * @return array          $files array with any discovered php files appended.
      */
-    private function scan_dir($folder, $files = [], $strip = '')
+    private function scan_dir($folder, $files = [])
     {
         // Ensure maximum portability.
         $folder = \trailingslashit($folder);
@@ -244,12 +251,12 @@ class Loader
             $contents = \scandir($folder);
         }
 
-        if (! empty($contents)) {
+        if (!empty($contents)) {
             // go through each file, adding it to the $files list.
             foreach ($contents as $file) {
                 $path = $folder . $file;
 
-                $class = \str_replace([$strip, '.php'], '', $path);
+                $class = \str_replace([\get_stylesheet_directory(), \get_template_directory(), '.php'], '', $path);
                 $class = \trim(
                     \str_replace(['/', 'theme'], ['\\', 'Theme'], $class),
                     '\\'
@@ -258,10 +265,10 @@ class Loader
                 if ('.' === $file || '..' === $file) {
                     continue;
                 } elseif (\pathinfo($path, PATHINFO_EXTENSION) === 'php') {
-                    $files[ $class ] = $path;
+                    $files[$class] = $path;
                 } elseif (\is_dir($path)) {
                     // Sub directory, scan this dir as well.
-                    $files = $this->scan_dir(\trailingslashit($path), $files, $strip);
+                    $files = $this->scan_dir(\trailingslashit($path), $files);
                 }
             }
         }
@@ -282,7 +289,7 @@ class Loader
 
         $files = \get_included_files();
 
-        if (\in_array($abspath.'wp-login.php', $files) || \in_array($abspath.'wp-register.php', $files)) {
+        if (\in_array($abspath . 'wp-login.php', $files) || \in_array($abspath . 'wp-register.php', $files)) {
             return true;
         }
 
@@ -290,7 +297,7 @@ class Loader
             return true;
         }
 
-        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF']== '/wp-login.php') {
+        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php') {
             return true;
         }
 

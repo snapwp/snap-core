@@ -1,0 +1,45 @@
+<?php
+
+namespace Theme\Http\RequestsNAMESPACE;
+
+use Snap\Http\Request;
+
+/**
+ * CLASSNAME description
+ */
+class CLASSNAME extends Request
+{
+    /**
+     * Provides default rules to the Validation instance.
+     *
+     * @see https://github.com/rakit/validation#available-rules
+     *
+     * @return array Array of rules.
+     */
+    public function rules()
+    {
+        return [
+            'thing' => 'required'
+        ];
+    }
+
+    /**
+     * Default error messages.
+     *
+     * @return array Array of messages.
+     */
+    public function messages()
+    {
+        return [];
+    }
+
+    /**
+     * Default aliases to be used in error messages.
+     *
+     * @return array Array of aliases.
+     */
+    public function aliases()
+    {
+        return [];
+    }
+}

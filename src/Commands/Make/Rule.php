@@ -7,11 +7,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Creates a controller class in the current directory.
+ * Creates a shortcode class in the current directory.
  *
  * @since  1.0.0
  */
-class Controller extends Creator
+class Rule extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -20,11 +20,11 @@ class Controller extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:controller')
-            ->setDescription('Creates a new Controller.')
-            ->setHelp('Creates a new Controller class within your theme/Http/Controllers directory');
+        $this->setName('make:rule')
+            ->setDescription('Creates a new Validation Rule.')
+            ->setHelp('Creates a new Request within your theme/Http/Validation/Rules directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Controller.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Rule.');
     }
 
     /**
@@ -39,7 +39,7 @@ class Controller extends Creator
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'controller',
+            'rule',
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]

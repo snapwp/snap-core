@@ -7,11 +7,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Creates a controller class in the current directory.
+ * Creates a shortcode class in the current directory.
  *
  * @since  1.0.0
  */
-class Controller extends Creator
+class Request extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -20,11 +20,11 @@ class Controller extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:controller')
-            ->setDescription('Creates a new Controller.')
-            ->setHelp('Creates a new Controller class within your theme/Http/Controllers directory');
+        $this->setName('make:request')
+            ->setDescription('Creates a new Request.')
+            ->setHelp('Creates a new Request within your theme/Http/Requests directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Controller.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Request.');
     }
 
     /**
@@ -39,7 +39,7 @@ class Controller extends Creator
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'controller',
+            'request',
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]

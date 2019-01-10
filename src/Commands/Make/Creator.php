@@ -124,7 +124,7 @@ class Creator extends Command
         switch ($scaffold) {
             case 'shortcode':
                 $dir = 'Shortcodes';
-                $sub_dir .= trailingslashit($hookables_dir);
+                $sub_dir .= \trailingslashit($hookables_dir);
                 break;
             case 'ajax':
                 $dir = 'Ajax';
@@ -137,22 +137,31 @@ class Creator extends Command
                 $dir = 'Controllers';
                 $sub_dir .= 'Http/';
                 break;
+            case 'request':
+                $dir = 'Requests';
+                $sub_dir .= 'Http/';
+                break;
+            case 'rule':
+                $dir = 'Rules';
+                $sub_dir .= 'Http/Validation/';
+                break;
             case 'posttype':
-                $dir = 'Posts';
+                $dir = 'Post_Types';
+                $sub_dir .= 'Content/';
                 break;
             case 'event':
                 $dir = 'Events';
                 break;
             case 'taxonomy':
                 $dir = 'Taxonomies';
+                $sub_dir .= 'Content/';
                 break;
         }
 
-
         $base_dir = $this->theme_dir . $sub_dir;
-        $folder = str_replace('\\', '/', $args['NAMESPACE']);
+        $folder = \str_replace('\\', '/', $args['NAMESPACE']);
 
-        $output_path = $base_dir . '/' . $dir . trailingslashit($folder);
+        $output_path = $base_dir . '/' . $dir . \trailingslashit($folder);
 
         \wp_mkdir_p($output_path);
 

@@ -3,6 +3,7 @@
 namespace Snap\Core;
 
 use Snap\Core\Concerns\Manages_Hooks;
+use Snap\Utils\Str_Utils;
 
 /**
  * Allows child classes to auto register hooks by simply defining them in an array
@@ -87,13 +88,7 @@ class Hookable
     {
         $classname = \basename(\str_replace('\\', '/', \get_class($this)));
 
-        if (\ctype_lower($classname)) {
-            return $classname;
-        }
-
-        $classname = \trim(\preg_replace('/([^_A-Z])(?=[A-Z])/', '$1_', $classname), '_');
-
-        return \strtolower($classname);
+        return Str_Utils::to_snake($classname);
     }
 
     /**

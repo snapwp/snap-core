@@ -132,7 +132,7 @@ class Validation
      *
      * @return boolean If the validation passed or not.
      */
-    public function is_valid()
+    public function is_valid(): bool
     {
         $this->validation->validate();
 
@@ -140,14 +140,59 @@ class Validation
     }
 
     /**
-     * Get errors from the internal validation instance as an array.
+     * Get errors from the internal validation instance as a multi-dimensional array.
      *
      * @since  1.0.0
      *
-     * @return array Errors.
+     * @param null   $key    Optional. Specific key to fetch errors for.
+     * @param string $format Optional. Format string for the fetched error when using $key.
+     * @return array
      */
-    public function get_errors()
+    public function get_errors($key = null, string $format = ':message'): array
     {
-        return $this->validation->errors()->toArray();
+        if (null === $key) {
+            return $this->validation->errors()->toArray();
+        }
+
+        return $this->validation->errors()->get($key, $format);
+    }
+
+    /**
+     * Get count of all errors.
+     *
+     * @since  1.0.0
+     *
+     * @return int
+     */
+    public function get_error_count(): int
+    {
+        return $this->validation->errors()->count();
+    }
+
+    /**
+     * Returns a flat array of all errors.
+     *
+     * @since 1.0.0
+     *
+     * @param string $format Optional. Format to wrap errors in such as '<li>:message</li>'.
+     *                       Defaults to ':message'.
+     * @return array
+     */
+    public function get_all_errors(string $format = ':message'): array
+    {
+        return $this->validation->errors()->all($format);
+    }
+
+    /**
+     * Checks if an error exists.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key The key to search for. EG. 'name' or 'uploads.*'.
+     * @return bool
+     */
+    public function has_error(string $key): bool
+    {
+        return $this->validation->errors()->has($key);
     }
 }

@@ -2,21 +2,21 @@
 
 namespace Theme\Http\ControllersNAMESPACE;
 
-use Snap\Core\Controller;
 use Snap\Http\Request;
+use Snap\Services\View;
 
 /**
  * CLASSNAME description
  */
-class CLASSNAME extends Controller
+class CLASSNAME
 {
     /**
-     * index description
+     * Method description.
      *
      * @param Request $request The current request object.
      */
     public function index(Request $request)
     {
-        $this->view->render('index');
+        View::render('index');
     }
 }

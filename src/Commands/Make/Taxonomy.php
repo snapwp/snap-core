@@ -40,7 +40,6 @@ class Taxonomy extends Creator
     {
         $created = $this->scaffold(
             'taxonomy',
-            $input->getArgument('name'),
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]
