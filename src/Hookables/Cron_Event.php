@@ -47,7 +47,6 @@ class Cron_Event extends Hookable
         if (! \wp_next_scheduled($this->get_cron_action())) {
             \wp_schedule_event(\time(), $this->schedule, $this->get_cron_action());
         }
-
     }
 
     /**

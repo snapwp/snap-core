@@ -49,7 +49,7 @@ class File_Bag extends Bag
      * @param  string $key Item key to check.
      * @return boolean
      */
-    public function has($key)
+    public function has($key): bool
     {
         return isset($this->data[ $key ]) && !empty($this->data[ $key ]);
     }

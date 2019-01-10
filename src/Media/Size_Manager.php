@@ -212,17 +212,19 @@ class Size_Manager extends Hookable
     public function remove_default_image_sizes($sizes = [])
     {
         $user_sizes_to_remove = \collect(Config::get('images.image_sizes'))
-            ->filter(function($value) {
-                return $value === false;
-            })
+            ->filter(
+                function ($value) {
+                    return $value === false;
+                }
+            )
             ->all();
 
         $user_sizes_to_remove = \array_keys($user_sizes_to_remove);
 
         $sizes_to_remove = \array_merge($user_sizes_to_remove, self::DEFAULT_IMAGE_SIZES);
 
-        if (is_array(current($sizes))) {
-            $sizes = array_keys($sizes);
+        if (\is_array(\current($sizes))) {
+            $sizes = \array_keys($sizes);
         }
 
         return \array_diff($sizes, $sizes_to_remove);

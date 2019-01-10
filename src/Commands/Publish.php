@@ -212,7 +212,7 @@ class Publish extends Command
         }
 
         // When running publish via the theme installer, the current theme isn't active yet.
-        //  We need to trick WP into thinking it is.
+        // We need to trick WP into thinking it is.
         if (isset($this->root)) {
             $parts = \explode('/', $this->root);
 

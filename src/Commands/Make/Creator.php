@@ -113,7 +113,7 @@ class Creator extends Command
      * @since  1.0.0
      *
      * @param  string $scaffold The file to scaffold.
-     * @param  array $args      The arguments passed from the Maker class.
+     * @param  array  $args      The arguments passed from the Maker class.
      * @return string
      */
     protected function get_destination($scaffold, $args)
@@ -233,10 +233,10 @@ class Creator extends Command
         $class_name = $this->sanitise_filename($args['CLASSNAME']);
 
         if ($this->is_nested_directory($class_name)) {
-            $parts = explode('\\', $class_name);
-            $class = array_pop($parts);
+            $parts = \explode('\\', $class_name);
+            $class = \array_pop($parts);
 
-            $args['NAMESPACE'] = '\\' . implode('\\', $parts);
+            $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
             $args['CLASSNAME'] = $class;
         }
 

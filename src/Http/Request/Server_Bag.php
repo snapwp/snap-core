@@ -12,7 +12,7 @@ class Server_Bag extends Bag
      *
      * @since 1.0.0
      *
-     * @param array $contents
+     * @param array $contents Kept for compatibility.
      */
     protected function set_data($contents = [])
     {

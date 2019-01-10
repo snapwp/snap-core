@@ -87,7 +87,7 @@ abstract class Service_Facade
      *
      * @return string
      *
-     * @throws RuntimeException
+     * @throws RuntimeException If this method is not overwritten.
      */
     protected static function get_service_name()
     {
