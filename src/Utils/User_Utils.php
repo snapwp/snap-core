@@ -22,10 +22,10 @@ class User_Utils
      **/
     public static function get_user_role($user = null)
     {
-        $wp_roles = wp_roles();
+        $wp_roles = \wp_roles();
 
         if ($user === null) {
-            $user = wp_get_current_user();
+            $user = \wp_get_current_user();
         }
 
         if (!($user instanceof WP_User)) {
@@ -49,7 +49,7 @@ class User_Utils
      **/
     public static function get_user_role_name($user = null)
     {
-        $wp_roles = wp_roles();
+        $wp_roles = \wp_roles();
 
         $role = static::get_user_role($user);
 

@@ -88,7 +88,7 @@ class Bag implements ArrayAccess
      * @param  string $key Item key to check.
      * @return boolean
      */
-    public function has($key)
+    public function has($key): bool
     {
         return isset($this->data[ $key ]);
     }
@@ -123,7 +123,7 @@ class Bag implements ArrayAccess
      * @param  mixed  $default Default value if the key is not present.
      * @return int
      */
-    public function get_int($key, $default = null)
+    public function get_int($key, $default = null): int
     {
         return (int)$this->get($key, $default);
     }
@@ -137,7 +137,7 @@ class Bag implements ArrayAccess
      * @param  mixed  $default Default value if the key is not present.
      * @return float
      */
-    public function get_float($key, $default = null)
+    public function get_float($key, $default = null): float
     {
         return (float)$this->get($key, $default);
     }
@@ -180,7 +180,7 @@ class Bag implements ArrayAccess
      *
      * @return array
      */
-    public function to_array()
+    public function to_array(): array
     {
         return $this->data;
     }
@@ -192,7 +192,7 @@ class Bag implements ArrayAccess
      *
      * @return string
      */
-    public function to_json()
+    public function to_json(): string
     {
         return \json_encode($this->data);
     }
@@ -243,7 +243,7 @@ class Bag implements ArrayAccess
      * @param  mixed $offset An offset to check for.
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }

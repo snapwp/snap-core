@@ -1,0 +1,40 @@
+<?php
+
+namespace Theme\Http\Validation\RulesNAMESPACE;
+
+use Snap\Request\Rule;
+
+/**
+ * CLASSNAME description
+ *
+ * @see https://github.com/rakit/validation#registeroverride-rule For more information about complex rules.
+ */
+class CLASSNAME extends Rule
+{
+    /**
+     * The default error message when this rule is not met.
+     *
+     * @var string
+     */
+    protected $message = ":value is an invalid value for :attribute";
+
+    /**
+     * When true and this rule fails, then no other rules are process for the attribute.
+     *
+     * For instance if the 'required' rule fails, there is no point validating additional rules.
+     *
+     * @var bool
+     */
+    protected $implicit = false;
+
+    /**
+     * Validate the $value to see if it passes the rule.
+     *
+     * @param mixed $value The input from the Request to validate against.
+     * @return bool
+     */
+    public function handle($value)
+    {
+        return true;
+    }
+}

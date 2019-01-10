@@ -10,7 +10,7 @@ use Snap\Services\Container;
  *
  * @since 1.0.0
  */
-class Cron extends Hookable
+class Cron_Event extends Hookable
 {
     /**
      * The action to register.
@@ -39,13 +39,13 @@ class Cron extends Hookable
     {
         $this->add_action($this->get_cron_action(), 'handler');
 
-        if (! \wp_next_scheduled($this->get_cron_action())) {
-            \wp_schedule_event(\time(), $this->schedule, $this->get_cron_action());
-        }
-
         // Update the interval if the schedule has changed since first addition.
         if (\wp_get_schedule($this->get_cron_action()) !== $this->schedule) {
-            \wp_reschedule_event(\time(), $this->schedule, $this->get_cron_action());
+            \wp_clear_scheduled_hook($this->get_cron_action());
+        }
+
+        if (! \wp_next_scheduled($this->get_cron_action())) {
+            \wp_schedule_event(\time(), $this->schedule, $this->get_cron_action());
         }
     }
 
@@ -54,7 +54,7 @@ class Cron extends Hookable
      *
      * @since 1.0.0
      */
-    public function handler()
+    final public function handler()
     {
         Container::resolve_method($this, 'handle');
     }

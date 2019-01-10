@@ -1,0 +1,28 @@
+<?php
+
+namespace Theme\EventsNAMESPACE;
+
+use Snap\Hookables\Cron_Event;
+
+/**
+ * CLASSNAME description
+ */
+class CLASSNAME extends Cron_Event
+{
+    /**
+     * The schedule to run this event at.
+     *
+     * @var string
+     */
+    protected $schedule = 'hourly';
+
+    /**
+     * Handle this event.
+     *
+     * This method is auto-wired.
+     */
+    public function handle()
+    {
+        // Cron Event task...
+    }
+}

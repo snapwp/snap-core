@@ -507,7 +507,7 @@ class File
             $result = !\wp_delete_attachment($this->get_id(), $force) === false;
         } else {
             \wp_delete_file($this->get_upload_path());
-            $result = !file_exists($this->get_upload_path());
+            $result = !\file_exists($this->get_upload_path());
         }
 
         if ($result === true) {

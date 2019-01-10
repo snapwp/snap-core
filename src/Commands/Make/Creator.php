@@ -7,7 +7,7 @@ use Snap\Services\Config;
 use Symfony\Component\Console\Command\Command;
 
 /**
- * Case class for all make:* commands.
+ * Base class for all make:* commands.
  */
 class Creator extends Command
 {
@@ -46,19 +46,18 @@ class Creator extends Command
      * @since  1.0.0
      *
      * @param  string $scaffold The file to scaffold.
-     * @param  string $filename The name of the new file to be generated.
      * @param  array  $args     Any replacement arguments.
      * @param  array  $options  Any replacement options. Used for toggling sections of the scaffold.
      * @return boolean
+     *
+     * @throws \Hodl\Exceptions\ContainerException
      */
-    protected function scaffold($scaffold, $filename, $args = [], $options = [])
+    protected function scaffold($scaffold, $args = [], $options = [])
     {
         $this->init_wordpress();
         Snap::create_container();
         Snap::init_config();
         $original = $this->scaffolding_dir . "{$scaffold}.txt";
-
-        $filename = $this->sanitise_filename($filename);
 
         if (\file_exists($original)) {
             $content = \file_get_contents($original);
@@ -91,6 +90,7 @@ class Creator extends Command
             }
 
             $args = $this->parse_args($args);
+            $target = $this->get_destination($scaffold, $args);
 
             // Substitute arguments.
             $content = \str_replace(
@@ -99,7 +99,7 @@ class Creator extends Command
                 $content
             );
 
-            if (\file_put_contents($this->get_destination($scaffold, $filename), $content) !== false) {
+            if (\file_put_contents($target, $content) !== false) {
                 return true;
             }
         }
@@ -108,67 +108,64 @@ class Creator extends Command
     }
 
     /**
-     * Ensures the target directory for the new file exists, and creates if not.
-     *
-     * @since  1.0.0
-     *
-     * @param  string $dir The directory to check.
-     */
-    protected function create_destination_dir($dir)
-    {
-        $hookables_directory = \trim(Config::get('theme.hookables_directory'), '/');
-
-        $theme_dir = "{$this->theme_dir}/theme/{$hookables_directory}";
-
-        \wp_mkdir_p($theme_dir . '/' . $dir);
-    }
-
-    /**
      * Returns the full path of the new file to be created.
      *
      * @since  1.0.0
      *
      * @param  string $scaffold The file to scaffold.
-     * @param  string $filename The name of the new file to be generated.
+     * @param  array  $args      The arguments passed from the Maker class.
      * @return string
      */
-    protected function get_destination($scaffold, $filename)
+    protected function get_destination($scaffold, $args)
     {
+        $sub_dir = '/theme/';
+        $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
+
         switch ($scaffold) {
             case 'shortcode':
                 $dir = 'Shortcodes';
+                $sub_dir .= \trailingslashit($hookables_dir);
                 break;
             case 'ajax':
                 $dir = 'Ajax';
+                $sub_dir .= 'Http/';
                 break;
             case 'hookable':
-                $dir = 'Hookables';
+                $dir = $hookables_dir;
                 break;
             case 'controller':
                 $dir = 'Controllers';
+                $sub_dir .= 'Http/';
+                break;
+            case 'request':
+                $dir = 'Requests';
+                $sub_dir .= 'Http/';
+                break;
+            case 'rule':
+                $dir = 'Rules';
+                $sub_dir .= 'Http/Validation/';
                 break;
             case 'posttype':
-                $dir = 'Posts';
+                $dir = 'Post_Types';
+                $sub_dir .= 'Content/';
                 break;
-            case 'cron':
-                $dir = 'Cron';
+            case 'event':
+                $dir = 'Events';
                 break;
             case 'taxonomy':
                 $dir = 'Taxonomies';
+                $sub_dir .= 'Content/';
                 break;
         }
 
-        \preg_match('/(.*)\/[^\/]*$/', $dir . '/' . $filename, $match);
+        $base_dir = $this->theme_dir . $sub_dir;
+        $folder = \str_replace('\\', '/', $args['NAMESPACE']);
 
-        if (isset($match[1])) {
-            $this->create_destination_dir($match[1]);
-        } else {
-            $this->create_destination_dir($dir);
-        }
+        $output_path = $base_dir . '/' . $dir . \trailingslashit($folder);
 
-        $hookables_directory = \trim(Config::get('theme.hookables_directory'), '/');
+        \wp_mkdir_p($output_path);
 
-        return $this->theme_dir . '/theme/' . $hookables_directory . '/' . $dir . '/' . $filename . '.php';
+        return $output_path . $args['CLASSNAME']. '.php';
     }
 
     /**
@@ -182,7 +179,6 @@ class Creator extends Command
 
         // Trick WP into thinking this is an AJAX request. Helps quieten certain plugins.
         \define('DOING_AJAX', true);
-        //\define('SHORTINIT', true);
 
         \define('BASE_PATH', $this->find_wordpress_base_path());
         \define('WP_USE_THEMES', false);
@@ -219,7 +215,7 @@ class Creator extends Command
      */
     private function sanitise_filename($filename)
     {
-        return \str_replace('\\', '/', $filename);
+        return \str_replace('/', '\\', $filename);
     }
 
     /**
@@ -236,13 +232,19 @@ class Creator extends Command
 
         $class_name = $this->sanitise_filename($args['CLASSNAME']);
 
-        if (\strpos($class_name, '/') !== false) {
-            \preg_match('/(.*)\/[^\/]*$/', $class_name, $match);
+        if ($this->is_nested_directory($class_name)) {
+            $parts = \explode('\\', $class_name);
+            $class = \array_pop($parts);
 
-            $args['NAMESPACE'] = '\\' . $match[1];
-            $args['CLASSNAME'] = \end(\explode('/', $args['CLASSNAME']));
+            $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
+            $args['CLASSNAME'] = $class;
         }
 
         return $args;
+    }
+
+    private function is_nested_directory($class_name)
+    {
+        return \strpos($class_name, '\\') !== false;
     }
 }

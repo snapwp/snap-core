@@ -80,7 +80,7 @@ class Response
      * @since 1.0.0
      *
      * @param mixed data        Data to JSON encode.
-     * @param null $status_code Optional. Status code to send with the response.
+     * @param null                                  $status_code Optional. Status code to send with the response.
      */
     public function send_json_success($data, $status_code = null)
     {
@@ -93,7 +93,7 @@ class Response
      * @since 1.0.0
      *
      * @param mixed data        Data to JSON encode.
-     * @param null $status_code Optional. Status code to send with the response.
+     * @param null                                  $status_code Optional. Status code to send with the response.
      */
     public function send_json_error($data, $status_code = null)
     {

@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
  *
  * @since  1.0.0
  */
-class Cron extends Creator
+class Rule extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -20,11 +20,11 @@ class Cron extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:cron')
-            ->setDescription('Creates a new Cron.')
-            ->setHelp('Creates a new Cron Hookable within your theme/Cron directory');
+        $this->setName('make:rule')
+            ->setDescription('Creates a new Validation Rule.')
+            ->setHelp('Creates a new Request within your theme/Http/Validation/Rules directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Cron.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Rule.');
     }
 
     /**
@@ -32,23 +32,23 @@ class Cron extends Creator
      *
      * @since  1.0.0
      *
-     * @param  InputInterface  $input Command input.
+     * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @throws \Hodl\Exceptions\ContainerException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'cron',
-            $input->getArgument('name'),
+            'rule',
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]
         );
 
         if ($created === true) {
-            $output->writeln('<info>'.$input->getArgument('name').' was created successfully</info>');
+            $output->writeln("<info>{$input->getArgument('name')} was created successfully</info>");
         } else {
-            $output->writeln('<error>'.$input->getArgument('name').' could not be created</error>');
+            $output->writeln("<error>{$input->getArgument('name')} could not be created</error>");
         }
     }
 }

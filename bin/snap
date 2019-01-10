@@ -5,7 +5,9 @@ if (! @include_once __DIR__ . '/../vendor/autoload.php') {
     @include_once __DIR__ . '/../../../autoload.php';
 }
 
-use Snap\Commands\Make\Cron;
+use Snap\Commands\Make\Event;
+use Snap\Commands\Make\Request;
+use Snap\Commands\Make\Rule;
 use Symfony\Component\Console\Application;
 use Snap\Commands\Make\Hookable;
 use Snap\Commands\Make\Controller;
@@ -23,7 +25,9 @@ $application->add(new Ajax());
 $application->add(new Post_Type());
 $application->add(new Taxonomy());
 $application->add(new Shortcode());
-$application->add(new Cron());
+$application->add(new Event());
+$application->add(new Request());
+$application->add(new Rule());
 
 $application->add(new Publish());
 

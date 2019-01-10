@@ -108,6 +108,34 @@ class Theme_Utils
     }
 
     /**
+     * Detect whether the current request is to the login page.
+     *
+     * @since 1.0.0
+     *
+     * @return bool
+     */
+    public static function is_wplogin()
+    {
+        $abspath = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
+
+        $files = \get_included_files();
+
+        if (\in_array($abspath . 'wp-login.php', $files) || \in_array($abspath . 'wp-register.php', $files)) {
+            return true;
+        }
+
+        if (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') {
+            return true;
+        }
+
+        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Parse the contents of mix-manifest.json and store as array.
      *
      * @since  1.0.0

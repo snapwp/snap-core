@@ -1,11 +1,11 @@
 <?php
 
-namespace Theme\PostsNAMESPACE;
+namespace Theme\Content\Post_TypesNAMESPACE;
 
 use Snap\Hookables\Post_Type;
 
 /**
- * CLASSNAME desciption
+ * CLASSNAME description
  */
 class CLASSNAME extends Post_Type
 {

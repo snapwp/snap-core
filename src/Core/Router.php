@@ -229,7 +229,7 @@ class Router
                     $action = 'index';
                 }
 
-                $fqn = '\\Theme\\Controllers\\' . $class;
+                $fqn = '\\Theme\\Http\\Controllers\\' . $class;
 
                 if (\class_exists($fqn)) {
                     Container::resolve_method(

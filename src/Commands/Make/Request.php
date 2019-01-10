@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
  *
  * @since  1.0.0
  */
-class Hookable extends Creator
+class Request extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -20,11 +20,11 @@ class Hookable extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:hookable')
-            ->setDescription('Creates a new Hookable.')
-            ->setHelp('Creates a new Hookable class within your theme/Hookables directory');
+        $this->setName('make:request')
+            ->setDescription('Creates a new Request.')
+            ->setHelp('Creates a new Request within your theme/Http/Requests directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Hookable.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Request.');
     }
 
     /**
@@ -39,7 +39,7 @@ class Hookable extends Creator
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'hookable',
+            'request',
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]
