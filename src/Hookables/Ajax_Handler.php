@@ -43,13 +43,7 @@ class Ajax_Handler extends Hookable
      * @since 1.0.0
      * @var array
      */
-    protected $restrict_to_roles = [
-        'Administrator',
-        'Editor',
-        'Author',
-        'Contributor',
-        'Subscriber',
-    ];
+    protected $restrict_to_roles = [];
 
     /**
      * Run this hookable when is_admin returns false.
@@ -80,8 +74,14 @@ class Ajax_Handler extends Hookable
      */
     public function handler()
     {
-        if (\in_array(User_Utils::get_user_role_name(), $this->restrict_to_roles) || $this->allow_public_access) {
+        if ($this->allow_public_access) {
             Container::resolve_method($this, 'handle');
+            return;
+        }
+
+        if (empty($this->restrict_to_roles) || \in_array(User_Utils::get_user_role()->name, $this->restrict_to_roles)) {
+            Container::resolve_method($this, 'handle');
+            return;
         }
 
         \wp_send_json_error('You do not have sufficient permissions to perform this action', 403);
