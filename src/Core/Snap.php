@@ -170,10 +170,17 @@ class Snap
         $provider_instances = [];
 
         foreach (static::$container->get(Config::class)->get('services.providers') as $provider) {
-            $provider = static::$container->resolve($provider);
-            $provider->register();
+            try {
+                $provider = static::$container->resolve($provider);
+                $provider->register();
 
-            $provider_instances[] = $provider;
+                $provider_instances[] = $provider;
+            } catch (Exception $e) {
+                // Fail silently if in production, otherwise throw originalException.
+                if (\defined('WP_DEBUG') && WP_DEBUG) {
+                    throw new ContainerException($e->getMessage());
+                }
+            }
         }
 
         foreach ($provider_instances as $provider) {
