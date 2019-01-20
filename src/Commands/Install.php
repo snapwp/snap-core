@@ -57,7 +57,7 @@ class Install
      *
      * @param \Composer\Script\Event $event
      */
-    public static function install_theme($event)
+    public static function run($event)
     {
         static::$io = $event->getIO();
         static::$composer = $event->getComposer();
