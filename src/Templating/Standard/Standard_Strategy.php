@@ -256,10 +256,12 @@ class Standard_Strategy implements Templating_Interface
     {
         $slug = \str_replace(
             [
-                Config::get('theme.templates_directory') . '/views/', '.php',
+                Config::get('theme.templates_directory') . '/views/',
+                '.php',
                 '.',
             ],
             [
+                '',
                 '',
                 '/',
             ],
@@ -285,7 +287,6 @@ class Standard_Strategy implements Templating_Interface
         if ($this->extends !== false) {
             throw new Templating_Exception($this->current_view . ' is attempting to extend multiple layouts.');
         }
-
         $this->extends = $this->get_template_name($layout);
     }
 
