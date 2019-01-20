@@ -250,7 +250,7 @@ class Loader
         // Ensure maximum portability.
         $folder = \trailingslashit($folder);
 
-        if (isset($this->visited[$folder])) {
+        if (isset($this->visited[ $folder ])) {
             return $files;
         }
 
@@ -258,7 +258,7 @@ class Loader
         if (\is_dir($folder)) {
             // Scan the directory for files to include.
             $contents = \scandir($folder);
-            $this->visited[$folder] = null;
+            $this->visited[ $folder ] = null;
         }
 
         if (!empty($contents)) {
