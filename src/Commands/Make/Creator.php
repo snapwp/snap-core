@@ -119,19 +119,18 @@ class Creator extends Command
     protected function get_destination($scaffold, $args)
     {
         $sub_dir = '/theme/';
-        $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
 
         switch ($scaffold) {
             case 'shortcode':
                 $dir = 'Shortcodes';
-                $sub_dir .= \trailingslashit($hookables_dir);
+                $sub_dir .= 'Content/';
                 break;
             case 'ajax':
                 $dir = 'Ajax';
                 $sub_dir .= 'Http/';
                 break;
             case 'hookable':
-                $dir = $hookables_dir;
+                $dir = \trim(Config::get('theme.hookables_directory'), '/');
                 break;
             case 'controller':
                 $dir = 'Controllers';

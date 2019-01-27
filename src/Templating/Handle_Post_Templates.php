@@ -125,10 +125,10 @@ class Handle_Post_Templates extends Hookable
      */
     public function post_template_routing($template_path)
     {
-        $routes_file = \get_template_directory() . '/resources/routes.php';
+        $routes_file = \get_template_directory() . '/public/routes.php';
         
         if (is_child_theme()) {
-            $routes_file = \locate_template('resources/routes.php');
+            $routes_file = \locate_template('public/routes.php');
         }
 
         if ('' !== $routes_file) {

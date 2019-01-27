@@ -142,7 +142,7 @@ class Loader
             \get_template_directory() . '/theme/' . $hookables_dir,
             \get_template_directory() . '/theme/Http/Ajax',
             \get_template_directory() . '/theme/Http/Middleware',
-            \get_template_directory() . '/theme/Http/Validation/Rules',
+            \get_template_directory() . '/theme/Http/Validation',
             \get_template_directory() . '/theme/Content',
             \get_template_directory() . '/theme/Events',
         ];
@@ -151,7 +151,7 @@ class Loader
             $hookable_locations[] = \get_stylesheet_directory() . '/theme/' . $hookables_dir;
             $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Ajax';
             $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Middleware';
-            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Validation/Rules';
+            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Validation';
             $hookable_locations[] = \get_stylesheet_directory() . '/theme/Content';
             $hookable_locations[] = \get_stylesheet_directory() . '/theme/Events';
         }
