@@ -5,10 +5,10 @@ if (! @include_once __DIR__ . '/../vendor/autoload.php') {
     @include_once __DIR__ . '/../../../autoload.php';
 }
 
+use Snap\Commands\Cache;
 use Snap\Commands\Make\Event;
 use Snap\Commands\Make\Request;
 use Snap\Commands\Make\Rule;
-use Symfony\Component\Console\Application;
 use Snap\Commands\Make\Hookable;
 use Snap\Commands\Make\Controller;
 use Snap\Commands\Make\Ajax;
@@ -16,6 +16,7 @@ use Snap\Commands\Make\Post_Type;
 use Snap\Commands\Make\Taxonomy;
 use Snap\Commands\Make\Shortcode;
 use Snap\Commands\Publish;
+use Symfony\Component\Console\Application;
 
 $application = new Application();
 
@@ -30,5 +31,6 @@ $application->add(new Request());
 $application->add(new Rule());
 
 $application->add(new Publish());
+$application->add(new Cache());
 
 $application->run();

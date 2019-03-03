@@ -4,15 +4,12 @@ namespace Snap\Core;
 
 /**
  * A simple config manager.
- *
- * @since  1.0.0
  */
 class Config
 {
     /**
      * Config directory paths, in order of addition.
      *
-     * @since  1.0.0
      * @var string
      */
     private $paths = [];
@@ -20,7 +17,6 @@ class Config
     /**
      * When a config item is accessed via dot notation, it is stored here for easier retrieval.
      *
-     * @since  1.0.0
      * @var array
      */
     private $cache = [];
@@ -28,7 +24,6 @@ class Config
     /**
      * Config defaults.
      *
-     * @since  1.0.0
      * @var array
      */
     private $config = [
@@ -73,13 +68,11 @@ class Config
     /**
      * Add a new config folder path.
      *
-     * @since  1.0.0
-     *
      * @param string $path Path to config directory.
      */
     public function add_path(string $path)
     {
-        $path = trailingslashit($path);
+        $path = \trailingslashit($path);
         $this->paths[] = $path;
         $this->parse_files($path);
     }
@@ -89,21 +82,17 @@ class Config
      *
      * New keys are added as per normal.
      *
-     * @since  1.0.0
-     *
      * @param string $path Path to config directory.
      */
     public function add_default_path(string $path)
     {
-        $path = trailingslashit($path);
+        $path = \trailingslashit($path);
         $this->paths[] = $path;
         $this->parse_files($path, false);
     }
 
     /**
      * Retrieve a config value.
-     *
-     * @since  1.0.0
      *
      * @param  string $option  The config key to retrieve.
      * @param  mixed  $default A default value to return if the config key was not defined.
@@ -112,7 +101,7 @@ class Config
     public function get($option, $default = null)
     {
         if ($this->has($option)) {
-            return $this->cache[ $option ];
+            return $this->cache[$option];
         }
 
         return $default;
@@ -121,15 +110,13 @@ class Config
     /**
      * Check if a given config value exists in the cache.
      *
-     * @since 1.0.0
-     *
      * @param  string $key The dot notation option key to look for.
      * @return boolean Whether an option exists for the given key.
      */
     public function has($key)
     {
         // Check if already cached.
-        if (isset($this->cache[ $key ])) {
+        if (isset($this->cache[$key])) {
             return true;
         }
 
@@ -138,7 +125,7 @@ class Config
 
         foreach ($segments as $segment) {
             if (\array_key_exists($segment, $root)) {
-                $root = $root[ $segment ];
+                $root = $root[$segment];
                 continue;
             } else {
                 return false;
@@ -146,7 +133,7 @@ class Config
         }
 
         // Set cache for the given key.
-        $this->cache[ $key ] = $root;
+        $this->cache[$key] = $root;
 
         return true;
     }
@@ -154,20 +141,38 @@ class Config
     /**
      * Sets an option.
      *
-     * @since  1.0.0
-     *
      * @param string $key   The key of this option.
      * @param mixed  $value The value to set for this option.
      */
     public function set($key, $value)
     {
-        $this->cache[ $key ] = $value;
+        $this->cache[$key] = $value;
     }
 
     /**
-     * Scans a path for config files, and merges them into the config.
+     * Primes and returns the cache array.
      *
-     * @since  1.0.0
+     * @return array
+     */
+    public function get_primed_cache(): array
+    {
+        $this->recurse_through_config($this->config);
+        return $this->cache;
+    }
+
+    /**
+     * Loads config from a cache file.
+     *
+     * @param string $data Serialized config array.
+     */
+    public function load_from_cache($data)
+    {
+        $this->cache = unserialize($data);
+    }
+
+
+    /**
+     * Scans a path for config files, and merges them into the config.
      *
      * @param string $path      Directory path to scan.
      * @param bool   $overwrite If true, then the config within the $path will overwrite existing config keys.
@@ -178,7 +183,7 @@ class Config
             $files = \glob($path . '*.php');
         }
 
-        if (! empty($files)) {
+        if (!empty($files)) {
             foreach ($files as $file) {
                 /** @noinspection PhpIncludeInspection */
                 $parsed_options = require $file;
@@ -189,14 +194,14 @@ class Config
                     continue;
                 }
 
-                if (isset($this->config[ $option_set ])) {
+                if (isset($this->config[$option_set])) {
                     if ($overwrite) {
-                        $this->config[ $option_set ] = \array_merge($this->config[ $option_set ], $parsed_options);
+                        $this->config[$option_set] = \array_merge($this->config[$option_set], $parsed_options);
                     } else {
-                        $this->config[ $option_set ] = \array_merge($parsed_options, $this->config[ $option_set ]);
+                        $this->config[$option_set] = \array_merge($parsed_options, $this->config[$option_set]);
                     }
                 } else {
-                    $this->config[ $option_set ] = $parsed_options;
+                    $this->config[$option_set] = $parsed_options;
                 }
             }
         }
@@ -205,13 +210,37 @@ class Config
     /**
      * Get the filename without extension from a given path.
      *
-     * @since  1.0.0
-     *
      * @param  string $path Full file path.
      * @return string Filename.
      */
-    private function get_filename($path)
+    private function get_filename(string $path): string
     {
         return \str_replace('.php', '', \basename($path));
+    }
+
+    /**
+     * Primes the cache array.
+     *
+     * @param array  $values An array to extract the keys from.
+     * @param string $path   The current level's key.
+     */
+    private function recurse_through_config(array $values, $path = null)
+    {
+        if (empty($values)) {
+            $this->has($path);
+        }
+
+        foreach ($values as $key => $value) {
+            if (!\is_string($key)) {
+                $this->has($path);
+                continue;
+            }
+
+            if (\is_array($value)) {
+                $this->recurse_through_config($value, $path ? "$path.$key" : $key);
+            } else {
+                $this->has("$path.$key");
+            }
+        }
     }
 }

@@ -132,10 +132,16 @@ class Snap
             $config = new Config();
 
             if ($theme_root === null) {
-                $config->add_path(\get_template_directory() . '/config');
+                if (WP_DEBUG === false && \file_exists(\get_stylesheet_directory() . '/cache/config/theme')) {
+                    $config->load_from_cache(
+                        \file_get_contents(\get_stylesheet_directory() . '/cache/config/theme')
+                    );
+                } else {
+                    $config->add_path(\get_template_directory() . '/config');
 
-                if (\is_child_theme()) {
-                    $config->add_path(\get_stylesheet_directory() . '/config');
+                    if (\is_child_theme()) {
+                        $config->add_path(\get_stylesheet_directory() . '/config');
+                    }
                 }
             } else {
                 $config->add_path($theme_root . '/config');
@@ -198,7 +204,7 @@ class Snap
     private static function init_templating()
     {
         // If no templating strategy has already been registered.
-        if (! static::$container->has(Templating_Interface::class)) {
+        if (!static::$container->has(Templating_Interface::class)) {
             // Add the default rendering engine.
             static::$container->add_singleton(
                 \Snap\Templating\Standard\Standard_Strategy::class,
