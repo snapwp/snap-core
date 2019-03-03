@@ -134,46 +134,55 @@ class Loader
      *
      * @since 1.0.0
      */
-    public function load_theme()
+    public function load_theme($classmap = null)
     {
-        $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
+        if ($classmap !== null) {
+            static::$theme_includes = unserialize($classmap);
+        } else {
+            $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
 
-        $hookable_locations = [
-            \get_template_directory() . '/theme/' . $hookables_dir,
-            \get_template_directory() . '/theme/Http/Ajax',
-            \get_template_directory() . '/theme/Http/Middleware',
-            \get_template_directory() . '/theme/Http/Validation/Rules',
-            \get_template_directory() . '/theme/Content',
-            \get_template_directory() . '/theme/Events',
-        ];
+            $hookable_locations = [
+                \get_template_directory() . '/theme/' . $hookables_dir,
+                \get_template_directory() . '/theme/Http/Ajax',
+                \get_template_directory() . '/theme/Http/Middleware',
+                \get_template_directory() . '/theme/Http/Validation/Rules',
+                \get_template_directory() . '/theme/Content',
+                \get_template_directory() . '/theme/Events',
+            ];
 
-        if (\is_child_theme()) {
-            $hookable_locations[] = \get_stylesheet_directory() . '/theme/' . $hookables_dir;
-            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Ajax';
-            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Middleware';
-            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Validation/Rules';
-            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Content';
-            $hookable_locations[] = \get_stylesheet_directory() . '/theme/Events';
-        }
-
-        // Gather all possible Hookables.
-        foreach ($hookable_locations as $dir) {
-            self::$theme_includes = $this->scan_dir($dir, self::$theme_includes);
-        }
-
-        if (!empty(self::$theme_includes)) {
-            foreach (self::$theme_includes as $class => $path) {
-                $this->init_hookable($class);
+            if (\is_child_theme()) {
+                $hookable_locations[] = \get_stylesheet_directory() . '/theme/' . $hookables_dir;
+                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Ajax';
+                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Middleware';
+                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Validation/Rules';
+                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Content';
+                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Events';
             }
-        }
 
-        self::$theme_includes = $this->scan_dir(
-            \get_stylesheet_directory() . '/theme/',
-            self::$theme_includes
-        );
+            // Gather all possible Hookables.
+            foreach ($hookable_locations as $dir) {
+                static::$theme_includes = $this->scan_dir($dir, static::$theme_includes);
+            }
+
+            if (!empty(static::$theme_includes)) {
+                foreach (static::$theme_includes as $class => $path) {
+                    $this->init_hookable($class);
+                }
+            }
+
+            static::$theme_includes = $this->scan_dir(
+                \get_stylesheet_directory() . '/theme/',
+                static::$theme_includes
+            );
+        }
 
         $this->init_theme_providers();
         $this->init_theme_setup();
+    }
+
+    public function get_theme_includes()
+    {
+        return static::$theme_includes;
     }
 
     /**

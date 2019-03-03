@@ -3,6 +3,7 @@
 namespace Snap\Core;
 
 use Exception;
+use Hodl\Exceptions\ContainerException;
 use Rakit\Validation\Validator;
 use Snap\Exceptions\Startup_Exception;
 use Snap\Http\Request;
@@ -92,7 +93,14 @@ class Snap
 
                 static::init_view();
 
-                $loader->load_theme();
+                $classmap = null;
+                $classmap_cache = \get_stylesheet_directory() . '/cache/config/' . sha1(NONCE_SALT . 'classmap');
+
+                if (WP_DEBUG === false && \file_exists($classmap_cache)) {
+                    $classmap = file_get_contents($classmap_cache);
+                }
+
+                $loader->load_theme($classmap);
             } catch (Exception $e) {
                 throw new Startup_Exception($e->getMessage());
             }
@@ -132,10 +140,10 @@ class Snap
             $config = new Config();
 
             if ($theme_root === null) {
-                if (WP_DEBUG === false && \file_exists(\get_stylesheet_directory() . '/cache/config/theme')) {
-                    $config->load_from_cache(
-                        \file_get_contents(\get_stylesheet_directory() . '/cache/config/theme')
-                    );
+                $config_cache_path = \get_stylesheet_directory() . '/cache/config/' . sha1(NONCE_SALT . 'theme');
+
+                if (WP_DEBUG === false && \file_exists($config_cache_path)) {
+                    $config->load_from_cache(\file_get_contents($config_cache_path));
                 } else {
                     $config->add_path(\get_template_directory() . '/config');
 
@@ -143,7 +151,9 @@ class Snap
                         $config->add_path(\get_stylesheet_directory() . '/config');
                     }
                 }
-            } else {
+            }
+
+            if ($theme_root !== null) {
                 $config->add_path($theme_root . '/config');
             }
 

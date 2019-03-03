@@ -4,6 +4,7 @@ namespace Snap\Commands;
 
 use Snap\Commands\Concerns\Needs_Wordpress;
 use Snap\Commands\Concerns\Uses_Filesystem;
+use Snap\Core\Loader;
 use Snap\Core\Snap;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -57,6 +58,9 @@ class Cache extends Command
         Snap::create_container();
         Snap::init_config();
 
+        $loader = new Loader();
+        $loader->load_theme();
+
         $config = Snap::get_container()->get('config');
 
         $root = \get_template_directory();
@@ -72,7 +76,17 @@ class Cache extends Command
             \wp_mkdir_p($cache_path);
         }
 
-        if ($this->file->put_contents($cache_path . 'theme', \serialize($config->get_primed_cache()))) {
+        $config_created = $this->file->put_contents(
+            $cache_path . sha1(NONCE_SALT . 'theme'),
+            \serialize($config->get_primed_cache())
+        );
+
+        $autoload_created = $this->file->put_contents(
+            $cache_path . sha1(NONCE_SALT . 'classmap'),
+            \serialize($loader->get_theme_includes())
+        );
+
+        if ($config_created && $autoload_created) {
             $output->writeln('<info>Snap cache was set up successfully.</info>');
             return;
         }
