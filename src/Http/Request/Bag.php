@@ -56,7 +56,7 @@ class Bag implements ArrayAccess
                 return $this->get_raw($key);
             }
 
-            return \sanitize_text_field($this->get_raw($key));
+            return \sanitize_textarea_field($this->get_raw($key));
         }
 
         return $default;
@@ -214,7 +214,7 @@ class Bag implements ArrayAccess
                 return $value;
             }
 
-            return \sanitize_text_field($value);
+            return \sanitize_textarea_field($value);
         }
     }
 
