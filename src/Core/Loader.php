@@ -137,7 +137,7 @@ class Loader
     public function load_theme($classmap = null)
     {
         if ($classmap !== null) {
-            static::$theme_includes = unserialize($classmap);
+            static::$theme_includes = \unserialize($classmap);
         } else {
             $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
 

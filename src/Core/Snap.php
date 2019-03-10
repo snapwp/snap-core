@@ -94,10 +94,10 @@ class Snap
                 static::init_view();
 
                 $classmap = null;
-                $classmap_cache = \get_stylesheet_directory() . '/cache/config/' . sha1(NONCE_SALT . 'classmap');
+                $classmap_cache = \get_stylesheet_directory() . '/cache/config/' . \sha1(NONCE_SALT . 'classmap');
 
                 if (WP_DEBUG === false && \file_exists($classmap_cache)) {
-                    $classmap = file_get_contents($classmap_cache);
+                    $classmap = \file_get_contents($classmap_cache);
                 }
 
                 $loader->load_theme($classmap);
@@ -140,7 +140,7 @@ class Snap
             $config = new Config();
 
             if ($theme_root === null) {
-                $config_cache_path = \get_stylesheet_directory() . '/cache/config/' . sha1(NONCE_SALT . 'theme');
+                $config_cache_path = \get_stylesheet_directory() . '/cache/config/' . \sha1(NONCE_SALT . 'theme');
 
                 if (WP_DEBUG === false && \file_exists($config_cache_path)) {
                     $config->load_from_cache(\file_get_contents($config_cache_path));

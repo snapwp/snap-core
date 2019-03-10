@@ -101,7 +101,7 @@ class Config
     public function get($option, $default = null)
     {
         if ($this->has($option)) {
-            return $this->cache[$option];
+            return $this->cache[ $option ];
         }
 
         return $default;
@@ -116,7 +116,7 @@ class Config
     public function has($key)
     {
         // Check if already cached.
-        if (isset($this->cache[$key])) {
+        if (isset($this->cache[ $key ])) {
             return true;
         }
 
@@ -125,7 +125,7 @@ class Config
 
         foreach ($segments as $segment) {
             if (\array_key_exists($segment, $root)) {
-                $root = $root[$segment];
+                $root = $root[ $segment ];
                 continue;
             } else {
                 return false;
@@ -133,7 +133,7 @@ class Config
         }
 
         // Set cache for the given key.
-        $this->cache[$key] = $root;
+        $this->cache[ $key ] = $root;
 
         return true;
     }
@@ -146,7 +146,7 @@ class Config
      */
     public function set($key, $value)
     {
-        $this->cache[$key] = $value;
+        $this->cache[ $key ] = $value;
     }
 
     /**
@@ -167,7 +167,7 @@ class Config
      */
     public function load_from_cache($data)
     {
-        $this->cache = unserialize($data);
+        $this->cache = \unserialize($data);
     }
 
 
@@ -194,14 +194,14 @@ class Config
                     continue;
                 }
 
-                if (isset($this->config[$option_set])) {
+                if (isset($this->config[ $option_set ])) {
                     if ($overwrite) {
-                        $this->config[$option_set] = \array_merge($this->config[$option_set], $parsed_options);
+                        $this->config[ $option_set ] = \array_merge($this->config[ $option_set ], $parsed_options);
                     } else {
-                        $this->config[$option_set] = \array_merge($parsed_options, $this->config[$option_set]);
+                        $this->config[ $option_set ] = \array_merge($parsed_options, $this->config[ $option_set ]);
                     }
                 } else {
-                    $this->config[$option_set] = $parsed_options;
+                    $this->config[ $option_set ] = $parsed_options;
                 }
             }
         }
