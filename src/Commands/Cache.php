@@ -6,6 +6,7 @@ use Snap\Commands\Concerns\Needs_Wordpress;
 use Snap\Commands\Concerns\Uses_Filesystem;
 use Snap\Core\Loader;
 use Snap\Core\Snap;
+use Snap\Services\Service_Provider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -69,7 +70,10 @@ class Cache extends Command
             $root = \get_stylesheet_directory();
         }
 
-        $cache_path = \trailingslashit($root) . \trailingslashit($config->get('theme.cache_directory')) . 'config/';
+        $cache_path = \trailingslashit($root) . \trailingslashit($config->get('theme.cache_directory'));
+
+        // Clear any previously cached templates
+        $this->file->rmdir($cache_path.'templates/', true);
 
         // Make the cache directory if it doesn't exist.
         if (!\is_dir($cache_path)) {
@@ -77,12 +81,12 @@ class Cache extends Command
         }
 
         $config_created = $this->file->put_contents(
-            $cache_path . \sha1(NONCE_SALT . 'theme'),
+            $cache_path . sha1(NONCE_SALT . 'theme'),
             \serialize($config->get_primed_cache())
         );
 
         $autoload_created = $this->file->put_contents(
-            $cache_path . \sha1(NONCE_SALT . 'classmap'),
+            $cache_path . sha1(NONCE_SALT . 'classmap'),
             \serialize($loader->get_theme_includes())
         );
 
