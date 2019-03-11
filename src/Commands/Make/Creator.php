@@ -17,7 +17,6 @@ class Creator extends Command
     /**
      * The current working directory.
      *
-     * @since  1.0.0
      * @var string
      */
     protected $theme_dir;
@@ -25,15 +24,12 @@ class Creator extends Command
     /**
      * The scaffolding directory.
      *
-     * @since  1.0.0
      * @var string
      */
     protected $scaffolding_dir;
 
     /**
      * Set properties.
-     *
-     * @since  1.0.0
      */
     public function __construct()
     {
@@ -45,8 +41,6 @@ class Creator extends Command
 
     /**
      * Update a scaffold file and put into the active theme.
-     *
-     * @since  1.0.0
      *
      * @param  string $scaffold The file to scaffold.
      * @param  array  $args     Any replacement arguments.
@@ -65,12 +59,12 @@ class Creator extends Command
         if (\file_exists($original)) {
             $content = \file_get_contents($original);
 
-            if (! empty($options)) {
+            if (!empty($options)) {
                 foreach ($options as $option => $value) {
                     if ($value !== null) {
                         \preg_match_all("/%IF\|$option%([^%]*)%END%/m", $content, $matches);
 
-                        if (! empty($matches)) {
+                        if (!empty($matches)) {
                             $content = \str_replace(
                                 $matches[0],
                                 \str_replace($option, $value, $matches[1]),
@@ -84,9 +78,9 @@ class Creator extends Command
             \preg_match_all("/%IF[^%]*%([^%]*)%END%/m", $content, $matches);
 
             // Clean up any IF tags.
-            if (! empty($matches)) {
+            if (!empty($matches)) {
                 foreach ($matches as $match) {
-                    if (! empty($match)) {
+                    if (!empty($match)) {
                         $content = \str_replace($match[0], '', $content);
                     }
                 }
@@ -113,10 +107,8 @@ class Creator extends Command
     /**
      * Returns the full path of the new file to be created.
      *
-     * @since  1.0.0
-     *
      * @param  string $scaffold The file to scaffold.
-     * @param  array  $args      The arguments passed from the Maker class.
+     * @param  array  $args     The arguments passed from the Maker class.
      * @return string
      */
     protected function get_destination($scaffold, $args)
@@ -143,6 +135,10 @@ class Creator extends Command
                 $dir = 'Requests';
                 $sub_dir .= 'Http/';
                 break;
+            case 'middleware':
+                $dir = 'Middleware';
+                $sub_dir .= 'Http/';
+                break;
             case 'rule':
                 $dir = 'Rules';
                 $sub_dir .= 'Http/Validation/';
@@ -167,13 +163,11 @@ class Creator extends Command
 
         \wp_mkdir_p($output_path);
 
-        return $output_path . $args['CLASSNAME']. '.php';
+        return $output_path . $args['CLASSNAME'] . '.php';
     }
 
     /**
      * Ensure a name-spaced $filename can be created as a directory.
-     *
-     * @since  1.0.0
      *
      * @param  string $filename The (possibly) name-spaced Hookable class name to create.
      * @return string
@@ -185,8 +179,6 @@ class Creator extends Command
 
     /**
      * Populates the NAMESPACE argument based off the passed CLASSNAME.
-     *
-     * @since  1.0.0
      *
      * @param  array $args The args passed to the creator.
      * @return array
@@ -208,6 +200,12 @@ class Creator extends Command
         return $args;
     }
 
+    /**
+     * Whether the current classname contains a directory.
+     *
+     * @param string $class_name The classname.
+     * @return bool
+     */
     private function is_nested_directory($class_name)
     {
         return \strpos($class_name, '\\') !== false;
