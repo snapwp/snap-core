@@ -7,6 +7,7 @@ if (! @include_once __DIR__ . '/../vendor/autoload.php') {
 
 use Snap\Commands\Cache;
 use Snap\Commands\Make\Event;
+use Snap\Commands\Make\Middleware;
 use Snap\Commands\Make\Request;
 use Snap\Commands\Make\Rule;
 use Snap\Commands\Make\Hookable;
@@ -24,6 +25,7 @@ $application->add(new Hookable());
 $application->add(new Controller());
 $application->add(new Ajax());
 $application->add(new Post_Type());
+$application->add(new Middleware());
 $application->add(new Taxonomy());
 $application->add(new Shortcode());
 $application->add(new Event());

@@ -81,12 +81,12 @@ class Cache extends Command
         }
 
         $config_created = $this->file->put_contents(
-            $cache_path . sha1(NONCE_SALT . 'theme'),
+            $cache_path . \sha1(NONCE_SALT . 'theme'),
             \serialize($config->get_primed_cache())
         );
 
         $autoload_created = $this->file->put_contents(
-            $cache_path . sha1(NONCE_SALT . 'classmap'),
+            $cache_path . \sha1(NONCE_SALT . 'classmap'),
             \serialize($loader->get_theme_includes())
         );
 

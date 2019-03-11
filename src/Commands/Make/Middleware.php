@@ -7,30 +7,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Creates an Event class in the current directory.
- *
- * @since  1.0.0
+ * Creates a Middleware class in the current directory.
  */
-class Event extends Creator
+class Middleware extends Creator
 {
     /**
      * Setup the command signature and help text.
-     *
-     * @since  1.0.0
      */
     protected function configure()
     {
-        $this->setName('make:event')
-            ->setDescription('Creates a new Cron_Event.')
-            ->setHelp('Creates a new Cron_Event Hookable within your theme/Events directory');
+        $this->setName('make:middleware')
+            ->setDescription('Creates a new middleware.')
+            ->setHelp('Creates a new Middleware Hookable within your theme/Http/Middleware directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Cron_Event.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Middleware.');
     }
 
     /**
      * Run the command.
-     *
-     * @since  1.0.0
      *
      * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
@@ -39,7 +33,7 @@ class Event extends Creator
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $created = $this->scaffold(
-            'event',
+            'middleware',
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]

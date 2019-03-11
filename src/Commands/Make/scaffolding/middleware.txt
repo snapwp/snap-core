@@ -1,0 +1,30 @@
+<?php
+
+namespace Theme\Http\MiddlewareNAMESPACE;
+
+use Snap\Hookables\Middleware;
+use Snap\Http\Request;
+use Snap\Http\Response;
+
+/**
+ * CLASSNAME description
+ */
+class CLASSNAME extends Middleware
+{
+    /**
+     * Handle the request.
+     *
+     * Return true to continue to the next middleware or dispatch the current view.
+     * Any other return value will short-circuit the currently tested route.
+     *
+     * Alternatively, use the Response class to force a redirect or alter HTTP headers.
+     *
+     * @param \Snap\Http\Request  $request  The current Request instance.
+     * @param \Snap\Http\Response $response The current Response instance.
+     * @return bool
+     */
+    public function handle(Request $request, Response $response)
+    {
+        return true;
+    }
+}
