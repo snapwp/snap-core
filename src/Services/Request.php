@@ -5,17 +5,21 @@ namespace Snap\Services;
 /**
  * Allow static access to the Request service.
  *
- * @method static  get_method()
- * @method static  get_url()
- * @method static  get_scheme()
- * @method static  get_path()
- * @method static  get_path_segments()
- * @method static  is_method($method)
- * @method static  get($key, $default = null)
- * @method static  post($key, $default = null)
- * @method static  file($key, $default = null)
- * @method static  server($key, $default = null)
- * @method static  query($key, $default = null)
+ * @method static string get_method()
+ * @method static string get_url()
+ * @method static string get_scheme()
+ * @method static string get_path()
+ * @method static string get_host()
+ * @method static array get_path_segments()
+ * @method static bool is_method($method)
+ * @method static mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[] get($key, $default = null)
+ * @method static mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[] post($key, $default = null)
+ * @method static mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[] files($key, $default = null)
+ * @method static mixed server($key, $default = null)
+ * @method static mixed query($key, $default = null)
+ * @method static bool has($key)
+ * @method static bool has_file($key)
+ * @method static bool filled($key)
  *
  * @see \Snap\Http\Request
  */
