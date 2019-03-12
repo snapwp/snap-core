@@ -144,6 +144,14 @@ class Theme_Utils
      */
     public static function is_external_url($url)
     {
-        return \strpos($url, Request::get_host()) !== false || \strpos($url, "/") === '0';
+        if (parse_url($url, PHP_URL_HOST) === Request::get_host()) {
+            return false;
+        }
+        
+        if (\strpos($url, "/") === 0) {
+            return false;
+        }
+
+        return true;
     }
 }
