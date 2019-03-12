@@ -142,7 +142,7 @@ class Theme_Utils
      * @param string $url The URL to check.
      * @return bool
      */
-    public function is_external_url($url)
+    public static function is_external_url($url)
     {
         return \strpos($url, Request::get_host()) !== false || \strpos($url, "/") === '0';
     }
