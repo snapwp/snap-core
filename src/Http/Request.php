@@ -19,7 +19,6 @@ class Request implements ArrayAccess
     /**
      * Request query params.
      *
-     * @since 1.0.0
      * @var \Snap\Http\Request\Bag
      */
     public $query = null;
@@ -27,7 +26,6 @@ class Request implements ArrayAccess
     /**
      * Request post params.
      *
-     * @since 1.0.0
      * @var \Snap\Http\Request\Bag
      */
     public $post = null;
@@ -35,7 +33,6 @@ class Request implements ArrayAccess
     /**
      * Request server params.
      *
-     * @since 1.0.0
      * @var Bag
      */
     public $server = null;
@@ -43,7 +40,6 @@ class Request implements ArrayAccess
     /**
      * Request file params.
      *
-     * @since 1.0.0
      * @var File_Bag
      */
     public $files = null;
@@ -53,7 +49,6 @@ class Request implements ArrayAccess
      *
      * POST takes precedence.
      *
-     * @since 1.0.0
      * @var \Snap\Http\Request\Bag
      */
     public $input = null;
@@ -61,7 +56,6 @@ class Request implements ArrayAccess
     /**
      * The current query being run by WordPress.
      *
-     * @since 1.0.0
      * @var string
      */
     public $matched_query;
@@ -69,7 +63,6 @@ class Request implements ArrayAccess
     /**
      * The current rewrite rule being run.
      *
-     * @since 1.0.0
      * @var string
      */
     public $matched_rule;
@@ -77,7 +70,6 @@ class Request implements ArrayAccess
     /**
      * Whether WordPress thinks the current request is from a mobile.
      *
-     * @since 1.0.0
      * @var boolean
      */
     public $is_mobile = false;
@@ -85,7 +77,6 @@ class Request implements ArrayAccess
     /**
      * The current request URL.
      *
-     * @since 1.0.0
      * @var string
      */
     protected $url;
@@ -93,7 +84,6 @@ class Request implements ArrayAccess
     /**
      * The current request path.
      *
-     * @since 1.0.0
      * @var string
      */
     protected $path;
@@ -101,15 +91,12 @@ class Request implements ArrayAccess
     /**
      * The current request scheme.
      *
-     * @since 1.0.0
      * @var string
      */
     protected $scheme;
 
     /**
      * Populate request variables and properties.
-     *
-     * @since  1.0.0
      */
     public function __construct()
     {
@@ -126,8 +113,6 @@ class Request implements ArrayAccess
     /**
      * Get the request HTTP method.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
     public function get_method()
@@ -137,8 +122,6 @@ class Request implements ArrayAccess
 
     /**
      * Returns the current URL.
-     *
-     * @since 1.0.0
      *
      * @return string
      */
@@ -150,8 +133,6 @@ class Request implements ArrayAccess
     /**
      * Returns the current URL path.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
     public function get_scheme()
@@ -160,9 +141,17 @@ class Request implements ArrayAccess
     }
 
     /**
-     * Returns the current URL path.
+     * Returns the current URL host (Domain).
      *
-     * @since 1.0.0
+     * @return string
+     */
+    public function get_host()
+    {
+        return $this->server('SERVER_NAME');
+    }
+
+    /**
+     * Returns the current URL path.
      *
      * @return string
      */
@@ -174,8 +163,6 @@ class Request implements ArrayAccess
     /**
      * Returns the path segments.
      *
-     * @since 1.0.0
-     *
      * @return array
      */
     public function get_path_segments()
@@ -185,8 +172,6 @@ class Request implements ArrayAccess
 
     /**
      * Checks if the current request matches the supplied HTTP method.
-     *
-     * @since  1.0.0
      *
      * @param  string $method HTTP method to check against. Case insensitive.
      * @return boolean
@@ -198,8 +183,6 @@ class Request implements ArrayAccess
 
     /**
      * Returns a parameter from the request bag, or a default if not present.
-     *
-     * @since  1.0.0
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
@@ -213,8 +196,6 @@ class Request implements ArrayAccess
     /**
      * Returns a parameter from the server bag, or a default if not present.
      *
-     * @since  1.0.0
-     *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
      * @return mixed
@@ -226,8 +207,6 @@ class Request implements ArrayAccess
 
     /**
      * Returns a parameter from the post bag, or a default if not present.
-     *
-     * @since  1.0.0
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
@@ -241,8 +220,6 @@ class Request implements ArrayAccess
     /**
      * Returns a parameter from the query bag, or a default if not present.
      *
-     * @since  1.0.0
-     *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
      * @return mixed
@@ -254,8 +231,6 @@ class Request implements ArrayAccess
 
     /**
      * Returns a parameter from the files bag, or a default if not present.
-     *
-     * @since  1.0.0
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
@@ -269,8 +244,6 @@ class Request implements ArrayAccess
     /**
      * Check if the $key exists within the post or query bags.
      *
-     * @since 1.0.0
-     *
      * @param string $key The key to check for.
      * @return bool
      */
@@ -281,8 +254,6 @@ class Request implements ArrayAccess
 
     /**
      * Check if the $key exists within the file bag.
-     *
-     * @since 1.0.0
      *
      * @param string $key The key to check for.
      * @return bool
@@ -295,8 +266,6 @@ class Request implements ArrayAccess
     /**
      * Determine if an input is present and not empty within the query or post bags.
      *
-     * @since 1.0.0
-     *
      * @param string $key The key to check for.
      * @return bool
      */
@@ -308,8 +277,6 @@ class Request implements ArrayAccess
     /**
      * Set a item on the request bag.
      *
-     * @since  1.0.0
-     *
      * @param  mixed $offset The offset to set.
      * @param  mixed $value  The value to set.
      */
@@ -318,14 +285,12 @@ class Request implements ArrayAccess
         if (\is_null($offset)) {
             $this->input[] = $value;
         } else {
-            $this->input[ $offset ] = $value;
+            $this->input[$offset] = $value;
         }
     }
 
     /**
      * Whether an item exists in the request bag.
-     *
-     * @since  1.0.0
      *
      * @param  mixed $offset An offset to check for.
      * @return boolean
@@ -338,19 +303,15 @@ class Request implements ArrayAccess
     /**
      * Remove an item from the request bag.
      *
-     * @since  1.0.0
-     *
      * @param  mixed $offset The offset to unset.
      */
     public function offsetUnset($offset)
     {
-        unset($this->input[ $offset ]);
+        unset($this->input[$offset]);
     }
 
     /**
      * Get an item from the request bag.
-     *
-     * @since  1.0.0
      *
      * @param  mixed $offset The offset to get.
      * @return mixed
@@ -363,8 +324,6 @@ class Request implements ArrayAccess
     /**
      * Get an item from the request bag.
      *
-     * @since  1.0.0
-     *
      * @param  mixed $name The offset to get.
      * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
      */
@@ -375,8 +334,6 @@ class Request implements ArrayAccess
 
     /**
      * Populates Request class parameters.
-     *
-     * @since 1.0.0
      */
     private function populate_properties()
     {
@@ -397,8 +354,6 @@ class Request implements ArrayAccess
      * Creates and fills the request bag with query params, and $_POST params if present.
      *
      * Post parameters take precedence and overwrite query params of the same key.
-     *
-     * @since  1.0.0
      */
     private function populate_input()
     {
