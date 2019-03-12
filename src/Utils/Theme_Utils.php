@@ -3,26 +3,23 @@
 namespace Snap\Utils;
 
 use Snap\Services\Config;
+use Snap\Services\Request;
 
 /**
  * Sidebar and widget utilities.
  *
- * @since 1.0.0
  */
 class Theme_Utils
 {
     /**
      * Mix-manifest.json contents stored as array.
      *
-     * @since 1.0.0
      * @var array|null
      */
     private static $manifest = null;
 
     /**
      * Gets the current full URL of the page with query string, host, and scheme.
-     *
-     * @since  1.0.0
      *
      * @param  boolean $remove_query If true, the URL is returned without any query params.
      * @return string The current URL.
@@ -41,8 +38,6 @@ class Theme_Utils
     /**
      * Shortcut to get the include path relative to the active theme directory.
      *
-     * @since 1.0.0
-     *
      * @param string $path Path to append relative to active theme.
      * @return string
      */
@@ -53,8 +48,6 @@ class Theme_Utils
 
     /**
      * Shortcut to get the file URL relative to the active theme directory.
-     *
-     * @since 1.0.0
      *
      * @param string $path Path to append relative to active theme directory URL.
      * @return string
@@ -67,8 +60,6 @@ class Theme_Utils
     /**
      * Retrieves a filename public URL with Webpack version ID if present.
      *
-     * @since  1.0.0
-     *
      * @param  string $file The asset file to look for.
      * @return string The (possibly versioned) asset URL.
      */
@@ -79,17 +70,15 @@ class Theme_Utils
         }
 
         // There was no manifest or no file present.
-        if (static::$manifest === null || ! isset(static::$manifest[ $file ])) {
+        if (static::$manifest === null || !isset(static::$manifest[$file])) {
             return get_stylesheet_directory_uri() . '/public' . $file;
         }
 
-        return get_stylesheet_directory_uri() . '/public' . static::$manifest[ $file ];
+        return get_stylesheet_directory_uri() . '/public' . static::$manifest[$file];
     }
 
     /**
      * Transforms a partial name and returns the path to the partial relative to theme root.
-     *
-     * @since  1.0.0
      *
      * @param  string $partial The partial name.
      * @return string
@@ -109,8 +98,6 @@ class Theme_Utils
 
     /**
      * Detect whether the current request is to the login page.
-     *
-     * @since 1.0.0
      *
      * @return bool
      */
@@ -137,8 +124,6 @@ class Theme_Utils
 
     /**
      * Parse the contents of mix-manifest.json and store as array.
-     *
-     * @since  1.0.0
      */
     private static function parse_manifest()
     {
@@ -147,7 +132,18 @@ class Theme_Utils
         if (\file_exists($manifest_path)) {
             $manifest = \file_get_contents($manifest_path);
 
-            static::$manifest = (array) \json_decode($manifest);
+            static::$manifest = (array)\json_decode($manifest);
         }
+    }
+
+    /**
+     * Check if a URL is off-site or not.
+     *
+     * @param string $url The URL to check.
+     * @return bool
+     */
+    public function is_external_url($url)
+    {
+        return \strpos($url, Request::get_host()) !== false || \strpos($url, "/") === '0';
     }
 }
