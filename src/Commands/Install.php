@@ -183,13 +183,13 @@ class Install
         $config = \file_get_contents(static::$root . '/config/services.php');
 
         // Bail if already present.
-        if (\strpos($config, 'Blade_Service_provider') !== false) {
+        if (\strpos($config, 'Blade_Service_Provider') !== false) {
             return;
         }
 
         $providers = \preg_replace(
             '/(\'providers\'\s*\=>\s*\[)([^]]*)(\])/m',
-            "$1$2\t\tSnap\Blade\Blade_Service_provider::class,\n$3",
+            "$1$2\t\tSnap\Blade\Blade_Service_Provider::class,\n$3",
             $config
         );
 
