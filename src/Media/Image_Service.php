@@ -104,7 +104,7 @@ class Image_Service
 
         if ($placeholder_url !== false) {
             $html = \sprintf(
-            /** @lang text */
+                /** @lang text */
                 '<img src="%s" alt="%s" width="%d" height="%d" %s>',
                 $placeholder_url,
                 get_the_title($post_id),
@@ -175,13 +175,13 @@ class Image_Service
             $crop = !\wp_image_matches_ratio($meta['height'], $meta['width'], $height, $width);
         } else {
             // Short-circuit if $size has not been registered.
-            if (!isset($_wp_additional_image_sizes[$size])) {
+            if (!isset($_wp_additional_image_sizes[ $size ])) {
                 return $image;
             }
 
-            $width = $_wp_additional_image_sizes[$size]['width'];
-            $height = $_wp_additional_image_sizes[$size]['height'];
-            $crop = $_wp_additional_image_sizes[$size]['crop'];
+            $width = $_wp_additional_image_sizes[ $size ]['width'];
+            $height = $_wp_additional_image_sizes[ $size ]['height'];
+            $crop = $_wp_additional_image_sizes[ $size ]['crop'];
         }
 
         $check = \image_get_intermediate_size($id, $size);
@@ -208,9 +208,9 @@ class Image_Service
                     $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
 
                     if (\is_array($size)) {
-                        $meta['sizes'][\implode('x', [$width, $height])] = $new_meta;
+                        $meta['sizes'][ \implode('x', [$width, $height]) ] = $new_meta;
                     } else {
-                        $meta['sizes'][$size] = $new_meta;
+                        $meta['sizes'][ $size ] = $new_meta;
                     }
 
                     $update = true;
@@ -226,7 +226,7 @@ class Image_Service
                         $size_data['crop']
                     );
 
-                    $meta['sizes'][$key] = $new_meta;
+                    $meta['sizes'][ $key ] = $new_meta;
                     $update = true;
                 }
             }

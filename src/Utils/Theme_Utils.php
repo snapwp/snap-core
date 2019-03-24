@@ -70,11 +70,11 @@ class Theme_Utils
         }
 
         // There was no manifest or no file present.
-        if (static::$manifest === null || !isset(static::$manifest[$file])) {
+        if (static::$manifest === null || !isset(static::$manifest[ $file ])) {
             return get_stylesheet_directory_uri() . '/public' . $file;
         }
 
-        return get_stylesheet_directory_uri() . '/public' . static::$manifest[$file];
+        return get_stylesheet_directory_uri() . '/public' . static::$manifest[ $file ];
     }
 
     /**
@@ -144,7 +144,7 @@ class Theme_Utils
      */
     public static function is_external_url($url)
     {
-        if (parse_url($url, PHP_URL_HOST) === Request::get_host()) {
+        if (\parse_url($url, PHP_URL_HOST) === Request::get_host()) {
             return false;
         }
         
