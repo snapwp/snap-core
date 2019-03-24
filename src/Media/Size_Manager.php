@@ -97,8 +97,6 @@ class Size_Manager extends Hookable
         if (Config::get('images.dynamic_image_sizes') !== false) {
             $this->add_filter('image_downsize', 'generate_dynamic_image');
         }
-
-        // dump(static::$dynamic_sizes, $this->size_dropdown_names);
     }
 
     /**

@@ -285,7 +285,7 @@ class Request implements ArrayAccess
         if (\is_null($offset)) {
             $this->input[] = $value;
         } else {
-            $this->input[$offset] = $value;
+            $this->input[ $offset ] = $value;
         }
     }
 
@@ -307,7 +307,7 @@ class Request implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->input[$offset]);
+        unset($this->input[ $offset ]);
     }
 
     /**
