@@ -192,7 +192,9 @@ class View
                 $composer(Facade::get_root_instance()->set_context($template), $data);
             }
 
-            return static::$additional_data[ static::$context ];
+            if (isset(static::$additional_data[ static::$context ])) {
+                return static::$additional_data[ static::$context ];
+            }
         }
 
         return [];
