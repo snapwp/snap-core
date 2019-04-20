@@ -48,7 +48,7 @@ class Response
      * @since 1.0.0
      *
      * @param string $redirect_after The URL the user should be sent to after the login screen. Defaults to current URL.
-     * @param int    $status Optional. The HTTP status to send when redirecting. Default 302.
+     * @param int    $status         Optional. The HTTP status to send when redirecting. Default 302.
      */
     public function redirect_to_login($redirect_after = null, $status = 302)
     {
@@ -80,9 +80,9 @@ class Response
      * @since 1.0.0
      *
      * @param mixed data        Data to JSON encode.
-     * @param null                                  $status_code Optional. Status code to send with the response.
+     * @param null $status_code Optional. Status code to send with the response.
      */
-    public function send_json_success($data, $status_code = null)
+    public function send_json_success($data = null, $status_code = null)
     {
         \wp_send_json_success($data, $status_code);
     }
@@ -93,9 +93,9 @@ class Response
      * @since 1.0.0
      *
      * @param mixed data        Data to JSON encode.
-     * @param null                                  $status_code Optional. Status code to send with the response.
+     * @param null $status_code Optional. Status code to send with the response.
      */
-    public function send_json_error($data, $status_code = null)
+    public function send_json_error($data = null, $status_code = null)
     {
         \wp_send_json_error($data, $status_code);
     }
