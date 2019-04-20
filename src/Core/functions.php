@@ -12,8 +12,6 @@ if (! \function_exists('collect')) {
     /**
      * Return a new Collection instance.
      *
-     * @since  1.0.0
-     *
      * @param array $items Items to add.
      * @return \Snap\Utils\Collection
      */
@@ -26,8 +24,6 @@ if (! \function_exists('collect')) {
 if (! \function_exists('snap_config')) {
     /**
      * Returns a key from the Config service.
-     *
-     * @since  1.0.0
      *
      * @param  string $key     The option name to fetch.
      * @param  mixed  $default If the option was not found, the default value to be returned instead.
@@ -43,8 +39,6 @@ if (! \function_exists('container')) {
     /**
      * Returns the service container
      *
-     * @since  1.0.0
-     *
      * @return mixed The service container or an individual service.
      */
     function container()
@@ -56,8 +50,6 @@ if (! \function_exists('container')) {
 if (! \function_exists('get_service')) {
     /**
      * Returns an object within the service container.
-     *
-     * @since  1.0.0
      *
      * @param  string $key The service to fetch.
      * @return object An individual service.
@@ -71,8 +63,6 @@ if (! \function_exists('get_service')) {
 if (! \function_exists('get_request')) {
     /**
      * Returns the current request instance.
-     *
-     * @since  1.0.0
      *
      * @return \Snap\Http\Request
      */
@@ -94,9 +84,7 @@ if (! \function_exists('snap_get_image_sizes')) {
     /**
      * Get size information for all currently registered image sizes.
      *
-     * @since  1.0.0
-     *
-     *  @return array Data for all currently registered image sizes.
+     * @return array Data for all currently registered image sizes.
      */
     function snap_get_image_sizes()
     {
@@ -107,8 +95,6 @@ if (! \function_exists('snap_get_image_sizes')) {
 if (! \function_exists('snap_get_image_size')) {
     /**
      * Get size information for a specific image size.
-     *
-     * @since  1.0.0
      *
      * @param  string $size The image size for which to retrieve data.
      * @return bool|array Size data about an image size or false if the size doesn't exist.
@@ -123,8 +109,6 @@ if (! \function_exists('snap_get_image_width')) {
     /**
      * Get the width of a specific image size.
      *
-     * @since  1.0.0
-     *
      * @param  string $size The image size for which to retrieve data.
      * @return bool|int Width of an image size or false if the size doesn't exist.
      */
@@ -137,8 +121,6 @@ if (! \function_exists('snap_get_image_width')) {
 if (! \function_exists('snap_get_image_height')) {
     /**
      * Get the height of a specific image size.
-     *
-     * @since  1.0.0
      *
      * @param  string $size The image size for which to retrieve data.
      * @return bool|int Height of an image size or false if the size doesn't exist.
@@ -161,8 +143,6 @@ if (! \function_exists('snap_get_nav_menu')) {
      *
      * A better replacement for wp_get_nav_menu_items.
      *
-     * @since  1.0.0
-     *
      * @param  string $theme_location The theme location the menu was registered with.
      * @return array
      */
@@ -175,8 +155,6 @@ if (! \function_exists('snap_get_nav_menu')) {
 if (! \function_exists('snap_get_menu_name')) {
     /**
      * For a given menu ID, name, or slug, return the user-set name for the associated menu.
-     *
-     * @since 1.0.0
      *
      * @param  string $theme_location Menu name, ID or slug
      * @return string|bool The name of the menu, or false if no menu was found
@@ -196,8 +174,6 @@ if (! \function_exists('snap_get_menu_name')) {
 if (! \function_exists('snap_get_user_role_name')) {
     /**
      * Returns the translated role of the current user or for a given user object.
-     *
-     * @since  1.0.0
      *
      * @param  WP_User $user A user to get the role of.
      *                       Defaults to current user.
@@ -219,8 +195,6 @@ if (! \function_exists('snap_get_widget_count')) {
     /**
      * Counts the number of widgets for a given sidebar ID.
      *
-     * @since  1.0.0
-     *
      * @param  string $sidebar_id The ID of the sidebar.
      * @return int The count of the widgets in the sidebar.
      */
@@ -240,8 +214,6 @@ if (! \function_exists('snap_get_current_url')) {
     /**
      * Gets the current full URL of the page with query string, host, and scheme.
      *
-     * @since  1.0.0
-     *
      * @param  boolean $remove_query If true, the URL is returned without any query params.
      * @return string The current URL.
      */
@@ -255,14 +227,37 @@ if (! \function_exists('snap_get_asset_url')) {
     /**
      * Retrieves a filename public URL with Webpack version ID if present.
      *
-     * @since  1.0.0
-     *
      * @param  string $file The asset file to look for.
      * @return string The (possibly versioned) asset URL.
      */
     function snap_get_asset_url($file)
     {
         return \Snap\Utils\Theme_Utils::get_asset_url($file);
+    }
+}
+
+if (! \function_exists('snap_is_post_template')) {
+    /**
+     * Whether the current request is the provided post template.
+     *
+     * @param string $post_template The template to check for.
+     * @return bool
+     */
+    function snap_is_post_template($post_template): bool
+    {
+        return Snap::get_container()->get('request')::is_post_template($post_template);
+    }
+}
+
+if (! \function_exists('snap_is_wp_login')) {
+    /**
+     * Whether the current request is the login page or not.
+     *
+     * @return bool
+     */
+    function snap_is_wp_login(): bool
+    {
+        return Snap::get_container()->get('request')::is_wp_login();
     }
 }
 
@@ -278,8 +273,6 @@ if (! \function_exists('snap_get_top_parent_page_id')) {
      *
      * Does not work with the objects returned by get_pages().
      *
-     * @since  1.0.0
-     *
      * @param int|WP_Post|array $post null Optional. Post object,array, or ID of a post to find the top ancestors for.
      * @return int ID
      */
@@ -292,8 +285,6 @@ if (! \function_exists('snap_get_top_parent_page_id')) {
 if (! \function_exists('snap_get_page_depth')) {
     /**
      * Get current page depth.
-     *
-     * @since  1.0.0
      *
      * @param int|\WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
      * @return integer

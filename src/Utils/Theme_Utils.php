@@ -83,7 +83,7 @@ class Theme_Utils
      * @param  string $partial The partial name.
      * @return string
      */
-    public static function get_path_to_partial($partial)
+    public static function get_path_to_partial($partial): string
     {
         $partial = \str_replace(
             ['.php', '.'],
@@ -97,29 +97,20 @@ class Theme_Utils
     }
 
     /**
-     * Detect whether the current request is to the login page.
+     * Returns the full include path for a given post template.
      *
-     * @return bool
+     * @param string $post_template The template to get the path for.
+     * @return string
      */
-    public static function is_wplogin()
+    public static function get_post_templates_path($post_template): string
     {
-        $abspath = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
+        $template = \str_replace(
+            ['.php', '.'],
+            ['', '/'],
+            $post_template
+        );
 
-        $files = \get_included_files();
-
-        if (\in_array($abspath . 'wp-login.php', $files) || \in_array($abspath . 'wp-register.php', $files)) {
-            return true;
-        }
-
-        if (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') {
-            return true;
-        }
-
-        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php') {
-            return true;
-        }
-
-        return false;
+        return \trailingslashit(Config::get('theme.templates_directory')) . 'views/post-templates/' . $template . '.php';
     }
 
     /**
@@ -147,7 +138,7 @@ class Theme_Utils
         if (\parse_url($url, PHP_URL_HOST) === Request::get_host()) {
             return false;
         }
-        
+
         if (\strpos($url, "/") === 0) {
             return false;
         }

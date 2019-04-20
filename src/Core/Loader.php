@@ -2,9 +2,9 @@
 
 namespace Snap\Core;
 
+use Snap\Services\Request;
 use Snap\Services\Config;
 use Snap\Services\Container;
-use Snap\Utils\Theme_Utils;
 
 /**
  * Initializes Snap classes and child includes.
@@ -105,7 +105,7 @@ class Loader
 
         static::$aliases = Config::get('services.aliases');
 
-        if (\is_admin() || Theme_Utils::is_wplogin()) {
+        if (\is_admin() || Request::is_wp_login()) {
             $this->class_list[] = \Snap\Admin\Whitelabel::class;
             $this->class_list[] = \Snap\Admin\Columns\Post_Template::class;
             $this->class_list[] = \Snap\Media\Admin::class;
@@ -132,7 +132,7 @@ class Loader
     /**
      * Load all theme files.
      *
-     * @since 1.0.0
+     * @param null|string $classmap Cached classmap.
      */
     public function load_theme($classmap = null)
     {
@@ -140,23 +140,26 @@ class Loader
             static::$theme_includes = \unserialize($classmap);
         } else {
             $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
+            $root = \trailingslashit(\get_template_directory());
 
             $hookable_locations = [
-                \get_template_directory() . '/theme/' . $hookables_dir,
-                \get_template_directory() . '/theme/Http/Ajax',
-                \get_template_directory() . '/theme/Http/Middleware',
-                \get_template_directory() . '/theme/Http/Validation/Rules',
-                \get_template_directory() . '/theme/Content',
-                \get_template_directory() . '/theme/Events',
+                $root . 'theme/' . $hookables_dir,
+                $root . 'theme/Http/Ajax',
+                $root . 'theme/Http/Middleware',
+                $root . 'theme/Http/Validation/Rules',
+                $root . 'theme/Content',
+                $root . 'theme/Events',
             ];
 
             if (\is_child_theme()) {
-                $hookable_locations[] = \get_stylesheet_directory() . '/theme/' . $hookables_dir;
-                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Ajax';
-                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Middleware';
-                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Http/Validation/Rules';
-                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Content';
-                $hookable_locations[] = \get_stylesheet_directory() . '/theme/Events';
+                $root = \trailingslashit(\get_stylesheet_directory());
+
+                $hookable_locations[] = $root . 'theme/' . $hookables_dir;
+                $hookable_locations[] = $root . 'theme/Http/Ajax';
+                $hookable_locations[] = $root . 'theme/Http/Middleware';
+                $hookable_locations[] = $root . 'theme/Http/Validation/Rules';
+                $hookable_locations[] = $root . 'theme/Content';
+                $hookable_locations[] = $root . 'theme/Events';
             }
 
             // Gather all possible Hookables.
