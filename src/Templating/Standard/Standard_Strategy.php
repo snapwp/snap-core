@@ -2,6 +2,8 @@
 
 namespace Snap\Templating\Standard;
 
+use Snap\Http\Validation\Validation;
+use Snap\Services\Request;
 use WP_Query;
 use Snap\Services\Config;
 use Snap\Services\Container;
@@ -67,12 +69,16 @@ class Standard_Strategy implements Templating_Interface
 
         $this->current_view = $this->get_template_name($slug);
 
-        global $wp_query;
+        global $wp_query, $post;
 
         $this->data = \array_merge(
             View::get_additional_data("views/$slug", $data),
             [
                 'wp_query' => $wp_query,
+                'request' => Request::get_root_instance(),
+                'errors' => Validation::$errors,
+                'post' => &$post,
+                'current_view' => $this->current_view,
             ],
             $data
         );

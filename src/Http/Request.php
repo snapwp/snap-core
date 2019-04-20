@@ -258,7 +258,7 @@ class Request implements ArrayAccess
      * @param string $key The key to check for.
      * @return bool
      */
-    public function has($key)
+    public function has($key): bool
     {
         return $this->post->has($key) ?: $this->query->has($key) ?: false;
     }
@@ -269,9 +269,19 @@ class Request implements ArrayAccess
      * @param string $key The key to check for.
      * @return bool
      */
-    public function has_file($key)
+    public function has_file($key): bool
     {
         return $this->files->has($key);
+    }
+
+    /**
+     * Whether there is any user submitted data.
+     *
+     * @return bool
+     */
+    public function has_input(): bool
+    {
+        return !$this->input->is_empty();
     }
 
     /**
@@ -280,7 +290,7 @@ class Request implements ArrayAccess
      * @param string $key The key to check for.
      * @return bool
      */
-    public function filled($key)
+    public function filled($key): bool
     {
         return $this->has($key) && !empty($this->get($key));
     }
