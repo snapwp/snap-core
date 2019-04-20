@@ -111,6 +111,17 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Get an item from the request bag.
+     *
+     * @param  mixed $name The offset to get.
+     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
+     */
+    public function __get($name)
+    {
+        return $this->input->get($name, null);
+    }
+
+    /**
      * Get the request HTTP method.
      *
      * @return string
@@ -275,6 +286,43 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Whether the current request is the provided post template.
+     *
+     * @param string $post_template The template to check for.
+     * @return bool
+     */
+    public function is_post_template($post_template): bool
+    {
+        return \is_page_template(Theme_Utils::get_post_templates_path($post_template));
+    }
+
+    /**
+     * Detect whether the current request is to the login page.
+     *
+     * @return bool
+     */
+    public function is_wp_login()
+    {
+        $abs_path = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
+
+        $files = \get_included_files();
+
+        if (\in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)) {
+            return true;
+        }
+
+        if (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') {
+            return true;
+        }
+
+        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Set a item on the request bag.
      *
      * @param  mixed $offset The offset to set.
@@ -319,17 +367,6 @@ class Request implements ArrayAccess
     public function offsetGet($offset)
     {
         return $this->input->get($offset, null);
-    }
-
-    /**
-     * Get an item from the request bag.
-     *
-     * @param  mixed $name The offset to get.
-     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
-     */
-    public function __get($name)
-    {
-        return $this->input->get($name, null);
     }
 
     /**

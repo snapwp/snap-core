@@ -20,6 +20,8 @@ namespace Snap\Services;
  * @method static bool has($key)
  * @method static bool has_file($key)
  * @method static bool filled($key)
+ * @method static bool is_wp_login()
+ * @method static bool is_post_template($post_template)
  *
  * @see \Snap\Http\Request
  */
