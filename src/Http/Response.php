@@ -82,7 +82,7 @@ class Response
      * @param mixed data        Data to JSON encode.
      * @param null                                  $status_code Optional. Status code to send with the response.
      */
-    public function send_json_success($data, $status_code = null)
+    public function send_json_success($data = null, $status_code = null)
     {
         \wp_send_json_success($data, $status_code);
     }
@@ -95,7 +95,7 @@ class Response
      * @param mixed data        Data to JSON encode.
      * @param null                                  $status_code Optional. Status code to send with the response.
      */
-    public function send_json_error($data, $status_code = null)
+    public function send_json_error($data = null, $status_code = null)
     {
         \wp_send_json_error($data, $status_code);
     }
