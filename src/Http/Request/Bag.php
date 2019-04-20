@@ -3,6 +3,7 @@
 namespace Snap\Http\Request;
 
 use ArrayAccess;
+use Rakit\Validation\Helper;
 use Snap\Http\Request\File\File;
 
 /**
@@ -13,7 +14,6 @@ class Bag implements ArrayAccess
     /**
      * Bag contents.
      *
-     * @since  1.0.0
      * @var array
      */
     protected $data = [];
@@ -21,11 +21,9 @@ class Bag implements ArrayAccess
     /**
      * Creates the bag.
      *
-     * @since 1.0.0
-     *
      * @param array $contents Array of items (key => value pairs) to add to the bag.
      */
-    public function __construct($contents = [])
+    public function __construct(array $contents = [])
     {
         $this->set_data($contents);
     }
@@ -35,19 +33,17 @@ class Bag implements ArrayAccess
      *
      * Use get_raw to get an un-sanitized version (should you need to).
      *
-     * @since 1.0.0
-     *
      * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         if ($this->has($key)) {
             if ($this->get_raw($key) === null) {
                 return null;
             }
-            
+
             if (\is_array($this->get_raw($key))) {
                 return \array_map([$this, 'sanitise_array'], $this->get_raw($key));
             }
@@ -65,32 +61,24 @@ class Bag implements ArrayAccess
     /**
      * Returns a value from the bag without any sanitation.
      *
-     * @since 1.0.0
-     *
      * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
      * @return mixed
      */
-    public function get_raw($key, $default = null)
+    public function get_raw(string $key, $default = null)
     {
-        if (isset($this->data[ $key ]) && '' !== $this->data[ $key ]) {
-            return $this->data[ $key ];
-        }
-
-        return $default;
+        return Helper::arrayGet($this->data, $key, $default);
     }
 
     /**
      * Checks if a key is present in the bag.
      *
-     * @since 1.0.0
-     *
      * @param  string $key Item key to check.
      * @return boolean
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
-        return isset($this->data[ $key ]);
+        return !empty(Helper::arrayGet($this->data, $key));
     }
 
     /**
@@ -99,13 +87,11 @@ class Bag implements ArrayAccess
      * Only digits, decimals and the minus (-) characters are returned.
      * All other characters are stripped out.
      *
-     * @since 1.0.0
-     *
      * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
      * @return string
      */
-    public function get_numeric($key, $default = null)
+    public function get_numeric(string $key, $default = null)
     {
         return \filter_var(
             $this->get($key, $default),
@@ -116,8 +102,6 @@ class Bag implements ArrayAccess
 
     /**
      * Return a value from the bag cast as an int.
-     *
-     * @since 1.0.0
      *
      * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
@@ -130,8 +114,6 @@ class Bag implements ArrayAccess
 
     /**
      * Return a value from the bag cast as a float.
-     *
-     * @since 1.0.0
      *
      * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
@@ -146,8 +128,6 @@ class Bag implements ArrayAccess
      * Only return a value if it matches the supplied regex pattern.
      *
      * Otherwise the $default is returned.
-     *
-     * @since 1.0.0
      *
      * @param  string $key     Item key to fetch.
      * @param  string $pattern A regex pattern to check against.
@@ -176,8 +156,6 @@ class Bag implements ArrayAccess
     /**
      * Returns the raw values as an array.
      *
-     * @since 1.0.0
-     *
      * @return array
      */
     public function to_array(): array
@@ -188,8 +166,6 @@ class Bag implements ArrayAccess
     /**
      * Returns a JSON representation of all the raw values in this bag.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
     public function to_json(): string
@@ -198,9 +174,17 @@ class Bag implements ArrayAccess
     }
 
     /**
-     * Callback for performing recursive sanitisation on an array of values.
+     * Whether there is any content within this bag.
      *
-     * @since  1.0.0
+     * @return bool
+     */
+    public function is_empty(): bool
+    {
+        return empty($this->data);
+    }
+
+    /**
+     * Callback for performing recursive sanitization on an array of values.
      *
      * @param  array|string $value The array to sanitise.
      * @return mixed
@@ -221,8 +205,6 @@ class Bag implements ArrayAccess
     /**
      * Set an item.
      *
-     * @since  1.0.0
-     *
      * @param  mixed $offset The offset to set.
      * @param  mixed $value  The value to set.
      */
@@ -238,8 +220,6 @@ class Bag implements ArrayAccess
     /**
      * Whether an item exists.
      *
-     * @since  1.0.0
-     *
      * @param  mixed $offset An offset to check for.
      * @return boolean
      */
@@ -251,8 +231,6 @@ class Bag implements ArrayAccess
     /**
      * Remove an item.
      *
-     * @since  1.0.0
-     *
      * @param  mixed $offset The offset to unset.
      */
     public function offsetUnset($offset)
@@ -262,8 +240,6 @@ class Bag implements ArrayAccess
 
     /**
      * Get an item.
-     *
-     * @since  1.0.0
      *
      * @param  mixed $offset The offset to get.
      * @return mixed
@@ -276,11 +252,9 @@ class Bag implements ArrayAccess
     /**
      * Add the contents into the bag.
      *
-     * @since 1.0.0
-     *
-     * @param array $contents
+     * @param array $contents The array of params to set.
      */
-    protected function set_data($contents = [])
+    protected function set_data(array $contents = [])
     {
         $this->data = $contents;
     }
