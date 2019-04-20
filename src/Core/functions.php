@@ -245,7 +245,7 @@ if (! \function_exists('snap_is_post_template')) {
      */
     function snap_is_post_template($post_template): bool
     {
-        return Snap::get_container()->get('request')::is_post_template($post_template);
+        return \Snap\Services\Request::is_post_template($post_template);
     }
 }
 
@@ -257,7 +257,7 @@ if (! \function_exists('snap_is_wp_login')) {
      */
     function snap_is_wp_login(): bool
     {
-        return Snap::get_container()->get('request')::is_wp_login();
+        return \Snap\Services\Request::is_wp_login();
     }
 }
 
