@@ -36,7 +36,7 @@ class File_Bag extends Bag
      * @param  mixed  $default Default value if the key is not present.
      * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         return parent::get($key, $default);
     }
@@ -49,7 +49,7 @@ class File_Bag extends Bag
      * @param  string $key Item key to check.
      * @return boolean
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return isset($this->data[ $key ]) && !empty($this->data[ $key ]);
     }
@@ -82,7 +82,7 @@ class File_Bag extends Bag
      *
      * @param array $contents
      */
-    protected function set_data($contents = [])
+    protected function set_data(array $contents = [])
     {
         foreach ($contents as $key => $file) {
             $this->data[ $key ] = $this->add_file($file);
