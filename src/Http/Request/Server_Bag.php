@@ -14,7 +14,7 @@ class Server_Bag extends Bag
      *
      * @param array $contents Kept for compatibility.
      */
-    protected function set_data($contents = [])
+    protected function set_data(array $contents = [])
     {
         $definition = [
             'REQUEST_METHOD' => [
