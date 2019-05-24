@@ -5,16 +5,14 @@ namespace Snap\Http\Request;
 /**
  * Server parameter bag.
  */
-class Server_Bag extends Bag
+class ServerBag extends Bag
 {
     /**
      * Populate the server bag.
      *
-     * @since 1.0.0
-     *
      * @param array $contents Kept for compatibility.
      */
-    protected function set_data(array $contents = [])
+    protected function setData(array $contents = [])
     {
         $definition = [
             'REQUEST_METHOD' => [
@@ -25,6 +23,12 @@ class Server_Bag extends Bag
             ],
             'QUERY_STRING' => FILTER_UNSAFE_RAW,
             'REMOTE_ADDR' => FILTER_VALIDATE_IP,
+            'HTTP_X_FORWARDED' => FILTER_VALIDATE_IP,
+            'HTTP_X_FORWARDED_FOR' => FILTER_VALIDATE_IP,
+            'HTTP_CLIENT_IP' => FILTER_VALIDATE_IP,
+            'HTTP_X_CLUSTER_CLIENT_IP' => FILTER_VALIDATE_IP,
+            'HTTP_FORWARDED_FOR' => FILTER_VALIDATE_IP,
+            'HTTP_FORWARDED' => FILTER_VALIDATE_IP,
             'SERVER_PORT' => FILTER_SANITIZE_NUMBER_INT,
             'SERVER_NAME' => FILTER_SANITIZE_STRING,
             'HTTP_HOST' => FILTER_SANITIZE_URL,

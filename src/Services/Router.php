@@ -11,11 +11,11 @@ namespace Snap\Services;
  * @method static \Snap\Core\Router view(string $view) Render a view and stop any other routes from processing.
  * @method static \Snap\Core\Router using(string|array $middleware) Apply middleware.
  * @method static \Snap\Core\Router group(Callable $callback) Create a route group.
- * @method static \Snap\Core\Router get_root_instance() Return root Router instance.
+ * @method static \Snap\Core\Router getRootInstance() Return root Router instance.
  *
  * @see \Snap\Core\Router
  */
-class Router extends Service_Facade
+class Router extends ServiceFacade
 {
     /**
      * Specify the underlying root class.
@@ -24,7 +24,7 @@ class Router extends Service_Facade
      *
      * @return string
      */
-    protected static function get_service_name()
+    protected static function getServiceName()
     {
         return \Snap\Core\Router::class;
     }
@@ -36,7 +36,7 @@ class Router extends Service_Facade
      *
      * @param \Snap\Core\Router $instance
      */
-    protected static function when_resolving($instance)
+    protected static function whenResolving($instance)
     {
         $instance->reset();
     }

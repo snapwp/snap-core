@@ -51,7 +51,7 @@ class Cleanup extends Hookable
     {
         // xmlrpc is a potential security weakness. Most of the time it is completely irrelevant.
         if (Config::get('disable_xmlrpc')) {
-            $this->add_filter('xmlrpc_enabled', '__return_false');
+            $this->addFilter('xmlrpc_enabled', '__return_false');
         }
     }
     
@@ -64,16 +64,16 @@ class Cleanup extends Hookable
     {
         if (! is_admin()) {
             // Remove the inline styles normally added by the admin bar and move to the footer.
-            $this->remove_action('wp_head', '_admin_bar_bump_cb');
-            $this->remove_action('wp_head', 'wp_admin_bar_header');
-            $this->add_action('wp_footer', 'wp_admin_bar_header');
-            $this->add_action('wp_footer', '_admin_bar_bump_cb');
+            $this->removeAction('wp_head', '_admin_bar_bump_cb');
+            $this->removeAction('wp_head', 'wp_admin_bar_header');
+            $this->addAction('wp_footer', 'wp_admin_bar_header');
+            $this->addAction('wp_footer', '_admin_bar_bump_cb');
 
             // Unregister the main admin bar css files...
             wp_dequeue_style('admin-bar');
 
             // ... and print to footer.
-            $this->add_action(
+            $this->addAction(
                 'wp_footer',
                 function () {
                     wp_enqueue_style('admin-bar');
@@ -166,27 +166,27 @@ class Cleanup extends Hookable
     {
         global $wp_widget_factory;
 
-        $this->remove_action('wp_head', 'feed_links_extra', 3);
+        $this->removeAction('wp_head', 'feed_links_extra', 3);
         
         // Remove emojis.
         $this->remove_emojis();
 
         // Remove next/previous links.
-        $this->remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10);
+        $this->removeAction('wp_head', 'adjacent_posts_rel_link_wp_head', 10);
         
         // Remove oembed.
-        $this->remove_action('wp_head', 'wp_oembed_add_discovery_links');
-        $this->remove_action('wp_head', 'wp_oembed_add_host_js');
+        $this->removeAction('wp_head', 'wp_oembed_add_discovery_links');
+        $this->removeAction('wp_head', 'wp_oembed_add_host_js');
 
         // Generic fixes.
-        $this->remove_action('wp_head', 'rsd_link');
-        $this->remove_action('wp_head', 'wlwmanifest_link');
-        $this->remove_action('wp_head', 'wp_generator');
-        $this->remove_action('wp_head', 'wp_shortlink_wp_head', 10);
-        $this->remove_action('wp_head', 'rest_output_link_wp_head', 10);
+        $this->removeAction('wp_head', 'rsd_link');
+        $this->removeAction('wp_head', 'wlwmanifest_link');
+        $this->removeAction('wp_head', 'wp_generator');
+        $this->removeAction('wp_head', 'wp_shortlink_wp_head', 10);
+        $this->removeAction('wp_head', 'rest_output_link_wp_head', 10);
         
         if (isset($wp_widget_factory->widgets['WP_Widget_Recent_Comments'])) {
-            $this->remove_action('wp_head', [$wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style']);
+            $this->removeAction('wp_head', [$wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style']);
         }
 
         add_filter('use_default_gallery_style', '__return_false');
@@ -199,11 +199,11 @@ class Cleanup extends Hookable
      */
     private function remove_emojis()
     {
-        $this->remove_hook(['the_content_feed', 'comment_text_rss'], 'wp_staticize_emoji');
-        $this->remove_hook('wp_head', 'print_emoji_detection_script', 7);
-        $this->remove_hook('wp_mail', 'wp_staticize_emoji_for_email');
-        $this->remove_hook('admin_print_scripts', 'print_emoji_detection_script');
-        $this->remove_hook(['admin_print_styles', 'wp_print_styles'], 'print_emoji_styles');
-        $this->add_filter('emoji_svg_url', '__return_false');
+        $this->removeHook(['the_content_feed', 'comment_text_rss'], 'wp_staticize_emoji');
+        $this->removeHook('wp_head', 'print_emoji_detection_script', 7);
+        $this->removeHook('wp_mail', 'wp_staticize_emoji_for_email');
+        $this->removeHook('admin_print_scripts', 'print_emoji_detection_script');
+        $this->removeHook(['admin_print_styles', 'wp_print_styles'], 'print_emoji_styles');
+        $this->addFilter('emoji_svg_url', '__return_false');
     }
 }

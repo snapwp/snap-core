@@ -2,59 +2,53 @@
 
 namespace Snap\Admin;
 
-use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Core\Snap;
 
 /**
  * Enables the Snap admin theme.
  *
  * Based on Slate admin theme.
  *
- * @See https://wordpress.org/plugins/slate-admin-theme/
- *
- * @since 1.0.0
+ * @see   https://wordpress.org/plugins/slate-admin-theme/
  */
 class Theme extends Hookable
 {
     /**
      * Filters to add on init.
      *
-     * @since  1.0.0
      * @var array
      */
     protected $filters = [
-        'menu_order' => 'move_page_link_above_posts',
-        'custom_menu_order' => 'move_page_link_above_posts',
-        'admin_enqueue_scripts' => 'enqueue_snap_admin',
+        'menu_order' => 'movePageLinkAbovePosts',
+        'custom_menu_order' => 'movePageLinkAbovePosts',
+        'admin_enqueue_scripts' => 'enqueueSnapAdmin',
         'admin_menu' => [
-            999 => 'clean_admin_menu',
+            999 => 'cleanAdminMenu',
         ],
     ];
 
     /**
      * Remove the user color scheme picker to enforce Snap colors.
      *
-     * @since  1.0.0
      */
     public function boot()
     {
-        $this->remove_action('admin_color_scheme_picker', 'admin_color_scheme_picker');
+        $this->removeAction('admin_color_scheme_picker', 'admin_color_scheme_picker');
     }
 
     /**
      * Move the page admin link above posts.
      *
-     * @since  1.0.0
-     *
      * @param  array $menu_order The current top level menu order.
      * @return array|bool
      */
-    public function move_page_link_above_posts($menu_order)
+    public function movePageLinkAbovePosts($menu_order)
     {
-        if (! $menu_order) {
+        if (!$menu_order) {
             return true;
         }
-         
+
         $pages = \array_search('edit.php?post_type=page', $menu_order);
 
         if ($pages > 0) {
@@ -63,7 +57,7 @@ class Theme extends Hookable
             if ($posts === false) {
                 $posts = 2;
             }
-            
+
             $pages = \array_splice($menu_order, $pages, 1);
             \array_splice($menu_order, $posts, 0, $pages);
         }
@@ -73,10 +67,8 @@ class Theme extends Hookable
 
     /**
      * Enqueue the theme css.
-     *
-     * @since  1.0.0
      */
-    public function enqueue_snap_admin()
+    public function enqueueSnapAdmin()
     {
         \wp_enqueue_style(
             'snap_admin_theme',
@@ -88,10 +80,8 @@ class Theme extends Hookable
 
     /**
      * Remove the dashboard submenu.
-     *
-     * @since  1.0.0
      */
-    public function clean_admin_menu()
+    public function cleanAdminMenu()
     {
         \remove_submenu_page('index.php', 'index.php');
         \remove_submenu_page('index.php', 'update-core.php');

@@ -148,8 +148,8 @@ class Publish extends Command
         $this->init_wordpress();
 
         // Setup Snap.
-        Snap::create_container();
-        Snap::init_config($this->root);
+        Snap::createContainer();
+        Snap::initConfig($this->root);
 
         // Setup WP filesystem helper.
         $this->setup_filesystem();

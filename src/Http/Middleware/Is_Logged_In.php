@@ -8,8 +8,6 @@ use Snap\Services\Response;
 
 /**
  * Some basic middleware.
- *
- * @since  1.0.0
  */
 class Is_Logged_In extends Middleware
 {
@@ -17,8 +15,6 @@ class Is_Logged_In extends Middleware
      * Check if the current user is logged in, and perform the redirect if not.
      *
      * Example: is_logged_in|404
-     *
-     * @since  1.0.0
      *
      * @param  \Snap\Http\Request $request  The current request.
      * @param  string|null        $redirect The middleware argument. How to redirect this request.
@@ -31,18 +27,18 @@ class Is_Logged_In extends Middleware
         }
 
         if ($redirect === 'login') {
-            Response::redirect_to_login();
+            Response::redirectToLogin();
         }
 
         if ($redirect === 'admin') {
-            Response::redirect_to_admin();
+            Response::redirectToAdmin();
         }
 
         if ($redirect !== null) {
             Response::redirect($redirect);
         }
 
-        Response::set_404();
+        Response::set404();
 
         return false;
     }

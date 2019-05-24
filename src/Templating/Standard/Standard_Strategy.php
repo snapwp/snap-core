@@ -75,7 +75,7 @@ class Standard_Strategy implements Templating_Interface
             View::get_additional_data("views/$slug", $data),
             [
                 'wp_query' => $wp_query,
-                'request' => Request::get_root_instance(),
+                'request' => Request::getRootInstance(),
                 'errors' => Validation::$errors,
                 'post' => &$post,
                 'current_view' => $this->current_view,

@@ -128,11 +128,11 @@ class Post_Type extends Hookable
         $post_type->register();
 
         // Register any sortable columns.
-        $this->add_filter('manage_edit-' . $this->get_name() . '_sortable_columns', 'set_sortable_columns');
+        $this->addFilter('manage_edit-' . $this->get_name() . '_sortable_columns', 'set_sortable_columns');
 
         // If there are sortable columns, run their callbacks.
         if (! empty($this->sortable_columns)) {
-            $this->add_action('pre_get_posts', 'sort_columns', 1, 999);
+            $this->addAction('pre_get_posts', 'sort_columns', 1, 999);
         }
     }
 

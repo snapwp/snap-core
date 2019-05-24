@@ -70,11 +70,11 @@ class Config
      *
      * @param string $path Path to config directory.
      */
-    public function add_path(string $path)
+    public function addPath(string $path)
     {
         $path = \trailingslashit($path);
         $this->paths[] = $path;
-        $this->parse_files($path);
+        $this->parseFiles($path);
     }
 
     /**
@@ -84,11 +84,11 @@ class Config
      *
      * @param string $path Path to config directory.
      */
-    public function add_default_path(string $path)
+    public function addDefaultPath(string $path)
     {
         $path = \trailingslashit($path);
         $this->paths[] = $path;
-        $this->parse_files($path, false);
+        $this->parseFiles($path, false);
     }
 
     /**
@@ -101,7 +101,7 @@ class Config
     public function get($option, $default = null)
     {
         if ($this->has($option)) {
-            return $this->cache[ $option ];
+            return $this->cache[$option];
         }
 
         return $default;
@@ -116,7 +116,7 @@ class Config
     public function has($key)
     {
         // Check if already cached.
-        if (isset($this->cache[ $key ])) {
+        if (isset($this->cache[$key])) {
             return true;
         }
 
@@ -125,7 +125,7 @@ class Config
 
         foreach ($segments as $segment) {
             if (\array_key_exists($segment, $root)) {
-                $root = $root[ $segment ];
+                $root = $root[$segment];
                 continue;
             } else {
                 return false;
@@ -133,7 +133,7 @@ class Config
         }
 
         // Set cache for the given key.
-        $this->cache[ $key ] = $root;
+        $this->cache[$key] = $root;
 
         return true;
     }
@@ -146,7 +146,7 @@ class Config
      */
     public function set($key, $value)
     {
-        $this->cache[ $key ] = $value;
+        $this->cache[$key] = $value;
     }
 
     /**
@@ -154,9 +154,9 @@ class Config
      *
      * @return array
      */
-    public function get_primed_cache(): array
+    public function getPrimedCache(): array
     {
-        $this->recurse_through_config($this->config);
+        $this->recurseThroughConfig($this->config);
         return $this->cache;
     }
 
@@ -165,7 +165,7 @@ class Config
      *
      * @param string $data Serialized config array.
      */
-    public function load_from_cache($data)
+    public function loadFromCache($data)
     {
         $this->cache = \unserialize($data);
     }
@@ -177,7 +177,7 @@ class Config
      * @param string $path      Directory path to scan.
      * @param bool   $overwrite If true, then the config within the $path will overwrite existing config keys.
      */
-    private function parse_files($path, $overwrite = true)
+    private function parseFiles($path, $overwrite = true)
     {
         if (\is_dir($path)) {
             $files = \glob($path . '*.php');
@@ -188,20 +188,20 @@ class Config
                 /** @noinspection PhpIncludeInspection */
                 $parsed_options = require $file;
 
-                $option_set = $this->get_filename($file);
+                $option_set = $this->getFilename($file);
 
                 if (!\is_array($parsed_options)) {
                     continue;
                 }
 
-                if (isset($this->config[ $option_set ])) {
+                if (isset($this->config[$option_set])) {
                     if ($overwrite) {
-                        $this->config[ $option_set ] = \array_merge($this->config[ $option_set ], $parsed_options);
+                        $this->config[$option_set] = \array_merge($this->config[$option_set], $parsed_options);
                     } else {
-                        $this->config[ $option_set ] = \array_merge($parsed_options, $this->config[ $option_set ]);
+                        $this->config[$option_set] = \array_merge($parsed_options, $this->config[$option_set]);
                     }
                 } else {
-                    $this->config[ $option_set ] = $parsed_options;
+                    $this->config[$option_set] = $parsed_options;
                 }
             }
         }
@@ -213,7 +213,7 @@ class Config
      * @param  string $path Full file path.
      * @return string Filename.
      */
-    private function get_filename(string $path): string
+    private function getFilename(string $path): string
     {
         return \str_replace('.php', '', \basename($path));
     }
@@ -224,7 +224,7 @@ class Config
      * @param array  $values An array to extract the keys from.
      * @param string $path   The current level's key.
      */
-    private function recurse_through_config(array $values, $path = null)
+    private function recurseThroughConfig(array $values, $path = null)
     {
         if (empty($values)) {
             $this->has($path);
@@ -237,7 +237,7 @@ class Config
             }
 
             if (\is_array($value)) {
-                $this->recurse_through_config($value, $path ? "$path.$key" : $key);
+                $this->recurseThroughConfig($value, $path ? "$path.$key" : $key);
             } else {
                 $this->has("$path.$key");
             }

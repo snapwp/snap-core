@@ -4,7 +4,7 @@ namespace Snap\Media;
 
 use Snap\Services\Config;
 use Snap\Utils\Image_Utils;
-use Snap\Utils\Theme_Utils;
+use Snap\Utils\Theme;
 
 /**
  * Image service for providing placeholder and dynamic image sizes.
@@ -54,11 +54,11 @@ class Image_Service
          */
         $this->placeholder_extensions = apply_filters('snap_placeholder_img_extensions', ['.jpg', '.svg', '.png']);
 
-        $this->placeholder_directory = Theme_Utils::get_active_theme_path(
+        $this->placeholder_directory = Theme::getActiveThemePath(
             \trailingslashit(Config::get('images.placeholder_dir'))
         );
 
-        $this->placeholder_directory_uri = Theme_Utils::get_active_theme_uri(
+        $this->placeholder_directory_uri = Theme::getActiveThemeUri(
             \trailingslashit(Config::get('images.placeholder_dir'))
         );
     }

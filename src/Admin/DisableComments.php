@@ -6,15 +6,12 @@ use Snap\Core\Hookable;
 
 /**
  * Additional code directly affecting admin area, or the removal of functionality.
- *
- * @since  1.0.0
  */
-class Disable_Comments extends Hookable
+class DisableComments extends Hookable
 {
     /**
      * Filters to add on init.
      *
-     * @since  1.0.0
      * @var array
      */
     protected $filters = [
@@ -25,51 +22,43 @@ class Disable_Comments extends Hookable
             20 => '__return_false',
         ],
         'pre_option_default_pingback_flag' => '__return_zero',
-        'admin_init' => 'remove_post_type_support',
+        'admin_init' => 'removePostTypeSupport',
     ];
 
     /**
      * Actions to add on init.
      *
-     * @since  1.0.0
-     *
      * @var array
      */
     protected $actions = [
-        'widgets_init' => 'remove_comments_widget',
-        'admin_print_footer_scripts-index.php' => 'remove_comments_dashboard_css',
-        'wp_dashboard_setup' => 'remove_comments_dashboard_widget',
-        'admin_menu' => 'remove_comments_access',
+        'widgets_init' => 'removeCommentsWidget',
+        'admin_print_footer_scripts-index.php' => 'removeCommentsDashboardCss',
+        'wp_dashboard_setup' => 'removeCommentsDashboardWidget',
+        'admin_menu' => 'removeCommentsAccess',
         'template_redirect' => [
-            9 => 'remove_comments_stop_bots',
+            9 => 'removeCommentsStopBots',
         ],
         'add_meta_boxes' => [
-            9999 => 'remove_comments_meta_boxes',
+            9999 => 'removeCommentsMetaBoxes',
         ],
     ];
 
     /**
-     * Boot up the class.
-     *
      * Add hooks to disable comments.
-     *
-     * @since 1.0.0
      */
     public function boot()
     {
         // Remove admin bar references to comments.
-        $this->add_action(['admin_init', 'template_redirect'], 'remove_comments_from_adminbar');
+        $this->addAction(['admin_init', 'template_redirect'], 'removeCommentsFromAdminbar');
 
         // Ensures all new posts are set to comments closed by default.
-        $this->add_action(['edit_form_advanced', 'edit_page_form'], 'remove_comments_set_closed_status');
+        $this->addAction(['edit_form_advanced', 'edit_page_form'], 'removeCommentsSetClosedStatus');
     }
 
     /**
      * Stop admin access to comments pages.
-     *
-     * @since 1.0.0
      */
-    public function remove_comments_access()
+    public function removeCommentsAccess()
     {
         global $pagenow;
 
@@ -83,10 +72,8 @@ class Disable_Comments extends Hookable
 
     /**
      * Adds CSS to the dashboard screen to remove references to comments.
-     *
-     * @since 1.0.0
      */
-    public function remove_comments_dashboard_css()
+    public function removeCommentsDashboardCss()
     {
         echo '<style>',
             '#dashboard_right_now .comment-count,#latest-comments, #welcome-panel .welcome-comments {display: none;}',
@@ -95,20 +82,16 @@ class Disable_Comments extends Hookable
 
     /**
      * Removes comment dashboard widget from admin.
-     *
-     * @since 1.0.0
      */
-    public function remove_comments_dashboard_widget()
+    public function removeCommentsDashboardWidget()
     {
         \remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal');
     }
 
     /**
      * Removes comments dropdown from the admin bar.
-     *
-     * @since 1.0.0
      */
-    public function remove_comments_from_adminbar()
+    public function removeCommentsFromAdminbar()
     {
         if (is_admin_bar_showing()) {
             \remove_action('admin_bar_menu', 'wp_admin_bar_comments_menu', 60);
@@ -117,10 +100,8 @@ class Disable_Comments extends Hookable
         
     /**
      * Remove comment meta boxes from all post types.
-     *
-     * @since  1.0.0
      */
-    public function remove_comments_meta_boxes()
+    public function removeCommentsMetaBoxes()
     {
         if (\is_admin() && \current_user_can('manage_options')) {
             // Get all public post types.
@@ -136,10 +117,8 @@ class Disable_Comments extends Hookable
 
     /**
      * Ensures all new posts are set to comments closed.
-     *
-     * @since 1.0.0
      */
-    public function remove_comments_set_closed_status()
+    public function removeCommentsSetClosedStatus()
     {
         echo '<input type="hidden" name="comment_status" value="closed" />',
             '<input type="hidden" name="ping_status" value="closed" />';
@@ -147,10 +126,8 @@ class Disable_Comments extends Hookable
     
     /**
      * Returns a 403 if someone (bots) ends up on a front end comments URL.
-     *
-     * @since 1.0.0
      */
-    public function remove_comments_stop_bots()
+    public function removeCommentsStopBots()
     {
         if (\is_comment_feed()) {
             \wp_die(\__('Comments are closed.', 'snap'), '', [ 'response' => 403 ]);
@@ -159,20 +136,16 @@ class Disable_Comments extends Hookable
 
     /**
      * Removes the comments widget.
-     *
-     * @since 1.0.0
      */
-    public function remove_comments_widget()
+    public function removeCommentsWidget()
     {
         \unregister_widget('WP_Widget_Recent_Comments');
     }
 
     /**
      * Remove comment support from all built in post-types.
-     *
-     * @since  1.0.0
      */
-    public function remove_post_type_support()
+    public function removePostTypeSupport()
     {
         \remove_post_type_support('page', 'comments');
         \remove_post_type_support('post', 'comments');

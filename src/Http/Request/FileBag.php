@@ -2,19 +2,16 @@
 
 namespace Snap\Http\Request;
 
-use finfo;
-use Snap\Http\Request\Bag;
-use Snap\Http\Request\File\File;
+use Rakit\Validation\Helper;
 
 /**
  * File parameter bag.
  */
-class File_Bag extends Bag
+class FileBag extends Bag
 {
     /**
      * Expected file keys.
      *
-     * @since 1.0.0
      * @var array
      */
     private $file_keys = [
@@ -26,43 +23,37 @@ class File_Bag extends Bag
     ];
 
     /**
-     * Gets a sanitized value from the bag, or a supplied default if not present.
+     * Gets a file from the bag, or a supplied default if not present.
      *
      * Use get_raw to get an un-sanitized version (should you need to).
      *
-     * @since 1.0.0
-     *
      * @param  string $key     Item key to fetch.
      * @param  mixed  $default Default value if the key is not present.
-     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
+     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
     public function get(string $key, $default = null)
     {
-        return parent::get($key, $default);
+        return Helper::arrayGet($this->data, $key, $default);
     }
 
     /**
      * Checks if a key is present in the bag.
-     *
-     * @since 1.0.0
      *
      * @param  string $key Item key to check.
      * @return boolean
      */
     public function has(string $key): bool
     {
-        return isset($this->data[ $key ]) && !empty($this->data[ $key ]);
+        return !empty(Helper::arrayGet($this->data, $key));
     }
 
     /**
      * Return how many files were uploaded for a given key.
      *
-     * @since 1.0.0
-     *
      * @param string $key Item key to check.
      * @return int
      */
-    public function count($key)
+    public function count(string $key): int
     {
         if ($this->has($key)) {
             if (\is_array($this->get($key))) {
@@ -78,32 +69,28 @@ class File_Bag extends Bag
     /**
      * Add the individual files to the bag.
      *
-     * @since 1.0.0
-     *
      * @param array $contents
      */
-    protected function set_data(array $contents = [])
+    protected function setData(array $contents = [])
     {
         foreach ($contents as $key => $file) {
-            $this->data[ $key ] = $this->add_file($file);
+            $this->data[$key] = $this->addFile($file);
         }
     }
 
     /**
      * Turn $_FILES data into File instances, or null if no file was uploaded.
      *
-     * @since 1.0.0
-     *
      * @param array $file
      * @return array|null|File
      */
-    protected function add_file($file = [])
+    protected function addFile($file = [])
     {
         if ($file instanceof File) {
             return $file;
         }
 
-        $normalised = $this->format_files_array($file);
+        $normalised = $this->formatFilesArray($file);
 
         if (\is_array($normalised)) {
             $keys = \array_keys($normalised);
@@ -116,7 +103,7 @@ class File_Bag extends Bag
                     $normalised = new File($normalised);
                 }
             } else {
-                $normalised = \array_map([$this, 'add_file'], $normalised);
+                $normalised = \array_map([$this, 'addFile'], $normalised);
 
                 if (\array_keys($keys) === $keys) {
                     $normalised = \array_filter($normalised);
@@ -139,12 +126,10 @@ class File_Bag extends Bag
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
-     * @since 1.0.0
-     *
      * @param $data
      * @return array
      */
-    protected function format_files_array($data)
+    protected function formatFilesArray($data): array
     {
         if (!\is_array($data)) {
             return $data;
@@ -160,17 +145,17 @@ class File_Bag extends Bag
         $files = $data;
 
         foreach ($this->file_keys as $k) {
-            unset($files[ $k ]);
+            unset($files[$k]);
         }
 
         foreach ($data['name'] as $key => $name) {
-            $files[ $key ] = $this->format_files_array(
+            $files[$key] = $this->formatFilesArray(
                 [
-                    'error' => $data['error'][ $key ],
+                    'error' => $data['error'][$key],
                     'name' => $name,
-                    'type' => $data['type'][ $key ],
-                    'tmp_name' => $data['tmp_name'][ $key ],
-                    'size' => $data['size'][ $key ],
+                    'type' => $data['type'][$key],
+                    'tmp_name' => $data['tmp_name'][$key],
+                    'size' => $data['size'][$key],
                 ]
             );
         }

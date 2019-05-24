@@ -56,13 +56,13 @@ class Cache extends Command
         }
 
         // Setup Snap.
-        Snap::create_container();
-        Snap::init_config();
+        Snap::createContainer();
+        Snap::initConfig();
 
         $loader = new Loader();
-        $loader->load_theme();
+        //$loader->load_theme();
 
-        $config = Snap::get_container()->get('config');
+        $config = Snap::getContainer()->get('config');
 
         $root = \get_template_directory();
 
@@ -82,7 +82,7 @@ class Cache extends Command
 
         $config_created = $this->file->put_contents(
             $cache_path . \sha1(NONCE_SALT . 'theme'),
-            \serialize($config->get_primed_cache())
+            \serialize($config->getPrimedCache())
         );
 
         $autoload_created = $this->file->put_contents(

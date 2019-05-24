@@ -189,7 +189,7 @@ class View
             $composers = static::$composers[ $template ];
 
             foreach ($composers as $composer) {
-                $composer(Facade::get_root_instance()->set_context($template), $data);
+                $composer(Facade::getRootInstance()->set_context($template), $data);
             }
 
             if (isset(static::$additional_data[ static::$context ])) {

@@ -2,6 +2,7 @@
 
 namespace Snap\Http\Validation;
 
+use Rakit\Validation\ErrorBag;
 use Snap\Services\Container;
 
 /**
@@ -10,23 +11,18 @@ use Snap\Services\Container;
 class Validation
 {
     /**
+     * Holds the ErrorBag instance.
+     *
      * @var \Rakit\Validation\ErrorBag
      */
     public static $errors;
 
     /**
-     * Holds the Validator singleton.
+     * Holds the validation instance.
      *
-     * @var \Rakit\Validation\Validator
+     * @var \Rakit\Validation\validation
      */
-    private $validator;
-
-    /**
-     * Holds the Validation instance.
-     *
-     * @var \Rakit\Validation\Validation
-     */
-    private $validation;
+    protected $validation;
 
     /**
      * Validation constructor.
@@ -37,45 +33,26 @@ class Validation
      */
     public function __construct($data = null, array $rules = [], array $messages = [])
     {
-        $this->validator = Container::get('Rakit\Validation\Validator');
-
         if ($data !== null) {
-            $this->validation = $this->validator->make(
+            $this->validation = Container::get('Rakit\Validation\Validator')->make(
                 $data,
                 []
             );
         }
 
         if (!empty($rules)) {
-            $this->set_rules($rules);
+            $this->setRules($rules);
         }
 
         if (!empty($messages)) {
-            $this->set_error_messages($messages);
+            $this->setErrorMessages($messages);
         }
 
+        // TODO THESE WILL BE POPULATED EVEN WHEN VALIDATING SINGLE ARRAY. IDEALLY ONLY WHEN WORKING ON REQUESTS
         static::$errors = $this->validation->errors();
     }
 
-    /**
-     * Manually validate any given array.
-     *
-     * @param  array $inputs   The array of data to validate as key value pairs.
-     * @param  array $rules    The rules to run against the data.
-     * @param  array $messages Messages to display when a value fails.
-     * @return bool|array Returns true if data validates, or an array of error messages.
-     */
-    public static function validate(array $inputs, array $rules = [], array $messages = [])
-    {
-        /** @var \Rakit\Validation\Validation $validation */
-        $validation = Container::get('Rakit\Validation\Validator')->validate($inputs, $rules, $messages);
-
-        if ($validation->fails()) {
-            return $validation->errors()->toArray();
-        }
-
-        return true;
-    }
+    // TODO WORK OUT A WAY TO VALIDATE SINGLE ARRAYS ETC
 
     /**
      * Set the validation error messages.
@@ -83,12 +60,11 @@ class Validation
      * @see    https://github.com/rakit/validation#custom-validation-message for format.
      *
      * @param array $messages Error messages as key value pairs.
-     * @return Validation
+     * @return $this
      */
-    public function set_error_messages(array $messages = [])
+    public function setErrorMessages(array $messages = [])
     {
         $this->validation->setMessages($messages);
-
         return $this;
     }
 
@@ -98,9 +74,9 @@ class Validation
      * @see    https://github.com/rakit/validation#available-rules for format.
      *
      * @param array $rule_set Rules as key value pairs.
-     * @return Validation
+     * @return $this
      */
-    public function set_rules(array $rule_set = [])
+    public function setRules(array $rule_set = [])
     {
         foreach ($rule_set as $attribute_key => $rules) {
             $this->validation->addAttribute($attribute_key, $rules);
@@ -116,10 +92,24 @@ class Validation
      * The key might not be ideal, so you can provide a better substitute as an alias.
      *
      * @param array $aliases Key value pairs as original => alias.
+     * @return $this
      */
-    public function set_aliases(array $aliases = [])
+    public function setAliases(array $aliases = [])
     {
         $this->validation->setAliases($aliases);
+        return $this;
+    }
+
+    /**
+     * Optionally set translations for any built-in error messages.
+     *
+     * @param array $translations Translations to set.
+     * @return $this
+     */
+    public function setTranslations(array $translations)
+    {
+        $this->validation->setTranslations($translations);
+        return $this;
     }
 
     /**
@@ -127,65 +117,95 @@ class Validation
      *
      * @return boolean If the validation passed or not.
      */
-    public function is_valid(): bool
+    public function isValid(): bool
     {
+
         $this->validation->validate();
         static::$errors = $this->validation->errors();
-
         return !$this->validation->fails();
     }
 
     /**
-     * Get errors from the internal validation instance as a multi-dimensional array.
+     * Get errors from the internal validation instance as a multi-dimensional array with numerical indexes.
+     * Shortcut to errors()->get($key, $format).
      *
-     * @param null   $key    Optional. Specific key to fetch errors for.
-     * @param string $format Optional. Format string for the fetched error when using $key.
+     * Calling with no arguments returns a numerically index array of inputs and their errors - great for AJAX
+     * responses.
+     *
+     * @param null   $key    Optional. The key to search for. EG. 'name' or 'uploads.*'.
+     * @param string $format Optional. Format of the returned errors.
+     *                       Defaults to :message.
      * @return array
      */
-    public function get_errors($key = null, string $format = ':message'): array
+    public function getErrors($key = null, string $format = ':message'): array
     {
-        if (null === $key) {
-            return \array_map(
-                function ($vals) {
-                    return \array_values($vals);
-                },
-                $this->validation->errors()->toArray()
-            );
+        if ($key !== null) {
+            return $this->validation->errors()->get($key, $format);
         }
 
-        return $this->validation->errors()->get($key, $format);
+        return \array_map(
+            function ($values) {
+                return \array_values($values);
+            },
+            $this->validation->errors()->toArray()
+        );
     }
 
     /**
-     * Get count of all errors.
+     * Helper method to get count of all errors. Shortcut to errors()->count().
      *
      * @return int
      */
-    public function get_error_count(): int
+    public function getErrorCount(): int
     {
         return $this->validation->errors()->count();
     }
 
     /**
-     * Returns a flat array of all errors.
+     * Returns a flat array of all errors. Shortcut to errors()->all().
      *
      * @param string $format Optional. Format to wrap errors in such as '<li>:message</li>'.
      *                       Defaults to ':message'.
      * @return array
      */
-    public function get_all_errors(string $format = ':message'): array
+    public function getAllErrors(string $format = ':message'): array
     {
         return $this->validation->errors()->all($format);
     }
 
     /**
-     * Checks if an error exists.
+     * Checks if an error exists. Shortcut to errors()->has().
      *
      * @param string $key The key to search for. EG. 'name' or 'uploads.*'.
      * @return bool
      */
-    public function has_error(string $key): bool
+    public function hasErrors(string $key): bool
     {
         return $this->validation->errors()->has($key);
+    }
+
+    /**
+     * Return the underlying Validation instance's ErrorBag.
+     *
+     * @return \Rakit\Validation\ErrorBag
+     */
+    public function errors(): ErrorBag
+    {
+        return $this->validation->errors();
+    }
+
+    public function getValidatedData()
+    {
+        return $this->validation->getValidatedData();
+    }
+
+    public function getValidData()
+    {
+        return $this->validation->getValidData();
+    }
+
+    public function getInvalidData()
+    {
+        return $this->validation->getInvalidData();
     }
 }

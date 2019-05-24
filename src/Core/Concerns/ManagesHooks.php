@@ -8,7 +8,7 @@ use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 
-trait Manages_Hooks
+trait ManagesHooks
 {
     /**
      * Syntactic sugar around add_filter for grouping hooks together based on type.
@@ -20,39 +20,39 @@ trait Manages_Hooks
      * @param integer      $priority        The priority of the callback.
      * @param integer      $accepted_args   The amount of arguments the callback accepts.
      */
-    final public function add_action($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+    final public function addAction($tag, $function_to_add, $priority = 10, $accepted_args = 1)
     {
-        $this->add_filter($tag, $function_to_add, $priority, $accepted_args);
+        $this->addFilter($tag, $function_to_add, $priority, $accepted_args);
     }
 
     /**
      * Syntactic sugar around remove_hook.
      *
-     * @see    Hookable::remove_hook
+     * @see    Hookable::removeHook
      * @since  1.0.0
      *
      * @param  string|array $tag                The hook(s) to remove the callback from.
      * @param  callable     $function_to_remove The callback to remove.
      * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
-    final public function remove_action($tag, $function_to_remove, $priority = 10)
+    final public function removeAction($tag, $function_to_remove, $priority = 10)
     {
-        $this->remove_hook($tag, $function_to_remove, $priority);
+        $this->removeHook($tag, $function_to_remove, $priority);
     }
 
     /**
      * Syntactic sugar around remove_hook.
      *
-     * @see    Hookable::remove_hook
+     * @see    Hookable::removeHook
      * @since  1.0.0
      *
      * @param  string|array $tag                The hook(s) to remove the callback from.
      * @param  callable     $function_to_remove The callback to remove.
      * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
-    final public function remove_filter($tag, $function_to_remove, $priority = 10)
+    final public function removeFilter($tag, $function_to_remove, $priority = 10)
     {
-        $this->remove_hook($tag, $function_to_remove, $priority);
+        $this->removeHook($tag, $function_to_remove, $priority);
     }
 
     /**
@@ -64,7 +64,7 @@ trait Manages_Hooks
      * @param  callable     $function_to_remove The callback to remove.
      * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
-    final public function remove_hook($tag, $function_to_remove, $priority = 10)
+    final public function removeHook($tag, $function_to_remove, $priority = 10)
     {
         if (\is_string($function_to_remove) && \is_callable([$this, $function_to_remove])) {
             $function_to_remove = [$this, $function_to_remove];
@@ -94,7 +94,7 @@ trait Manages_Hooks
      * @param integer      $priority        The priority of the callback.
      * @param integer      $accepted_args   The amount of arguments the callback accepts.
      */
-    final public function add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+    final public function addFilter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
     {
         $callback = $function_to_add;
 
@@ -113,7 +113,7 @@ trait Manages_Hooks
                 $hook,
                 $callback,
                 $priority ? $priority : 10,
-                $this->get_argument_count($function_to_add, $accepted_args)
+                $this->getArgumentCount($function_to_add, $accepted_args)
             );
         }
     }
@@ -127,7 +127,7 @@ trait Manages_Hooks
      * @param  integer         $accepted_args The amount of arguments passed into the hook.
      * @return integer
      */
-    final private function get_argument_count($callback, $accepted_args = 1)
+    final private function getArgumentCount($callback, $accepted_args = 1)
     {
         try {
             if (\is_string($callback) && \is_callable([$this, $callback])) {

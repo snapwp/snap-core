@@ -2,7 +2,7 @@
 
 namespace Snap\Core;
 
-use Snap\Core\Concerns\Manages_Hooks;
+use Snap\Core\Concerns\ManagesHooks;
 use Snap\Utils\Str_Utils;
 
 /**
@@ -17,7 +17,7 @@ use Snap\Utils\Str_Utils;
  */
 class Hookable
 {
-    use Manages_Hooks;
+    use ManagesHooks;
 
     /**
      * Filters to add on init.
@@ -102,16 +102,16 @@ class Hookable
     {
         foreach ($hooks as $tag => $filter) {
             if (\is_string($filter)) {
-                $this->add_filter($tag, $filter);
+                $this->addFilter($tag, $filter);
             } else {
                 foreach ($filter as $priority => $callbacks) {
                     if (\is_string($callbacks)) {
-                        $this->add_filter($tag, $callbacks, $priority);
+                        $this->addFilter($tag, $callbacks, $priority);
                     } else {
                         $count = \count($callbacks);
 
                         for ($i = 0; $i < $count; $i++) {
-                            $this->add_filter($tag, $callbacks[ $i ], $priority);
+                            $this->addFilter($tag, $callbacks[ $i ], $priority);
                         }
                     }
                 }

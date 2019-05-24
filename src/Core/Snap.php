@@ -8,14 +8,13 @@ use Rakit\Validation\Validator;
 use Snap\Exceptions\Startup_Exception;
 use Snap\Http\Request;
 use Snap\Http\Response;
-use Snap\Templating\View;
+use Snap\Http\Validation\Validation;
+use Snap\Media\Image_Service;
 use Snap\Templating\Templating_Interface;
-use \Snap\Media\Image_Service;
+use Snap\Templating\View;
 
 /**
  * The main Snap class.
- *
- * @since 1.0.0
  */
 class Snap
 {
@@ -30,9 +29,15 @@ class Snap
     const VERSION = '1.0.0';
 
     /**
+     * Whether Snap has been setup yet.
+     *
+     * @var boolean
+     */
+    public static $short_setup = false;
+
+    /**
      * Container instance.
      *
-     * @since 1.0.0
      * @var Container
      */
     private static $container;
@@ -40,15 +45,12 @@ class Snap
     /**
      * Whether Snap has been setup yet.
      *
-     * @since 1.0.0
      * @var boolean
      */
     private static $setup = false;
 
     /**
      * This class never needs to be instantiated.
-     *
-     * @since  1.0.0
      */
     final private function __construct()
     {
@@ -57,8 +59,6 @@ class Snap
 
     /**
      * This class never needs to be instantiated.
-     *
-     * @since  1.0.0
      */
     final private function __clone()
     {
@@ -70,28 +70,26 @@ class Snap
      *
      * Must be run in order for anything to work.
      *
-     * @since  1.0.0
-     *
      * @throws Startup_Exception
      */
     public static function setup()
     {
         if (static::$setup === false) {
             try {
-                static::create_container();
-                static::init_config();
-                static::init_routing();
-                static::init_services();
-                static::add_wordpress_globals();
+                static::createContainer();
+                static::initConfig();
+                static::initRouting();
+                static::initServices();
+                static::addWordpressGlobals();
 
                 // Run the loader.
                 $loader = new Loader();
                 $loader->boot();
 
-                static::register_providers();
-                static::init_templating();
+                static::registerProviders();
+                static::initTemplating();
 
-                static::init_view();
+                static::initView();
 
                 $classmap = null;
                 $classmap_cache = \get_stylesheet_directory() . '/cache/config/' . \sha1(NONCE_SALT . 'classmap');
@@ -112,11 +110,9 @@ class Snap
     /**
      * Create the static Container instance.
      *
-     * @since 1.0.0
-     *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    public static function create_container()
+    public static function createContainer()
     {
         if (static::$setup === false) {
             static::$container = new Container();
@@ -128,13 +124,11 @@ class Snap
     /**
      * Create a config instance, provide config directories, and add to the container.
      *
-     * @since 1.0.0
-     *
      * @param string $theme_root Used by the publish command when not the current active theme.
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    public static function init_config($theme_root = null)
+    public static function initConfig($theme_root = null)
     {
         if (static::$setup === false) {
             $config = new Config();
@@ -143,18 +137,18 @@ class Snap
                 $config_cache_path = \get_stylesheet_directory() . '/cache/config/' . \sha1(NONCE_SALT . 'theme');
 
                 if (WP_DEBUG === false && \file_exists($config_cache_path)) {
-                    $config->load_from_cache(\file_get_contents($config_cache_path));
+                    $config->loadFromCache(\file_get_contents($config_cache_path));
                 } else {
-                    $config->add_path(\get_template_directory() . '/config');
+                    $config->addPath(\get_template_directory() . '/config');
 
                     if (\is_child_theme()) {
-                        $config->add_path(\get_stylesheet_directory() . '/config');
+                        $config->addPath(\get_stylesheet_directory() . '/config');
                     }
                 }
             }
 
             if ($theme_root !== null) {
-                $config->add_path($theme_root . '/config');
+                $config->addPath($theme_root . '/config');
             }
 
             static::$container->add_instance($config);
@@ -165,11 +159,9 @@ class Snap
     /**
      * Return the Container object.
      *
-     * @since  1.0.0
-     *
      * @return Container
      */
-    public static function get_container()
+    public static function getContainer()
     {
         return static::$container;
     }
@@ -177,11 +169,9 @@ class Snap
     /**
      * Registers any service providers defined in theme config.
      *
-     * @since 1.0.0
-     *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    public static function register_providers()
+    public static function registerProviders()
     {
         $provider_instances = [];
 
@@ -208,10 +198,8 @@ class Snap
      * Add the templating definitions to the container.
      *
      * Adds the View class, and if no other templating strategy is present, adds and binds the default.
-     *
-     * @since  1.0.0
      */
-    private static function init_templating()
+    private static function initTemplating()
     {
         // If no templating strategy has already been registered.
         if (!static::$container->has(Templating_Interface::class)) {
@@ -236,10 +224,8 @@ class Snap
 
     /**
      * Add the View class ot the container.
-     *
-     * @since 1.0.0
      */
-    private static function init_view()
+    private static function initView()
     {
         static::$container->add_singleton(
             View::class,
@@ -253,10 +239,8 @@ class Snap
 
     /**
      * Add Snap services to the container.
-     *
-     * @since  1.0.0
      */
-    private static function init_services()
+    private static function initServices()
     {
         // Add Image service.
         static::$container->add_singleton(
@@ -272,10 +256,8 @@ class Snap
 
     /**
      * Add Snap routing, request, and validation services to the container.
-     *
-     * @since  1.0.0
      */
-    private static function init_routing()
+    private static function initRouting()
     {
         static::$container->add_singleton(
             Router::class,
@@ -293,15 +275,26 @@ class Snap
 
         static::$container->add_singleton(
             Response::class,
-            function () {
-                return new Response();
+            function (\Hodl\Container $container) {
+                /** @var \Snap\Templating\View $view */
+                $view = $container->get(View::class);
+
+                return new Response($view);
             }
         );
 
+        // This is required to fill with any custom rules.
         static::$container->add_singleton(
             Validator::class,
             function () {
                 return new Validator();
+            }
+        );
+
+        static::$container->add(
+            Validation::class,
+            function(\Hodl\Container $container) {
+                $container->resolve(Validation::class);
             }
         );
 
@@ -313,11 +306,9 @@ class Snap
     /**
      * Add WordPress globals into container.
      *
-     * @Since 1.0.0
-     *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    private static function add_wordpress_globals()
+    private static function addWordpressGlobals()
     {
         // Add global WP classes.
         global $wpdb, $wp_query;

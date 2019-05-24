@@ -39,11 +39,11 @@ class Admin extends Hookable
     public function boot()
     {
         if (Config::get('images.dynamic_image_sizes') !== false) {
-            $this->add_filter('media_meta', 'add_image_sizes_meta_to_media');
-            $this->add_filter('attachment_fields_to_edit', 'add_intermediate_mgmt_fields');
-            $this->add_filter('attachment_fields_to_save', 'handle_delete_intermediate_ajax');
+            $this->addFilter('media_meta', 'add_image_sizes_meta_to_media');
+            $this->addFilter('attachment_fields_to_edit', 'add_intermediate_mgmt_fields');
+            $this->addFilter('attachment_fields_to_save', 'handle_delete_intermediate_ajax');
 
-            $this->add_action('admin_enqueue_scripts', 'enqueue_image_admin_scripts');
+            $this->addAction('admin_enqueue_scripts', 'enqueue_image_admin_scripts');
         }
     }
 

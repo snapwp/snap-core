@@ -52,8 +52,9 @@ class Creator extends Command
     protected function scaffold($scaffold, $args = [], $options = [])
     {
         $this->init_wordpress();
-        Snap::create_container();
-        Snap::init_config();
+
+        Snap::initConfig();
+
         $original = $this->scaffolding_dir . "{$scaffold}.txt";
 
         if (\file_exists($original)) {
@@ -160,7 +161,7 @@ class Creator extends Command
         $folder = \str_replace('\\', '/', $args['NAMESPACE']);
 
         $output_path = $base_dir . '/' . $dir . \trailingslashit($folder);
-
+        
         \wp_mkdir_p($output_path);
 
         return $output_path . $args['CLASSNAME'] . '.php';

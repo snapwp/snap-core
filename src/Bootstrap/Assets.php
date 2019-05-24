@@ -39,13 +39,13 @@ class Assets extends Hookable
     {
         // Whether to add 'defer' to enqueued scripts.
         if (Config::get('theme.defer_scripts')) {
-            $this->add_filter('script_loader_tag', 'defer_scripts', 10, 2);
+            $this->addFilter('script_loader_tag', 'defer_scripts', 10, 2);
         }
 
         // Whether to remove asset version strings.
         if (Config::get('theme.remove_asset_versions')) {
-            $this->add_filter('style_loader_src', 'remove_versions_from_assets', 15);
-            $this->add_filter('script_loader_src', 'remove_versions_from_assets', 15);
+            $this->addFilter('style_loader_src', 'remove_versions_from_assets', 15);
+            $this->addFilter('script_loader_src', 'remove_versions_from_assets', 15);
         }
     }
 

@@ -2,61 +2,50 @@
 
 namespace Snap\Admin;
 
-use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Core\Snap;
 use Snap\Services\Config;
 
 /**
  * Admin changes for whitelabel/branding purposes.
- *
- * @since 1.0.0
  */
 class Whitelabel extends Hookable
 {
     /**
      * Filters to add on init.
      *
-     * @since  1.0.0
      * @var array
      */
     protected $filters = [
-        'admin_footer_text' => 'branding_admin_footer',
-        'login_headerurl' => 'set_login_logo_url',
+        'admin_footer_text' => 'brandingAdminFooter',
+        'login_headerurl' => 'setLoginLogoUrl',
 
         'update_footer' => [
-            99 => 'remove_version_text',
+            99 => 'removeVersionText',
         ],
     ];
 
     /**
      * Add conditional hooks.
-     *
-     * @since  1.0.0
      */
     public function boot()
     {
         if (Config::get('admin.login_extra_css') !== false) {
-            $this->add_action('login_enqueue_scripts', 'enqueue_login_css');
+            $this->addAction('login_enqueue_scripts', 'enqueueLoginCss');
         }
     }
 
     /**
      * Outputs the SnapWP footer in WordPress admin.
-     *
-     * @since  1.0.0
      */
-    public function branding_admin_footer()
+    public function brandingAdminFooter()
     {
         if (Config::get('admin.footer_text')) {
-            echo Config::get('admin.footer_text');
+            echo \esc_html(Config::get('admin.footer_text'));
             return;
         }
 
-        /**
-         * Keep PHPStorm happy.
-         *
-         * @noinspection HtmlUnknownTarget
-         */
+        /** @noinspection HtmlUnknownTarget */
         echo \sprintf(
             '%s <a href="https://wordpress.org" target="_blank">WordPress</a> %s <a href="%s" target="_blank">SnapWP</a>',
             \__('Built using', 'snap'),
@@ -68,11 +57,9 @@ class Whitelabel extends Hookable
     /**
      * Set URL of the login page logo link.
      *
-     * @since  1.0.0
-     *
      * @return  string
      */
-    public function set_login_logo_url()
+    public function setLoginLogoUrl(): string
     {
         return Config::get('admin.login_logo_url');
     }
@@ -80,12 +67,10 @@ class Whitelabel extends Hookable
     /**
      * Removes the admin footer version text.
      *
-     * @since  1.0.0
-     *
      * @param  string $version The current WP version string.
      * @return string
      */
-    public function remove_version_text($version)
+    public function removeVersionText($version): string
     {
         if (true === Config::get('admin.show_version')) {
             return $version;
@@ -96,10 +81,8 @@ class Whitelabel extends Hookable
 
     /**
      * Enqueue custom login page css.
-     *
-     * @since  1.0.0
      */
-    public function enqueue_login_css()
+    public function enqueueLoginCss()
     {
         \wp_enqueue_style('theme_custom_login_css', Config::get('admin.login_extra_css'));
     }

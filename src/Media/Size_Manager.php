@@ -80,22 +80,22 @@ class Size_Manager extends Hookable
 
         // Remove all default image sizes.
         if (Config::get('images.reset_image_sizes') !== false) {
-            $this->add_filter('intermediate_image_sizes_advanced', 'remove_default_image_sizes');
-            $this->add_filter('intermediate_image_sizes_advanced', 'remove_custom_image_sizes');
-            $this->add_filter('intermediate_image_sizes', 'remove_default_image_sizes');
+            $this->addFilter('intermediate_image_sizes_advanced', 'remove_default_image_sizes');
+            $this->addFilter('intermediate_image_sizes_advanced', 'remove_custom_image_sizes');
+            //$this->addFilter('intermediate_image_sizes', 'remove_default_image_sizes');
         }
 
         if (! empty($this->size_dropdown_names)) {
-            $this->add_filter('image_size_names_choose', 'enable_custom_image_sizes');
+            $this->addFilter('image_size_names_choose', 'enable_custom_image_sizes');
         }
     
         // Set default image size dropdown value.
         if (! empty(Config::get('images.insert_image_default_size'))) {
-            $this->add_filter('after_setup_theme', 'set_insert_image_default_size');
+            $this->addFilter('after_setup_theme', 'set_insert_image_default_size');
         }
 
         if (Config::get('images.dynamic_image_sizes') !== false) {
-            $this->add_filter('image_downsize', 'generate_dynamic_image');
+            $this->addFilter('image_downsize', 'generate_dynamic_image');
         }
     }
 
@@ -222,7 +222,8 @@ class Size_Manager extends Hookable
         $sizes_to_remove = \array_merge($user_sizes_to_remove, self::DEFAULT_IMAGE_SIZES);
 
         if (\is_array(\current($sizes))) {
-            $sizes = \array_keys($sizes);
+            $sizes_to_remove = array_flip($sizes_to_remove);
+            return array_diff_key($sizes, $sizes_to_remove);
         }
 
         return \array_diff($sizes, $sizes_to_remove);
@@ -344,8 +345,8 @@ class Size_Manager extends Hookable
                     };
 
                     // Remove the size.
-                    $this->add_filter('intermediate_image_sizes_advanced', $callback);
-                    $this->add_filter('intermediate_image_sizes', $callback);
+                    $this->addFilter('intermediate_image_sizes_advanced', $callback);
+                    $this->addFilter('intermediate_image_sizes', $callback);
                 }
             } else {
                 // Add custom image size.

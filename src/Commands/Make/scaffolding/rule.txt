@@ -2,7 +2,7 @@
 
 namespace Theme\Http\Validation\RulesNAMESPACE;
 
-use Snap\Request\Rule;
+use Snap\Http\Validation\Rule;
 
 /**
  * CLASSNAME description

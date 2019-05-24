@@ -23,7 +23,7 @@ class Middleware extends Hookable
     protected $name = null;
 
     /**
-     * Run this hookable only on the frontend.
+     * Run this Hookable only on the frontend.
      *
      * @since 1.0.0
      * @var boolean
@@ -37,7 +37,7 @@ class Middleware extends Hookable
      */
     public function boot()
     {
-        $this->add_filter("snap_middleware_{$this->get_name()}", 'handler');
+        $this->addFilter("snap_middleware_{$this->get_name()}", 'handler');
     }
 
     /**

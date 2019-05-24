@@ -2,6 +2,7 @@
 
 namespace Snap\Core;
 
+use Snap\Core\Concerns\ManagesHooks;
 use Snap\Services\Request;
 use Snap\Services\Config;
 use Snap\Services\Container;
@@ -13,6 +14,8 @@ use Snap\Services\Container;
  */
 class Loader
 {
+    use ManagesHooks;
+
     /**
      * A cache of the parent/child includes from the Theme folder.
      *
@@ -105,9 +108,10 @@ class Loader
 
         static::$aliases = Config::get('services.aliases');
 
-        if (\is_admin() || Request::is_wp_login()) {
+
+        if (\is_admin() || Request::isLoginPage()) {
             $this->class_list[] = \Snap\Admin\Whitelabel::class;
-            $this->class_list[] = \Snap\Admin\Columns\Post_Template::class;
+            $this->class_list[] = \Snap\Admin\Columns\PostTemplate::class;
             $this->class_list[] = \Snap\Media\Admin::class;
 
             $this->conditional_load('admin.snap_admin_theme', 'Snap\Admin\Theme');
@@ -115,15 +119,18 @@ class Loader
             $this->class_list[] = \Snap\Http\Middleware\Is_Logged_In::class;
         }
 
-        $this->conditional_load('theme.disable_comments', 'Snap\Admin\Disable_Comments');
-        $this->conditional_load('theme.disable_customizer', 'Snap\Admin\Disable_Customizer');
-        $this->conditional_load('theme.disable_tags', 'Snap\Admin\Disable_Tags');
+        $this->conditional_load('theme.disable_comments', 'Snap\Admin\DisableComments');
+        $this->conditional_load('theme.disable_customizer', 'Snap\Admin\DisableCustomizer');
+        $this->conditional_load('theme.disable_tags', 'Snap\Admin\DisableTags');
 
         foreach ($this->class_list as $module) {
             Container::resolve($module)->run();
         }
 
         $this->init_widgets();
+
+        // Ensure Request if populated.
+        $this->addAction('wp', 'populateRequest');
 
         // Now all core files are loaded, turn on output buffer until a view is dispatched.
         \ob_start();
@@ -189,6 +196,14 @@ class Loader
     }
 
     /**
+     * Ensures the the global Request object has access to the global $wp properties.
+     */
+    public function populateRequest()
+    {
+        Request::populateWpParams();
+    }
+
+    /**
      * Register additional Snap widgets.
      *
      * @since 1.0.0
@@ -251,8 +266,6 @@ class Loader
     /**
      * Scans a directory for PHP files.
      *
-     * @since  1.0.0
-     *
      * @param  string $folder Directory path to scan.
      * @param  array  $files  An array to append the discovered files to.
      * @return array          $files array with any discovered php files appended.
@@ -300,8 +313,6 @@ class Loader
 
     /**
      * Include Theme\Theme_Setup
-     *
-     * @since 1.0.0
      */
     private function init_theme_setup()
     {
@@ -312,8 +323,6 @@ class Loader
 
     /**
      * Adds a class to the list if the provided config $key is true.
-     *
-     * @since 1.0.0
      *
      * @param string $key
      * @param string $class

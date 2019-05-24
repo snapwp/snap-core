@@ -2,7 +2,7 @@
 
 namespace Snap\Services;
 
-use Snap\Core\Concerns\Manages_Hooks;
+use Snap\Core\Concerns\ManagesHooks;
 use RecursiveIteratorIterator;
 use RecursiveArrayIterator;
 
@@ -11,7 +11,7 @@ use RecursiveArrayIterator;
  */
 class Service_Provider
 {
-    use Manages_Hooks;
+    use ManagesHooks;
 
     /**
      * List of files and folders published.
@@ -75,7 +75,7 @@ class Service_Provider
      */
     protected function add_config_location($path)
     {
-        Config::add_default_path($path);
+        Config::addDefaultPath($path);
     }
 
     /**

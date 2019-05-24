@@ -60,10 +60,10 @@ class Ajax_Handler extends Hookable
      */
     public function boot()
     {
-        $this->add_action("wp_ajax_{$this->get_action_name()}", 'handler');
+        $this->addAction("wp_ajax_{$this->get_action_name()}", 'handler');
 
         if ($this->allow_public_access) {
-            $this->add_action("wp_ajax_nopriv_{$this->get_action_name()}", 'handler');
+            $this->addAction("wp_ajax_nopriv_{$this->get_action_name()}", 'handler');
         }
     }
 

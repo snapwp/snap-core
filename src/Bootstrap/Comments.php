@@ -4,7 +4,7 @@ namespace Snap\Bootstrap;
 
 use Snap\Core\Hookable;
 use Snap\Services\Config;
-use Snap\Utils\Theme_Utils;
+use Snap\Utils\Theme;
 
 /**
  * All Comment functionality.
@@ -21,7 +21,7 @@ class Comments extends Hookable
     public function boot()
     {
         if (Config::get('theme.disable_comments') === false) {
-            $this->add_filter('comments_template', 'map_comments_template_to_partials');
+            $this->addFilter('comments_template', 'map_comments_template_to_partials');
         }
     }
 
@@ -39,13 +39,13 @@ class Comments extends Hookable
             $path
         );
 
-        $locate = \locate_template(Theme_Utils::get_path_to_partial($tpl), false);
+        $locate = \locate_template(Theme::getPathToPartial($tpl), false);
 
         if ($locate !== '') {
             return $locate;
         }
 
-        $locate = \locate_template(Theme_Utils::get_path_to_partial('comments'), false);
+        $locate = \locate_template(Theme::getPathToPartial('comments'), false);
 
         if ($locate !== '') {
             return $locate;

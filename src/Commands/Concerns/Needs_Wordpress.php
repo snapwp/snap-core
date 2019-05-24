@@ -2,6 +2,8 @@
 
 namespace Snap\Commands\Concerns;
 
+use Snap\Core\Snap;
+
 trait Needs_Wordpress
 {
     /**
@@ -15,9 +17,6 @@ trait Needs_Wordpress
 
         // Trick WP into thinking this is an AJAX request. Helps quieten certain plugins.
         \define('DOING_AJAX', true);
-        
-        \define('SNAP_DOING_COMMAND', true);
-
         \define('BASE_PATH', $this->find_wordpress_base_path());
         \define('WP_USE_THEMES', false);
         require(BASE_PATH . 'wp-load.php');

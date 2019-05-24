@@ -7,9 +7,8 @@ use Snap\Services\Request;
 
 /**
  * Sidebar and widget utilities.
- *
  */
-class Theme_Utils
+class Theme
 {
     /**
      * Mix-manifest.json contents stored as array.
@@ -24,7 +23,7 @@ class Theme_Utils
      * @param  boolean $remove_query If true, the URL is returned without any query params.
      * @return string The current URL.
      */
-    public static function get_current_url($remove_query = false)
+    public static function getCurrentUrl($remove_query = false)
     {
         global $wp;
 
@@ -41,7 +40,7 @@ class Theme_Utils
      * @param string $path Path to append relative to active theme.
      * @return string
      */
-    public static function get_active_theme_path($path)
+    public static function getActiveThemePath($path)
     {
         return \trailingslashit(\get_stylesheet_directory()) . $path;
     }
@@ -52,7 +51,7 @@ class Theme_Utils
      * @param string $path Path to append relative to active theme directory URL.
      * @return string
      */
-    public static function get_active_theme_uri($path)
+    public static function getActiveThemeUri($path)
     {
         return \trailingslashit(\get_stylesheet_directory_uri()) . $path;
     }
@@ -63,18 +62,18 @@ class Theme_Utils
      * @param  string $file The asset file to look for.
      * @return string The (possibly versioned) asset URL.
      */
-    public static function get_asset_url($file)
+    public static function getAssetUrl($file)
     {
         if (static::$manifest === null) {
-            static::parse_manifest();
+            static::parseManifest();
         }
 
         // There was no manifest or no file present.
         if (static::$manifest === null || !isset(static::$manifest[ $file ])) {
-            return get_stylesheet_directory_uri() . '/public' . $file;
+            return \get_stylesheet_directory_uri() . '/public' . $file;
         }
 
-        return get_stylesheet_directory_uri() . '/public' . static::$manifest[ $file ];
+        return \get_stylesheet_directory_uri() . '/public' . static::$manifest[ $file ];
     }
 
     /**
@@ -83,7 +82,7 @@ class Theme_Utils
      * @param  string $partial The partial name.
      * @return string
      */
-    public static function get_path_to_partial($partial): string
+    public static function getPathToPartial($partial): string
     {
         $partial = \str_replace(
             ['.php', '.'],
@@ -102,7 +101,7 @@ class Theme_Utils
      * @param string $post_template The template to get the path for.
      * @return string
      */
-    public static function get_post_templates_path($post_template): string
+    public static function getPostTemplatesPath($post_template): string
     {
         $template = \str_replace(
             ['.php', '.'],
@@ -116,9 +115,9 @@ class Theme_Utils
     /**
      * Parse the contents of mix-manifest.json and store as array.
      */
-    private static function parse_manifest()
+    private static function parseManifest()
     {
-        $manifest_path = get_stylesheet_directory() . '/public/mix-manifest.json';
+        $manifest_path = \get_stylesheet_directory() . '/public/mix-manifest.json';
 
         if (\file_exists($manifest_path)) {
             $manifest = \file_get_contents($manifest_path);
@@ -133,9 +132,9 @@ class Theme_Utils
      * @param string $url The URL to check.
      * @return bool
      */
-    public static function is_external_url($url)
+    public static function isExternalUrl($url)
     {
-        if (\parse_url($url, PHP_URL_HOST) === Request::get_host()) {
+        if (\parse_url($url, PHP_URL_HOST) === Request::getHost()) {
             return false;
         }
 

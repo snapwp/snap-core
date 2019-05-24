@@ -6,27 +6,22 @@ use Snap\Core\Hookable;
 
 /**
  * Remove post Tag taxonomy.
- *
- * @since  1.0.0
  */
-class Disable_Tags extends Hookable
+class DisableTags extends Hookable
 {
     /**
      * Actions to add on init.
      *
-     * @since  1.0.0
      * @var array
      */
     protected $actions = [
-        'init' => 'disable_tags',
+        'init' => 'disableTags',
     ];
 
     /**
      * Remove post_tag taxonomy from all post types.
-     *
-     * @since 1.0.0
      */
-    public function disable_tags()
+    public function disableTags()
     {
         $types = \get_post_types();
 

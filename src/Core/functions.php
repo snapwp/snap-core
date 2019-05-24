@@ -43,7 +43,7 @@ if (! \function_exists('container')) {
      */
     function container()
     {
-        return Snap::get_container();
+        return Snap::getContainer();
     }
 }
 
@@ -56,7 +56,7 @@ if (! \function_exists('get_service')) {
      */
     function get_service($key)
     {
-        return Snap::get_container()->get($key);
+        return Snap::getContainer()->get($key);
     }
 }
 
@@ -68,7 +68,7 @@ if (! \function_exists('get_request')) {
      */
     function get_request()
     {
-        return Snap::get_container()->get('request');
+        return Snap::getContainer()->get('request');
     }
 }
 
@@ -219,7 +219,7 @@ if (! \function_exists('snap_get_current_url')) {
      */
     function snap_get_current_url($remove_query = false)
     {
-        return \Snap\Utils\Theme_Utils::get_current_url($remove_query);
+        return \Snap\Utils\Theme::getCurrentUrl($remove_query);
     }
 }
 
@@ -232,7 +232,7 @@ if (! \function_exists('snap_get_asset_url')) {
      */
     function snap_get_asset_url($file)
     {
-        return \Snap\Utils\Theme_Utils::get_asset_url($file);
+        return \Snap\Utils\Theme::getAssetUrl($file);
     }
 }
 
@@ -245,7 +245,7 @@ if (! \function_exists('snap_is_post_template')) {
      */
     function snap_is_post_template($post_template): bool
     {
-        return \Snap\Services\Request::is_post_template($post_template);
+        return \Snap\Services\Request::isPostTemplate($post_template);
     }
 }
 
@@ -257,7 +257,7 @@ if (! \function_exists('snap_is_wp_login')) {
      */
     function snap_is_wp_login(): bool
     {
-        return \Snap\Services\Request::is_wp_login();
+        return \Snap\Services\Request::isLoginPage();
     }
 }
 

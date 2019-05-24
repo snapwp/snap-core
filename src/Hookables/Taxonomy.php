@@ -125,11 +125,11 @@ class Taxonomy extends Hookable
         $taxonomy->register();
 
         // Register any sortable columns.
-        $this->add_filter('manage_edit-' . $this->get_name() . '_sortable_columns', 'set_sortable_columns');
+        $this->addFilter('manage_edit-' . $this->get_name() . '_sortable_columns', 'set_sortable_columns');
 
         // If there are sortable columns, run their callbacks.
         if (! empty($this->sortable_columns)) {
-            $this->add_action('parse_term_query', 'sort_columns', 1, 999);
+            $this->addAction('parse_term_query', 'sort_columns', 1, 999);
         }
     }
 

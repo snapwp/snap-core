@@ -111,7 +111,7 @@ class Handle_Post_Templates extends Hookable
     public function register_theme_template_hooks()
     {
         foreach (\get_post_types([ 'public' => true ]) as $post_type) {
-            $this->add_filter("theme_{$post_type}_templates", 'custom_template_locator');
+            $this->addFilter("theme_{$post_type}_templates", 'custom_template_locator');
         }
     }
 
