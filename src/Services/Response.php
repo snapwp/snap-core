@@ -16,8 +16,9 @@ namespace Snap\Services;
  * @method static  \Snap\Http\Response setCookie(string $name, $value = '', int $expires = 3600, string $path = '/', string $domain = null, bool $secure = null, bool $httponly = true )
  * @method static  \Snap\Http\Response removeCookie(string $name)
  * @method static  \Snap\Http\Response set404()
- * @method static  void sendJsonSuccess($data = null, $status_code = null)
- * @method static  void sendJsonError($data = null, $status_code = null)
+ * @method static  void json($data = null, $statusCode = null, $disableCaching = true)
+ * @method static  void jsonSuccess($data = null, $statusCode = null, $disableCaching = true)
+ * @method static  void jsonError($data = null, $statusCode = null, $disableCaching = true)
  *
  * @see \Snap\Http\Response
  */

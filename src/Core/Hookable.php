@@ -10,10 +10,6 @@ use Snap\Utils\Str_Utils;
  * at the top of the class.
  *
  * Any class which extends Snap\Hookable is auto initialised upon inclusion.
- *
- * This forces a clean and readable pattern across all child classes.
- *
- * @since 1.0.0
  */
 class Hookable
 {
@@ -22,7 +18,6 @@ class Hookable
     /**
      * Filters to add on init.
      *
-     * @since 1.0.0
      * @var array
      */
     protected $filters = [];
@@ -30,7 +25,6 @@ class Hookable
     /**
      * Actions to add on init.
      *
-     * @since 1.0.0
      * @var array
      */
     protected $actions = [];
@@ -38,7 +32,6 @@ class Hookable
     /**
      * Run this hookable when is_admin returns true.
      *
-     * @since 1.0.0
      * @var boolean
      */
     protected $admin = true;
@@ -46,7 +39,6 @@ class Hookable
     /**
      * Run this hookable when is_admin returns false.
      *
-     * @since 1.0.0
      * @var boolean
      */
     protected $public = true;
@@ -56,8 +48,6 @@ class Hookable
      *
      * The hooks are registered, then boot is run.
      * This gives some extra options for conditionally adding filters.
-     *
-     * @since 1.0.0
      */
     final public function run()
     {
@@ -69,8 +59,8 @@ class Hookable
             return;
         }
 
-        $this->parse_filters();
-        $this->parse_actions();
+        $this->parseFilters();
+        $this->parseActions();
 
         if (\method_exists($this, 'boot')) {
             $this->boot();
@@ -78,27 +68,22 @@ class Hookable
     }
 
     /**
-     * Returns the snake case version of the current Hookable class name.
-     *
-     * @since  1.0.0
+     * Returns the snake _ase version of the current Hookable class name.
      *
      * @return string
      */
-    final protected function get_classname()
+    final protected function getClassname(): string
     {
         $classname = \basename(\str_replace('\\', '/', \get_class($this)));
-
         return Str_Utils::to_snake($classname);
     }
 
     /**
      * Add the hooks defined in $filters and $actions.
      *
-     * @since 1.0.0
-     *
      * @param array $hooks The contents of $filters or $actions.
      */
-    final private function add_hooks($hooks)
+    final private function addhooks(array $hooks)
     {
         foreach ($hooks as $tag => $filter) {
             if (\is_string($filter)) {
@@ -121,25 +106,21 @@ class Hookable
 
     /**
      * Check if $actions need to be added.
-     *
-     * @since 1.0.0
      */
-    final private function parse_actions()
+    final private function parseActions()
     {
         if (isset($this->actions) && \is_array($this->actions) && !empty($this->actions)) {
-            $this->add_hooks($this->actions);
+            $this->addhooks($this->actions);
         }
     }
 
     /**
      * Check if $filters need to be added.
-     *
-     * @since 1.0.0
      */
-    final private function parse_filters()
+    final private function parseFilters()
     {
         if (isset($this->filters) && \is_array($this->filters) && !empty($this->filters)) {
-            $this->add_hooks($this->filters);
+            $this->addhooks($this->filters);
         }
     }
 }

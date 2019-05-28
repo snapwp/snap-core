@@ -2,22 +2,20 @@
 
 namespace Snap\Hookables;
 
+use ReflectionMethod;
 use Snap\Core\Hookable;
 use Snap\Services\Container;
 
 /**
  * A simple wrapper for auto registering Middleware.
- *
- * @since 1.0.0
  */
 class Middleware extends Hookable
 {
     /**
      * The name of the Middleware.
      *
-     * If not present, then the snake cased class name is used instead.
+     * If not present, then the snake_case class name is used instead.
      *
-     * @since 1.0.0
      * @var null|string
      */
     protected $name = null;
@@ -25,42 +23,53 @@ class Middleware extends Hookable
     /**
      * Run this Hookable only on the frontend.
      *
-     * @since 1.0.0
      * @var boolean
      */
     protected $admin = false;
 
     /**
      * Boot the AJAX Hookable, and register the handler.
-     *
-     * @since  1.0.0
      */
     public function boot()
     {
-        $this->addFilter("snap_middleware_{$this->get_name()}", 'handler');
+        $this->addFilter("snap_middleware_{$this->getName()}", 'handler', 10, 100);
     }
 
     /**
-     * Auto-wire and call the child class's handle method.
+     * Auto-wire and call the child class's handle method, injecting any params.
      *
-     * @since 1.0.0
+     * @param array $args Params to pass to the handle method.
+     * @return mixed
+     *
+     * @throws \ReflectionException
      */
-    public function handler()
+    public function handler(...$args)
     {
-        return Container::resolve_method($this, 'handle');
+        // Get any expected params of the handle method.
+        $ref = new ReflectionMethod($this, 'handle');
+        $params = [];
+
+        foreach ($ref->getParameters() as $param) {
+            // Let classes get auto-wired.
+            if ($param->getClass() === null) {
+                if (count($args) >= 1) {
+                    $params[$param->getName()] = array_shift($args);
+                }
+            }
+        }
+
+        return Container::resolveMethod($this, 'handle', $params);
     }
 
     /**
      * Return the unqualified snake case name of the current child class, or $name if set.
      *
-     * @since  1.0.0
-     *
      * @return string
      */
-    private function get_name()
+    private function getName(): string
     {
         if ($this->name === null) {
-            return $this->get_classname();
+            return $this->getClassname();
         }
 
         return $this->name;

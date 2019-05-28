@@ -262,7 +262,7 @@ class Taxonomy extends Hookable
     private function get_name()
     {
         if ($this->name === null) {
-            return $this->get_classname();
+            return $this->getClassname();
         }
 
         return $this->name;

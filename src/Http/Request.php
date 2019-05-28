@@ -7,13 +7,13 @@ use Snap\Http\Request\Bag;
 use Snap\Http\Request\FileBag;
 use Snap\Http\Request\ServerBag;
 use Snap\Http\Validation\Traits\ValidatesInput;
-use Snap\Http\Validation\Validation;
+use Snap\Http\Validation\Validator;
 use Snap\Utils\Theme;
 
 /**
  * Gathers all request variables into one place, and provides a simple API for changes affecting the response.
  */
-class Request extends Validation implements ArrayAccess
+class Request extends Validator implements ArrayAccess
 {
     use ValidatesInput;
 
@@ -136,6 +136,9 @@ class Request extends Validation implements ArrayAccess
 
         // Set up the Validation instance.
         parent::__construct($_GET + $_POST + $_FILES, $this->rules(), $this->messages());
+
+        // Set blank global ErrorBag.
+        static::$globalErrors = $this->validation->errors();
 
         if (!empty($this->aliases())) {
             $this->setAliases($this->aliases());

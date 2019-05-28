@@ -56,7 +56,7 @@ class Cron_Event extends Hookable
      */
     final public function handler()
     {
-        Container::resolve_method($this, 'handle');
+        Container::resolveMethod($this, 'handle');
     }
 
     /**
@@ -69,7 +69,7 @@ class Cron_Event extends Hookable
     private function get_cron_action()
     {
         if ($this->action === null) {
-            return 'snap_cron_' . $this->get_classname();
+            return 'snap_cron_' . $this->getClassname();
         }
 
         return $this->action;

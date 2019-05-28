@@ -82,7 +82,7 @@ class Theme
      * @param  string $partial The partial name.
      * @return string
      */
-    public static function getPathToPartial($partial): string
+    public static function getPartialPath($partial): string
     {
         $partial = \str_replace(
             ['.php', '.'],

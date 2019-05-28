@@ -3,12 +3,12 @@
 namespace Snap\Core;
 
 use Exception;
+use Hodl\Container;
 use Hodl\Exceptions\ContainerException;
-use Rakit\Validation\Validator;
 use Snap\Exceptions\Startup_Exception;
 use Snap\Http\Request;
 use Snap\Http\Response;
-use Snap\Http\Validation\Validation;
+use Snap\Http\Validation\Validator;
 use Snap\Media\Image_Service;
 use Snap\Templating\Templating_Interface;
 use Snap\Templating\View;
@@ -117,7 +117,7 @@ class Snap
         if (static::$setup === false) {
             static::$container = new Container();
 
-            static::$container->add_instance(static::$container);
+            static::$container->addInstance(static::$container);
         }
     }
 
@@ -151,7 +151,7 @@ class Snap
                 $config->addPath($theme_root . '/config');
             }
 
-            static::$container->add_instance($config);
+            static::$container->addInstance($config);
             static::$container->alias(Config::class, 'config');
         }
     }
@@ -170,6 +170,7 @@ class Snap
      * Registers any service providers defined in theme config.
      *
      * @throws \Hodl\Exceptions\ContainerException
+     * @throws \ReflectionException
      */
     public static function registerProviders()
     {
@@ -190,7 +191,7 @@ class Snap
         }
 
         foreach ($provider_instances as $provider) {
-            static::$container->resolve_method($provider, 'boot');
+            static::$container->resolveMethod($provider, 'boot');
         }
     }
 
@@ -204,7 +205,7 @@ class Snap
         // If no templating strategy has already been registered.
         if (!static::$container->has(Templating_Interface::class)) {
             // Add the default rendering engine.
-            static::$container->add_singleton(
+            static::$container->addSingleton(
                 \Snap\Templating\Standard\Standard_Strategy::class,
                 function () {
                     return new \Snap\Templating\Standard\Standard_Strategy;
@@ -215,8 +216,8 @@ class Snap
 
             static::$container->add(
                 \Snap\Templating\Standard\Partial::class,
-                function (Container $hodl) {
-                    return $hodl->resolve(\Snap\Templating\Standard\Partial::class);
+                function (Container $container) {
+                    return $container->resolve(\Snap\Templating\Standard\Partial::class);
                 }
             );
         }
@@ -227,10 +228,10 @@ class Snap
      */
     private static function initView()
     {
-        static::$container->add_singleton(
+        static::$container->addSingleton(
             View::class,
-            function (Container $hodl) {
-                return $hodl->resolve(View::class);
+            function (Container $container) {
+                return $container->resolve(View::class);
             }
         );
 
@@ -243,7 +244,7 @@ class Snap
     private static function initServices()
     {
         // Add Image service.
-        static::$container->add_singleton(
+        static::$container->addSingleton(
             Image_Service::class,
             function () {
                 return new Image_Service();
@@ -259,48 +260,46 @@ class Snap
      */
     private static function initRouting()
     {
-        static::$container->add_singleton(
+        static::$container->addSingleton(
             Router::class,
             function () {
                 return new Router();
             }
         );
 
-        static::$container->add_singleton(
+        static::$container->addSingleton(
             Request::class,
             function () {
                 return new Request();
             }
         );
 
-        static::$container->add_singleton(
+        static::$container->addSingleton(
             Response::class,
-            function (\Hodl\Container $container) {
-                /** @var \Snap\Templating\View $view */
-                $view = $container->get(View::class);
-
-                return new Response($view);
+            function (Container $container) {
+                return $container->resolve(Response::class);
             }
         );
 
         // This is required to fill with any custom rules.
-        static::$container->add_singleton(
-            Validator::class,
+        static::$container->addSingleton(
+            \Rakit\Validation\Validator::class,
             function () {
-                return new Validator();
+                return new \Rakit\Validation\Validator();
             }
         );
 
         static::$container->add(
-            Validation::class,
-            function(\Hodl\Container $container) {
-                $container->resolve(Validation::class);
+            Validator::class,
+            function() {
+                return new Validator();
             }
         );
 
         static::$container->alias(Router::class, 'router');
         static::$container->alias(Request::class, 'request');
         static::$container->alias(Response::class, 'response');
+        static::$container->alias(Validator::class, 'validator');
     }
 
     /**
@@ -312,7 +311,7 @@ class Snap
     {
         // Add global WP classes.
         global $wpdb, $wp_query;
-        static::$container->add_instance($wp_query);
-        static::$container->add_instance($wpdb);
+        static::$container->addInstance($wp_query);
+        static::$container->addInstance($wpdb);
     }
 }

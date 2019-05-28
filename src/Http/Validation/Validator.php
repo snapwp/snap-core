@@ -8,7 +8,7 @@ use Snap\Services\Container;
 /**
  * A handy wrapper around Rakit\Validation.
  */
-class Validation
+class Validator
 {
     /**
      * Holds the ErrorBag instance.
@@ -33,6 +33,19 @@ class Validation
      */
     public function __construct($data = null, array $rules = [], array $messages = [])
     {
+        $this->make($data, $rules, $messages);
+    }
+
+    /**
+     * Setup the validation instance.
+     *
+     * @param null|array $data     Optional. Input data to validate.
+     * @param array      $rules    Optional. Validation rules array.
+     * @param array      $messages Optional. Validation messages.
+     * @return $this
+     */
+    public function make($data = null, array $rules = [], array $messages = [])
+    {
         if ($data !== null) {
             $this->validation = Container::get('Rakit\Validation\Validator')->make(
                 $data,
@@ -45,14 +58,11 @@ class Validation
         }
 
         if (!empty($messages)) {
-            $this->setErrorMessages($messages);
+            $this->setMessages($messages);
         }
 
-        // TODO THESE WILL BE POPULATED EVEN WHEN VALIDATING SINGLE ARRAY. IDEALLY ONLY WHEN WORKING ON REQUESTS
-        static::$errors = $this->validation->errors();
+        return $this;
     }
-
-    // TODO WORK OUT A WAY TO VALIDATE SINGLE ARRAYS ETC
 
     /**
      * Set the validation error messages.
@@ -62,7 +72,7 @@ class Validation
      * @param array $messages Error messages as key value pairs.
      * @return $this
      */
-    public function setErrorMessages(array $messages = [])
+    public function setMessages(array $messages = [])
     {
         $this->validation->setMessages($messages);
         return $this;
@@ -119,9 +129,7 @@ class Validation
      */
     public function isValid(): bool
     {
-
         $this->validation->validate();
-        static::$errors = $this->validation->errors();
         return !$this->validation->fails();
     }
 
@@ -194,16 +202,31 @@ class Validation
         return $this->validation->errors();
     }
 
+    /**
+     * Return all data which had a validation rule run against it.
+     *
+     * @return array
+     */
     public function getValidatedData()
     {
         return $this->validation->getValidatedData();
     }
 
+    /**
+     * Return all data which had a validation rule run against it and passed.
+     *
+     * @return array
+     */
     public function getValidData()
     {
         return $this->validation->getValidData();
     }
 
+    /**
+     * Return all data which had a validation rule run against it and failed.
+     *
+     * @return array
+     */
     public function getInvalidData()
     {
         return $this->validation->getInvalidData();

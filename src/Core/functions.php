@@ -181,7 +181,7 @@ if (! \function_exists('snap_get_user_role_name')) {
      **/
     function snap_get_user_role_name($user = null)
     {
-        return \Snap\Utils\User_Utils::get_user_role_name($user);
+        return \Snap\Utils\User::getUserRoleName($user);
     }
 }
 

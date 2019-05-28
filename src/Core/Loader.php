@@ -6,11 +6,10 @@ use Snap\Core\Concerns\ManagesHooks;
 use Snap\Services\Request;
 use Snap\Services\Config;
 use Snap\Services\Container;
+use Snap\Utils\Str_Utils;
 
 /**
  * Initializes Snap classes and child includes.
- *
- * @since 1.0.0
  */
 class Loader
 {
@@ -19,7 +18,6 @@ class Loader
     /**
      * A cache of the parent/child includes from the Theme folder.
      *
-     * @since 1.0.0
      * @var array
      */
     private static $theme_includes = [];
@@ -27,7 +25,6 @@ class Loader
     /**
      * Hold all current class aliases.
      *
-     * @since 1.0.0
      * @var array
      */
     private static $aliases = [];
@@ -35,7 +32,6 @@ class Loader
     /**
      * Cached list of scanned folders.
      *
-     * @since 1.0.0
      * @var array
      */
     private $visited = [];
@@ -43,7 +39,6 @@ class Loader
     /**
      * List of Snap classes to autoload.
      *
-     * @since 1.0.0
      * @var array
      */
     private $class_list = [
@@ -53,12 +48,11 @@ class Loader
         \Snap\Bootstrap\I18n::class,
         \Snap\Media\Size_Manager::class,
         \Snap\Templating\Handle_Post_Templates::class,
+        \Snap\Http\Validation\Rules\Nonce::class,
     ];
 
     /**
      * The Snap autoloader.
-     *
-     * @since   1.0.0
      *
      * @param string $class The fully qualified class name to load.
      * @return bool
@@ -108,7 +102,6 @@ class Loader
 
         static::$aliases = Config::get('services.aliases');
 
-
         if (\is_admin() || Request::isLoginPage()) {
             $this->class_list[] = \Snap\Admin\Whitelabel::class;
             $this->class_list[] = \Snap\Admin\Columns\PostTemplate::class;
@@ -116,7 +109,7 @@ class Loader
 
             $this->conditional_load('admin.snap_admin_theme', 'Snap\Admin\Theme');
         } else {
-            $this->class_list[] = \Snap\Http\Middleware\Is_Logged_In::class;
+            $this->class_list[] = \Snap\Http\Middleware\IsLoggedIn::class;
         }
 
         $this->conditional_load('theme.disable_comments', 'Snap\Admin\DisableComments');
@@ -124,7 +117,7 @@ class Loader
         $this->conditional_load('theme.disable_tags', 'Snap\Admin\DisableTags');
 
         foreach ($this->class_list as $module) {
-            Container::resolve($module)->run();
+            $this->init_hookable($module);
         }
 
         $this->init_widgets();
@@ -239,10 +232,9 @@ class Loader
                 $class_parts = \explode('\\', $class_name);
 
                 Container::get('Rakit\Validation\Validator')->addValidator(
-                    \strtolower(\end($class_parts)),
+                    Str_Utils::to_snake(\end($class_parts)),
                     Container::resolve($class_name)
                 );
-                return;
             }
         }
     }
@@ -257,7 +249,7 @@ class Loader
         foreach (Config::get('services.theme_providers') as $class_name) {
             if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
                 $provider = Container::resolve($class_name);
-                Container::resolve_method($provider, 'register');
+                Container::resolveMethod($provider, 'register');
                 return;
             }
         }

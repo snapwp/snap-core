@@ -4,21 +4,18 @@ namespace Snap\Hookables;
 
 use Snap\Core\Hookable;
 use Snap\Services\Container;
-use Snap\Utils\User_Utils;
+use Snap\Utils\User;
 
 /**
  * A simple wrapper for auto registering AJAX actions.
- *
- * @since 1.0.0
  */
-class Ajax_Handler extends Hookable
+class AjaxHandler extends Hookable
 {
     /**
      * The action to register.
      *
-     * If not present, then the snake cased class name is used instead.
+     * If not present, then the snake_case class name is used instead.
      *
-     * @since 1.0.0
      * @var null|string
      */
     protected $action = null;
@@ -28,7 +25,6 @@ class Ajax_Handler extends Hookable
      *
      * When false, only logged in users can call this action.
      *
-     * @since 1.0.0
      * @var boolean
      */
     protected $allow_public_access = true;
@@ -37,10 +33,8 @@ class Ajax_Handler extends Hookable
      * A list of roles which are allowed to perform this action.
      *
      * If this action is available to guests as well as authorised users, then this restriction is ignored.
-     *
      * An unauthorised user receives a 403 HTTP status as a response.
      *
-     * @since 1.0.0
      * @var array
      */
     protected $restrict_to_roles = [];
@@ -48,39 +42,35 @@ class Ajax_Handler extends Hookable
     /**
      * Run this hookable when is_admin returns false.
      *
-     * @since 1.0.0
      * @var boolean
      */
     protected $public = false;
 
     /**
      * Boot the AJAX Hookable, and register the handler.
-     *
-     * @since  1.0.0
      */
     public function boot()
     {
-        $this->addAction("wp_ajax_{$this->get_action_name()}", 'handler');
+        $this->addAction("wp_ajax_{$this->getActionName()}", 'handler');
 
         if ($this->allow_public_access) {
-            $this->addAction("wp_ajax_nopriv_{$this->get_action_name()}", 'handler');
+            $this->addAction("wp_ajax_nopriv_{$this->getActionName()}", 'handler');
         }
     }
 
     /**
      * Auto-wire and call the child class's handle method.
      *
-     * @since 1.0.0
      */
     public function handler()
     {
         if ($this->allow_public_access) {
-            Container::resolve_method($this, 'handle');
+            Container::resolveMethod($this, 'handle');
             return;
         }
 
-        if (empty($this->restrict_to_roles) || \in_array(User_Utils::get_user_role()->name, $this->restrict_to_roles)) {
-            Container::resolve_method($this, 'handle');
+        if (empty($this->restrict_to_roles) || \in_array(User::getUserRole()->name, $this->restrict_to_roles)) {
+            Container::resolveMethod($this, 'handle');
             return;
         }
 
@@ -90,14 +80,12 @@ class Ajax_Handler extends Hookable
     /**
      * Return the unqualified snake case name of the current child class, or $action if set.
      *
-     * @since  1.0.0
-     *
      * @return string
      */
-    private function get_action_name()
+    private function getActionName()
     {
         if ($this->action === null) {
-            return $this->get_classname();
+            return $this->getClassname();
         }
 
         return $this->action;

@@ -94,7 +94,7 @@ class Shortcode extends Hookable
     private function get_shortcode_name()
     {
         if ($this->tag === null) {
-            return $this->get_classname();
+            return $this->getClassname();
         }
 
         return $this->tag;

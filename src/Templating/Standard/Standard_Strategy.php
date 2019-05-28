@@ -2,7 +2,6 @@
 
 namespace Snap\Templating\Standard;
 
-use Snap\Http\Validation\Validation;
 use Snap\Services\Request;
 use WP_Query;
 use Snap\Services\Config;
@@ -76,7 +75,7 @@ class Standard_Strategy implements Templating_Interface
             [
                 'wp_query' => $wp_query,
                 'request' => Request::getRootInstance(),
-                'errors' => Validation::$errors,
+                'errors' => Request::getGlobalErrors(),
                 'post' => &$post,
                 'current_view' => $this->current_view,
             ],

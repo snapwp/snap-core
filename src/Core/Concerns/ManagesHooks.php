@@ -13,8 +13,6 @@ trait ManagesHooks
     /**
      * Syntactic sugar around add_filter for grouping hooks together based on type.
      *
-     * @since 1.0.0
-     *
      * @param string|array $tag             The name of the filter to hook the $function_to_add callback to.
      * @param callable     $function_to_add The callback to be run when the filter is applied.
      * @param integer      $priority        The priority of the callback.
@@ -29,7 +27,6 @@ trait ManagesHooks
      * Syntactic sugar around remove_hook.
      *
      * @see    Hookable::removeHook
-     * @since  1.0.0
      *
      * @param  string|array $tag                The hook(s) to remove the callback from.
      * @param  callable     $function_to_remove The callback to remove.
@@ -44,7 +41,6 @@ trait ManagesHooks
      * Syntactic sugar around remove_hook.
      *
      * @see    Hookable::removeHook
-     * @since  1.0.0
      *
      * @param  string|array $tag                The hook(s) to remove the callback from.
      * @param  callable     $function_to_remove The callback to remove.
@@ -58,8 +54,6 @@ trait ManagesHooks
     /**
      * Removes a the given callback from a specific hook.
      *
-     * @since  1.0.0
-     *
      * @param  string|array $tag                The hook(s) to remove the callback from.
      * @param  callable     $function_to_remove The callback to remove.
      * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
@@ -72,10 +66,10 @@ trait ManagesHooks
 
         if (\is_array($tag)) {
             foreach ($tag as $hook) {
-                remove_filter($hook, $function_to_remove, $priority);
+                \remove_filter($hook, $function_to_remove, $priority);
             }
         } else {
-            remove_filter($tag, $function_to_remove, $priority);
+            \remove_filter($tag, $function_to_remove, $priority);
         }
     }
 
@@ -85,8 +79,6 @@ trait ManagesHooks
      * to multiple filters within the same method call.
      *
      * If the supplied callback is from a child class, it will be bound to that instance automatically.
-     *
-     * @since 1.0.0
      *
      * @param string|array $tag             The name of the filter to hook the $function_to_add callback to.
      *                                      Can also be an array of filters.
@@ -120,8 +112,6 @@ trait ManagesHooks
 
     /**
      * Use reflection to count the amount of arguments a hook callback expects.
-     *
-     * @since 1.0.0
      *
      * @param  callable|string $callback      Closure or function name.
      * @param  integer         $accepted_args The amount of arguments passed into the hook.

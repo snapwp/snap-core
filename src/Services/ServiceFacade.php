@@ -23,6 +23,9 @@ abstract class ServiceFacade
      * @param string $method The method being called.
      * @param array  $args   The method arguments.
      * @return mixed
+     *
+     * @throws \Hodl\Exceptions\ContainerException If the service name is malformed.
+     * @throws \Hodl\Exceptions\NotFoundException When the service does not exist within the container.
      */
     public static function __callStatic($method, $args)
     {
@@ -35,11 +38,13 @@ abstract class ServiceFacade
         return static::$instances[static::getServiceName()]->{$method}(...$args);
     }
 
-
     /**
      * Get the underlying instance from  the container.
      *
      * @return object The resolved instance.
+     *
+     * @throws \Hodl\Exceptions\ContainerException If the service name is malformed.
+     * @throws \Hodl\Exceptions\NotFoundException When the service does not exist within the container.
      */
     public static function getRootInstance()
     {
@@ -52,6 +57,9 @@ abstract class ServiceFacade
 
     /**
      * Resolve the underlying instance from the service container.
+     *
+     * @throws \Hodl\Exceptions\ContainerException If the service name is malformed.
+     * @throws \Hodl\Exceptions\NotFoundException When the service does not exist within the container.
      */
     protected static function resolveService()
     {

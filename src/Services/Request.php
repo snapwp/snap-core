@@ -24,6 +24,7 @@ namespace Snap\Services;
  * @method static bool filled($key)
  * @method static bool isLoginPage()
  * @method static bool isPostTemplate($post_template)
+ * @method static bool getGlobalErrors()
  *
  * @see \Snap\Http\Request
  */
