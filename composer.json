@@ -18,7 +18,7 @@
         "files": ["src/Core/functions.php"]
     },
     "require": {
-        "php": ">=7",
+        "php": ">=7.1",
         "jakewhiteley/hodl": "~1.3",
         "jjgrainger/posttypes": "~2.0.1",
         "rakit/validation": "~1.0",
