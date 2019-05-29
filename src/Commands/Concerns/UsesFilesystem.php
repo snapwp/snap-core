@@ -2,7 +2,7 @@
 
 namespace Snap\Commands\Concerns;
 
-trait Uses_Filesystem
+trait UsesFilesystem
 {
     /**
      * The wp filesystem class.
@@ -13,7 +13,7 @@ trait Uses_Filesystem
     /**
      * Setup the WP_Filesystem_Direct instance.
      */
-    private function setup_filesystem()
+    private function setupFilesystem()
     {
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         \WP_Filesystem();

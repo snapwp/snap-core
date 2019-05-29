@@ -53,6 +53,8 @@ if (! \function_exists('get_service')) {
      *
      * @param  string $key The service to fetch.
      * @return object An individual service.
+     * @throws \Hodl\Exceptions\ContainerException
+     * @throws \Hodl\Exceptions\NotFoundException
      */
     function get_service($key)
     {
@@ -65,9 +67,12 @@ if (! \function_exists('get_request')) {
      * Returns the current request instance.
      *
      * @return \Snap\Http\Request
+     * @throws \Hodl\Exceptions\ContainerException
+     * @throws \Hodl\Exceptions\NotFoundException
      */
     function get_request()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return Snap::getContainer()->get('request');
     }
 }
@@ -88,7 +93,7 @@ if (! \function_exists('snap_get_image_sizes')) {
      */
     function snap_get_image_sizes()
     {
-        return \Snap\Utils\Image_Utils::get_image_sizes();
+        return \Snap\Utils\Image::getImageSizes();
     }
 }
 
@@ -101,7 +106,7 @@ if (! \function_exists('snap_get_image_size')) {
      */
     function snap_get_image_size($size)
     {
-        return \Snap\Utils\Image_Utils::get_image_size($size);
+        return \Snap\Utils\Image::getImageSize($size);
     }
 }
 
@@ -114,7 +119,7 @@ if (! \function_exists('snap_get_image_width')) {
      */
     function snap_get_image_width($size)
     {
-        return \Snap\Utils\Image_Utils::get_image_width($size);
+        return \Snap\Utils\Image::getImageWidth($size);
     }
 }
 
@@ -127,7 +132,7 @@ if (! \function_exists('snap_get_image_height')) {
      */
     function snap_get_image_height($size)
     {
-        return \Snap\Utils\Image_Utils::get_image_height($size);
+        return \Snap\Utils\Image::getImageHeight($size);
     }
 }
 
@@ -148,7 +153,7 @@ if (! \function_exists('snap_get_nav_menu')) {
      */
     function snap_get_nav_menu($theme_location)
     {
-        return \Snap\Utils\Menu_Utils::get_nav_menu($theme_location);
+        return \Snap\Utils\Menu::getNavMenu($theme_location);
     }
 }
 
@@ -161,7 +166,7 @@ if (! \function_exists('snap_get_menu_name')) {
      */
     function snap_get_menu_name($theme_location)
     {
-        return \Snap\Utils\Menu_Utils::get_menu_name($theme_location);
+        return \Snap\Utils\Menu::getMenuName($theme_location);
     }
 }
 
@@ -200,7 +205,7 @@ if (! \function_exists('snap_get_widget_count')) {
      */
     function snap_get_widget_count($sidebar_id)
     {
-        return \Snap\Utils\Sidebar_Utils::get_widget_count($sidebar_id);
+        return \Snap\Utils\Sidebar::getWidgetCount($sidebar_id);
     }
 }
 
@@ -278,7 +283,7 @@ if (! \function_exists('snap_get_top_parent_page_id')) {
      */
     function snap_get_top_parent_page_id($post = null)
     {
-        return \Snap\Utils\View_Utils::get_top_level_parent_id($post);
+        return \Snap\Utils\View::getTopLevelParentId($post);
     }
 }
 
@@ -291,6 +296,6 @@ if (! \function_exists('snap_get_page_depth')) {
      */
     function snap_get_page_depth($page = null)
     {
-        return \Snap\Utils\View_Utils::get_page_depth($page);
+        return \Snap\Utils\View::getPageDepth($page);
     }
 }

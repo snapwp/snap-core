@@ -142,14 +142,14 @@ class Response
     /**
      * Attempt to set cookie.
      *
-     * @param string      $name     The cookie name.
-     * @param string      $value    Optional. The cookie value.
-     * @param int         $expires  Optional. The cookie lifetime in seconds. Default: 1 hour.
-     * @param string      $path     Optional. The path to set the cookie to. Default: '/'.
-     * @param string|null $domain   Optional. The domain for the cookie. Default: the current domain.
-     * @param bool        $secure   Optional. Whether the cookie is HTTPS only.
-     * @param bool        $httpOnly Optional. Whether the cookie is only accessed via PHP. Set to false to open to js.
-     *                              Default: true.
+     * @param string      $name      The cookie name.
+     * @param string      $value     Optional. The cookie value.
+     * @param int         $expires   Optional. The cookie lifetime in seconds. Default: 1 hour.
+     * @param string      $path      Optional. The path to set the cookie to. Default: '/'.
+     * @param string|null $domain    Optional. The domain for the cookie. Default: the current domain.
+     * @param bool        $secure    Optional. Whether the cookie is HTTPS only.
+     * @param bool        $http_only Optional. Whether the cookie is only accessed via PHP. Set to false to open to js.
+     *                               Default: true.
      * @return $this
      */
     public function setCookie(
@@ -159,11 +159,11 @@ class Response
         string $path = '/',
         string $domain = null,
         bool $secure = null,
-        bool $httpOnly = true
+        bool $http_only = true
     ) {
         $domain = $domain ?: \Snap\Services\Request::getHost();
         $secure = $secure ?: \is_ssl();
-        $this->setCookieHeader($name, $value, $expires, $path, $domain, $secure, $httpOnly);
+        $this->setCookieHeader($name, $value, $expires, $path, $domain, $secure, $http_only);
         return $this;
     }
 
@@ -196,63 +196,63 @@ class Response
      * Send a JSON generic response.
      *
      * @param null $data
-     * @param null $statusCode     Optional. Status code to send with the response.
-     * @param bool $disableCaching Whether to disable browser caching on the response.
+     * @param null $status_code     Optional. Status code to send with the response.
+     * @param bool $disable_caching Whether to disable browser caching on the response.
      */
-    public function json($data = null, $statusCode = null, $disableCaching = true)
+    public function json($data = null, $status_code = null, $disable_caching = true)
     {
-        if ($disableCaching) {
+        if ($disable_caching) {
             \nocache_headers();
         }
 
-        \wp_send_json($data, $statusCode);
+        \wp_send_json($data, $status_code);
         exit;
     }
 
     /**
      * Send a JSON success response.
      *
-     * @param mixed data        Data to JSON encode.
-     * @param null $statusCode Optional. Status code to send with the response.
-     * @param bool $disableCaching Whether to disable browser caching on the response.
+     * @param mixed $data            Data to JSON encode.
+     * @param null  $status_code     Optional. Status code to send with the response.
+     * @param bool  $disable_caching Whether to disable browser caching on the response.
      */
-    public function jsonSuccess($data = null, $statusCode = null, $disableCaching = true)
+    public function jsonSuccess($data = null, $status_code = null, $disable_caching = true)
     {
-        if ($disableCaching) {
+        if ($disable_caching) {
             \nocache_headers();
         }
 
-        \wp_send_json_success($data, $statusCode);
+        \wp_send_json_success($data, $status_code);
         exit;
     }
 
     /**
      * Send a JSON error response.
      *
-     * @param mixed data        Data to JSON encode.
-     * @param null $statusCode Optional. Status code to send with the response.
-     * @param bool $disableCaching Whether to disable browser caching on the response.
+     * @param mixed $data            Data to JSON encode.
+     * @param null  $status_code     Optional. Status code to send with the response.
+     * @param bool  $disable_caching Whether to disable browser caching on the response.
      */
-    public function jsonError($data = null, $statusCode = null, $disableCaching = true)
+    public function jsonError($data = null, $status_code = null, $disable_caching = true)
     {
-        if ($disableCaching) {
+        if ($disable_caching) {
             \nocache_headers();
         }
 
-        \wp_send_json_error($data, $statusCode);
+        \wp_send_json_error($data, $status_code);
         exit;
     }
 
     /**
      * Constructs and sends the header to set a cookie.
      *
-     * @param string      $name     The cookie name.
-     * @param null        $value    The cookie value.
-     * @param int         $expires  The cookie lifetime in seconds.
-     * @param string      $path     The path to set the cookie to.
-     * @param string|null $domain   The domain for the cookie.
-     * @param bool        $secure   Whether the cookie is HTTPS only.
-     * @param bool        $httpOnly Whether the cookie is only accessed via PHP. Set to false to open to js.
+     * @param string      $name      The cookie name.
+     * @param null        $value     The cookie value.
+     * @param int         $expires   The cookie lifetime in seconds.
+     * @param string      $path      The path to set the cookie to.
+     * @param string|null $domain    The domain for the cookie.
+     * @param bool        $secure    Whether the cookie is HTTPS only.
+     * @param bool        $http_only Whether the cookie is only accessed via PHP. Set to false to open to js.
      */
     private function setCookieHeader(
         string $name,
@@ -261,7 +261,7 @@ class Response
         string $path,
         string $domain,
         bool $secure,
-        bool $httpOnly
+        bool $http_only
     ) {
         $attr = [
             \rawurlencode($name) . '=' . \rawurlencode($value)
@@ -284,7 +284,7 @@ class Response
             $attr[] = 'Secure';
         }
 
-        if ($httpOnly) {
+        if ($http_only) {
             $attr[] = 'HttpOnly';
         }
 

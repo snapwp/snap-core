@@ -5,7 +5,7 @@ namespace Snap\Core;
 use Exception;
 use Hodl\Container;
 use Hodl\Exceptions\ContainerException;
-use Snap\Exceptions\Startup_Exception;
+use Snap\Exceptions\StartupException;
 use Snap\Http\Request;
 use Snap\Http\Response;
 use Snap\Http\Validation\Validator;
@@ -70,7 +70,7 @@ class Snap
      *
      * Must be run in order for anything to work.
      *
-     * @throws Startup_Exception
+     * @throws StartupException
      */
     public static function setup()
     {
@@ -98,9 +98,9 @@ class Snap
                     $classmap = \file_get_contents($classmap_cache);
                 }
 
-                $loader->load_theme($classmap);
+                $loader->loadTheme($classmap);
             } catch (Exception $e) {
-                throw new Startup_Exception($e->getMessage());
+                throw new StartupException($e->getMessage());
             }
         }
 

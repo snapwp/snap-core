@@ -5,17 +5,15 @@ namespace Snap\Utils;
 /**
  * Provides some basic string utilities.
  */
-class Str_Utils
+class Str
 {
     /**
      * Transform a string into valid snake case.
      *
-     * @since 1.0.0
-     *
      * @param string $string The string to convert.
      * @return string
      */
-    public static function to_snake($string)
+    public static function toSnake(string $string): string
     {
         if (\ctype_lower($string)) {
             return $string;

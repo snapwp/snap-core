@@ -2,8 +2,8 @@
 
 namespace Snap\Commands;
 
-use Snap\Commands\Concerns\Needs_Wordpress;
-use Snap\Commands\Concerns\Uses_Filesystem;
+use Snap\Commands\Concerns\NeedsWordPress;
+use Snap\Commands\Concerns\UsesFilesystem;
 use Snap\Core\Snap;
 use Snap\Services\Config;
 use Snap\Services\Container;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class Publish extends Command
 {
-    use Needs_Wordpress, Uses_Filesystem;
+    use NeedsWordPress, UsesFilesystem;
 
     /**
      * Store the Command Helper instance.

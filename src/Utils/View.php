@@ -4,22 +4,18 @@ namespace Snap\Utils;
 
 /**
  * Provides utilities for use within templates.
- *
- * @since 1.0.0
  */
-class View_Utils
+class View
 {
     /**
      * Get value of top level hierarchical post ID.
      *
      * Does not work with the objects returned by get_pages().
      *
-     * @since  1.0.0
-     *
-     * @param (int|WP_Post|array) $post null Optional. Post object,array, or ID of a post to find the top ancestors for.
-     * @return int ID
+     * @param int|\WP_Post|array $post Optional. Post object, array, or ID of a post to find the top ancestors for.
+     * @return int|null
      */
-    public static function get_top_level_parent_id($post = null)
+    public static function getTopLevelParentId($post = null): ?int
     {
         if (\is_search() || \is_404()) {
             return null;
@@ -29,10 +25,14 @@ class View_Utils
             // No post has been set, so use global.
             case null:
                 global $post;
+                $ancestors = $post->ancestors;
+                break;
 
             // The post ID has been provided.
             case \is_int($post):
                 $post = \get_post($post);
+                $ancestors = $post->ancestors;
+                break;
 
             // A WP_Post was provided.
             case \is_object($post):
@@ -54,12 +54,10 @@ class View_Utils
     /**
      * Get current page depth.
      *
-     * @since  1.0.0
-     *
      * @param int|\WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
      * @return integer
      */
-    public static function get_page_depth($page = null)
+    public static function getPageDepth($page = null): int
     {
         if ($page === null) {
             global $wp_query;

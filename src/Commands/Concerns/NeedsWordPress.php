@@ -2,14 +2,11 @@
 
 namespace Snap\Commands\Concerns;
 
-use Snap\Core\Snap;
-
-trait Needs_Wordpress
+trait NeedsWordPress
 {
     /**
      * Include and boot up WordPress.
      *
-     * @since  1.0.0
      */
     private function init_wordpress()
     {
@@ -17,19 +14,20 @@ trait Needs_Wordpress
 
         // Trick WP into thinking this is an AJAX request. Helps quieten certain plugins.
         \define('DOING_AJAX', true);
-        \define('BASE_PATH', $this->find_wordpress_base_path());
+        \define('BASE_PATH', $this->findWordpressBasePath());
         \define('WP_USE_THEMES', false);
+        
+        /** @noinspection PhpIncludeInspection */
         require(BASE_PATH . 'wp-load.php');
     }
 
     /**
      * Traverse up the directory structure looking for the current WP base path.
      *
-     * @since  1.0.0
      *
      * @return string The base path.
      */
-    private function find_wordpress_base_path()
+    private function findWordpressBasePath()
     {
         $dir = \dirname(__FILE__);
 

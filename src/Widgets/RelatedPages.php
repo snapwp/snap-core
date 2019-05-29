@@ -2,22 +2,19 @@
 
 namespace Snap\Widgets;
 
-use Snap\Utils\View_Utils;
+use Snap\Utils\View;
 use WP_Widget;
 
 /**
  * Outputs a one dimensional list of related pages.
  *
  * Related pages are all sibling, parent, and child pages within the current hierarchical tree.
- *
- * @since  1.0.0
  */
-class Related_Pages extends WP_Widget
+class RelatedPages extends WP_Widget
 {
     /**
      * Related_Pages arguments array.
      *
-     * @since 1.0.0
      * @var array
      */
     private $args = [];
@@ -25,7 +22,6 @@ class Related_Pages extends WP_Widget
     /**
      * The top level parent page ID.
      *
-     * @since 1.0.0
      * @var int|null
      */
     private $parent_page_id = null;
@@ -33,7 +29,6 @@ class Related_Pages extends WP_Widget
     /**
      * Array of pages to display.
      *
-     * @since 1.0.0
      * @var array
      */
     private $pages = [];
@@ -41,7 +36,6 @@ class Related_Pages extends WP_Widget
     /**
      * Boot up and declare this class as a widget.
      *
-     * @since 1.0.0
      */
     public function __construct()
     {
@@ -49,7 +43,10 @@ class Related_Pages extends WP_Widget
             'snap_related_pages',
             __('Related Pages', 'snap'),
             [
-                'description' => __('Output list of all pages in the current hierarchy. Outputs nothing if none are found.', 'snap'),
+                'description' => __(
+                    'Output list of all pages in the current hierarchy. Outputs nothing if none are found.',
+                    'snap'
+                ),
             ]
         );
     }
@@ -57,14 +54,12 @@ class Related_Pages extends WP_Widget
     /**
      * The widget output.
      *
-     * @since 1.0.0
-     *
      * @param  array $args     The sidebar args.
      * @param  array $instance The instance args.
      */
     public function widget($args, $instance)
     {
-        $this->parent_page_id = View_Utils::get_top_level_parent_id();
+        $this->parent_page_id = View::getTopLevelParentId();
 
         // We are on a 404 or search route.
         if ($this->parent_page_id === null) {
@@ -95,11 +90,11 @@ class Related_Pages extends WP_Widget
              * }
              * @return array
              */
-            apply_filters('snap_related_pages_widget_defaults', $this->get_defaults())
+            \apply_filters('snap_related_pages_widget_defaults', $this->getDefaults())
         );
 
         // Populate $pages array.
-        $this->get_pages();
+        $this->getPages();
 
         if (\count($this->pages) > 0) {
             $title = apply_filters('widget_title', $instance['title']);
@@ -119,8 +114,6 @@ class Related_Pages extends WP_Widget
     /**
      * Output the admin widget form.
      *
-     * @since 1.0.0
-     *
      * @param  array $instance The current instance args.
      */
     public function form($instance)
@@ -139,19 +132,32 @@ class Related_Pages extends WP_Widget
         ?>
             <p>
                 <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label> 
-                <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
+                <input
+                    class="widefat"
+                    id="<?php echo $this->get_field_id('title'); ?>"
+                    name="<?php echo $this->get_field_name('title'); ?>"
+                    type="text"
+                    value="<?php echo esc_attr($title); ?>"
+                />
             </p>
             <p>
-                <input class="checkbox" type="checkbox" id="<?php echo $this->get_field_id('show_parent'); ?>" name="<?php echo $this->get_field_name('show_parent'); ?>" <?php checked($show_parent); ?>>
-                &nbsp;<label for="<?php echo $this->get_field_id('show_parent'); ?>"><?php _e('Include the top level page', 'snap'); ?></label>
+                <input
+                    class="checkbox"
+                    type="checkbox"
+                    id="<?php echo $this->get_field_id('show_parent'); ?>"
+                    name="<?php echo $this->get_field_name('show_parent'); ?>"
+                    <?php checked($show_parent); ?>
+                >
+                &nbsp;
+                <label for="<?php echo $this->get_field_id('show_parent'); ?>">
+                    <?php _e('Include the top level page', 'snap'); ?>
+                </label>
             </p>
         <?php
     }
          
     /**
      * Update the widget upon saving.
-     *
-     * @since  1.0.0
      *
      * @param  array $new_instance Submitted instance args.
      * @param  array $old_instance Old instance args.
@@ -167,29 +173,25 @@ class Related_Pages extends WP_Widget
 
     /**
      * Populate $this->pages.
-     *
-     * @since  1.0.0
      */
-    private function get_pages()
+    private function getPages()
     {
-        $this->pages = get_pages(['child_of' => $this->parent_page_id, 'sort_column' => 'menu_order']);
+        $this->pages = \get_pages(['child_of' => $this->parent_page_id, 'sort_column' => 'menu_order']);
     }
 
     /**
      * Output the related pages list HTML.
-     *
-     * @since  1.0.0
      */
     private function render()
     {
         $str = $this->args['container_start'];
 
         if ($this->args['show_parent'] && $this->parent_page_id !== false) {
-            $str .= $this->get_parent_link_html();
+            $str .= $this->getParentLinkHtml();
         }
 
         foreach ($this->pages as $page) {
-            $str .= $this->get_link_html($page);
+            $str .= $this->getLinkHtml($page);
         }
 
         $str .= $this->args['container_end'];
@@ -199,11 +201,9 @@ class Related_Pages extends WP_Widget
     /**
      * Construct the HTML for the parent link.
      *
-     * @since  1.0.0
-     *
      * @return string
      */
-    private function get_parent_link_html()
+    private function getParentLinkHtml()
     {
         global $post;
 
@@ -220,9 +220,9 @@ class Related_Pages extends WP_Widget
             $li_class,
             $this->args['before_link'],
             $link_class,
-            get_the_permalink($this->parent_page_id),
+            \get_the_permalink($this->parent_page_id),
             $this->args['before_text'],
-            get_the_title($this->parent_page_id),
+            \get_the_title($this->parent_page_id),
             $this->args['after_text'],
             $this->args['after_link']
         );
@@ -231,12 +231,10 @@ class Related_Pages extends WP_Widget
     /**
      * Construct the HTML for the a non-parent link.
      *
-     * @since  1.0.0
-     *
      * @param \WP_Post $page The current post object.
      * @return string
      */
-    private function get_link_html($page)
+    private function getLinkHtml($page)
     {
         global $post;
 
@@ -253,9 +251,9 @@ class Related_Pages extends WP_Widget
             $li_class,
             $this->args['before_link'],
             $link_class,
-            get_the_permalink($page),
+            \get_the_permalink($page),
             $this->args['before_text'],
-            get_the_title($page),
+            \get_the_title($page),
             $this->args['after_text'],
             $this->args['after_link']
         );
@@ -264,11 +262,9 @@ class Related_Pages extends WP_Widget
     /**
      * Returns the widget default arguments.
      *
-     * @since  1.0.0
-     *
      * @return array
      */
-    private function get_defaults()
+    private function getDefaults()
     {
         return [
             'container_start' => '<ul role="navigation">',

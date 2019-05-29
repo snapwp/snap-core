@@ -9,7 +9,7 @@ use Snap\Services\Container;
 use Snap\Templating\Pagination;
 use Snap\Templating\View;
 use Snap\Templating\Templating_Interface;
-use Snap\Exceptions\Templating_Exception;
+use Snap\Exceptions\TemplatingException;
 
 /**
  * The default vanilla PHP templating engine.
@@ -58,12 +58,12 @@ class Standard_Strategy implements Templating_Interface
      * @param  string $slug The slug for the generic template.
      * @param  array  $data Optional. Additional data to pass to a partial. Available in the partial as $data.
      *
-     * @throws Templating_Exception If views are nested.
+     * @throws TemplatingException If views are nested.
      */
     public function render($slug, $data = [])
     {
         if ($this->current_view !== null) {
-            throw new Templating_Exception('Views should not be nested');
+            throw new TemplatingException('Views should not be nested');
         }
 
         $this->current_view = $this->get_template_name($slug);
@@ -85,7 +85,7 @@ class Standard_Strategy implements Templating_Interface
         $snap_template_path = locate_template(Config::get('theme.templates_directory') . '/views/' . $this->current_view);
 
         if ($snap_template_path === '') {
-            throw new Templating_Exception('Could not find view: ' . $this->current_view);
+            throw new TemplatingException('Could not find view: ' . $this->current_view);
         }
 
         unset($data, $slug);
@@ -285,12 +285,12 @@ class Standard_Strategy implements Templating_Interface
      *
      * @param string $layout The name of the layout to extend. Relative to theme.templates_directory config item.
      *
-     * @throws Templating_Exception If the current view is trying to extend multiple layouts.
+     * @throws TemplatingException If the current view is trying to extend multiple layouts.
      */
     protected function extends($layout)
     {
         if ($this->extends !== false) {
-            throw new Templating_Exception($this->current_view . ' is attempting to extend multiple layouts.');
+            throw new TemplatingException($this->current_view . ' is attempting to extend multiple layouts.');
         }
         $this->extends = $this->get_template_name($layout);
     }
@@ -311,14 +311,14 @@ class Standard_Strategy implements Templating_Interface
      *
      * @since 1.0.0
      *
-     * @throws Templating_Exception
+     * @throws TemplatingException
      */
     private function render_layout()
     {
         $snap_layout_path = \locate_template(Config::get('theme.templates_directory') . '/' . $this->extends);
 
         if ($snap_layout_path === '') {
-            throw new Templating_Exception('Could not find layout: ' . $this->extends);
+            throw new TemplatingException('Could not find layout: ' . $this->extends);
         }
 
         /**

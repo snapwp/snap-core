@@ -47,8 +47,9 @@ class Whitelabel extends Hookable
 
         /** @noinspection HtmlUnknownTarget */
         echo \sprintf(
-            '%s <a href="https://wordpress.org" target="_blank">WordPress</a> %s <a href="%s" target="_blank">SnapWP</a>',
+            '%s %s %s <a href="%s" target="_blank">SnapWP</a>',
             \__('Built using', 'snap'),
+            '<a href="https://wordpress.org" target="_blank">WordPress</a>',
             \__('and', 'snap'),
             \esc_url(Snap::SNAPWP_HOME)
         );

@@ -109,7 +109,7 @@ class Theme
             $post_template
         );
 
-        return \trailingslashit(Config::get('theme.templates_directory')) . 'views/post-templates/' . $template . '.php';
+        return \trailingslashit(Config::get('theme.templates_directory')) . "views/post-templates/{$template}.php";
     }
 
     /**

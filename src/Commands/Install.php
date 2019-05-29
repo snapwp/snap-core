@@ -10,23 +10,19 @@ use Symfony\Component\Process\Process;
 
 /**
  * Installs additional features after a snap is pulled in via composer.
- *
- * @Since 1.0.0
  */
 class Install
 {
     /**
      * The Composer IO instance.
      *
-     * @since 1.0.0
-     * @var Composer\IO\ConsoleIO
+     * @var \Composer\IO\ConsoleIO
      */
     private static $io;
 
     /**
      * The Composer instance.
      *
-     * @since 1.0.0
      * @var \Composer\Composer
      */
     private static $composer;
@@ -34,7 +30,6 @@ class Install
     /**
      * The strategies to choose from.
      *
-     * @since 1.0.0
      * @var string
      */
     private static $root;
@@ -42,7 +37,6 @@ class Install
     /**
      * The strategies to choose from.
      *
-     * @since 1.0.0
      * @var array
      */
     private static $strategies = [
@@ -53,8 +47,6 @@ class Install
     /**
      * Install a theme after create-project used in Composer.
      *
-     * @since 1.0.0
-     *
      * @param \Composer\Script\Event $event
      */
     public static function run($event)
@@ -63,10 +55,10 @@ class Install
         static::$composer = $event->getComposer();
 
         // Set the root theme folder dir.
-        static::set_root();
+        static::setRoot();
 
         // Display snap logo!
-        static::write_intro();
+        static::writeIntro();
 
         $strategy = static::$io->select(
             "\n<comment>Please choose a templating system for your theme:</comment>",
@@ -81,17 +73,15 @@ class Install
                 break;
 
             case '1':
-                static::install_blade();
+                static::installBlade();
                 break;
         }
     }
 
     /**
      * Install the Blade package and publish.
-     *
-     * @Since 1.0.0
      */
-    private static function install_blade()
+    private static function installBlade()
     {
         $install = new Process('composer require snapwp/snap-blade -n');
 
@@ -111,11 +101,12 @@ class Install
             exit;
         }
 
-        static::add_blade_to_config();
+        static::addBladeToConfig();
 
-        static::clear_templates();
+        static::clearTemplates();
 
         // Publish the snap package.
+        /** @noinspection PhpParamsInspection */
         $publish = new Process(
             \sprintf(
                 'cd %s/vendor/bin && snap publish --package=\Snap\Blade\Blade_Service_Provider --root=%s',
@@ -137,10 +128,8 @@ class Install
 
     /**
      * Output welcome message.
-     *
-     * @Since 1.0.0
      */
-    private static function write_intro()
+    private static function writeIntro()
     {
         static::$io->write(
             '
@@ -155,11 +144,9 @@ class Install
     }
 
     /**
-     * @Since 1.0.0
-     *
      * Clears all default templates from the theme.
      */
-    private static function clear_templates()
+    private static function clearTemplates()
     {
         $dir_iterator = new RecursiveDirectoryIterator(static::$root . '/resources/templates');
         $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
@@ -175,10 +162,8 @@ class Install
      * Add the provider to the services config.
      *
      * Crude but gets the job done.
-     *
-     * @Since 1.0.0
      */
-    private static function add_blade_to_config()
+    private static function addBladeToConfig()
     {
         $config = \file_get_contents(static::$root . '/config/services.php');
 
@@ -198,10 +183,8 @@ class Install
 
     /**
      * Sets the root of the theme.
-     *
-     * @since 1.0.0
      */
-    private static function set_root()
+    private static function setRoot()
     {
         static::$root = \dirname(static::$composer->getConfig()->get('vendor-dir'));
     }

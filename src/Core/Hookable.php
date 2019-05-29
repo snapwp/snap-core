@@ -3,7 +3,7 @@
 namespace Snap\Core;
 
 use Snap\Core\Concerns\ManagesHooks;
-use Snap\Utils\Str_Utils;
+use Snap\Utils\Str;
 
 /**
  * Allows child classes to auto register hooks by simply defining them in an array
@@ -75,7 +75,7 @@ class Hookable
     final protected function getClassname(): string
     {
         $classname = \basename(\str_replace('\\', '/', \get_class($this)));
-        return Str_Utils::to_snake($classname);
+        return Str::toSnake($classname);
     }
 
     /**

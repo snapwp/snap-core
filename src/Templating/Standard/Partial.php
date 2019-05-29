@@ -2,7 +2,7 @@
 
 namespace Snap\Templating\Standard;
 
-use Snap\Exceptions\Templating_Exception;
+use Snap\Exceptions\TemplatingException;
 use Snap\Services\Config;
 use Snap\Services\Container;
 
@@ -52,7 +52,7 @@ class Partial
      *
      * @since  1.0.0
      *
-     * @throws Templating_Exception If no partial template found.
+     * @throws TemplatingException If no partial template found.
      *
      * @param  string $slug     The slug for the generic template.
      * @param  mixed  $data     Optional. Additional data to pass to a partial. Available in the partial as $data.
@@ -69,7 +69,7 @@ class Partial
         $this->data = $data;
 
         if ($snap_template_path === '') {
-            throw new Templating_Exception('Could not find partial: ' . $this->view->get_template_name($slug));
+            throw new TemplatingException('Could not find partial: ' . $this->view->get_template_name($slug));
         }
 
         unset($slug, $name, $data);

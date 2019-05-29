@@ -4,22 +4,18 @@ namespace Snap\Utils;
 
 /**
  * Sidebar and widget utilities.
- *
- * @since 1.0.0
  */
-class Sidebar_Utils
+class Sidebar
 {
     /**
      * Counts the number of widgets for a given sidebar ID.
      *
      * Useful for applying classes to a parent container.
      *
-     * @since  1.0.0
-     *
      * @param  string $sidebar_id The ID of the sidebar.
      * @return int The count of the widgets in the sidebar.
      */
-    public static function get_widget_count($sidebar_id)
+    public static function getWidgetCount(string $sidebar_id): int
     {
         global $_wp_sidebars_widgets;
 

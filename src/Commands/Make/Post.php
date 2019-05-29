@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
  *
  * @since  1.0.0
  */
-class Post_Type extends Creator
+class Post extends Creator
 {
     /**
      * Setup the command signature and help text.
@@ -20,9 +20,9 @@ class Post_Type extends Creator
      */
     protected function configure()
     {
-        $this->setName('make:post_type')
+        $this->setName('make:post')
             ->setDescription('Creates a new custom post type.')
-            ->setHelp('Creates a new Post_Type class within your theme/Shortcodes directory');
+            ->setHelp('Creates a new PostType class within your theme/Shortcodes directory');
 
         $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created post type.');
     }

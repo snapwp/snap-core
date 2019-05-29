@@ -3,7 +3,7 @@
 namespace Snap\Media;
 
 use Snap\Services\Config;
-use Snap\Utils\Image_Utils;
+use Snap\Utils\Image;
 use Snap\Utils\Theme;
 
 /**
@@ -85,7 +85,7 @@ class Image_Service
 
         $post_id = $post_id ?? \get_the_id();
 
-        if (Image_Utils::get_image_size($size) === false) {
+        if (Image::getImageSize($size) === false) {
             $size = 'full';
         }
 
@@ -108,8 +108,8 @@ class Image_Service
                 '<img src="%s" alt="%s" width="%d" height="%d" %s>',
                 $placeholder_url,
                 get_the_title($post_id),
-                \is_array($original_size) ? $original_size[0] : Image_Utils::get_image_width($size),
-                \is_array($original_size) ? $original_size[1] : Image_Utils::get_image_height($size),
+                \is_array($original_size) ? $original_size[0] : Image::getImageWidth($size),
+                \is_array($original_size) ? $original_size[1] : Image::getImageHeight($size),
                 $this->parse_attributes($attr)
             );
 

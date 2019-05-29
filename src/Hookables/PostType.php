@@ -2,23 +2,22 @@
 
 namespace Snap\Hookables;
 
+use PostTypes\PostType as PT;
 use Snap\Core\Hookable;
-use PostTypes\PostType;
 
 /**
  * Post type base class.
  *
  * A wrapper around \PostTypes\PostType.
  *
- * @see https://github.com/jjgrainger/PostTypes
+ * @see   https://github.com/jjgrainger/PostTypes
  * @since 1.0.0
  */
-class Post_Type extends Hookable
+class PostType extends Hookable
 {
     /**
      * Override the post type name (defaults to snake case class name).
      *
-     * @since  1.0.0
      * @var null|string
      */
     public $name = null;
@@ -26,7 +25,6 @@ class Post_Type extends Hookable
     /**
      * Override the plural name. Defaults to {$name}s.
      *
-     * @since  1.0.0
      * @var null|string
      */
     public $plural = null;
@@ -34,15 +32,13 @@ class Post_Type extends Hookable
     /**
      * Override the plural name. Defaults to $name.
      *
-     * @since  1.0.0
      * @var null|string
      */
     public $singular = null;
-    
+
     /**
      * Override the plural name. Defaults to kebab cased $name.
      *
-     * @since  1.0.0
      * @var null|string
      */
     public $slug = null;
@@ -51,7 +47,6 @@ class Post_Type extends Hookable
      * Override the post type labels.
      *
      * @see https://codex.wordpress.org/Function_Reference/register_post_type#Parameters
-     * @since  1.0.0
      * @var null|array
      */
     public $labels = [];
@@ -60,15 +55,13 @@ class Post_Type extends Hookable
      * Override the post type options.
      *
      * @see https://codex.wordpress.org/Function_Reference/register_post_type#Parameters
-     * @since  1.0.0
      * @var null|array
      */
     public $options = [];
-    
+
     /**
      * Register additional admin columns for this post type.
      *
-     * @since  1.0.0
      * @var null|array
      */
     public $columns = [];
@@ -76,7 +69,6 @@ class Post_Type extends Hookable
     /**
      * Register which columns should be sortable for post type.
      *
-     * @since  1.0.0
      * @var null|array
      */
     public $sortable_columns = [];
@@ -87,36 +79,33 @@ class Post_Type extends Hookable
      * By default all taxonomies are added to the admin as filters for this post type.
      * By supplying name => false as a value for your taxonomy, it will not be added as a filter.
      *
-     * @since  1.0.0
      * @var array|string[]
      */
     public $taxonomies = [];
 
     /**
      * Register the post type.
-     *
-     * @since  1.0.0
      */
     public function __construct()
     {
-        $post_type = new PostType($this->get_names(), $this->options, $this->labels);
+        $post_type = new PT($this->getNames(), $this->options, $this->labels);
 
         // Register any relationships.
-        $this->add_relationships($post_type);
+        $this->addRelationships($post_type);
 
         // If the child class has defined columns.
-        if (! empty($this->columns)) {
+        if (!empty($this->columns)) {
             $post_type->columns()->add($this->columns);
 
             foreach ($this->columns as $key => $title) {
                 // If a getter has been set.
                 if (\is_callable([$this, "get_{$key}_column"])) {
-                    $post_type->columns()->populate($key, [$this, "output_column"]);
+                    $post_type->columns()->populate($key, [$this, "outputColumn"]);
                 }
 
                 // If a sort method has been defined, save the key in $sortable_columns.
                 if (\is_callable([$this, "sort_{$key}_column"])) {
-                    $this->sortable_columns[ $key ] = $key;
+                    $this->sortable_columns[$key] = $key;
                 }
             }
         }
@@ -128,25 +117,23 @@ class Post_Type extends Hookable
         $post_type->register();
 
         // Register any sortable columns.
-        $this->addFilter('manage_edit-' . $this->get_name() . '_sortable_columns', 'set_sortable_columns');
+        $this->addFilter('manage_edit-' . $this->getName() . '_sortable_columns', 'setSortableColumns');
 
         // If there are sortable columns, run their callbacks.
-        if (! empty($this->sortable_columns)) {
-            $this->addAction('pre_get_posts', 'sort_columns', 1, 999);
+        if (!empty($this->sortable_columns)) {
+            $this->addAction('pre_get_posts', 'sortColumns', 1, 999);
         }
     }
 
     /**
      * Make custom columns sortable.
      *
-     * @since 1.0.0
-     *
      * @param array $columns Default WordPress sortable columns.
      * @return array
      */
-    public function set_sortable_columns($columns)
+    public function setSortableColumns($columns)
     {
-        if (! empty($this->sortable_columns)) {
+        if (!empty($this->sortable_columns)) {
             $columns = \array_merge($columns, $this->sortable_columns);
         }
 
@@ -156,21 +143,19 @@ class Post_Type extends Hookable
     /**
      * Runs any supplied sort_{$key}_column callbacks in pre_get_posts.
      *
-     * @since  1.0.0
-     *
      * @param  \WP_Query $query The global WP_Query object.
      */
-    public function sort_columns($query)
+    public function sortColumns($query)
     {
         // Bail if we are not on the correct admin page.
-        if (! $query->is_main_query() || ! is_admin() || $query->get('post_type') !== $this->get_name()) {
+        if (!$query->is_main_query() || !\is_admin() || $query->get('post_type') !== $this->getName()) {
             return;
         }
 
         $order_by = $query->get('orderby');
 
         // Check if the current sorted column has a sort callback defined.
-        if (isset($this->sortable_columns[ $order_by ])) {
+        if (isset($this->sortable_columns[$order_by])) {
             $callback = "sort_{$order_by}_column";
             $this->{$callback}($query);
         }
@@ -179,13 +164,12 @@ class Post_Type extends Hookable
     /**
      * Register a columns sort method with PostTypes\PostType.
      *
-     * @since  1.0.0
-     * @see  https://github.com/jjgrainger/PostTypes/ For all possible options.
+     * @see    https://github.com/jjgrainger/PostTypes/ For all possible options.
      *
      * @param  string $column  The current column key.
      * @param  int    $post_id The current post ID.
      */
-    public function output_column($column, $post_id)
+    public function outputColumn($column, $post_id)
     {
         $method = "get_{$column}_column";
 
@@ -195,24 +179,20 @@ class Post_Type extends Hookable
     /**
      * Allow the child class the ability to modify the PostType instance directly.
      *
-     * @since  1.0.0
-     *
-     * @param  PostType $post_type The current PostType instance.
+     * @param \PostTypes\PostType $post_type The current PostType instance.
      */
-    protected function modify(PostType $post_type)
+    protected function modify(PT $post_type)
     {
     }
 
     /**
      * Define the taxonomy relationships, and whether each taxonomy can be quick filtered.
      *
-     * @since  1.0.0
-     *
-     * @param PostType $post_type The current PostType instance.
+     * @param \PostTypes\PostType $post_type The current PostType instance.
      */
-    private function add_relationships($post_type)
+    private function addRelationships(PT $post_type)
     {
-        if (! empty($this->taxonomies)) {
+        if (!empty($this->taxonomies)) {
             $filters = [];
 
             foreach ($this->taxonomies as $k => $v) {
@@ -235,14 +215,12 @@ class Post_Type extends Hookable
     /**
      * Get the full array of overridden names to pass to PostTypes\PostType.
      *
-     * @since 1.0.0
-     *
      * @return array All names.
      */
-    private function get_names()
+    private function getNames()
     {
         $names = [
-            'name' => $this->get_name(),
+            'name' => $this->getName(),
         ];
 
         if ($this->plural !== null) {
@@ -265,11 +243,9 @@ class Post_Type extends Hookable
      *
      * Can be overwritten by setting the $name property.
      *
-     * @since  1.0.0
-     *
      * @return string
      */
-    private function get_name()
+    private function getName()
     {
         if ($this->name === null) {
             return $this->getClassname();

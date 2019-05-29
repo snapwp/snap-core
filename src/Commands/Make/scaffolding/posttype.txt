@@ -2,12 +2,12 @@
 
 namespace Theme\Content\Post_TypesNAMESPACE;
 
-use Snap\Hookables\Post_Type;
+use Snap\Hookables\PostType;
 
 /**
  * CLASSNAME description
  */
-class CLASSNAME extends Post_Type
+class CLASSNAME extends PostType
 {
     /**
      * Override the plural name.
