@@ -222,8 +222,8 @@ class Size_Manager extends Hookable
         $sizes_to_remove = \array_merge($user_sizes_to_remove, self::DEFAULT_IMAGE_SIZES);
 
         if (\is_array(\current($sizes))) {
-            $sizes_to_remove = array_flip($sizes_to_remove);
-            return array_diff_key($sizes, $sizes_to_remove);
+            $sizes_to_remove = \array_flip($sizes_to_remove);
+            return \array_diff_key($sizes, $sizes_to_remove);
         }
 
         return \array_diff($sizes, $sizes_to_remove);

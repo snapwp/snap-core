@@ -13,7 +13,7 @@ trait ValidatesInput
 
     /**
      * Returns the ErrorBag being used by the current request.
-     * 
+     *
      * @return \Rakit\Validation\ErrorBag
      */
     public static function getGlobalErrors()

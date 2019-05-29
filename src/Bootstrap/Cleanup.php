@@ -167,10 +167,13 @@ class Cleanup extends Hookable
         $this->removeAction('wp_head', 'rest_output_link_wp_head', 10);
 
         if (isset($wp_widget_factory->widgets['WP_Widget_Recent_Comments'])) {
-            $this->removeAction('wp_head', [
-                $wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
-                'recent_comments_style'
-            ]);
+            $this->removeAction(
+                'wp_head',
+                [
+                    $wp_widget_factory->widgets['WP_Widget_Recent_Comments'],
+                    'recent_comments_style',
+                ]
+            );
         }
 
         $this->addFilter('use_default_gallery_style', '__return_false');

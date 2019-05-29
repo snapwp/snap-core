@@ -264,7 +264,7 @@ class Response
         bool $http_only
     ) {
         $attr = [
-            \rawurlencode($name) . '=' . \rawurlencode($value)
+            \rawurlencode($name) . '=' . \rawurlencode($value),
         ];
 
         if (!\is_null($expires)) {

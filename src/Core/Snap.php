@@ -291,7 +291,7 @@ class Snap
 
         static::$container->add(
             Validator::class,
-            function() {
+            function () {
                 return new Validator();
             }
         );

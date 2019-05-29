@@ -470,8 +470,7 @@ class Request extends Validator implements ArrayAccess
         $abs_path = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
         $files = \get_included_files();
 
-        if (
-            \in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)
+        if (\in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)
             || isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php'
             || isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php'
         ) {
@@ -548,7 +547,7 @@ class Request extends Validator implements ArrayAccess
         $this->is_mobile = (bool)\wp_is_mobile();
         $this->scheme = \is_ssl() ? 'https' : 'http';
         $this->url = Theme::getCurrentUrl();
-        $this->host = parse_url($this->getUrl(), PHP_URL_HOST);
+        $this->host = \parse_url($this->getUrl(), PHP_URL_HOST);
         $this->path = \rtrim(\parse_url($this->url, PHP_URL_PATH), '/');
     }
 
