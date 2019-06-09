@@ -5,6 +5,7 @@ namespace Snap\Commands\Make;
 use Snap\Commands\Concerns\NeedsWordPress;
 use Snap\Core\Snap;
 use Snap\Services\Config;
+use Snap\Utils\Str;
 use Symfony\Component\Console\Command\Command;
 
 /**
@@ -189,6 +190,7 @@ class Creator extends Command
         $args['NAMESPACE'] = '';
 
         $class_name = $this->sanitiseFilename($args['CLASSNAME']);
+        $args['NAME'] = Str::toSnake($class_name);
 
         if ($this->isNestedDirectory($class_name)) {
             $parts = \explode('\\', $class_name);
@@ -196,6 +198,7 @@ class Creator extends Command
 
             $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
             $args['CLASSNAME'] = $class;
+            $args['NAME'] = Str::toSnake($class);
         }
 
         return $args;

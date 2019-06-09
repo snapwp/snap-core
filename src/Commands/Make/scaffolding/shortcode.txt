@@ -1,6 +1,6 @@
 <?php
 
-namespace Theme\Hookables\ShortcodesNAMESPACE;
+namespace Theme\Content\ShortcodesNAMESPACE;
 
 use Snap\Hookables\Shortcode;
 
@@ -9,6 +9,14 @@ use Snap\Hookables\Shortcode;
  */
 class CLASSNAME extends Shortcode
 {
+    /**
+     * The tag to register the shortcode with.
+     * If not present or null, then the snake cased class name is used instead.
+     *
+     * @var string|null
+     */
+    protected $tag = 'NAME';
+
     /**
      * The allowed attributes for this shortcode.
      *
