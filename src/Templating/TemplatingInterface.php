@@ -3,9 +3,9 @@
 namespace Snap\Templating;
 
 /**
- * Interface to ensure interopability between templating engines.
+ * Interface to ensure interoperability between templating engines.
  */
-interface Templating_Interface
+interface TemplatingInterface
 {
     /**
      * Renders a view template.
@@ -28,7 +28,15 @@ interface Templating_Interface
     /**
      * Should return the parent view for the current request.
      *
+     * @return string|null
+     */
+    public function getCurrentView(): ?string;
+
+    /**
+     * Should normalize a provided template path into something the strategy wants to work with.
+     *
+     * @param string $path The path to transform.
      * @return string
      */
-    public function get_current_view();
+    public function transformPath(string $path): string;
 }

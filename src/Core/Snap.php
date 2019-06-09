@@ -10,7 +10,7 @@ use Snap\Http\Request;
 use Snap\Http\Response;
 use Snap\Http\Validation\Validator;
 use Snap\Media\Image_Service;
-use Snap\Templating\Templating_Interface;
+use Snap\Templating\TemplatingInterface;
 use Snap\Templating\View;
 
 /**
@@ -203,22 +203,18 @@ class Snap
     private static function initTemplating()
     {
         // If no templating strategy has already been registered.
-        if (!static::$container->has(Templating_Interface::class)) {
+        if (!static::$container->has(TemplatingInterface::class)) {
             // Add the default rendering engine.
             static::$container->addSingleton(
-                \Snap\Templating\Standard\Standard_Strategy::class,
+                \Snap\Templating\Standard\StandardStrategy::class,
                 function () {
-                    return new \Snap\Templating\Standard\Standard_Strategy;
+                    return new \Snap\Templating\Standard\StandardStrategy;
                 }
             );
 
-            static::$container->bind(\Snap\Templating\Standard\Standard_Strategy::class, Templating_Interface::class);
-
-            static::$container->add(
-                \Snap\Templating\Standard\Partial::class,
-                function (Container $container) {
-                    return $container->resolve(\Snap\Templating\Standard\Partial::class);
-                }
+            static::$container->bind(
+                \Snap\Templating\Standard\StandardStrategy::class,
+                TemplatingInterface::class
             );
         }
     }
