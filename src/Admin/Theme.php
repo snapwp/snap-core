@@ -23,9 +23,6 @@ class Theme extends Hookable
         'menu_order' => 'movePageLinkAbovePosts',
         'custom_menu_order' => 'movePageLinkAbovePosts',
         'admin_enqueue_scripts' => 'enqueueSnapAdmin',
-        'admin_menu' => [
-            999 => 'cleanAdminMenu',
-        ],
     ];
 
     /**
@@ -76,14 +73,5 @@ class Theme extends Hookable
             [],
             Snap::VERSION
         );
-    }
-
-    /**
-     * Remove the dashboard submenu.
-     */
-    public function cleanAdminMenu()
-    {
-        \remove_submenu_page('index.php', 'index.php');
-        \remove_submenu_page('index.php', 'update-core.php');
     }
 }
