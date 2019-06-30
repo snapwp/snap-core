@@ -90,7 +90,7 @@ class Theme
             $partial
         );
 
-        $path = \trailingslashit(Config::get('theme.templates_directory')) . 'partials/' . $partial . '.php';
+        $path = static::getTemplatesPath() . 'partials/' . $partial . '.php';
 
         return $path;
     }
@@ -109,21 +109,12 @@ class Theme
             $post_template
         );
 
-        return \trailingslashit(Config::get('theme.templates_directory')) . "views/post-templates/{$template}.php";
+        return static::getTemplatesPath() . "views/post-templates/{$template}.php";
     }
 
-    /**
-     * Parse the contents of mix-manifest.json and store as array.
-     */
-    private static function parseManifest()
+    public static function getTemplatesPath(): string
     {
-        $manifest_path = \get_stylesheet_directory() . '/public/mix-manifest.json';
-
-        if (\file_exists($manifest_path)) {
-            $manifest = \file_get_contents($manifest_path);
-
-            static::$manifest = (array)\json_decode($manifest);
-        }
+        return \trailingslashit(Config::get('theme.templates_directory'));
     }
 
     /**
@@ -143,5 +134,19 @@ class Theme
         }
 
         return true;
+    }
+
+    /**
+     * Parse the contents of mix-manifest.json and store as array.
+     */
+    private static function parseManifest()
+    {
+        $manifest_path = \get_stylesheet_directory() . '/public/mix-manifest.json';
+
+        if (\file_exists($manifest_path)) {
+            $manifest = \file_get_contents($manifest_path);
+
+            static::$manifest = (array)\json_decode($manifest);
+        }
     }
 }

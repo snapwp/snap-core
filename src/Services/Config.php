@@ -13,16 +13,16 @@ namespace Snap\Services;
  *
  * @see \Snap\Core\Config
  */
-class Config extends ServiceFacade
+class Config
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
-    protected static function getServiceName()
+    protected static function getServiceName(): string
     {
         return \Snap\Core\Config::class;
     }

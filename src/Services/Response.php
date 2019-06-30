@@ -22,14 +22,16 @@ namespace Snap\Services;
  *
  * @see \Snap\Http\Response
  */
-class Response extends ServiceFacade
+class Response
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
      * @return string
      */
-    protected static function getServiceName()
+    protected static function getServiceName(): string
     {
         return \Snap\Http\Response::class;
     }

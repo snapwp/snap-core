@@ -15,16 +15,16 @@ namespace Snap\Services;
  *
  * @see \Snap\Templating\View
  */
-class View extends ServiceFacade
+class View
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
-    protected static function getServiceName()
+    protected static function getServiceName(): string
     {
         return \Snap\Templating\View::class;
     }

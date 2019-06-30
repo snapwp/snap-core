@@ -6,7 +6,7 @@ use Snap\Commands\Concerns\NeedsWordPress;
 use Snap\Commands\Concerns\UsesFilesystem;
 use Snap\Core\Loader;
 use Snap\Core\Snap;
-use Snap\Services\Service_Provider;
+use Snap\Services\ServiceProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

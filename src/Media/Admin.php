@@ -8,15 +8,12 @@ use Snap\Services\Config;
 
 /**
  * Adds the ability to delete dynamic intermediate image sizes from the media admin screen.
- *
- * @since 1.0.0
  */
 class Admin extends Hookable
 {
     /**
      * The filters to run when booted.
      *
-     * @since  1.0.0
      * @var array
      */
     public $filters = [
@@ -152,7 +149,7 @@ class Admin extends Hookable
         ) {
             $meta = wp_get_attachment_metadata($post->ID);
 
-            $public_sizes = \array_diff(get_intermediate_image_sizes(), Size_Manager::get_dynamic_sizes());
+            $public_sizes = \array_diff(get_intermediate_image_sizes(), SizeManager::getDynamicSizes());
 
             $output = '<hr><p><strong>Generated sizes:</strong></p>';
 

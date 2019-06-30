@@ -14,7 +14,7 @@ namespace Snap\Services;
  * @method static bool isMethod($method)
  * @method static mixed get($key, $default = null)
  * @method static mixed post($key, $default = null)
- * @method static mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[] files($key, $default = null)
+ * @method static mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[] files($key, $default = null)
  * @method static mixed server($key, $default = null)
  * @method static mixed wp($key, $default = null)
  * @method static mixed cookie($key, $default = null)
@@ -25,19 +25,20 @@ namespace Snap\Services;
  * @method static bool isLoginPage()
  * @method static bool isPostTemplate($post_template)
  * @method static bool getGlobalErrors()
+ * @method static \Snap\Http\Request getRootInstance() Return root instance.
  *
  * @see \Snap\Http\Request
  */
-class Request extends ServiceFacade
+class Request
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
-    protected static function getServiceName()
+    protected static function getServiceName(): string
     {
         return \Snap\Http\Request::class;
     }

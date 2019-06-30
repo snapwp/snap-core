@@ -2,13 +2,12 @@
 
 namespace Snap\Services;
 
-use RuntimeException;
 use Snap\Core\Snap;
 
 /**
  * Base Service Facade class.
  */
-abstract class ServiceFacade
+trait ProvidesServiceFacade
 {
     /**
      * Holds all resolved facade instances.
@@ -81,8 +80,6 @@ abstract class ServiceFacade
      * Must exist within the container.
      *
      * @return string
-     *
-     * @throws RuntimeException If this method is not overwritten.
      */
     abstract protected static function getServiceName(): string;
 }

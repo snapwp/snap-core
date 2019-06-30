@@ -19,17 +19,20 @@ namespace Snap\Services;
  * @method static array getValidatedData()
  * @method static array getValidData()
  * @method static array getInvalidData()
+ * @method static \Snap\Http\Validation\Validator getRootInstance()
  *
  * @see \Snap\Http\Validation\Validator
  */
-class Validator extends ServiceFacade
+class Validator
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
      * @return string
      */
-    protected static function getServiceName()
+    protected static function getServiceName(): string
     {
         return \Snap\Http\Validation\Validator::class;
     }

@@ -16,14 +16,16 @@ namespace Snap\Services;
  *
  * @see \Snap\Core\Router
  */
-class Router extends ServiceFacade
+class Router
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
      * @return string
      */
-    protected static function getServiceName()
+    protected static function getServiceName(): string
     {
         return \Snap\Core\Router::class;
     }

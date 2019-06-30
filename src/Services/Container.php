@@ -14,20 +14,20 @@ namespace Snap\Services;
  * @method static bool remove($key) Remove a service.
  * @method static object resolve(string $class, array $args = []) Auto-wire and return a class instance.
  * @method static mixed resolveMethod($class, string $method, array $args = []) Auto-wire and run a class method.
- * @method static \Hodl\Container getRootInstance() Return root Container instance.
+ * @method static \Hodl\Container getRootInstance() Return root instance.
  *
  * @see \Hodl\Container
  */
-class Container extends ServiceFacade
+class Container
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
-    protected static function getServiceName()
+    protected static function getServiceName(): string
     {
         return \Hodl\Container::class;
     }

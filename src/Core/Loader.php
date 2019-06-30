@@ -46,8 +46,8 @@ class Loader
         \Snap\Bootstrap\Cleanup::class,
         \Snap\Bootstrap\Comments::class,
         \Snap\Bootstrap\I18n::class,
-        \Snap\Media\Size_Manager::class,
-        \Snap\Templating\Handle_Post_Templates::class,
+        \Snap\Media\SizeManager::class,
+        \Snap\Templating\HandlePostTemplates::class,
         \Snap\Http\Validation\Rules\Nonce::class,
     ];
 
@@ -220,7 +220,7 @@ class Loader
     private function initThemeProviders()
     {
         foreach (Config::get('services.theme_providers') as $class_name) {
-            if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
+            if (\is_subclass_of($class_name, \Snap\Services\ServiceProvider::class)) {
                 $provider = Container::resolve($class_name);
                 Container::resolveMethod($provider, 'register');
                 return;

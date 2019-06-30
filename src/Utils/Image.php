@@ -2,7 +2,7 @@
 
 namespace Snap\Utils;
 
-use Snap\Media\Size_Manager;
+use Snap\Media\SizeManager;
 
 /**
  * Class Image_Utils
@@ -20,7 +20,7 @@ class Image
 
         $sizes = [];
 
-        $dynamic_sizes = Size_Manager::get_dynamic_sizes();
+        $dynamic_sizes = SizeManager::getDynamicSizes();
 
         foreach (\get_intermediate_image_sizes() as $size) {
             if (\in_array($size, ['thumbnail', 'medium', 'medium_large', 'large'])) {
