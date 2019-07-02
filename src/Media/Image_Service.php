@@ -104,7 +104,7 @@ class Image_Service
 
         if ($placeholder_url !== false) {
             $html = \sprintf(
-                /** @lang text */
+            /** @lang text */
                 '<img src="%s" alt="%s" width="%d" height="%d" %s>',
                 $placeholder_url,
                 get_the_title($post_id),
@@ -201,11 +201,19 @@ class Image_Service
             $update = false;
 
             foreach ($_wp_additional_image_sizes as $key => $size_data) {
+                if (\array_key_exists($key, $meta['sizes']) === true) {
+                    continue;
+                }
+
                 if ($key == $size) {
                     /*
                      * Generate the requested dynamic size.
                      */
                     $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
+
+                    if ($new_meta === false) {
+                        continue;
+                    }
 
                     if (\is_array($size)) {
                         $meta['sizes'][ \implode('x', [$width, $height]) ] = $new_meta;
@@ -225,6 +233,10 @@ class Image_Service
                         $size_data['height'],
                         $size_data['crop']
                     );
+
+                    if ($new_meta === false) {
+                        continue;
+                    }
 
                     $meta['sizes'][ $key ] = $new_meta;
                     $update = true;

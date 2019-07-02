@@ -29,7 +29,7 @@ class Size_Manager extends Hookable
      * @var array
      */
     private static $dynamic_sizes = [];
-    
+
     /**
      * Holds any defined image dropdown names.
      *
@@ -88,7 +88,7 @@ class Size_Manager extends Hookable
         if (! empty($this->size_dropdown_names)) {
             $this->add_filter('image_size_names_choose', 'enable_custom_image_sizes');
         }
-    
+
         // Set default image size dropdown value.
         if (! empty(Config::get('images.insert_image_default_size'))) {
             $this->add_filter('after_setup_theme', 'set_insert_image_default_size');
@@ -132,23 +132,23 @@ class Size_Manager extends Hookable
         if ('full' == $size) {
             return $image;
         }
-        
+
         return $this->image_service->generate_dynamic_image($image, $id, $size);
     }
 
-   /**
-    * If no post_thumbnail was found, find the corresponding placeholder image and return the image HTML.
-    *
-    * @since 1.0.0
-    *
-    * @param  string       $html              The post thumbnail HTML.
-    * @param  int          $post_id           The post ID.
-    * @param  string       $post_thumbnail_id The post thumbnail ID.
-    * @param  string|array $size              The post thumbnail size. Image size or array of width and height
-    *                                         values (in that order). Default 'post-thumbnail'.
-    * @param  string       $attr              Query string of attributes.
-    * @return string The image HTML
-    */
+    /**
+     * If no post_thumbnail was found, find the corresponding placeholder image and return the image HTML.
+     *
+     * @since 1.0.0
+     *
+     * @param  string       $html              The post thumbnail HTML.
+     * @param  int          $post_id           The post ID.
+     * @param  string       $post_thumbnail_id The post thumbnail ID.
+     * @param  string|array $size              The post thumbnail size. Image size or array of width and height
+     *                                         values (in that order). Default 'post-thumbnail'.
+     * @param  string       $attr              Query string of attributes.
+     * @return string The image HTML
+     */
     public function placeholder_image_fallback($html, $post_id, $post_thumbnail_id, $size, $attr)
     {
         if ($html === '' && Config::get('images.placeholder_dir') !== false) {
@@ -157,7 +157,7 @@ class Size_Manager extends Hookable
 
         return $html;
     }
-    
+
     /**
      * Adds any extra sizes to add media sizes dropdown.
      *
@@ -195,7 +195,7 @@ class Size_Manager extends Hookable
         if (\is_numeric(Config::get('images.default_image_quality'))) {
             return (int) Config::get('images.default_image_quality');
         }
-        
+
         return $quality;
     }
 

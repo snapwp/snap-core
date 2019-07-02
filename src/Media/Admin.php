@@ -164,7 +164,7 @@ class Admin extends Hookable
                                 <input id="delete-intermediate-all" type="checkbox">
                             </td>
                             <th>Name</th>
-                            <th>Width</th>
+                            <th>Size</th>
                         </tr>
                     </thead>
                     <tbody>';
@@ -176,7 +176,7 @@ class Admin extends Hookable
 
                     $output .= '<tr style="display:table-row;"><th class="check-column">';
                     $output .= '<input type="checkbox" name="[delete-intermediate][]" value="'.$key.'">';
-                    $output .= '</th><td>'.$key.'</td><td>'. $value['width'] . 'x' . $value['height'].'</td></tr>';
+                    $output .= '</th><td>'.$key.'</td><td>'. $value['width'] . ' x ' . $value['height'].'</td></tr>';
                 }
 
                 $output .= '</tbody></table>
@@ -209,7 +209,7 @@ class Admin extends Hookable
             $dir = \pathinfo(get_attached_file($post['ID']), PATHINFO_DIRNAME);
 
             foreach ($sizes as $size) {
-                if ($meta['sizes'][ $size ]) {
+                if (isset($meta['sizes'][ $size ])) {
                     $file = $meta['sizes'][ $size ]['file'];
 
                     // Remove size meta from attachment
