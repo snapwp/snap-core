@@ -11,17 +11,17 @@ use Snap\Services\Config;
 class Size_Manager extends Hookable
 {
     /**
-     * Default WordPress image sizes.
-     *
-     * @since  1.0.0
-     * @var array
-     */
+    * Default WordPress image sizes.
+    *
+    * @since  1.0.0
+    * @var array
+    */
     const DEFAULT_IMAGE_SIZES = [
+        'thumbnail',
         'medium',
         'medium_large',
         'large',
     ];
-
     /**
      * Holds any defined image sizes intended for theme use only.
      *
@@ -52,6 +52,7 @@ class Size_Manager extends Hookable
     protected $filters = [
         'post_thumbnail_html' => 'placeholder_image_fallback',
         'wp_editor_set_quality' => 'get_upload_quality',
+        'intermediate_image_sizes_advanced' => 'remove_custom_image_sizes'
     ];
 
     /**
@@ -77,13 +78,6 @@ class Size_Manager extends Hookable
 
         // Register all image sizes.
         $this->register_image_sizes();
-
-        // Remove all default image sizes.
-        if (Config::get('images.reset_image_sizes') !== false) {
-            $this->add_filter('intermediate_image_sizes_advanced', 'remove_default_image_sizes');
-            $this->add_filter('intermediate_image_sizes_advanced', 'remove_custom_image_sizes');
-            $this->add_filter('intermediate_image_sizes', 'remove_default_image_sizes');
-        }
 
         if (! empty($this->size_dropdown_names)) {
             $this->add_filter('image_size_names_choose', 'enable_custom_image_sizes');
