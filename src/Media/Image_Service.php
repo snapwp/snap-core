@@ -200,46 +200,53 @@ class Image_Service
         if ($check === false || !\file_exists(\wp_upload_dir()['basedir'] . '/' . $check['path'])) {
             $update = false;
 
-            foreach ($_wp_additional_image_sizes as $key => $size_data) {
-                if (\array_key_exists($key, $meta['sizes']) === true) {
-                    continue;
+            if (\is_array($size)) {
+                $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
+
+                if ($new_meta !== false) {
+                    $meta['sizes'][ \implode('x', [$width, $height]) ] = $new_meta;
+                    $update = true;
                 }
+            }
 
-                if ($key == $size) {
-                    /*
-                     * Generate the requested dynamic size.
-                     */
-                    $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
-
-                    if ($new_meta === false) {
+            if ($update === false) {
+                foreach ($_wp_additional_image_sizes as $key => $size_data) {
+                    if (\array_key_exists($key, $meta['sizes']) === true) {
                         continue;
                     }
 
-                    if (\is_array($size)) {
-                        $meta['sizes'][ \implode('x', [$width, $height]) ] = $new_meta;
-                    } else {
+                    if ($key == $size) {
+                        /*
+                         * Generate the requested dynamic size.
+                         */
+                        $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
+
+                        if ($new_meta === false) {
+                            continue;
+                        }
+
                         $meta['sizes'][ $size ] = $new_meta;
+
+                        $update = true;
+                    } elseif (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
+                        /*
+                         * This size is has not been requested, but matches the requested size ratio so should be generated
+                         * for use within the srcset.
+                         */
+                        $new_meta = \image_make_intermediate_size(
+                            $parent_image_path,
+                            $size_data['width'],
+                            $size_data['height'],
+                            $size_data['crop']
+                        );
+
+                        if ($new_meta === false) {
+                            continue;
+                        }
+
+                        $meta['sizes'][ $key ] = $new_meta;
+                        $update = true;
                     }
-
-                    $update = true;
-                } elseif (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
-                    /*
-                     * This size is has not been requested, but matches the requested size ratio so should be generated
-                     * for use within the srcset.
-                     */
-                    $new_meta = \image_make_intermediate_size(
-                        $parent_image_path,
-                        $size_data['width'],
-                        $size_data['height'],
-                        $size_data['crop']
-                    );
-
-                    if ($new_meta === false) {
-                        continue;
-                    }
-
-                    $meta['sizes'][ $key ] = $new_meta;
-                    $update = true;
                 }
             }
 
