@@ -161,9 +161,9 @@ class ColumnController
                 $query->query_vars['orderby'] = 'meta_value';
                 return;
             }
-             if (\is_callable($column)) {
-                 $column($query);
-             }
+            if (\is_callable($column)) {
+                $column($query);
+            }
         }
     }
 }

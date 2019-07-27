@@ -6,7 +6,6 @@ use Snap\Hookables\Content\ColumnController;
 use Snap\Database\PostQuery;
 use Snap\Utils\Str;
 
-
 class PostType extends ContentHookable
 {
     protected $taxonomies = [];
@@ -184,16 +183,16 @@ class PostType extends ContentHookable
             'name' => $this->getPlural(),
             'singular_name' => $this->getSingular(),
             'menu_name' => $this->getPlural(),
-            'all_items' => sprintf(__("All %s"), $this->getSingular()),
-            'add_new' => sprintf(__("Add New %s"), $this->getSingular()),
-            'add_new_item' => sprintf(__("Add New %s"), $this->getSingular()),
-            'edit_item' => sprintf(__("Edit %s"), $this->getSingular()),
-            'new_item' => sprintf(__("New %s"), $this->getSingular()),
-            'view_item' => sprintf(__("View %s"), $this->getSingular()),
-            'search_items' => sprintf(__("Search %s"), $this->getSingular()),
-            'not_found' => sprintf(__("No %s found"), $this->getSingular()),
-            'not_found_in_trash' => sprintf(__("No %s found in Trash"), $this->getSingular()),
-            'parent_item_colon' => sprintf(__("Parent %s:"), $this->getSingular()),
+            'all_items' => \sprintf(__("All %s"), $this->getSingular()),
+            'add_new' => \sprintf(__("Add New %s"), $this->getSingular()),
+            'add_new_item' => \sprintf(__("Add New %s"), $this->getSingular()),
+            'edit_item' => \sprintf(__("Edit %s"), $this->getSingular()),
+            'new_item' => \sprintf(__("New %s"), $this->getSingular()),
+            'view_item' => \sprintf(__("View %s"), $this->getSingular()),
+            'search_items' => \sprintf(__("Search %s"), $this->getSingular()),
+            'not_found' => \sprintf(__("No %s found"), $this->getSingular()),
+            'not_found_in_trash' => \sprintf(__("No %s found in Trash"), $this->getSingular()),
+            'parent_item_colon' => \sprintf(__("Parent %s:"), $this->getSingular()),
         ];
     }
 
@@ -241,18 +240,21 @@ class PostType extends ContentHookable
 
     private function registerFilters(): void
     {
-        $this->addFilter('restrict_manage_posts', function (string $post_type) {
-            if ($post_type === $this->getName()) {
-                foreach ($this->admin_filters as $filter) {
-                    if (\is_callable($filter)) {
-                        dump('closure');
-                        continue;
-                    }
+        $this->addFilter(
+            'restrict_manage_posts',
+            function (string $post_type) {
+                if ($post_type === $this->getName()) {
+                    foreach ($this->admin_filters as $filter) {
+                        if (\is_callable($filter)) {
+                            dump('closure');
+                            continue;
+                        }
 
-                    $this->outputTaxonomyFilter($filter);
+                        $this->outputTaxonomyFilter($filter);
+                    }
                 }
             }
-        });
+        );
     }
 
     /**
@@ -268,11 +270,13 @@ class PostType extends ContentHookable
 
         $tax = \get_taxonomy($taxonomy);
 
-        $terms = \get_terms([
-            'taxonomy' => $taxonomy,
-            'orderby' => 'name',
-            'hide_empty' => false,
-        ]);
+        $terms = \get_terms(
+            [
+                'taxonomy' => $taxonomy,
+                'orderby' => 'name',
+                'hide_empty' => false,
+            ]
+        );
 
         if (empty($terms)) {
             return;

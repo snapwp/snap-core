@@ -22,7 +22,7 @@ abstract class ContentHookable extends Hookable
      */
     protected static $hasRegistered = [
         'post' => [],
-        'taxonomy' => []
+        'taxonomy' => [],
     ];
 
     protected static $type;

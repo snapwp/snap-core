@@ -52,7 +52,7 @@ class SizeManager extends Hookable
     protected $filters = [
         'post_thumbnail_html' => 'placeholderImageFallback',
         'wp_editor_set_quality' => 'getUploadQuality',
-        'intermediate_image_sizes_advanced' => 'removeCustomImageSizes'
+        'intermediate_image_sizes_advanced' => 'removeCustomImageSizes',
     ];
 
     /**

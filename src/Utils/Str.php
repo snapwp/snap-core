@@ -69,7 +69,7 @@ class Str
             return static::$studlyCache[$string];
         }
 
-        static::$studlyCache[$string] = \str_replace(['_', '-', ' '], '', ucwords($string, " \t\r\n\f\v_-"));
+        static::$studlyCache[$string] = \str_replace(['_', '-', ' '], '', \ucwords($string, " \t\r\n\f\v_-"));
         return static::$studlyCache[$string];
     }
 

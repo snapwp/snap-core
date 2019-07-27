@@ -63,18 +63,22 @@ class TaxQuery extends Query
 
         if (\is_array($id)) {
             return $this->getCollection(
-                $this->createArguments([
-                    'taxonomy' => $this->name,
-                    'limit' => count($id),
-                ])
+                $this->createArguments(
+                    [
+                        'taxonomy' => $this->name,
+                        'limit' => \count($id),
+                    ]
+                )
             );
         }
 
         return $this->getTerm(
-            $this->createArguments([
-                'taxonomy' => $this->name,
-                'limit' => 1,
-            ])
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                    'limit' => 1,
+                ]
+            )
         );
     }
 
@@ -86,9 +90,11 @@ class TaxQuery extends Query
     public function get(): Collection
     {
         return $this->getCollection(
-            $this->createArguments([
-                'taxonomy' => $this->name,
-            ])
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                ]
+            )
         );
     }
 
@@ -100,10 +106,12 @@ class TaxQuery extends Query
     public function getIds(): array
     {
         return $this->getArray(
-            $this->createArguments([
-                'taxonomy' => $this->name,
-                'fields' => 'ids'
-            ])
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                    'fields' => 'ids',
+                ]
+            )
         );
     }
 
@@ -115,10 +123,12 @@ class TaxQuery extends Query
     public function getNames(): array
     {
         return $this->getArray(
-            $this->createArguments([
-                'taxonomy' => $this->name,
-                'fields' => 'id=>name'
-            ])
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                    'fields' => 'id=>name',
+                ]
+            )
         );
     }
 
@@ -130,10 +140,12 @@ class TaxQuery extends Query
     public function getSlugs(): array
     {
         return $this->getArray(
-            $this->createArguments([
-                'taxonomy' => $this->name,
-                'fields' => 'id=>slug'
-            ])
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                    'fields' => 'id=>slug',
+                ]
+            )
         );
     }
 
@@ -145,10 +157,12 @@ class TaxQuery extends Query
     public function first()
     {
         return $this->getTerm(
-            $this->createArguments([
-                'taxonomy' => $this->name,
-                'limit' => 1,
-            ])
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                    'limit' => 1,
+                ]
+            )
         );
     }
 
@@ -160,9 +174,11 @@ class TaxQuery extends Query
     public function getQueryObject()
     {
         return new WP_Term_Query(
-            $this->createArguments([
-                'taxonomy' => $this->name,
-            ])
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                ]
+            )
         );
     }
 

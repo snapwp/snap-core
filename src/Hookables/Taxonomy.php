@@ -110,7 +110,7 @@ class Taxonomy extends ContentHookable
         if (isset($this->columnManager)) {
             $columnController = new ColumnController($this, $this->columnManager);
 
-            $this->addFilter("manage_edit-{$this->getName()}_columns",  [$columnController, 'manageColumns']);
+            $this->addFilter("manage_edit-{$this->getName()}_columns", [$columnController, 'manageColumns']);
 
             if (!empty($this->columns()->getCustomColumns())) {
                 $this->addFilter(
@@ -127,7 +127,7 @@ class Taxonomy extends ContentHookable
                     [$columnController, 'setSortableColumns']
                 );
 
-                $this->addFilter("parse_term_query",  [$columnController, 'handleSortableColumns']);
+                $this->addFilter("parse_term_query", [$columnController, 'handleSortableColumns']);
             }
         }
 
@@ -192,20 +192,20 @@ class Taxonomy extends ContentHookable
             'name' => $this->getPlural(),
             'singular_name' => $this->getSingular(),
             'menu_name' => $this->getPlural(),
-            'all_items' => sprintf(__("All %s", 'theme'), $this->getPlural()),
-            'edit_item' => sprintf(__("Edit %s", 'theme'), $this->getPlural()),
-            'view_item' => sprintf(__("View %s", 'theme'), $this->getPlural()),
-            'update_item' => sprintf(__("Update %s", 'theme'), $this->getPlural()),
-            'add_new_item' => sprintf(__("Add New %s", 'theme'), $this->getPlural()),
-            'new_item_name' => sprintf(__("New %s Name", 'theme'), $this->getPlural()),
-            'parent_item' => sprintf(__("Parent %s", 'theme'), $this->getPlural()),
-            'parent_item_colon' => sprintf(__("Parent %s:", 'theme'), $this->getPlural()),
-            'search_items' => sprintf(__("Search %s", 'theme'), $this->getPlural()),
-            'popular_items' => sprintf(__("Popular %s", 'theme'), $this->getPlural()),
-            'separate_items_with_commas' => sprintf(__("Separate %s with commas", 'theme'), $this->getPlural()),
-            'add_or_remove_items' => sprintf(__("Add or remove %s", 'theme'), $this->getPlural()),
-            'choose_from_most_used' => sprintf(__("Choose from most used %s", 'theme'), $this->getPlural()),
-            'not_found' => sprintf(__("No %s found", 'theme'), $this->getPlural()),
+            'all_items' => \sprintf(__("All %s", 'theme'), $this->getPlural()),
+            'edit_item' => \sprintf(__("Edit %s", 'theme'), $this->getPlural()),
+            'view_item' => \sprintf(__("View %s", 'theme'), $this->getPlural()),
+            'update_item' => \sprintf(__("Update %s", 'theme'), $this->getPlural()),
+            'add_new_item' => \sprintf(__("Add New %s", 'theme'), $this->getPlural()),
+            'new_item_name' => \sprintf(__("New %s Name", 'theme'), $this->getPlural()),
+            'parent_item' => \sprintf(__("Parent %s", 'theme'), $this->getPlural()),
+            'parent_item_colon' => \sprintf(__("Parent %s:", 'theme'), $this->getPlural()),
+            'search_items' => \sprintf(__("Search %s", 'theme'), $this->getPlural()),
+            'popular_items' => \sprintf(__("Popular %s", 'theme'), $this->getPlural()),
+            'separate_items_with_commas' => \sprintf(__("Separate %s with commas", 'theme'), $this->getPlural()),
+            'add_or_remove_items' => \sprintf(__("Add or remove %s", 'theme'), $this->getPlural()),
+            'choose_from_most_used' => \sprintf(__("Choose from most used %s", 'theme'), $this->getPlural()),
+            'not_found' => \sprintf(__("No %s found", 'theme'), $this->getPlural()),
         ];
     }
 
@@ -241,6 +241,6 @@ class Taxonomy extends ContentHookable
 
         unset($wp_taxonomies[$this->getName()]);
 
-        \do_action( 'unregistered_taxonomy', $taxonomy );
+        \do_action('unregistered_taxonomy', $taxonomy);
     }
 }

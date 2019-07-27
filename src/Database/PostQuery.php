@@ -2,8 +2,6 @@
 
 namespace Snap\Database;
 
-
-
 use WP_Query;
 
 // todo add find to accept search q or id
@@ -52,22 +50,26 @@ class PostQuery extends Query
     {
         if (\is_array($id)) {
             return $this->getArray(
-                $this->createArguments([
-                    'post__in' => $id,
-                    'post_type' => $this->name,
-                    'posts_per_page' => count($id),
-                    'no_found_rows' => true,
-                ])
+                $this->createArguments(
+                    [
+                        'post__in' => $id,
+                        'post_type' => $this->name,
+                        'posts_per_page' => \count($id),
+                        'no_found_rows' => true,
+                    ]
+                )
             );
         }
 
         return $this->getPost(
-            $this->createArguments([
-                'p' => $id,
-                'post_type' => $this->name,
-                'posts_per_page' => 1,
-                'no_found_rows' => true,
-            ])
+            $this->createArguments(
+                [
+                    'p' => $id,
+                    'post_type' => $this->name,
+                    'posts_per_page' => 1,
+                    'no_found_rows' => true,
+                ]
+            )
         );
     }
 
@@ -193,11 +195,13 @@ class PostQuery extends Query
     public function first()
     {
         return $this->getPost(
-            $this->createArguments([
-                'post_type' => $this->name,
-                'posts_per_page' => 1,
-                'no_found_rows' => true,
-            ])
+            $this->createArguments(
+                [
+                    'post_type' => $this->name,
+                    'posts_per_page' => 1,
+                    'no_found_rows' => true,
+                ]
+            )
         );
     }
 
@@ -209,10 +213,12 @@ class PostQuery extends Query
     public function get()
     {
         return $this->getArray(
-            $this->createArguments([
-                'post_type' => $this->name,
-                'no_found_rows' => true,
-            ])
+            $this->createArguments(
+                [
+                    'post_type' => $this->name,
+                    'no_found_rows' => true,
+                ]
+            )
         );
     }
 
@@ -224,9 +230,11 @@ class PostQuery extends Query
     public function getWPQuery()
     {
         return new WP_Query(
-            $this->createArguments([
-                'post_type' => $this->name,
-            ])
+            $this->createArguments(
+                [
+                    'post_type' => $this->name,
+                ]
+            )
         );
     }
 
@@ -237,11 +245,13 @@ class PostQuery extends Query
      */
     public function all()
     {
-        return $this->getArray([
-            'post_type' => $this->name,
-            'posts_per_page' => -1,
-            'no_found_rows' => true,
-        ]);
+        return $this->getArray(
+            [
+                'post_type' => $this->name,
+                'posts_per_page' => -1,
+                'no_found_rows' => true,
+            ]
+        );
     }
 
 

@@ -227,18 +227,24 @@ class Snap
      */
     private static function initView()
     {
-        static::$container->addSingleton(View::class, function (Container $container) {
-            return $container->resolve(View::class);
-        });
+        static::$container->addSingleton(
+            View::class,
+            function (Container $container) {
+                return $container->resolve(View::class);
+            }
+        );
 
         static::$container->alias(View::class, 'view');
     }
 
     private static function initContentTypes()
     {
-        static::$container->add(TaxQuery::class, function () {
-            return new TaxQuery();
-        });
+        static::$container->add(
+            TaxQuery::class,
+            function () {
+                return new TaxQuery();
+            }
+        );
     }
 
     /**
