@@ -2,8 +2,8 @@
 
 namespace Snap\Media;
 
-use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Core\Snap;
 use Snap\Services\Config;
 
 /**
@@ -111,7 +111,7 @@ class Admin extends Hookable
      * @since  1.0.0
      *
      * @param string   $form_meta The form meta html.
-     * @param \WP_Post $post The current attachment post object.
+     * @param \WP_Post $post      The current attachment post object.
      * @return string
      */
     public function add_image_sizes_meta_to_media($form_meta, $post = null)
@@ -130,8 +130,8 @@ class Admin extends Hookable
      *
      * @since 1.0.0
      *
-     * @param  array    $form_fields The current output.
-     * @param \WP_Post $post The current attachment.
+     * @param  array   $form_fields The current output.
+     * @param \WP_Post $post        The current attachment.
      * @return mixed
      */
     public function add_intermediate_mgmt_fields($form_fields, $post = null)
@@ -161,7 +161,7 @@ class Admin extends Hookable
                                 <input id="delete-intermediate-all" type="checkbox">
                             </td>
                             <th>Name</th>
-                            <th>Width</th>
+                            <th>Size</th>
                         </tr>
                     </thead>
                     <tbody>';
@@ -172,8 +172,8 @@ class Admin extends Hookable
                     }
 
                     $output .= '<tr style="display:table-row;"><th class="check-column">';
-                    $output .= '<input type="checkbox" name="[delete-intermediate][]" value="'.$key.'">';
-                    $output .= '</th><td>'.$key.'</td><td>'. $value['width'] . 'x' . $value['height'].'</td></tr>';
+                    $output .= '<input type="checkbox" name="[delete-intermediate][]" value="' . $key . '">';
+                    $output .= '</th><td>' . $key . '</td><td>' . $value['width'] . ' x ' . $value['height'] . '</td></tr>';
                 }
 
                 $output .= '</tbody></table>
@@ -194,7 +194,7 @@ class Admin extends Hookable
      *
      * @since 1.0.0
      *
-     * @param \WP_Post $post The current attachment.
+     * @param \WP_Post $post            The current attachment.
      * @param array    $attachment_data The POST data passed from the quest.
      * @return \WP_Post
      */
@@ -206,11 +206,11 @@ class Admin extends Hookable
             $dir = \pathinfo(get_attached_file($post['ID']), PATHINFO_DIRNAME);
 
             foreach ($sizes as $size) {
-                if ($meta['sizes'][ $size ]) {
-                    $file = $meta['sizes'][ $size ]['file'];
+                if (isset($meta['sizes'][$size])) {
+                    $file = $meta['sizes'][$size]['file'];
 
                     // Remove size meta from attachment
-                    unset($meta['sizes'][ $size ]);
+                    unset($meta['sizes'][$size]);
                     \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
                 }
             }
@@ -221,7 +221,7 @@ class Admin extends Hookable
              *
              * @since 1.0.0
              * @param array $sizes List of sizes to be deleted
-             * @param int $id The ID of the current attachment.
+             * @param int   $id    The ID of the current attachment.
              */
             \do_action('snap_dynamic_image_before_delete', $sizes, $post['ID']);
 
@@ -233,7 +233,7 @@ class Admin extends Hookable
              *
              * @since 1.0.0
              * @param array $sizes List of sizes to be deleted
-             * @param int $id The ID of the current attachment.
+             * @param int   $id    The ID of the current attachment.
              */
             \do_action('snap_dynamic_image_after_delete', $sizes, $post['ID']);
 

@@ -52,7 +52,7 @@ class Image_Service
          * @param  array $extensions The file extension list, in order of search preference.
          * @return array $extensions The modified file extension list.
          */
-        $this->placeholder_extensions = apply_filters('snap_placeholder_img_extensions', ['.jpg', '.svg', '.png']);
+        $this->placeholder_extensions = \apply_filters('snap_placeholder_img_extensions', ['.jpg', '.svg', '.png']);
 
         $this->placeholder_directory = Theme::getActiveThemePath(
             \trailingslashit(Config::get('images.placeholder_dir'))
@@ -79,7 +79,7 @@ class Image_Service
      * @param  array        $attr              Array string of attributes.
      * @return string The image HTML
      */
-    public function get_placeholder_image($post_id, $post_thumbnail_id, $size, $attr = [])
+    public function getPlaceholderImage($post_id, $post_thumbnail_id, $size, $attr = [])
     {
         $original_size = $size;
 
@@ -90,16 +90,16 @@ class Image_Service
         }
 
         // Search for a size specific placeholder first.
-        $placeholder_url = $this->search_for_placeholder('placeholder-' . $size);
+        $placeholder_url = $this->searchForPlaceholder('placeholder-' . $size);
 
         // Then the post type placeholder.
         if ($placeholder_url === false) {
-            $placeholder_url = $this->search_for_placeholder('placeholder-' . get_post_type($post_id));
+            $placeholder_url = $this->searchForPlaceholder('placeholder-' . get_post_type($post_id));
         }
 
         // Finally a generic placeholder.
         if ($placeholder_url === false) {
-            $placeholder_url = $this->search_for_placeholder('placeholder');
+            $placeholder_url = $this->searchForPlaceholder('placeholder');
         }
 
         if ($placeholder_url !== false) {
@@ -107,10 +107,10 @@ class Image_Service
                 /** @lang text */
                 '<img src="%s" alt="%s" width="%d" height="%d" %s>',
                 $placeholder_url,
-                get_the_title($post_id),
+                \get_the_title($post_id),
                 \is_array($original_size) ? $original_size[0] : Image::getImageWidth($size),
                 \is_array($original_size) ? $original_size[1] : Image::getImageHeight($size),
-                $this->parse_attributes($attr)
+                $this->parseAttributes($attr)
             );
 
             /**
@@ -143,7 +143,7 @@ class Image_Service
      * @return false|array Array containing the image URL, width, height, and boolean for whether
      *                            the image is an intermediate size. False on failure.
      */
-    public function generate_dynamic_image($image, $id, $size)
+    public function generateDynamicImage($image, $id, $size)
     {
         global $_wp_additional_image_sizes;
 
@@ -175,13 +175,13 @@ class Image_Service
             $crop = !\wp_image_matches_ratio($meta['height'], $meta['width'], $height, $width);
         } else {
             // Short-circuit if $size has not been registered.
-            if (!isset($_wp_additional_image_sizes[ $size ])) {
+            if (!isset($_wp_additional_image_sizes[$size])) {
                 return $image;
             }
 
-            $width = $_wp_additional_image_sizes[ $size ]['width'];
-            $height = $_wp_additional_image_sizes[ $size ]['height'];
-            $crop = $_wp_additional_image_sizes[ $size ]['crop'];
+            $width = $_wp_additional_image_sizes[$size]['width'];
+            $height = $_wp_additional_image_sizes[$size]['height'];
+            $crop = $_wp_additional_image_sizes[$size]['crop'];
         }
 
         $check = \image_get_intermediate_size($id, $size);
@@ -200,34 +200,53 @@ class Image_Service
         if ($check === false || !\file_exists(\wp_upload_dir()['basedir'] . '/' . $check['path'])) {
             $update = false;
 
-            foreach ($_wp_additional_image_sizes as $key => $size_data) {
-                if ($key == $size) {
-                    /*
-                     * Generate the requested dynamic size.
-                     */
-                    $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
+            if (\is_array($size)) {
+                $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
 
-                    if (\is_array($size)) {
-                        $meta['sizes'][ \implode('x', [$width, $height]) ] = $new_meta;
-                    } else {
-                        $meta['sizes'][ $size ] = $new_meta;
+                if ($new_meta !== false) {
+                    $meta['sizes'][\implode('x', [$width, $height])] = $new_meta;
+                    $update = true;
+                }
+            }
+
+            if ($update === false) {
+                foreach ($_wp_additional_image_sizes as $key => $size_data) {
+                    if (\array_key_exists($key, $meta['sizes']) === true) {
+                        continue;
                     }
 
-                    $update = true;
-                } elseif (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
-                    /*
-                     * This size is has not been requested, but matches the requested size ratio so should be generated
-                     * for use within the srcset.
-                     */
-                    $new_meta = \image_make_intermediate_size(
-                        $parent_image_path,
-                        $size_data['width'],
-                        $size_data['height'],
-                        $size_data['crop']
-                    );
+                    if ($key == $size) {
+                        /*
+                         * Generate the requested dynamic size.
+                         */
+                        $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
 
-                    $meta['sizes'][ $key ] = $new_meta;
-                    $update = true;
+                        if ($new_meta === false) {
+                            continue;
+                        }
+
+                        $meta['sizes'][$size] = $new_meta;
+
+                        $update = true;
+                    } elseif (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
+                        /*
+                         * This size is has not been requested, but matches the requested size ratio so should be generated
+                         * for use within the srcset.
+                         */
+                        $new_meta = \image_make_intermediate_size(
+                            $parent_image_path,
+                            $size_data['width'],
+                            $size_data['height'],
+                            $size_data['crop']
+                        );
+
+                        if ($new_meta === false) {
+                            continue;
+                        }
+
+                        $meta['sizes'][$key] = $new_meta;
+                        $update = true;
+                    }
                 }
             }
 
@@ -248,7 +267,7 @@ class Image_Service
      * @param  string $file_name The placeholder to look for, minus extension.
      * @return string|bool false if not found, otherwise the public URI to the found placeholder.
      */
-    private function search_for_placeholder($file_name)
+    private function searchForPlaceholder($file_name)
     {
         $placeholder_url = false;
 
@@ -273,7 +292,7 @@ class Image_Service
      * @param  array $attr The $attr array.
      * @return string
      */
-    private function parse_attributes($attr)
+    private function parseAttributes($attr)
     {
         $html = '';
 
