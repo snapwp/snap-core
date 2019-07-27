@@ -22,7 +22,7 @@ class Taxonomy extends Creator
     {
         $this->setName('make:taxonomy')
             ->setDescription('Creates a new Taxonomy.')
-            ->setHelp('Creates a new Taxonomy class within your theme/Taxonomies directory');
+            ->setHelp('Creates a new Taxonomy class within your theme/Content/Taxonomies directory');
 
         $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Taxonomy.');
     }

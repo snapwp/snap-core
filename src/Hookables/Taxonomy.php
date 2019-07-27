@@ -2,269 +2,245 @@
 
 namespace Snap\Hookables;
 
-use Snap\Core\Hookable;
-use PostTypes\Taxonomy as Tax;
+use Snap\Database\TaxQuery;
+use Snap\Hookables\Content\ColumnController;
 
 /**
- * Taxonomy base class.
+ * The Post Type Hookable.
  *
- * A wrapper around PostTypes\Taxonomy.
- *
- * @see https://github.com/jjgrainger/PostTypes
- * @since 1.0.0
+ * @method static \Snap\Utils\Collection get()
+ * @method static \Snap\Utils\Collection|false|\WP_Term find(int|array $ids)
+ * @method static array getNames()
+ * @method static array getIds()
+ * @method static array getSlugs()
+ * @method static \WP_Term_Query getQueryObject()
+ * @method static false|\WP_Term first()
+ * @method static int count()
+ * @method static TaxQuery for(int|\WP_Post|int[]|\WP_Post[] $object_ids)
+ * @method static TaxQuery hideEmpty()
+ * @method static TaxQuery includeEmpty()
+ * @method static TaxQuery childOf(int|\WP_Term $parent)
+ * @method static TaxQuery notChildOf(int|int[]|\WP_Term|\WP_Term[] $term_ids)
+ * @method static TaxQuery directChildOf(int|\WP_Term $parent)
+ * @method static TaxQuery childless()
+ * @method static TaxQuery in(int|int[] $term_ids)
+ * @method static TaxQuery exclude(int|int[] $term_ids)
+ * @method static TaxQuery where(string|callable $key, $value, string $operator = '=', string $type = 'CHAR')
+ * @method static TaxQuery orWhere(string|callable $key, $value, string $operator = '=', string $type = 'CHAR')
+ * @method static TaxQuery whereExists(string $key)
+ * @method static TaxQuery orWhereExists(string $key)
+ * @method static TaxQuery whereNotExists(string $key)
+ * @method static TaxQuery orWhereNotExists(string $key)
+ * @method static TaxQuery whereName(string|string[] $names)
+ * @method static TaxQuery whereNameLike(string $name)
+ * @method static TaxQuery whereSlug(string|string[] $slugs)
+ * @method static TaxQuery whereTaxonomyId(int|int[] $ids)
+ * @method static TaxQuery whereLike(string $name)
+ * @method static TaxQuery whereDescriptionLike(string $name)
+ * @method static TaxQuery orderBy(string $order_by, string $order = 'ASC')
+ * @method static TaxQuery limit(int $amount)
+ * @method static TaxQuery offset(int $amount)
  */
-class Taxonomy extends Hookable
+class Taxonomy extends ContentHookable
 {
     /**
-     * Override the Taxonomy name (defaults to snake case class name).
-     *
-     * @since  1.0.0
-     * @var null|string
+     * Post types to attach to.
      */
-    public $name = null;
+    protected $post_types;
 
     /**
-     * Override the plural name. Defaults to {$name}s.
+     * The content type.
      *
-     * @since  1.0.0
-     * @var null|string
+     * @var string
      */
-    public $plural = null;
-
-    /**
-     * Override the plural name. Defaults to $name.
-     *
-     * @since  1.0.0
-     * @var null|string
-     */
-    public $singular = null;
-    
-    /**
-     * Override the plural name. Defaults to kebab cased $name.
-     *
-     * @since  1.0.0
-     * @var null|string
-     */
-    public $slug = null;
-
-    /**
-     * Override the Taxonomy labels.
-     *
-     * @see https://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
-     * @since  1.0.0
-     * @var null|array
-     */
-    public $labels = [];
-
-    /**
-     * Override the Taxonomy options.
-     *
-     * @see https://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
-     * @since  1.0.0
-     * @var null|array
-     */
-    public $options = [];
-    
-    /**
-     * Register additional admin columns for this Taxonomy.
-     *
-     * @since  1.0.0
-     * @var null|array
-     */
-    public $columns = [];
-
-    /**
-     * Register which columns should be sortable for Taxonomy.
-     *
-     * @since  1.0.0
-     * @var null|array
-     */
-    public $sortable_columns = [];
-
-    /**
-     * Attach post types by supplying the names to attach here.
-     *
-     * @since  1.0.0
-     * @var array|string[]
-     */
-    public $posttypes = [];
+    protected static $type = 'taxonomy';
 
     /**
      * Register the Taxonomy.
-     *
-     * @since  1.0.0
      */
-    public function __construct()
+    public function register()
     {
-        $taxonomy = new Tax($this->get_names(), $this->options, $this->labels);
-
-        // Register any relationships.
-        $this->add_relationships($taxonomy);
-
-        // If the child class has defined columns.
-        if (! empty($this->columns)) {
-            $taxonomy->columns()->add($this->columns);
-
-            foreach ($this->columns as $key => $title) {
-                // If a getter has been set.
-                if (\is_callable([$this, "get_{$key}_column"])) {
-                    $taxonomy->columns()->populate($key, [$this, "output_column"]);
-                }
-
-                // If a sort method has been defined, save the key in $sortable_columns.
-                if (\is_callable([$this, "sort_{$key}_column"])) {
-                    $this->sortable_columns[ $key ] = $key;
-                }
-            }
-        }
-
-        // Give the child class full access to the PostTypes\Taxonomy instance.
-        $this->modify($taxonomy);
-
-        // Register the Taxonomy.
-        $taxonomy->register();
-
-        // Register any sortable columns.
-        $this->addFilter('manage_edit-' . $this->get_name() . '_sortable_columns', 'set_sortable_columns');
-
-        // If there are sortable columns, run their callbacks.
-        if (! empty($this->sortable_columns)) {
-            $this->addAction('parse_term_query', 'sort_columns', 1, 999);
-        }
-    }
-
-    /**
-     * Make custom columns sortable.
-     *
-     * @since 1.0.0
-     *
-     * @param array $columns Default WordPress sortable columns.
-     * @return array
-     */
-    public function set_sortable_columns($columns)
-    {
-        if (! empty($this->sortable_columns)) {
-            $columns = \array_merge($columns, $this->sortable_columns);
-        }
-
-        return $columns;
-    }
-
-    /**
-     * Runs any supplied sort_{$key}_column callbacks in parse_term_query.
-     *
-     * @since  1.0.0
-     *
-     * @param  \WP_Query $query The global WP_Query object.
-     */
-    public function sort_columns($query)
-    {
-        // Bail if we are not on the correct admin page.
-        if (! \is_admin() || !\in_array($this->name, $query->query_vars['taxonomy'])) {
+        if ($this->hasRegistered()) {
             return;
         }
 
-        $order_by = $query->get('orderby');
+        if (\taxonomy_exists($this->getName())) {
+            $existing = \get_taxonomy($this->getName());
 
-        // Check if the current sorted column has a sort callback defined.
-        if (isset($this->sortable_columns[ $order_by ])) {
-            $callback = "sort_{$order_by}_column";
-            $this->{$callback}($query);
-        }
-    }
+            if (empty($this->post_types)) {
+                // Remove the taxonomy.
+                $this->unRegisterTaxonomy($existing);
+                return;
+            }
 
-    /**
-     * Register a columns sort method with PostTypes\Taxonomy.
-     *
-     * @since  1.0.0
-     * @see  https://github.com/jjgrainger/PostTypes/ For all possible options.
-     *
-     * @param  string $content The content to return.
-     * @param  string $column The current column key.
-     * @param  int    $term_id The current term ID.
-     * @return string
-     */
-    public function output_column($content, $column, $term_id)
-    {
-        $method = "get_{$column}_column";
-
-        if (\method_exists($this, $method)) {
-            return $this->{$method}($term_id);
+            \register_taxonomy($this->getName(), null, $this->getOptionsForExisting($existing));
+        } else {
+            \register_taxonomy($this->getName(), null, $this->getOptions());
         }
 
-        return $content;
+        $this->registerAttachedPostTypes();
+        $this->registerColumns();
     }
 
     /**
-     * Allow the child class the ability to modify the Taxonomy instance directly.
+     * Add the taxonomy to the supplied post type.
      *
-     * @since  1.0.0
-     *
-     * @param  \PostTypes\Taxonomy $taxonomy The current Taxonomy instance.
+     * @param string $post_type Post type to register for.
+     * @return $this
      */
-    protected function modify(Tax $taxonomy)
+    public function attachToPostType(string $post_type)
     {
+        if (!isset(static::$relationships[$post_type])) {
+            static::$relationships[$post_type] = [];
+        }
+
+        static::$relationships[$post_type] = \array_unique(\array_merge((array)static::$relationships[$post_type], [$this->getName()]));
+        return $this;
     }
 
     /**
-     * Define the taxonomy relationships, and whether each taxonomy can be quick filtered.
-     *
-     * @since  1.0.0
-     *
-     * @param \PostTypes\Taxonomy $taxonomy The current Taxonomy instance.
+     * Register any column hooks.
      */
-    private function add_relationships(Tax $taxonomy)
+    public function registerColumns()
     {
-        if (! empty($this->posttypes)) {
-            foreach ($this->posttypes as $k => $v) {
-                $taxonomy->posttype($v);
+        if ($this->hasRegisteredColumns() === true) {
+            return;
+        }
+
+        if (isset($this->columnManager)) {
+            $columnController = new ColumnController($this, $this->columnManager);
+
+            $this->addFilter("manage_edit-{$this->getName()}_columns",  [$columnController, 'manageColumns']);
+
+            if (!empty($this->columns()->getCustomColumns())) {
+                $this->addFilter(
+                    "manage_{$this->getName()}_custom_column",
+                    [$columnController, 'handleColumnOutput'],
+                    10,
+                    3
+                );
+            }
+
+            if (!empty($this->columns()->getSortableColumns())) {
+                $this->addFilter(
+                    "manage_edit-{$this->getName()}_sortable_columns",
+                    [$columnController, 'setSortableColumns']
+                );
+
+                $this->addFilter("parse_term_query",  [$columnController, 'handleSortableColumns']);
+            }
+        }
+
+        static::$registered_columns[] = static::class;
+    }
+
+    /**
+     * Return a fresh PostQuery instance.
+     *
+     * @return \Snap\Database\TaxQuery
+     */
+    protected function makeNewQuery(): TaxQuery
+    {
+        return new TaxQuery($this->getName());
+    }
+
+    /**
+     * Attach the taxonomy to any $post_types defined.
+     */
+    private function registerAttachedPostTypes()
+    {
+        if ($this->post_types !== null) {
+            foreach ($this->post_types as $post_type) {
+                $this->attachToPostType($post_type);
             }
         }
     }
 
     /**
-     * Get the full array of overridden names to pass to PostTypes\Taxonomy.
+     * Get the options to register the taxonomy with.
      *
-     * @since 1.0.0
-     *
-     * @return array All names.
+     * @return array
      */
-    private function get_names()
+    private function getOptions(): array
     {
-        $names = [
-            'name' => $this->get_name(),
+        $defaults = [
+            'show_admin_column' => true,
+            'public' => true,
+            'rewrite' => [
+                'slug' => $this->getName(),
+                'with_front' => false,
+            ],
         ];
 
-        if ($this->plural !== null) {
-            $names['plural'] = $this->plural;
+        $options = \array_replace_recursive($defaults, $this->options);
+
+        if (!isset($options['labels'])) {
+            $options['labels'] = $this->getLabels();
         }
 
-        if ($this->singular !== null) {
-            $names['singular'] = $this->singular;
-        }
-
-        if ($this->slug !== null) {
-            $names['slug'] = $this->slug;
-        }
-
-        return $names;
+        return $options;
     }
 
     /**
-     * Get the unqualified name of the current class and convert it to snake case for the taxonomy name.
+     * Get the labels to register the taxonomy with.
      *
-     * Can be overwritten by setting the $name property.
-     *
-     * @since  1.0.0
-     *
-     * @return string
+     * @return array
      */
-    private function get_name()
+    private function getLabels(): array
     {
-        if ($this->name === null) {
-            return $this->getClassname();
+        return [
+            'name' => $this->getPlural(),
+            'singular_name' => $this->getSingular(),
+            'menu_name' => $this->getPlural(),
+            'all_items' => sprintf(__("All %s", 'theme'), $this->getPlural()),
+            'edit_item' => sprintf(__("Edit %s", 'theme'), $this->getPlural()),
+            'view_item' => sprintf(__("View %s", 'theme'), $this->getPlural()),
+            'update_item' => sprintf(__("Update %s", 'theme'), $this->getPlural()),
+            'add_new_item' => sprintf(__("Add New %s", 'theme'), $this->getPlural()),
+            'new_item_name' => sprintf(__("New %s Name", 'theme'), $this->getPlural()),
+            'parent_item' => sprintf(__("Parent %s", 'theme'), $this->getPlural()),
+            'parent_item_colon' => sprintf(__("Parent %s:", 'theme'), $this->getPlural()),
+            'search_items' => sprintf(__("Search %s", 'theme'), $this->getPlural()),
+            'popular_items' => sprintf(__("Popular %s", 'theme'), $this->getPlural()),
+            'separate_items_with_commas' => sprintf(__("Separate %s with commas", 'theme'), $this->getPlural()),
+            'add_or_remove_items' => sprintf(__("Add or remove %s", 'theme'), $this->getPlural()),
+            'choose_from_most_used' => sprintf(__("Choose from most used %s", 'theme'), $this->getPlural()),
+            'not_found' => sprintf(__("No %s found", 'theme'), $this->getPlural()),
+        ];
+    }
+
+    /**
+     * When overloading an existing taxonomy, we dont want to use any of the getOptions() defaults.
+     *
+     * @param object $existing Original taxonomy object.
+     * @return array
+     */
+    private function getOptionsForExisting($existing): array
+    {
+        $new_args = \array_replace_recursive(\get_object_vars($existing), $this->options);
+        $new_args['label'] = $this->getPlural();
+        $new_args['labels'] = $this->getLabels();
+        return $new_args;
+    }
+
+    /**
+     * Removes a taxonomy.
+     *
+     * @param \WP_Taxonomy $taxonomy The taxonomy to unset.
+     */
+    private function unRegisterTaxonomy(\WP_Taxonomy $taxonomy)
+    {
+        global $wp_taxonomies;
+
+        foreach ($taxonomy->object_type as $type) {
+            \unregister_taxonomy_for_object_type($this->getName(), $type);
         }
 
-        return $this->name;
+        $taxonomy->remove_rewrite_rules();
+        $taxonomy->remove_hooks();
+
+        unset($wp_taxonomies[$this->getName()]);
+
+        \do_action( 'unregistered_taxonomy', $taxonomy );
     }
 }

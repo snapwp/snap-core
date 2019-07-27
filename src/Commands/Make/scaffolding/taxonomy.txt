@@ -9,21 +9,30 @@ use Snap\Hookables\Taxonomy;
  */
 class CLASSNAME extends Taxonomy
 {
-    /**
-     * Override the plural name.
-     *
-     * @var string
-     */
-    public $plural = 'CLASSNAMEs';
+   /**
+    * Post types to register this taxonomy for.
+    *
+    * @var array
+    */
+   protected $post_types = [
+       //'post'
+   ];
 
-    /**
-     * Override the post type default options.
-     *
-     * @see https://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
-     * @var null|array
-     */
-    public $options = [
-        'public' => true,
-        'hierarchical' => true,
-    ];
+   /**
+    * Override the post type default options.
+    *
+    * @see https://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
+    * @var array
+    */
+   public $options = [
+       //
+   ];
+
+   /**
+    * Run after the taxonomy is registered.
+    */
+   public function boot()
+   {
+       //$this->columns()->add('example_column', 'Example Column');
+   }
 }

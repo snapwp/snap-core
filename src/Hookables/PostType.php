@@ -2,255 +2,302 @@
 
 namespace Snap\Hookables;
 
-use PostTypes\PostType as PT;
-use Snap\Core\Hookable;
+use Snap\Hookables\Content\ColumnController;
+use Snap\Database\PostQuery;
+use Snap\Utils\Str;
 
-/**
- * Post type base class.
- *
- * A wrapper around \PostTypes\PostType.
- *
- * @see   https://github.com/jjgrainger/PostTypes
- * @since 1.0.0
- */
-class PostType extends Hookable
+
+class PostType extends ContentHookable
 {
-    /**
-     * Override the post type name (defaults to snake case class name).
-     *
-     * @var null|string
-     */
-    public $name = null;
+    protected $taxonomies = [];
+
+    protected static $type = 'post';
+
+    protected static $has_registered_accessors = false;
+    protected static $post_types = [];
+
+    private $admin_filters = [];
 
     /**
-     * Override the plural name. Defaults to {$name}s.
+     * Run any registered accessor methods.
      *
-     * @var null|string
+     * @param null   $default   Default return value.
+     * @param int    $object_id The ID of the current post object.
+     * @param string $meta_key  The key being looked up.
+     * @param bool   $single    Whether to return only one result.
+     * @return mixed
      */
-    public $plural = null;
+    public static function runAttributeAccessors($default, $object_id, $meta_key, $single)
+    {
+        // Do not run for built-ins.
+        if ($meta_key === '' || $meta_key[0] === '_' || $single === false) {
+            return $default;
+        }
 
-    /**
-     * Override the plural name. Defaults to $name.
-     *
-     * @var null|string
-     */
-    public $singular = null;
+        $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
 
-    /**
-     * Override the plural name. Defaults to kebab cased $name.
-     *
-     * @var null|string
-     */
-    public $slug = null;
+        // As we are getting post meta, we know it will be loaded in the cache already - so this won't be expensive.
+        $post = \get_post($object_id);
 
-    /**
-     * Override the post type labels.
-     *
-     * @see https://codex.wordpress.org/Function_Reference/register_post_type#Parameters
-     * @var null|array
-     */
-    public $labels = [];
+        if ($post === null) {
+            return $default;
+        }
 
-    /**
-     * Override the post type options.
-     *
-     * @see https://codex.wordpress.org/Function_Reference/register_post_type#Parameters
-     * @var null|array
-     */
-    public $options = [];
+        foreach (static::$hasRegistered[self::$type] as $post_type => $class) {
+            if ($post->post_type !== $post_type) {
+                continue;
+            }
 
-    /**
-     * Register additional admin columns for this post type.
-     *
-     * @var null|array
-     */
-    public $columns = [];
+            if (\method_exists($class, $method)) {
+                return $class::{$method}($post);
+            }
+        }
 
-    /**
-     * Register which columns should be sortable for post type.
-     *
-     * @var null|array
-     */
-    public $sortable_columns = [];
-
-    /**
-     * Attach Taxonomies by supplying the names to attach here.
-     *
-     * By default all taxonomies are added to the admin as filters for this post type.
-     * By supplying name => false as a value for your taxonomy, it will not be added as a filter.
-     *
-     * @var array|string[]
-     */
-    public $taxonomies = [];
+        return $default;
+    }
 
     /**
      * Register the post type.
      */
-    public function __construct()
+    public function register()
     {
-        $post_type = new PT($this->getNames(), $this->options, $this->labels);
-
-        // Register any relationships.
-        $this->addRelationships($post_type);
-
-        // If the child class has defined columns.
-        if (!empty($this->columns)) {
-            $post_type->columns()->add($this->columns);
-
-            foreach ($this->columns as $key => $title) {
-                // If a getter has been set.
-                if (\is_callable([$this, "get_{$key}_column"])) {
-                    $post_type->columns()->populate($key, [$this, "outputColumn"]);
-                }
-
-                // If a sort method has been defined, save the key in $sortable_columns.
-                if (\is_callable([$this, "sort_{$key}_column"])) {
-                    $this->sortable_columns[$key] = $key;
-                }
-            }
-        }
-
-        // Give the child class full access to the PostTypes\PostType instance.
-        $this->modify($post_type);
-
-        // Register the post type.
-        $post_type->register();
-
-        // Register any sortable columns.
-        $this->addFilter('manage_edit-' . $this->getName() . '_sortable_columns', 'setSortableColumns');
-
-        // If there are sortable columns, run their callbacks.
-        if (!empty($this->sortable_columns)) {
-            $this->addAction('pre_get_posts', 'sortColumns', 1, 999);
-        }
-    }
-
-    /**
-     * Make custom columns sortable.
-     *
-     * @param array $columns Default WordPress sortable columns.
-     * @return array
-     */
-    public function setSortableColumns($columns)
-    {
-        if (!empty($this->sortable_columns)) {
-            $columns = \array_merge($columns, $this->sortable_columns);
-        }
-
-        return $columns;
-    }
-
-    /**
-     * Runs any supplied sort_{$key}_column callbacks in pre_get_posts.
-     *
-     * @param  \WP_Query $query The global WP_Query object.
-     */
-    public function sortColumns($query)
-    {
-        // Bail if we are not on the correct admin page.
-        if (!$query->is_main_query() || !\is_admin() || $query->get('post_type') !== $this->getName()) {
+        if ($this->hasRegistered()) {
             return;
         }
 
-        $order_by = $query->get('orderby');
-
-        // Check if the current sorted column has a sort callback defined.
-        if (isset($this->sortable_columns[$order_by])) {
-            $callback = "sort_{$order_by}_column";
-            $this->{$callback}($query);
+        if (\post_type_exists($this->getName())) {
+            $this->registerExistingPostType();
+        } else {
+            $this->registerPostType();
         }
+
+        $this->registerAttachedTaxonomies();
+        $this->registerFilters();
+
+        $this->registerAccessors();
+        $this->registerColumns();
     }
 
     /**
-     * Register a columns sort method with PostTypes\PostType.
-     *
-     * @see    https://github.com/jjgrainger/PostTypes/ For all possible options.
-     *
-     * @param  string $column  The current column key.
-     * @param  int    $post_id The current post ID.
+     * Register any column hooks.
      */
-    public function outputColumn($column, $post_id)
+    public function registerColumns()
     {
-        $method = "get_{$column}_column";
+        if ($this->hasRegisteredColumns() === true) {
+            return;
+        }
 
-        $this->{$method}($post_id);
-    }
+        if (isset($this->columnManager)) {
+            $columnController = new ColumnController($this, $this->columnManager);
 
-    /**
-     * Allow the child class the ability to modify the PostType instance directly.
-     *
-     * @param \PostTypes\PostType $post_type The current PostType instance.
-     */
-    protected function modify(PT $post_type)
-    {
-    }
+            $this->addFilter("manage_{$this->getName()}_posts_columns", [$columnController, 'manageColumns']);
 
-    /**
-     * Define the taxonomy relationships, and whether each taxonomy can be quick filtered.
-     *
-     * @param \PostTypes\PostType $post_type The current PostType instance.
-     */
-    private function addRelationships(PT $post_type)
-    {
-        if (!empty($this->taxonomies)) {
-            $filters = [];
-
-            foreach ($this->taxonomies as $k => $v) {
-                // Add all taxonomies to $filters unless explicitly declared otherwise.
-                if (\is_integer($k)) {
-                    $post_type->taxonomy($v);
-                    $filters[] = $v;
-                    continue;
-                }
-
-                if ($v === false) {
-                    $post_type->taxonomy($k);
-                }
+            if (!empty($this->columns()->getCustomColumns())) {
+                $this->addFilter(
+                    "manage_{$this->getName()}_posts_custom_column",
+                    [$columnController, 'handleColumnOutput'],
+                    10,
+                    3
+                );
             }
 
-            $post_type->filters($filters);
+            if (!empty($this->columns()->getSortableColumns())) {
+                $this->addFilter(
+                    "manage_edit-{$this->getName()}_sortable_columns",
+                    [$columnController, 'setSortableColumns']
+                );
+
+                $this->addFilter("pre_get_posts", [$columnController, 'handleSortableColumns']);
+            }
         }
+
+        static::$registered_columns[] = static::class;
+    }
+
+
+    public function filter($filter)
+    {
+        if (!\is_array($filter)) {
+            $this->admin_filters[] = $filter;
+            return $this;
+        }
+
+        $this->admin_filters = \array_merge($this->admin_filters, $filter);
+        return $this;
+    }
+
+    public function addTaxonomy(string $taxonomy)
+    {
+        if (!isset(static::$relationships[$this->getName()])) {
+            static::$relationships[$this->getName()] = [];
+        }
+
+        static::$relationships[$this->getName()] = \array_unique(
+            \array_merge((array)static::$relationships[$this->getName()], [$taxonomy])
+        );
+
+        return $this;
     }
 
     /**
-     * Get the full array of overridden names to pass to PostTypes\PostType.
+     * Return a fresh PostQuery instance.
      *
-     * @return array All names.
+     * @return \Snap\Database\PostQuery
      */
-    private function getNames()
+    protected function makeNewQuery()
     {
-        $names = [
-            'name' => $this->getName(),
+        return new PostQuery($this->getName());
+    }
+
+    /**
+     * Get the options to register the post type with.
+     *
+     * @return array
+     */
+    private function getOptions(): array
+    {
+        $defaults = [
+            'public' => true,
+            'rewrite' => [
+                'slug' => $this->getName(),
+                'with_front' => false,
+            ],
         ];
 
-        if ($this->plural !== null) {
-            $names['plural'] = $this->plural;
+        $options = \array_replace_recursive($defaults, $this->options);
+
+        if (!isset($options['labels'])) {
+            $options['labels'] = $this->getLabels();
         }
 
-        if ($this->singular !== null) {
-            $names['singular'] = $this->singular;
-        }
-
-        if ($this->slug !== null) {
-            $names['slug'] = $this->slug;
-        }
-
-        return $names;
+        return $options;
     }
 
     /**
-     * Get the unqualified name of the current class and convert it to snake case for the post type name.
+     * Get the labels to register the post type with.
      *
-     * Can be overwritten by setting the $name property.
-     *
-     * @return string
+     * @return array
      */
-    private function getName()
+    private function getLabels(): array
     {
-        if ($this->name === null) {
-            return $this->getClassname();
+        return [
+            'name' => $this->getPlural(),
+            'singular_name' => $this->getSingular(),
+            'menu_name' => $this->getPlural(),
+            'all_items' => sprintf(__("All %s"), $this->getSingular()),
+            'add_new' => sprintf(__("Add New %s"), $this->getSingular()),
+            'add_new_item' => sprintf(__("Add New %s"), $this->getSingular()),
+            'edit_item' => sprintf(__("Edit %s"), $this->getSingular()),
+            'new_item' => sprintf(__("New %s"), $this->getSingular()),
+            'view_item' => sprintf(__("View %s"), $this->getSingular()),
+            'search_items' => sprintf(__("Search %s"), $this->getSingular()),
+            'not_found' => sprintf(__("No %s found"), $this->getSingular()),
+            'not_found_in_trash' => sprintf(__("No %s found in Trash"), $this->getSingular()),
+            'parent_item_colon' => sprintf(__("Parent %s:"), $this->getSingular()),
+        ];
+    }
+
+    /**
+     * Add taxonomies based on the taxonomies property.
+     */
+    private function registerAttachedTaxonomies()
+    {
+        if ($this->taxonomies !== null) {
+            foreach ($this->taxonomies as $taxonomy) {
+                $this->addTaxonomy($taxonomy);
+            }
+        }
+    }
+
+    /**
+     * Override existing post type.
+     */
+    private function registerExistingPostType()
+    {
+        $existing = \get_post_type_object($this->getName());
+        $new_args = \array_replace_recursive(\get_object_vars($existing), $this->getOptions());
+        $new_args['label'] = $this->getPlural();
+        \register_post_type($this->getName(), $new_args);
+    }
+
+    /**
+     * Register the post type.
+     */
+    private function registerPostType()
+    {
+        \register_post_type($this->getName(), $this->getOptions());
+    }
+
+    /**
+     * Add hook to allow accessor methods.
+     */
+    private function registerAccessors()
+    {
+        if (static::$has_registered_accessors === false) {
+            $this->addFilter('get_post_metadata', 'self::runAttributeAccessors', 10, 4);
+            static::$has_registered_accessors = true;
+        }
+    }
+
+    private function registerFilters(): void
+    {
+        $this->addFilter('restrict_manage_posts', function (string $post_type) {
+            if ($post_type === $this->getName()) {
+                foreach ($this->admin_filters as $filter) {
+                    if (\is_callable($filter)) {
+                        dump('closure');
+                        continue;
+                    }
+
+                    $this->outputTaxonomyFilter($filter);
+                }
+            }
+        });
+    }
+
+    /**
+     * Outputs a taxonomy dropdown filter.
+     *
+     * @param string $taxonomy The taxonomy name.
+     */
+    private function outputTaxonomyFilter(string $taxonomy)
+    {
+        if (!\taxonomy_exists($taxonomy)) {
+            return;
         }
 
-        return $this->name;
+        $tax = \get_taxonomy($taxonomy);
+
+        $terms = \get_terms([
+            'taxonomy' => $taxonomy,
+            'orderby' => 'name',
+            'hide_empty' => false,
+        ]);
+
+        if (empty($terms)) {
+            return;
+        }
+
+        $selected = null;
+
+        if (isset($_GET[$taxonomy])) {
+            $selected = \sanitize_title($_GET[$taxonomy]);
+        }
+
+        $dropdown_args = [
+            'option_none_value' => '',
+            'hide_empty' => 0,
+            'hide_if_empty' => false,
+            'show_count' => true,
+            'taxonomy' => $tax->name,
+            'name' => $taxonomy,
+            'orderby' => 'name',
+            'hierarchical' => true,
+            'show_option_none' => "Show all {$tax->label}",
+            'value_field' => 'slug',
+            'selected' => $selected,
+        ];
+
+        \wp_dropdown_categories($dropdown_args);
     }
 }

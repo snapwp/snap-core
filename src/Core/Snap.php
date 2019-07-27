@@ -5,6 +5,7 @@ namespace Snap\Core;
 use Exception;
 use Hodl\Container;
 use Hodl\Exceptions\ContainerException;
+use Snap\Database\TaxQuery;
 use Snap\Exceptions\StartupException;
 use Snap\Http\Request;
 use Snap\Http\Response;
@@ -88,6 +89,8 @@ class Snap
 
                 static::registerProviders();
                 static::initTemplating();
+
+                static::initContentTypes();
 
                 static::initView();
 
@@ -224,14 +227,18 @@ class Snap
      */
     private static function initView()
     {
-        static::$container->addSingleton(
-            View::class,
-            function (Container $container) {
-                return $container->resolve(View::class);
-            }
-        );
+        static::$container->addSingleton(View::class, function (Container $container) {
+            return $container->resolve(View::class);
+        });
 
         static::$container->alias(View::class, 'view');
+    }
+
+    private static function initContentTypes()
+    {
+        static::$container->add(TaxQuery::class, function () {
+            return new TaxQuery();
+        });
     }
 
     /**

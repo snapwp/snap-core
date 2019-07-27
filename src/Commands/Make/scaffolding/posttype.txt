@@ -10,13 +10,6 @@ use Snap\Hookables\PostType;
 class CLASSNAME extends PostType
 {
     /**
-     * Override the plural name.
-     *
-     * @var string
-     */
-    public $plural = 'CLASSNAMEs';
-
-    /**
      * Override the post type default options.
      *
      * @see https://codex.wordpress.org/Function_Reference/register_post_type#Parameters
