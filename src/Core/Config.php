@@ -40,7 +40,6 @@ class Config
             'cache_directory' => 'cache',
             'disable_xmlrpc' => true,
             'disable_comments' => true,
-            'disable_tags' => true,
             'disable_customizer' => true,
             'remove_asset_versions' => true,
             'defer_scripts' => true,

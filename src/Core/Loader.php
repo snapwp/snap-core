@@ -313,7 +313,6 @@ class Loader
 
         $this->conditionalLoad('theme.disable_comments', 'Snap\Admin\DisableComments');
         $this->conditionalLoad('theme.disable_customizer', 'Snap\Admin\DisableCustomizer');
-        $this->conditionalLoad('theme.disable_tags', 'Snap\Admin\DisableTags');
 
         foreach ($this->class_list as $module) {
             $this->initHookable($module);
