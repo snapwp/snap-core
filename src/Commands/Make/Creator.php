@@ -191,6 +191,7 @@ class Creator extends Command
 
         $class_name = $this->sanitiseFilename($args['CLASSNAME']);
         $args['NAME'] = Str::toSnake($class_name);
+        $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
 
         if ($this->isNestedDirectory($class_name)) {
             $parts = \explode('\\', $class_name);
@@ -199,6 +200,7 @@ class Creator extends Command
             $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
             $args['CLASSNAME'] = $class;
             $args['NAME'] = Str::toSnake($class);
+            $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
         }
 
         return $args;
