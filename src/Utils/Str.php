@@ -45,6 +45,7 @@ class Str
             return $string;
         }
 
+        $string = \preg_replace('/\-+/u', ' ', $string);
         $string = \preg_replace('/\s+/u', '', \ucwords($string));
 
         static::$snakeCache[$string] = \strtolower(
