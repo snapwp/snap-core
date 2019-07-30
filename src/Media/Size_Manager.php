@@ -334,6 +334,10 @@ class Size_Manager extends Hookable
                     \update_option($name . '_crop', $crop);
                 } else {
                     $callback = function ($sizes = []) use ($name) {
+                        if (!\is_string(\current($sizes))) {
+                            return $sizes;
+                        }
+                        
                         return \array_diff($sizes, [$name]);
                     };
 
