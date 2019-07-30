@@ -122,7 +122,9 @@ class Admin extends Hookable
         if (wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
             $meta = wp_get_attachment_metadata($post->ID);
 
-            $form_meta .= '<strong>Available sizes: </strong>' . \count($meta['sizes']);
+            if (isset($meta['sizes'])) {
+                $form_meta .= '<strong>Available sizes: </strong>' . \count($meta['sizes']);
+            }
         }
 
         return $form_meta;
