@@ -63,7 +63,7 @@ class Theme_Utils
      * @param  string $file The asset file to look for.
      * @return string The (possibly versioned) asset URL.
      */
-    public static function get_asset_url($file)
+     public static function get_asset_url($file)
     {
         if (static::$manifest === null) {
             static::parse_manifest();
@@ -71,10 +71,10 @@ class Theme_Utils
 
         // There was no manifest or no file present.
         if (static::$manifest === null || !isset(static::$manifest[ $file ])) {
-            return get_stylesheet_directory_uri() . '/public' . $file;
+            return \trailingslashit(get_stylesheet_directory_uri() . '/public') . \ltrim($file, '/');
         }
 
-        return get_stylesheet_directory_uri() . '/public' . static::$manifest[ $file ];
+        return \trailingslashit(get_stylesheet_directory_uri() . '/public') . \ltrim( static::$manifest[ $file ], '/');
     }
 
     /**
