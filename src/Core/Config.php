@@ -59,7 +59,7 @@ class Config
         ],
         'services' => [
             'providers' => [],
-            'theme_providers' => [\Theme\Theme_Provider::class],
+            'theme_providers' => [\Theme\ThemeProvider::class],
             'aliases' => [],
         ],
     ];

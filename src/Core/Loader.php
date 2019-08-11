@@ -277,12 +277,12 @@ class Loader
     }
 
     /**
-     * Include Theme\Theme_Setup
+     * Include Theme\ThemeSetup
      */
     private function initThemeSetup()
     {
-        if (isset(static::$theme_includes['Theme\Theme_Setup'])) {
-            $this->initHookable('Theme\Theme_Setup');
+        if (isset(static::$theme_includes['Theme\ThemeSetup'])) {
+            $this->initHookable('Theme\ThemeSetup');
         }
     }
 
