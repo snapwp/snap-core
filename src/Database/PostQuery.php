@@ -28,7 +28,7 @@ class PostQuery extends Query
     /**
      * Returns the first found WP_Post.
      *
-     * @return false|\WP_Post
+     * @return null|\WP_Post
      */
     public function first()
     {
@@ -118,7 +118,7 @@ class PostQuery extends Query
      * Lookup Posts by slugs or IDs.
      *
      * @param string|string[]|int|int[] $search
-     * @return false|\WP_Term|\Snap\Utils\Collection
+     * @return false|\WP_Post|\Snap\Utils\Collection
      */
     public function find($search)
     {
@@ -476,9 +476,9 @@ class PostQuery extends Query
      * Perform a query and return a WP_Post object.
      *
      * @param array $args WP_Query arguments.
-     * @return bool|\WP_Post
+     * @return null|\WP_Post
      */
-    private function getPost(array $args)
+    private function getPost(array $args): ?\WP_Post
     {
         $query = new WP_Query($args);
 
@@ -486,7 +486,7 @@ class PostQuery extends Query
             return $query->post;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -591,7 +591,7 @@ class PostQuery extends Query
      * Performs a find() for a single id or slug.
      *
      * @param string|int $search Search term.
-     * @return false|\WP_Term
+     * @return null|\WP_Post
      */
     private function findSingle($search)
     {

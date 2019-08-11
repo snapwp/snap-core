@@ -58,7 +58,7 @@ class TaxQuery extends Query
      * Return the found WP_Term objects by slug or ID.
      *
      * @param int|int[]|string|string[] $search
-     * @return false|\WP_Term|\Snap\Utils\Collection
+     * @return null|\WP_Term|\Snap\Utils\Collection
      */
     public function find($search)
     {
@@ -141,7 +141,7 @@ class TaxQuery extends Query
     /**
      * Return the first found WP_Term object.
      *
-     * @return false|\WP_Term
+     * @return null|\WP_Term
      */
     public function first()
     {
@@ -411,14 +411,14 @@ class TaxQuery extends Query
      * Perform a query and return a WP_Term object.
      *
      * @param array $args WP_Term_Query arguments.
-     * @return false|\WP_Term
+     * @return null|\WP_Term
      */
     private function getTerm(array $args)
     {
         $query = new WP_Term_Query($args);
 
         if (!$query->terms) {
-            return false;
+            return null;
         }
 
         return \current($query->terms);
