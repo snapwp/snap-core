@@ -4,19 +4,20 @@ namespace Snap\Hookables;
 
 use Snap\Database\TaxQuery;
 use Snap\Hookables\Content\ColumnController;
+use Snap\Utils\Collection;
 
 /**
  * The Post Type Hookable.
  *
- * @method static \Snap\Utils\Collection get()
- * @method static \Snap\Utils\Collection|false|\WP_Term find(int|array $ids)
+ * @method static Collection get()
+ * @method static Collection|false|\WP_Term find(int|int[]|string|string[] $ids)
  * @method static array getNames()
  * @method static array getIds()
  * @method static array getSlugs()
  * @method static \WP_Term_Query getQueryObject()
  * @method static false|\WP_Term first()
  * @method static int count()
- * @method static TaxQuery for(int|\WP_Post|int[]|\WP_Post[] $object_ids)
+ * @method static TaxQuery for (int|\WP_Post|int[]|\WP_Post[] $object_ids)
  * @method static TaxQuery hideEmpty()
  * @method static TaxQuery includeEmpty()
  * @method static TaxQuery childOf(int|\WP_Term $parent)
@@ -35,7 +36,7 @@ use Snap\Hookables\Content\ColumnController;
  * @method static TaxQuery whereNameLike(string $name)
  * @method static TaxQuery whereSlug(string|string[] $slugs)
  * @method static TaxQuery whereTaxonomyId(int|int[] $ids)
- * @method static TaxQuery whereLike(string $name)
+ * @method static TaxQuery whereLike(string $search)
  * @method static TaxQuery whereDescriptionLike(string $name)
  * @method static TaxQuery orderBy(string $order_by, string $order = 'ASC')
  * @method static TaxQuery limit(int $amount)
@@ -85,16 +86,26 @@ class Taxonomy extends ContentHookable
     /**
      * Add the taxonomy to the supplied post type.
      *
-     * @param string $post_type Post type to register for.
+     * @param string|array $post_type Post type to register for.
      * @return $this
      */
-    public function attachToPostType(string $post_type)
+    public function attachToPostType($post_type)
     {
-        if (!isset(static::$relationships[$post_type])) {
-            static::$relationships[$post_type] = [];
+        Collection::wrap($post_type);
+
+        foreach ($post_type as $type) {
+            if (!isset(static::$relationships[$type])) {
+                static::$relationships[$type] = [];
+            }
+
+            static::$relationships[$type] = \array_unique(
+                \array_merge(
+                    (array)static::$relationships[$type],
+                    [$this->getName()]
+                )
+            );
         }
 
-        static::$relationships[$post_type] = \array_unique(\array_merge((array)static::$relationships[$post_type], [$this->getName()]));
         return $this;
     }
 

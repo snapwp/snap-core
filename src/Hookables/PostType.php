@@ -2,19 +2,90 @@
 
 namespace Snap\Hookables;
 
-use Snap\Hookables\Content\ColumnController;
 use Snap\Database\PostQuery;
+use Snap\Hookables\Content\ColumnController;
+use Snap\Utils\Collection;
 use Snap\Utils\Str;
 
+/**
+ * Class PostType
+ *
+ * @method static false|\WP_Post first()
+ * @method static Collection get()
+ * @method static \WP_Query getWPQuery()
+ * @method static Collection all()
+ * @method static int count()
+ * @method static false|\WP_Term|Collection find(string|string[]|int|int[] $search)
+ *
+ * @method static PostQuery withStatus(string|string[]|int|int[] $status)
+ * @method static PostQuery withSticky()
+ *
+ * @method static PostQuery whereTaxonomy(string|callable $key, int|string|array $terms = '', string $operator = 'IN', bool $include_children = true)
+ * @method static PostQuery orWhereTaxonomy(string|callable $key, int|string|array $terms = '', string $operator = 'IN', bool $include_children = true)
+ * @method static PostQuery whereTerms($objects, string $operator = 'IN', bool $include_children = true)
+ * @method static PostQuery orWhereTerms($objects, string $operator = 'IN', bool $include_children = true)
+ *
+ * @method static PostQuery whereAuthor(int|int[]|\WP_User|\WP_User[] $author)
+ * @method static PostQuery whereAuthorNot(int|int[]|\WP_User|\WP_User[] $author)
+ * @method static PostQuery whereLike(string $search)
+ * @method static PostQuery whereExact(string $search)
+ * @method static PostQuery whereSlug(string|string[] $slug)
+ *
+ * @method static PostQuery WhereDate(\WP_Post|\DateTimeInterface|int $date)
+ * @method static PostQuery orWhereDate(\WP_Post|\DateTimeInterface|int $date)
+ * @method static PostQuery whereDateBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
+ * @method static PostQuery orWhereDateBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
+ * @method static PostQuery whereDateNotBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
+ * @method static PostQuery orWhereDateNotBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
+ * @method static PostQuery whereDateBefore(\WP_Post|\DateTimeInterface|int $date)
+ * @method static PostQuery orWhereDateBefore(\WP_Post|\DateTimeInterface|int $date)
+ * @method static PostQuery whereDateAfter(\WP_Post|\DateTimeInterface|int $date)
+ * @method static PostQuery orWhereDateAfter(\WP_Post|\DateTimeInterface|int $date)
+ * @method static PostQuery whereYear(int $year, string $operator = '=')
+ * @method static PostQuery orWhereYear(int $year, string $operator = '=')
+ * @method static PostQuery whereMonth(int $month, string $operator = '=')
+ * @method static PostQuery orWhereMonth(int $month, string $operator = '=')
+ * @method static PostQuery whereDay(int $day, string $operator = '=')
+ * @method static PostQuery orWhereDay(int $day, string $operator = '=')
+ * @method static PostQuery whereHour(int $hour, string $operator = '=')
+ * @method static PostQuery orWhereHour(int $hour, string $operator = '=')
+ *
+ * @method static PostQuery childOf(int|int[]|\WP_Post|\WP_Post[]$post_ids)
+ * @method static PostQuery notChildOf(int|int[]|\WP_Post|\WP_Post[]$post_ids)
+ * @method static PostQuery in(int|int[] $ids)
+ * @method static PostQuery exclude(int|int[] $ids)
+ *
+ * @method static PostQuery orderBy(string $order_by, string $order = 'ASC')
+ * @method static PostQuery limit(int $amount)
+ * @method static PostQuery offset(int $amount)
+ * @method static PostQuery page(int $page)
+ */
 class PostType extends ContentHookable
 {
+    /**
+     * Taxonomies to register for the current post type.
+     *
+     * @var array
+     */
     protected $taxonomies = [];
 
+    /**
+     * @inherit
+     */
     protected static $type = 'post';
 
+    /**
+     * Whether accessors have been registered yet.
+     *
+     * @var bool
+     */
     protected static $has_registered_accessors = false;
-    protected static $post_types = [];
 
+    /**
+     * Registered admin filters.
+     *
+     * @var array
+     */
     private $admin_filters = [];
 
     /**
@@ -42,11 +113,22 @@ class PostType extends ContentHookable
             return $default;
         }
 
-        foreach (static::$hasRegistered[self::$type] as $post_type => $class) {
+        foreach (static::$has_registered[self::$type] as $post_type => $class) {
             if ($post->post_type !== $post_type) {
                 continue;
             }
 
+            // Return taxonomy Collection if the taxonomy exists.
+            if (\in_array($meta_key, static::$taxonomy_plurals)) {
+                $name = \array_search($meta_key, self::$taxonomy_plurals);
+
+                if (\in_array($name, self::$relationships[$post_type])) {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    return (new self::$has_registered['taxonomy'][$name])->for($object_id)->get();
+                }
+            }
+
+            // Call accessor.
             if (\method_exists($class, $method)) {
                 return $class::{$method}($post);
             }
@@ -72,7 +154,6 @@ class PostType extends ContentHookable
 
         $this->registerAttachedTaxonomies();
         $this->registerFilters();
-
         $this->registerAccessors();
         $this->registerColumns();
     }
@@ -113,26 +194,39 @@ class PostType extends ContentHookable
         static::$registered_columns[] = static::class;
     }
 
-
-    public function filter($filter)
+    /**
+     * Adds a filter to the admin for quick filtering by the supplied taxonomy.
+     *
+     * @param string|array $taxonomy Taxonomy or array of taxonomies to create a filter for.
+     * @return $this
+     */
+    public function addTaxonomyFilter($taxonomy)
     {
-        if (!\is_array($filter)) {
-            $this->admin_filters[] = $filter;
+        if (!\is_array($taxonomy)) {
+            $this->admin_filters[] = $taxonomy;
             return $this;
         }
 
-        $this->admin_filters = \array_merge($this->admin_filters, $filter);
+        $this->admin_filters = \array_merge($this->admin_filters, $taxonomy);
         return $this;
     }
 
-    public function addTaxonomy(string $taxonomy)
+    /**
+     * Attach a taxonomy.
+     *
+     * @param string|array $taxonomy Taxonomy name to attach.
+     * @return $this
+     */
+    public function attachTaxonomy($taxonomy)
     {
         if (!isset(static::$relationships[$this->getName()])) {
             static::$relationships[$this->getName()] = [];
         }
 
+        Collection::wrap($taxonomy);
+
         static::$relationships[$this->getName()] = \array_unique(
-            \array_merge((array)static::$relationships[$this->getName()], [$taxonomy])
+            \array_merge((array)static::$relationships[$this->getName()], $taxonomy)
         );
 
         return $this;
@@ -203,7 +297,7 @@ class PostType extends ContentHookable
     {
         if ($this->taxonomies !== null) {
             foreach ($this->taxonomies as $taxonomy) {
-                $this->addTaxonomy($taxonomy);
+                $this->attachTaxonomy($taxonomy);
             }
         }
     }
@@ -216,6 +310,7 @@ class PostType extends ContentHookable
         $existing = \get_post_type_object($this->getName());
         $new_args = \array_replace_recursive(\get_object_vars($existing), $this->getOptions());
         $new_args['label'] = $this->getPlural();
+        // todo unset taxonomies
         \register_post_type($this->getName(), $new_args);
     }
 
@@ -245,11 +340,6 @@ class PostType extends ContentHookable
             function (string $post_type) {
                 if ($post_type === $this->getName()) {
                     foreach ($this->admin_filters as $filter) {
-                        if (\is_callable($filter)) {
-                            dump('closure');
-                            continue;
-                        }
-
                         $this->outputTaxonomyFilter($filter);
                     }
                 }

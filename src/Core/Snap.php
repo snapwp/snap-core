@@ -11,6 +11,7 @@ use Snap\Http\Request;
 use Snap\Http\Response;
 use Snap\Http\Validation\Validator;
 use Snap\Media\Image_Service;
+use Snap\Services\PostQuery;
 use Snap\Templating\TemplatingInterface;
 use Snap\Templating\View;
 
@@ -90,7 +91,7 @@ class Snap
                 static::registerProviders();
                 static::initTemplating();
 
-                static::initContentTypes();
+                static::initDatabase();
 
                 static::initView();
 
@@ -237,12 +238,22 @@ class Snap
         static::$container->alias(View::class, 'view');
     }
 
-    private static function initContentTypes()
+    /**
+     * Include any database classes.
+     */
+    private static function initDatabase()
     {
         static::$container->add(
             TaxQuery::class,
             function () {
                 return new TaxQuery();
+            }
+        );
+
+        static::$container->add(
+            PostQuery::class,
+            function () {
+                return new PostQuery();
             }
         );
     }

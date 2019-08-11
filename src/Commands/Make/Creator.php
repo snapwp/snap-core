@@ -146,7 +146,7 @@ class Creator extends Command
                 $sub_dir .= 'Http/Validation/';
                 break;
             case 'posttype':
-                $dir = 'Post_Types';
+                $dir = 'PostTypes';
                 $sub_dir .= 'Content/';
                 break;
             case 'event':

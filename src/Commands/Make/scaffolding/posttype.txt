@@ -1,6 +1,6 @@
 <?php
 
-namespace Theme\Content\Post_TypesNAMESPACE;
+namespace Theme\Content\PostTypesNAMESPACE;
 
 use Snap\Hookables\PostType;
 
@@ -25,12 +25,17 @@ class CLASSNAME extends PostType
     /**
      * Attach Taxonomies by supplying the names to attach here.
      *
-     * By default all taxonomies are added to the admin as filters for this post type.
-     * By supplying name => false as a value for your taxonomy, it will not be added as a filter.
-     *
      * @var array|string[]
      */
     public $taxonomies = [
         //'example_taxonomy'
     ];
+
+    /**
+     * Run after the post type is registered.
+     */
+    public function boot()
+    {
+        //$this->columns()->add('example_column', 'Example Column');
+    }
 }

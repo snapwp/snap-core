@@ -2,11 +2,14 @@
 
 namespace Snap\Database;
 
+use Snap\Database\Concerns\QueriesMeta;
 use Snap\Utils\Collection;
 use WP_Term_Query;
 
 class TaxQuery extends Query
 {
+    use QueriesMeta;
+
     /**
      * PostQuery constructor.
      *
@@ -52,34 +55,20 @@ class TaxQuery extends Query
     }
 
     /**
-     * Return the first found WP_Term object.
+     * Return the found WP_Term objects by slug or ID.
      *
-     * @param $id
+     * @param int|int[]|string|string[] $search
      * @return false|\WP_Term|\Snap\Utils\Collection
      */
-    public function find($id)
+    public function find($search)
     {
         $this->includeEmpty();
 
-        if (\is_array($id)) {
-            return $this->getCollection(
-                $this->createArguments(
-                    [
-                        'taxonomy' => $this->name,
-                        'limit' => \count($id),
-                    ]
-                )
-            );
+        if (\is_array($search)) {
+            return $this->findMultiple($search);
         }
 
-        return $this->getTerm(
-            $this->createArguments(
-                [
-                    'taxonomy' => $this->name,
-                    'limit' => 1,
-                ]
-            )
-        );
+        return $this->findSingle($search);
     }
 
     /**
@@ -361,26 +350,12 @@ class TaxQuery extends Query
     /**
      * Query for LIKE matches against term name and slug.
      *
-     * @param string $name The search term.
+     * @param string $search The search term.
      * @return $this
      */
-    public function whereLike(string $name)
+    public function whereLike(string $search)
     {
-        $this->params['search'] = $name;
-        return $this;
-    }
-
-    /**
-     * Include post counts.
-     *
-     * @param string $order_by What field to order by.
-     * @param string $order    Direction of ordering: ASC or DESC.
-     * @return $this
-     */
-    public function orderBy(string $order_by, string $order = 'ASC')
-    {
-        $this->params['orderby'] = $order_by;
-        $this->params['order'] = \strtoupper($order);
+        $this->params['search'] = $search;
         return $this;
     }
 
@@ -485,5 +460,53 @@ class TaxQuery extends Query
         }
 
         return $input;
+    }
+
+    /**
+     * Performs a find() for multiple ids or slugs.
+     *
+     * @param array $search Search terms.
+     * @return \Snap\Utils\Collection
+     */
+    private function findMultiple(array $search): Collection
+    {
+        if (\is_numeric(\current($search))) {
+            $this->in($search);
+        } else {
+            $this->whereSlug($search);
+        }
+
+        return $this->getCollection(
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                    'limit' => \count($search),
+                ]
+            )
+        );
+    }
+
+    /**
+     * Performs a find() for a single id or slug.
+     *
+     * @param string|int $search Search term.
+     * @return false|\WP_Term
+     */
+    private function findSingle($search)
+    {
+        if (\is_numeric($search)) {
+            $this->in($search);
+        } else {
+            $this->whereSlug($search);
+        }
+
+        return $this->getTerm(
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                    'limit' => 1,
+                ]
+            )
+        );
     }
 }

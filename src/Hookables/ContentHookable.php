@@ -20,15 +20,24 @@ abstract class ContentHookable extends Hookable
      *
      * @var array
      */
-    protected static $hasRegistered = [
+    protected static $has_registered = [
         'post' => [],
         'taxonomy' => [],
     ];
 
+    /**
+     * The content type.
+     *
+     * @var string
+     */
     protected static $type;
 
-
-    protected static $hasAttachedTaxonomies = false;
+    /**
+     * Flag to indicate if taxonomies have been attached yet.
+     *
+     * @var bool
+     */
+    protected static $has_attached_taxonomies = false;
 
     /**
      * Map of scope methods.
@@ -37,9 +46,19 @@ abstract class ContentHookable extends Hookable
      */
     protected static $scope_cache = [];
 
-
+    /**
+     * Holds all relationships to be registered.
+     *
+     * @var array
+     */
     protected static $relationships = [];
 
+    /**
+     * Holds all registered taxonomies with their plurals.
+     *
+     * @var array
+     */
+    protected static $taxonomy_plurals = [];
 
     /**
      * Override the name to register with (defaults to snake case class name).
@@ -110,9 +129,12 @@ abstract class ContentHookable extends Hookable
      */
     abstract protected function makeNewQuery();
 
+    /**
+     * Register all taxonomies defined in $relationships array.
+     */
     public static function registerTaxonomiesForPosts()
     {
-        if (static::$hasAttachedTaxonomies === false) {
+        if (static::$has_attached_taxonomies === false) {
             foreach (static::$relationships as $post_type => $taxes) {
                 foreach ($taxes as $tax) {
                     \register_taxonomy_for_object_type($tax, $post_type);
@@ -120,7 +142,7 @@ abstract class ContentHookable extends Hookable
             }
         }
 
-        static::$hasAttachedTaxonomies = true;
+        static::$has_attached_taxonomies = true;
     }
 
     /**
@@ -239,11 +261,15 @@ abstract class ContentHookable extends Hookable
      */
     final protected function hasRegistered(): bool
     {
-        if (\in_array(static::class, static::$hasRegistered[static::$type])) {
+        if (\in_array(static::class, static::$has_registered[static::$type])) {
             return true;
         }
 
-        static::$hasRegistered[static::$type][$this->getName()] = static::class;
+        if (static::$type === 'taxonomy') {
+            static::$taxonomy_plurals[$this->getName()] = \strtolower($this->getPlural());
+        }
+
+        static::$has_registered[static::$type][$this->getName()] = static::class;
         return false;
     }
 

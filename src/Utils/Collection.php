@@ -22,6 +22,18 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
     protected $items = [];
 
     /**
+     * Wraps any non iterable value in an array.
+     *
+     * @param mixed $value The value to wrap.
+     */
+    public static function wrap(&$value)
+    {
+        if (!\is_iterable($value)) {
+            $value = [$value];
+        }
+    }
+
+    /**
      * Create the collection and add items.
      *
      * @param array $items Items to add.
@@ -60,7 +72,7 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
     /**
      * Flatten a multi-dimensional array into a single level.
      *
-     * @param  int $depth   How many level to flatten.
+     * @param  int   $depth How many level to flatten.
      * @param  array $array Private.
      * @return Collection
      */
@@ -88,6 +100,50 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
     }
 
     /**
+     * Implodes the collection into a string using a delimiter.
+     *
+     * If the collection contains arrays/objects, then you should pass the key you want to implode as the first param.
+     *
+     * @param mixed  $value The glue. Or if a collection of arrays/objects, the key to implode.
+     * @param string $glue  The glue when working with arrays/objects.
+     * @return string
+     */
+    public function implode($value, $glue = null): string
+    {
+        $first = $this->first();
+
+        if (\is_array($first) || \is_object($first)) {
+            return \implode($glue, $this->pluck($value)->all());
+        }
+
+        return \implode($value, $this->items);
+    }
+
+    /**
+     * Get the first element in the Collection. Can be optionally passed a callback to return the first element which
+     * passes a truthy test.
+     *
+     * @param null|callable $callback Optional. Callback which performs a truthy test against the values, and returns a
+     *                                bool.
+     * @param null|mixed    $default  Value to return as default.
+     * @return mixed|null
+     */
+    public function first($callback = null, $default = null)
+    {
+        if ($callback === null) {
+            return empty($this->items) ? $default : \reset($this->items);
+        }
+
+        foreach ($this->items as $key => $value) {
+            if (\call_user_func($callback, $value, $key)) {
+                return $value;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Reverse the items.
      *
      * @return Collection
@@ -101,7 +157,7 @@ class Collection implements Countable, ArrayAccess, IteratorAggregate
      * Run a filter over each of the items.
      *
      * @param  callable|null $callback Optional callback to use when filtering options.
-     *                                 Must return bool to indicate if item passed check.
+     *                                 Must return a bool to indicate if the item passed the check.
      * @return Collection
      */
     public function filter(callable $callback = null): Collection
