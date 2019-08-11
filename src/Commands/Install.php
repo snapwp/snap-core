@@ -83,7 +83,7 @@ class Install
      */
     private static function installBlade()
     {
-        $install = new Process('composer require snapwp/snap-blade -n');
+        $install = new Process('composer require snapwp/snap-blade:dev-release/1.1.0 -n');
 
         static::$io->write("\n<comment>Downloading latest snapwp/snap-blade package.\nPlease wait...</comment>");
 
