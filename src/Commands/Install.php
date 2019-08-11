@@ -109,7 +109,7 @@ class Install
         /** @noinspection PhpParamsInspection */
         $publish = new Process(
             \sprintf(
-                'cd %s/vendor/bin && snap publish --package=\Snap\Blade\Blade_Service_Provider --root=%s',
+                'cd %s/vendor/bin && snap publish --package=\Snap\Blade\BladeServiceProvider --root=%s',
                 static::$root,
                 static::$root
             )
@@ -168,13 +168,13 @@ class Install
         $config = \file_get_contents(static::$root . '/config/services.php');
 
         // Bail if already present.
-        if (\strpos($config, 'Blade_Service_Provider') !== false) {
+        if (\strpos($config, 'BladeServiceProvider') !== false) {
             return;
         }
 
         $providers = \preg_replace(
             '/(\'providers\'\s*\=>\s*\[)([^]]*)(\])/m',
-            "$1$2\tSnap\Blade\Blade_Service_Provider::class,\n\t$3",
+            "$1$2\tSnap\Blade\BladeServiceProvider::class,\n\t$3",
             $config
         );
 
