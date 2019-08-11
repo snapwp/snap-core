@@ -19,7 +19,6 @@ class Whitelabel extends Hookable
     protected $filters = [
         'admin_footer_text' => 'brandingAdminFooter',
         'login_headerurl' => 'setLoginLogoUrl',
-
         'update_footer' => [
             99 => 'removeVersionText',
         ],

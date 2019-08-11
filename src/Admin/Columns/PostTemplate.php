@@ -49,12 +49,16 @@ class PostTemplate extends Hookable
      */
     public function registerColumns($columns = [])
     {
-        return \array_merge(
-            $columns,
-            [
-                'snap_template' => 'Template',
-            ]
-        );
+        if (!empty(\wp_get_theme()->get_page_templates(null, \get_query_var('post_type')))) {
+            return \array_merge(
+                $columns,
+                [
+                    'snap_template' => 'Template',
+                ]
+            );
+        }
+
+        return $columns;
     }
 
     /**

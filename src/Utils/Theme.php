@@ -69,11 +69,11 @@ class Theme
         }
 
         // There was no manifest or no file present.
-        if (static::$manifest === null || !isset(static::$manifest[ $file ])) {
-            return \get_stylesheet_directory_uri() . '/public' . $file;
+        if (static::$manifest === null || !isset(static::$manifest[$file])) {
+            return static::getActiveThemeUri('public/') . \ltrim($file, '/');
         }
 
-        return \get_stylesheet_directory_uri() . '/public' . static::$manifest[ $file ];
+        return static::getActiveThemeUri('public/') . \ltrim(static::$manifest[$file], '/');
     }
 
     /**

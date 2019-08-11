@@ -3,7 +3,6 @@
 namespace Snap\Templating;
 
 use Snap\Core\Hookable;
-use Snap\Services\Config;
 use Snap\Services\View;
 use Snap\Utils\Theme;
 
@@ -19,7 +18,7 @@ class HandlePostTemplates extends Hookable
      * @var array
      */
     protected $filters = [
-        'after_setup_theme' => 'registerThemeTemplateHooks',
+        'after_setup_theme' => 'addThemePostTemplatesToCache',
         'template_include' => 'postTemplateRouting',
         'get_search_form' => 'getSearchForm',
     ];
@@ -57,15 +56,12 @@ class HandlePostTemplates extends Hookable
     /**
      * Scans the templates folder and adds any templates found to the global template array.
      *
-     * @param array $post_templates Array of page templates. Keys are filenames,
-     *                              values are translated names.
-     * @param \WP_Theme $wp_theme   The theme object.
-     * @param \WP_Post|null $post   The post being edited, provided for context, or null.
-     * @param string $post_type     Post type to get the templates for.
-     * @return array                Modified array of page templates
+     * @return array
      */
-    public function customTemplateLocator($post_templates, $wp_theme, $post, $post_type)
+    public function customTemplateLocator()
     {
+        $post_templates = [];
+
         // Path to  templates folder.
         $path = \get_stylesheet_directory() . '/' . Theme::getTemplatesPath() . 'views/post-templates/';
 
@@ -89,8 +85,13 @@ class HandlePostTemplates extends Hookable
                     $types = \explode(',', \_cleanup_header_comment(\str_replace(' ', '', $type[1])));
                 }
 
-                if (\in_array($post_type, $types)) {
-                    $post_templates[Theme::getTemplatesPath() . 'views/post-templates/' . $tpl] = \trim($header[1]);
+                foreach ($types as $type) {
+                    $type = sanitize_key($type);
+                    if (!isset($post_templates[$type])) {
+                        $post_templates[$type] = [];
+                    }
+
+                    $post_templates[$type][Theme::getTemplatesPath() . 'views/post-templates/' . $tpl] = _cleanup_header_comment($header[1]);
                 }
             }
         }
@@ -101,11 +102,12 @@ class HandlePostTemplates extends Hookable
     /**
      * Register the page-template loader for all available public post types
      */
-    public function registerThemeTemplateHooks()
+    public function addThemePostTemplatesToCache()
     {
-        foreach (\get_post_types(['public' => true]) as $post_type) {
-            $this->addFilter("theme_{$post_type}_templates", 'customTemplateLocator');
-        }
+        $cache_key = 'post_templates-' . \md5(\get_theme_root() . '/' . \get_stylesheet());
+        $templates = \wp_get_theme()->get_post_templates();
+        \wp_cache_delete($cache_key, 'themes');
+        \wp_cache_add($cache_key, \array_merge($templates, $this->customTemplateLocator()), 'themes', 1800);
     }
 
     /**
