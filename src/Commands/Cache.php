@@ -46,8 +46,8 @@ class Cache extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->init_wordpress();
-        $this->setup_filesystem();
+        $this->initWordpress();
+        $this->setupFilesystem();
 
         if ($input->getOption('force') === false && (!\defined('WP_DEBUG') || WP_DEBUG === false)) {
             if ($this->confirmChoice($input, $output) === false) {

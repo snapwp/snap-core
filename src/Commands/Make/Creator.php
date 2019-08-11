@@ -52,7 +52,7 @@ class Creator extends Command
      */
     protected function scaffold($scaffold, $args = [], $options = [])
     {
-        $this->init_wordpress();
+        $this->initWordpress();
 
         Snap::initConfig();
 
