@@ -8,7 +8,7 @@ trait NeedsWordPress
      * Include and boot up WordPress.
      *
      */
-    private function init_wordpress()
+    private function initWordpress()
     {
         global $wp, $wp_query, $wp_the_query, $wp_rewrite, $wp_did_header;
 
