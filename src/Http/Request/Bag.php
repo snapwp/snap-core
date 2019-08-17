@@ -35,7 +35,7 @@ class Bag implements ArrayAccess
      */
     public function has(string $key): bool
     {
-        return !empty(Helper::arrayGet($this->data, $key));
+        return !\is_null(Helper::arrayGet($this->data, $key));
     }
 
     /**
