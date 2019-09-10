@@ -53,6 +53,7 @@ class SizeManager extends Hookable
         'post_thumbnail_html' => 'placeholderImageFallback',
         'wp_editor_set_quality' => 'getUploadQuality',
         'intermediate_image_sizes_advanced' => 'removeCustomImageSizes',
+        'max_srcset_image_width' => 'max_srcset_image_width'
     ];
 
     /**
@@ -174,6 +175,11 @@ class SizeManager extends Hookable
         }
 
         return $sizes;
+    }
+    
+    public function max_srcset_image_width()
+    {
+        return 9999;
     }
 
     /**
