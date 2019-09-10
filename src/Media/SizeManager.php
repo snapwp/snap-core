@@ -53,7 +53,8 @@ class SizeManager extends Hookable
         'post_thumbnail_html' => 'placeholderImageFallback',
         'wp_editor_set_quality' => 'getUploadQuality',
         'intermediate_image_sizes_advanced' => 'removeCustomImageSizes',
-        'max_srcset_image_width' => 'max_srcset_image_width'
+        'max_srcset_image_width' => 'max_srcset_image_width',
+        'wp_calculate_image_sizes' => 'update_max_size_attr_in_srcset_size_attr'
     ];
 
     /**
@@ -104,6 +105,31 @@ class SizeManager extends Hookable
     public static function getDynamicSizes()
     {
         return \array_keys(self::$dynamic_sizes);
+    }
+    
+    public function update_max_size_attr_in_srcset_size_attr($sizes, $size, $image_src, $image_meta)
+    {
+        $biggest = $size[0];
+
+        if (isset($image_meta['sizes']) && !empty($image_meta['sizes'])) {
+            foreach ($image_meta['sizes'] as $key => $s) {
+                if (!isset($s['width'])) {
+                    continue;
+                }
+
+                if (\wp_image_matches_ratio($size[0], $size[1], $s['width'], $s['height'])) {
+                    if ($s['width'] > $biggest) {
+                        $biggest = $s['width'];
+                    }
+                }
+            }
+        }
+
+        if ($biggest > $size[0]) {
+            return str_replace("{$size[0]}px", "{$biggest}px", $sizes);
+        }
+        
+        return $sizes;
     }
 
     /**
