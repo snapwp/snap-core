@@ -285,6 +285,8 @@ class Router
         }
 
         foreach ($this->middleware as $hook => $args) {
+            $args = empty($args) ? [null] : $args;
+            
             /**
              * Execute the middleware callback via snap_middleware_{$middleware} filter.
              *
