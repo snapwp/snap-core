@@ -130,7 +130,7 @@ class PostType extends ContentHookable
 
             // Call accessor.
             if (\method_exists($class, $method)) {
-                return $class::{$method}($post);
+                return (new $class)->{$method}($post);
             }
         }
 
