@@ -4,7 +4,8 @@ namespace Snap\Hookables;
 
 use Snap\Database\PostQuery;
 use Snap\Hookables\Content\ColumnController;
-use Snap\Utils\Collection;
+use Tightenco\Collect\Support\Arr;
+use Tightenco\Collect\Support\Collection;
 use Snap\Utils\Str;
 
 /**
@@ -223,7 +224,7 @@ class PostType extends ContentHookable
             static::$relationships[$this->getName()] = [];
         }
 
-        Collection::wrap($taxonomy);
+        $taxonomy = Arr::wrap($taxonomy);
 
         static::$relationships[$this->getName()] = \array_unique(
             \array_merge((array)static::$relationships[$this->getName()], $taxonomy)

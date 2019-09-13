@@ -4,7 +4,8 @@ namespace Snap\Database;
 
 use Snap\Database\Concerns\QueriesDate;
 use Snap\Database\Concerns\QueriesMeta;
-use Snap\Utils\Collection;
+use Tightenco\Collect\Support\Arr;
+use Tightenco\Collect\Support\Collection;
 use WP_Query;
 use WP_User;
 
@@ -46,7 +47,7 @@ class PostQuery extends Query
     /**
      * Return found WP_Posts.
      *
-     * @return \Snap\Utils\Collection
+     * @return \Tightenco\Collect\Support\Collection;
      */
     public function get()
     {
@@ -79,7 +80,7 @@ class PostQuery extends Query
     /**
      * Return all found WP_Posts with no pagination, ignoring any additional arguments.
      *
-     * @return \Snap\Utils\Collection
+     * @return \Tightenco\Collect\Support\Collection;
      */
     public function all()
     {
@@ -118,7 +119,7 @@ class PostQuery extends Query
      * Lookup Posts by slugs or IDs.
      *
      * @param string|string[]|int|int[] $search
-     * @return false|\WP_Post|\Snap\Utils\Collection
+     * @return false|\WP_Post|\Tightenco\Collect\Support\Collection;
      */
     public function find($search)
     {
@@ -288,7 +289,7 @@ class PostQuery extends Query
      */
     public function whereAuthorNot($author)
     {
-        Collection::wrap($author);
+        $author = Arr::wrap($author);
 
         foreach ($author as $key => $value) {
             if ($value instanceof WP_User) {
@@ -464,7 +465,7 @@ class PostQuery extends Query
      * Perform a query and return a Collection of WP_Posts.
      *
      * @param array $args WP_Query arguments.
-     * @return \Snap\Utils\Collection
+     * @return \Tightenco\Collect\Support\Collection;
      */
     private function getCollection(array $args): Collection
     {
@@ -566,7 +567,7 @@ class PostQuery extends Query
      * Performs a find() for multiple ids or slugs.
      *
      * @param array $search Search terms.
-     * @return \Snap\Utils\Collection
+     * @return \Tightenco\Collect\Support\Collection;
      */
     private function findMultiple(array $search): Collection
     {

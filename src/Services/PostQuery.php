@@ -6,11 +6,11 @@ namespace Snap\Services;
  * PostQuery service facade.
  *
  * @method static false|\WP_Post first()
- * @method static \Snap\Utils\Collection get()
+ * @method static \Tightenco\Collect\Support\Collection get()
  * @method static \WP_Query getWPQuery()
- * @method static \Snap\Utils\Collection all()
+ * @method static \Tightenco\Collect\Support\Collection all()
  * @method static int count()
- * @method static false|\WP_Term|\Snap\Utils\Collection find(string|string[]|int|int[] $search)
+ * @method static false|\WP_Term|\Tightenco\Collect\Support\Collection find(string|string[]|int|int[] $search)
  *
  * @method static \Snap\Database\PostQuery withStatus(string|string[]|int|int[] $status)
  * @method static \Snap\Database\PostQuery withSticky()

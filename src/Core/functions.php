@@ -13,11 +13,11 @@ if (! \function_exists('collect')) {
      * Return a new Collection instance.
      *
      * @param array $items Items to add.
-     * @return \Snap\Utils\Collection
+     * @return \Tightenco\Collect\Support\Collection
      */
     function collect($items)
     {
-        return new \Snap\Utils\Collection($items);
+        return new \Tightenco\Collect\Support\Collection($items);
     }
 }
 

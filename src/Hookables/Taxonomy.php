@@ -4,13 +4,13 @@ namespace Snap\Hookables;
 
 use Snap\Database\TaxQuery;
 use Snap\Hookables\Content\ColumnController;
-use Snap\Utils\Collection;
+use Tightenco\Collect\Support\Arr;
 
 /**
  * The Post Type Hookable.
  *
- * @method static Collection get()
- * @method static Collection|false|\WP_Term find(int|int[]|string|string[] $ids)
+ * @method static \Tightenco\Collect\Support\Collection get()
+ * @method static \Tightenco\Collect\Support\Collection|false|\WP_Term find(int|int[]|string|string[] $ids)
  * @method static array getNames()
  * @method static array getIds()
  * @method static array getSlugs()
@@ -91,7 +91,7 @@ class Taxonomy extends ContentHookable
      */
     public function attachToPostType($post_type)
     {
-        Collection::wrap($post_type);
+        $post_type = Arr::wrap($post_type);
 
         foreach ($post_type as $type) {
             if (!isset(static::$relationships[$type])) {
