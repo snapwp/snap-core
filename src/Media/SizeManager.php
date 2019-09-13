@@ -54,7 +54,7 @@ class SizeManager extends Hookable
         'wp_editor_set_quality' => 'getUploadQuality',
         'intermediate_image_sizes_advanced' => 'removeCustomImageSizes',
         'max_srcset_image_width' => 'max_srcset_image_width',
-        'wp_calculate_image_sizes' => 'update_max_size_attr_in_srcset_size_attr'
+        'wp_calculate_image_sizes' => 'update_max_size_attr_in_srcset_size_attr',
     ];
 
     /**
@@ -126,7 +126,7 @@ class SizeManager extends Hookable
         }
 
         if ($biggest > $size[0]) {
-            return str_replace("{$size[0]}px", "{$biggest}px", $sizes);
+            return \str_replace("{$size[0]}px", "{$biggest}px", $sizes);
         }
         
         return $sizes;
