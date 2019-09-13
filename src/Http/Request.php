@@ -66,7 +66,7 @@ class Request extends Validator implements ArrayAccess
      *
      * @var \Snap\Http\Request\Bag
      */
-    public $wp;
+    protected static $wp;
 
     /**
      * The current query being run by WordPress.
@@ -153,6 +153,9 @@ class Request extends Validator implements ArrayAccess
      */
     public function __get($name)
     {
+        if ($name === 'wp') {
+            return static::$wp;
+        }
         return $this->input->get($name, null) ?? $this->files->get($name, null);
     }
 
@@ -393,7 +396,7 @@ class Request extends Validator implements ArrayAccess
      */
     public function wp($key = null, $default = null)
     {
-        return $this->wp->get($key, $default);
+        return static::$wp->get($key, $default);
     }
 
     /**
@@ -536,7 +539,7 @@ class Request extends Validator implements ArrayAccess
 
         $this->matched_query = $wp->matched_query;
         $this->matched_rule = $wp->matched_rule;
-        $this->wp = new Bag($wp->query_vars + $wp->extra_query_vars);
+        static::$wp = new Bag($wp->query_vars + $wp->extra_query_vars);
     }
 
     /**
