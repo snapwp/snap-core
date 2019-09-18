@@ -1,30 +1,25 @@
 #!/usr/bin/env php
 <?php
 
+error_reporting(E_ALL);
+@ini_set("display_errors", 1);
+
 if (! @include_once __DIR__ . '/../vendor/autoload.php') {
     @include_once __DIR__ . '/../../../autoload.php';
 }
 
 use Snap\Commands\Cache;
-use Snap\Commands\Make\Event;
-use Snap\Commands\Make\Middleware;
-use Snap\Commands\Make\Request;
-use Snap\Commands\Make\Rule;
-use Snap\Commands\Make\Hookable;
-use Snap\Commands\Make\Controller;
-use Snap\Commands\Make\Ajax;
-use Snap\Commands\Make\Post_Type;
-use Snap\Commands\Make\Taxonomy;
-use Snap\Commands\Make\Shortcode;
+use Snap\Commands\Make\{Event, Middleware, Request, Rule, Hookable, Controller, Ajax, Post, Taxonomy, Shortcode};
 use Snap\Commands\Publish;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
 
+// All make:* commands
 $application->add(new Hookable());
 $application->add(new Controller());
 $application->add(new Ajax());
-$application->add(new Post_Type());
+$application->add(new Post());
 $application->add(new Middleware());
 $application->add(new Taxonomy());
 $application->add(new Shortcode());
@@ -32,6 +27,7 @@ $application->add(new Event());
 $application->add(new Request());
 $application->add(new Rule());
 
+// Other commands
 $application->add(new Publish());
 $application->add(new Cache());
 

@@ -2,21 +2,22 @@
 
 namespace Snap\Core;
 
-use Snap\Services\Request;
+use Snap\Core\Concerns\ManagesHooks;
 use Snap\Services\Config;
 use Snap\Services\Container;
+use Snap\Services\Request;
+use Snap\Utils\Str;
 
 /**
  * Initializes Snap classes and child includes.
- *
- * @since 1.0.0
  */
 class Loader
 {
+    use ManagesHooks;
+
     /**
      * A cache of the parent/child includes from the Theme folder.
      *
-     * @since 1.0.0
      * @var array
      */
     private static $theme_includes = [];
@@ -24,7 +25,6 @@ class Loader
     /**
      * Hold all current class aliases.
      *
-     * @since 1.0.0
      * @var array
      */
     private static $aliases = [];
@@ -32,7 +32,6 @@ class Loader
     /**
      * Cached list of scanned folders.
      *
-     * @since 1.0.0
      * @var array
      */
     private $visited = [];
@@ -40,7 +39,6 @@ class Loader
     /**
      * List of Snap classes to autoload.
      *
-     * @since 1.0.0
      * @var array
      */
     private $class_list = [
@@ -48,45 +46,35 @@ class Loader
         \Snap\Bootstrap\Cleanup::class,
         \Snap\Bootstrap\Comments::class,
         \Snap\Bootstrap\I18n::class,
-        \Snap\Media\Size_Manager::class,
-        \Snap\Templating\Handle_Post_Templates::class,
+        \Snap\Media\SizeManager::class,
+        \Snap\Templating\HandlePostTemplates::class,
+        \Snap\Http\Validation\Rules\Nonce::class,
     ];
 
     /**
      * The Snap autoloader.
      *
-     * @since   1.0.0
-     *
      * @param string $class The fully qualified class name to load.
-     * @return bool
      */
-    public static function class_autoload($class)
+    public static function classAutoload($class)
     {
         // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
-        if (isset(static::$theme_includes[ $class ])) {
+        if (isset(static::$theme_includes[$class])) {
             /** @noinspection PhpIncludeInspection */
-            require static::$theme_includes[ $class ];
-            return true;
+            require static::$theme_includes[$class];
         }
-
-        return false;
     }
 
     /**
      * The alias autoloader.
      *
-     * @since 1.0.0
-     *
      * @param string $class The fully qualified class name to load.
-     * @return bool|null
      */
-    public static function alias_autoload($class)
+    public static function aliasAutoload($class)
     {
         if (\in_array($class, \array_keys(static::$aliases))) {
-            return \class_alias(static::$aliases[ $class ], $class);
+            \class_alias(static::$aliases[$class], $class);
         }
-
-        return false;
     }
 
     /**
@@ -94,36 +82,21 @@ class Loader
      *
      * Initializes any Snap\Hookable classes.
      *
-     * @since 1.0.0
-     *
      * @throws \Exception
      */
     public function boot()
     {
-        \spl_autoload_register(__NAMESPACE__ . '\Loader::class_autoload', true);
-        \spl_autoload_register(__NAMESPACE__ . '\Loader::alias_autoload', true);
+        \spl_autoload_register(__NAMESPACE__ . '\Loader::classAutoload', true);
+        \spl_autoload_register(__NAMESPACE__ . '\Loader::aliasAutoload', true);
 
         static::$aliases = Config::get('services.aliases');
 
-        if (\is_admin() || Request::is_wp_login()) {
-            $this->class_list[] = \Snap\Admin\Whitelabel::class;
-            $this->class_list[] = \Snap\Admin\Columns\Post_Template::class;
-            $this->class_list[] = \Snap\Media\Admin::class;
+        $this->loadSnapHookables();
 
-            $this->conditional_load('admin.snap_admin_theme', 'Snap\Admin\Theme');
-        } else {
-            $this->class_list[] = \Snap\Http\Middleware\Is_Logged_In::class;
-        }
+        $this->initWidgets();
 
-        $this->conditional_load('theme.disable_comments', 'Snap\Admin\Disable_Comments');
-        $this->conditional_load('theme.disable_customizer', 'Snap\Admin\Disable_Customizer');
-        $this->conditional_load('theme.disable_tags', 'Snap\Admin\Disable_Tags');
-
-        foreach ($this->class_list as $module) {
-            Container::resolve($module)->run();
-        }
-
-        $this->init_widgets();
+        // Ensure Request if populated.
+        $this->addAction('wp', 'populateRequest');
 
         // Now all core files are loaded, turn on output buffer until a view is dispatched.
         \ob_start();
@@ -134,7 +107,7 @@ class Loader
      *
      * @param null|string $classmap Cached classmap.
      */
-    public function load_theme($classmap = null)
+    public function loadTheme($classmap = null)
     {
         if ($classmap !== null) {
             static::$theme_includes = \unserialize($classmap);
@@ -164,41 +137,53 @@ class Loader
 
             // Gather all possible Hookables.
             foreach ($hookable_locations as $dir) {
-                static::$theme_includes = $this->scan_dir($dir, static::$theme_includes);
+                static::$theme_includes = $this->scanDir($dir, static::$theme_includes);
             }
 
             if (!empty(static::$theme_includes)) {
                 foreach (static::$theme_includes as $class => $path) {
-                    $this->init_hookable($class);
+                    $this->initHookable($class);
                 }
             }
 
-            static::$theme_includes = $this->scan_dir(
+            static::$theme_includes = $this->scanDir(
                 \get_stylesheet_directory() . '/theme/',
                 static::$theme_includes
             );
         }
 
-        $this->init_theme_providers();
-        $this->init_theme_setup();
+        $this->initThemeProviders();
+        $this->initThemeSetup();
     }
 
-    public function get_theme_includes()
+    /**
+     * Return the full list of all theme included classes.
+     *
+     * @return array
+     */
+    public function getThemeIncludes()
     {
         return static::$theme_includes;
     }
 
     /**
-     * Register additional Snap widgets.
-     *
-     * @since 1.0.0
+     * Ensures the the global Request object has access to the global $wp properties.
      */
-    private function init_widgets()
+    public function populateRequest()
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        Request::populateWpParams();
+    }
+
+    /**
+     * Register additional Snap widgets.
+     */
+    private function initWidgets()
     {
         \add_action(
             'widgets_init',
             function () {
-                \register_widget(\Snap\Widgets\Related_Pages::class);
+                \register_widget(\Snap\Widgets\RelatedPages::class);
             }
         );
     }
@@ -206,11 +191,9 @@ class Loader
     /**
      * If the class is a Hookable, initialize the class and fire the run() method.
      *
-     * @since 1.0.0
-     *
      * @param string $class_name The path to an included file.
      */
-    private function init_hookable($class_name)
+    private function initHookable($class_name)
     {
         // If the included class extends the Hookable abstract.
         if (\class_exists($class_name)) {
@@ -224,25 +207,22 @@ class Loader
                 $class_parts = \explode('\\', $class_name);
 
                 Container::get('Rakit\Validation\Validator')->addValidator(
-                    \strtolower(\end($class_parts)),
+                    Str::toSnake(\end($class_parts)),
                     Container::resolve($class_name)
                 );
-                return;
             }
         }
     }
 
     /**
      * Initialize any theme service providers.
-     *
-     * @since 1.0.0
      */
-    private function init_theme_providers()
+    private function initThemeProviders()
     {
         foreach (Config::get('services.theme_providers') as $class_name) {
-            if (\is_subclass_of($class_name, \Snap\Services\Service_Provider::class)) {
+            if (\is_subclass_of($class_name, \Snap\Services\ServiceProvider::class)) {
                 $provider = Container::resolve($class_name);
-                Container::resolve_method($provider, 'register');
+                Container::resolveMethod($provider, 'register');
                 return;
             }
         }
@@ -251,18 +231,16 @@ class Loader
     /**
      * Scans a directory for PHP files.
      *
-     * @since  1.0.0
-     *
      * @param  string $folder Directory path to scan.
      * @param  array  $files  An array to append the discovered files to.
      * @return array          $files array with any discovered php files appended.
      */
-    private function scan_dir($folder, $files = [])
+    private function scanDir($folder, $files = [])
     {
         // Ensure maximum portability.
         $folder = \trailingslashit($folder);
 
-        if (isset($this->visited[ $folder ])) {
+        if (isset($this->visited[$folder])) {
             return $files;
         }
 
@@ -270,7 +248,7 @@ class Loader
         if (\is_dir($folder)) {
             // Scan the directory for files to include.
             $contents = \scandir($folder);
-            $this->visited[ $folder ] = null;
+            $this->visited[$folder] = null;
         }
 
         if (!empty($contents)) {
@@ -287,10 +265,10 @@ class Loader
                 if ('.' === $file || '..' === $file) {
                     continue;
                 } elseif (\pathinfo($path, PATHINFO_EXTENSION) === 'php') {
-                    $files[ $class ] = $path;
+                    $files[$class] = $path;
                 } elseif (\is_dir($path)) {
                     // Sub directory, scan this dir as well.
-                    $files = $this->scan_dir(\trailingslashit($path), $files);
+                    $files = $this->scanDir(\trailingslashit($path), $files);
                 }
             }
         }
@@ -299,29 +277,45 @@ class Loader
     }
 
     /**
-     * Include Theme\Theme_Setup
-     *
-     * @since 1.0.0
+     * Include Theme\ThemeSetup
      */
-    private function init_theme_setup()
+    private function initThemeSetup()
     {
-        if (isset(static::$theme_includes['Theme\Theme_Setup'])) {
-            $this->init_hookable('Theme\Theme_Setup');
+        if (isset(static::$theme_includes['Theme\ThemeSetup'])) {
+            $this->initHookable('Theme\ThemeSetup');
         }
     }
 
     /**
      * Adds a class to the list if the provided config $key is true.
      *
-     * @since 1.0.0
-     *
      * @param string $key
      * @param string $class
      */
-    private function conditional_load(string $key, string $class)
+    private function conditionalLoad(string $key, string $class)
     {
         if (Config::get($key) === true) {
             $this->class_list[] = $class;
+        }
+    }
+
+    private function loadSnapHookables()
+    {
+        if (\is_admin() || Request::isLoginPage()) {
+            $this->class_list[] = \Snap\Admin\Whitelabel::class;
+            $this->class_list[] = \Snap\Admin\Columns\PostTemplate::class;
+            $this->class_list[] = \Snap\Media\Admin::class;
+
+            $this->conditionalLoad('admin.snap_admin_theme', 'Snap\Admin\Theme');
+        } else {
+            $this->class_list[] = \Snap\Http\Middleware\IsLoggedIn::class;
+        }
+
+        $this->conditionalLoad('theme.disable_comments', 'Snap\Admin\DisableComments');
+        $this->conditionalLoad('theme.disable_customizer', 'Snap\Admin\DisableCustomizer');
+
+        foreach ($this->class_list as $module) {
+            $this->initHookable($module);
         }
     }
 }

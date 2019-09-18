@@ -2,18 +2,17 @@
 
 namespace Theme\Http\AjaxNAMESPACE;
 
-use Snap\Hookables\Ajax_Handler;
+use Snap\Hookables\AjaxHandler;
 use Snap\Http\Request;
+use Snap\Http\Response;
 
 /**
  * CLASSNAME description
  */
-class CLASSNAME extends Ajax_Handler
+class CLASSNAME extends AjaxHandler
 {
 	/**
-     * If true then the AJAX action can be used by all users - logged in and otherwise.
-     *
-     * When false, only logged in users can call this action.
+     * Whether logged-out users can use this endpoint.
      *
      * @var boolean
      */
@@ -28,13 +27,14 @@ class CLASSNAME extends Ajax_Handler
      */
     protected $action = 'ACTION';
 %END%
-    /**
-     * Handle the AJAX request.
-     *
-     * @param Request $request The current request object.
-     */
-    public function handle(Request $request)
-    {
-        
-    }
+   /**
+    * Handle the AJAX request.
+    *
+    * @param Request             $request  The current request object.
+    * @param \Snap\Http\Response $response The current response object.
+    */
+   public function handle(Request $request, Response $response)
+   {
+       $response->jsonSuccess('ExampleAjaxHandler works!');
+   }
 }

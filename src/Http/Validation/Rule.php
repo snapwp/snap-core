@@ -4,21 +4,24 @@ namespace Snap\Http\Validation;
 
 use Rakit\Validation\Rule as ValidationRule;
 
-/**
- * Simple extension to Rakit\Validation\Rule to keep within the Snap namespace.
- */
-class Rule extends ValidationRule
+abstract class Rule extends ValidationRule
 {
     /**
-     * See if the input passes this rule or not.
-     *
-     * @since  1.0.0
+     * Run the child class's handle method.
      *
      * @param  mixed $input The $input to validate.
-     * @return bool whether tha $input passed or failed.
+     * @return bool whether that $input passed or failed.
      */
     public function check($input): bool
     {
         return $this->handle($input);
     }
+
+    /**
+     * See if the input passes this rule or not.
+     *
+     * @param $input
+     * @return bool
+     */
+    abstract protected function handle($input): bool;
 }

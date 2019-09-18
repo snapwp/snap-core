@@ -37,7 +37,7 @@ class Cron_Event extends Hookable
      */
     public function boot()
     {
-        $this->add_action($this->get_cron_action(), 'handler');
+        $this->addAction($this->get_cron_action(), 'handler');
 
         // Update the interval if the schedule has changed since first addition.
         if (\wp_get_schedule($this->get_cron_action()) !== $this->schedule) {
@@ -56,7 +56,7 @@ class Cron_Event extends Hookable
      */
     final public function handler()
     {
-        Container::resolve_method($this, 'handle');
+        Container::resolveMethod($this, 'handle');
     }
 
     /**
@@ -69,7 +69,7 @@ class Cron_Event extends Hookable
     private function get_cron_action()
     {
         if ($this->action === null) {
-            return 'snap_cron_' . $this->get_classname();
+            return 'snap_cron_' . $this->getClassname();
         }
 
         return $this->action;

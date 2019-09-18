@@ -2,11 +2,11 @@
 
 namespace Snap\Commands;
 
-use Snap\Commands\Concerns\Needs_Wordpress;
-use Snap\Commands\Concerns\Uses_Filesystem;
+use Snap\Commands\Concerns\NeedsWordPress;
+use Snap\Commands\Concerns\UsesFilesystem;
 use Snap\Core\Loader;
 use Snap\Core\Snap;
-use Snap\Services\Service_Provider;
+use Snap\Services\ServiceProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class Cache extends Command
 {
-    use Needs_Wordpress, Uses_Filesystem;
+    use NeedsWordPress, UsesFilesystem;
 
     /**
      * Setup the command signature and help text.
@@ -46,23 +46,23 @@ class Cache extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->init_wordpress();
-        $this->setup_filesystem();
+        $this->initWordpress();
+        $this->setupFilesystem();
 
         if ($input->getOption('force') === false && (!\defined('WP_DEBUG') || WP_DEBUG === false)) {
-            if ($this->confirm_choice($input, $output) === false) {
+            if ($this->confirmChoice($input, $output) === false) {
                 return;
             }
         }
 
         // Setup Snap.
-        Snap::create_container();
-        Snap::init_config();
+        Snap::createContainer();
+        Snap::initConfig();
 
         $loader = new Loader();
-        $loader->load_theme();
+        //$loader->load_theme();
 
-        $config = Snap::get_container()->get('config');
+        $config = Snap::getContainer()->get('config');
 
         $root = \get_template_directory();
 
@@ -82,12 +82,12 @@ class Cache extends Command
 
         $config_created = $this->file->put_contents(
             $cache_path . \sha1(NONCE_SALT . 'theme'),
-            \serialize($config->get_primed_cache())
+            \serialize($config->getPrimedCache())
         );
 
         $autoload_created = $this->file->put_contents(
             $cache_path . \sha1(NONCE_SALT . 'classmap'),
-            \serialize($loader->get_theme_includes())
+            \serialize($loader->getThemeIncludes())
         );
 
         if ($config_created && $autoload_created) {
@@ -105,7 +105,7 @@ class Cache extends Command
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @return bool
      */
-    private function confirm_choice(InputInterface $input, OutputInterface $output): bool
+    private function confirmChoice(InputInterface $input, OutputInterface $output): bool
     {
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion(

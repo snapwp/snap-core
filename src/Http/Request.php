@@ -4,45 +4,53 @@ namespace Snap\Http;
 
 use ArrayAccess;
 use Snap\Http\Request\Bag;
-use Snap\Http\Request\File_Bag;
-use Snap\Http\Request\Server_Bag;
-use Snap\Http\Validation\Traits\Validates_Input;
-use Snap\Utils\Theme_Utils;
+use Snap\Http\Request\FileBag;
+use Snap\Http\Request\ServerBag;
+use Snap\Http\Validation\Traits\ValidatesInput;
+use Snap\Http\Validation\Validator;
+use Snap\Utils\Theme;
 
 /**
  * Gathers all request variables into one place, and provides a simple API for changes affecting the response.
  */
-class Request implements ArrayAccess
+class Request extends Validator implements ArrayAccess
 {
-    use Validates_Input;
+    use ValidatesInput;
 
     /**
      * Request query params.
      *
      * @var \Snap\Http\Request\Bag
      */
-    public $query = null;
+    public $query;
 
     /**
      * Request post params.
      *
      * @var \Snap\Http\Request\Bag
      */
-    public $post = null;
+    public $post;
 
     /**
      * Request server params.
      *
-     * @var Bag
+     * @var \Snap\Http\Request\Bag
      */
-    public $server = null;
+    public $server;
+
+    /**
+     * Cookies bag.
+     *
+     * @var \Snap\Http\Request\Bag
+     */
+    public $cookies;
 
     /**
      * Request file params.
      *
-     * @var File_Bag
+     * @var \Snap\Http\Request\FileBag
      */
-    public $files = null;
+    public $files;
 
     /**
      * Holds all available request parameters.
@@ -51,28 +59,42 @@ class Request implements ArrayAccess
      *
      * @var \Snap\Http\Request\Bag
      */
-    public $input = null;
+    public $input;
+
+    /**
+     * WordPress query vars.
+     *
+     * @var \Snap\Http\Request\Bag
+     */
+    protected static $wp;
 
     /**
      * The current query being run by WordPress.
      *
      * @var string
      */
-    public $matched_query;
+    protected $matched_query;
 
     /**
      * The current rewrite rule being run.
      *
      * @var string
      */
-    public $matched_rule;
+    protected $matched_rule;
 
     /**
      * Whether WordPress thinks the current request is from a mobile.
      *
      * @var boolean
      */
-    public $is_mobile = false;
+    protected $is_mobile = false;
+
+    /**
+     * The client IP address.
+     *
+     * @var string|null
+     */
+    protected $clientIp = null;
 
     /**
      * The current request URL.
@@ -80,6 +102,13 @@ class Request implements ArrayAccess
      * @var string
      */
     protected $url;
+
+    /**
+     * The current request host (domain).
+     *
+     * @var string
+     */
+    protected $host;
 
     /**
      * The current request path.
@@ -100,33 +129,53 @@ class Request implements ArrayAccess
      */
     public function __construct()
     {
-        $this->server = new Server_Bag();
-        $this->query = new Bag($_GET);
-        $this->post = new Bag($_POST);
-        $this->files = new File_Bag($_FILES);
+        $this->server = new ServerBag();
+        $this->cookies = new Bag($_COOKIE);
+        $this->populateInput();
+        $this->populateProperties();
 
-        $this->populate_input();
-        $this->populate_properties();
-        $this->setup_validation($_GET + $_POST + $_FILES);
+        // Set up the Validation instance.
+        parent::__construct($_GET + $_POST + $_FILES, $this->rules(), $this->messages());
+
+        // Set blank global ErrorBag.
+        static::$globalErrors = $this->validation->errors();
+
+        if (!empty($this->aliases())) {
+            $this->setAliases($this->aliases());
+        }
     }
 
     /**
      * Get an item from the request bag.
      *
      * @param  mixed $name The offset to get.
-     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
+     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
     public function __get($name)
     {
-        return $this->input->get($name, null);
+        if ($name === 'wp') {
+            return static::$wp;
+        }
+        return $this->input->get($name, null) ?? $this->files->get($name, null);
+    }
+
+    /**
+     * Check if an input element is set on the request.
+     *
+     * @param  mixed $name The offset to get.
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return ! \is_null($this->__get($name));
     }
 
     /**
      * Get the request HTTP method.
      *
-     * @return string
+     * @return string|null
      */
-    public function get_method()
+    public function getMethod(): ?string
     {
         return $this->server('REQUEST_METHOD');
     }
@@ -134,9 +183,9 @@ class Request implements ArrayAccess
     /**
      * Returns the current URL.
      *
-     * @return string
+     * @return string|null
      */
-    public function get_url()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -144,9 +193,9 @@ class Request implements ArrayAccess
     /**
      * Returns the current URL path.
      *
-     * @return string
+     * @return string|null
      */
-    public function get_scheme()
+    public function getScheme(): ?string
     {
         return $this->scheme;
     }
@@ -154,21 +203,65 @@ class Request implements ArrayAccess
     /**
      * Returns the current URL host (Domain).
      *
-     * @return string
+     * @return string|null
      */
-    public function get_host()
+    public function getHost(): ?string
     {
-        return $this->server('SERVER_NAME');
+        return $this->host;
     }
 
     /**
      * Returns the current URL path.
      *
-     * @return string
+     * @return string|null
      */
-    public function get_path()
+    public function getPath(): ?string
     {
         return $this->path;
+    }
+
+    /**
+     * Attempts to return a truthful client IP.
+     *
+     * @return string|null
+     */
+    public function getIp(): ?string
+    {
+        // Bail early if we already have a match.
+        if ($this->clientIp) {
+            return $this->clientIp;
+        }
+
+        $search = [
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_FORWARDED',
+            'HTTP_X_CLUSTER_CLIENT_IP',
+            'HTTP_FORWARDED_FOR',
+            'HTTP_FORWARDED',
+            'REMOTE_ADDR',
+        ];
+
+        $flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+
+        foreach ($search as $key) {
+            if ($this->server->has($key) === true) {
+                $ips = \explode(',', $this->server->getRaw($key));
+
+                // There was only one IP.
+                if (\count($ips) === 1) {
+                    $this->clientIp = $ips[0];
+                }
+
+                foreach ($ips as $ip) {
+                    if (\filter_var($ip, FILTER_VALIDATE_IP, $flags) !== false) {
+                        $this->clientIp = $ip;
+                    }
+                }
+            }
+        }
+
+        return $this->clientIp;
     }
 
     /**
@@ -176,9 +269,39 @@ class Request implements ArrayAccess
      *
      * @return array
      */
-    public function get_path_segments()
+    public function getPathSegments(): array
     {
         return \array_values(\array_filter(\explode('/', $this->path)));
+    }
+
+    /**
+     * Get the current query being used by WordPress.
+     *
+     * @return string
+     */
+    public function getMatchedQuery(): string
+    {
+        return $this->matched_query;
+    }
+
+    /**
+     * Get the current rewrite rule used by WordPress.
+     *
+     * @return string
+     */
+    public function getMatchedRule(): string
+    {
+        return $this->matched_rule;
+    }
+
+    /**
+     * Whether the current request is from a mobile browser.
+     *
+     * @return bool
+     */
+    public function isMobile(): bool
+    {
+        return $this->is_mobile;
     }
 
     /**
@@ -187,9 +310,9 @@ class Request implements ArrayAccess
      * @param  string $method HTTP method to check against. Case insensitive.
      * @return boolean
      */
-    public function is_method($method)
+    public function isMethod($method): bool
     {
-        return \strtoupper($method) === $this->get_method();
+        return \strtoupper($method) === $this->getMethod();
     }
 
     /**
@@ -197,9 +320,9 @@ class Request implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
+     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
-    public function get($key, $default = null)
+    public function input($key = null, $default = null)
     {
         return $this->input->get($key, $default);
     }
@@ -211,9 +334,21 @@ class Request implements ArrayAccess
      * @param  mixed  $default A default value to return if not present.
      * @return mixed
      */
-    public function server($key, $default = null)
+    public function server($key = null, $default = null)
     {
         return $this->server->get($key, $default);
+    }
+
+    /**
+     * Returns a parameter from the cookie bag, or a default if not present.
+     *
+     * @param  string $key     The parameter key to look for.
+     * @param  mixed  $default A default value to return if not present.
+     * @return mixed
+     */
+    public function cookie($key = null, $default = null)
+    {
+        return $this->cookies->get($key, $default);
     }
 
     /**
@@ -223,7 +358,7 @@ class Request implements ArrayAccess
      * @param  mixed  $default A default value to return if not present.
      * @return mixed
      */
-    public function post($key, $default = null)
+    public function post($key = null, $default = null)
     {
         return $this->post->get($key, $default);
     }
@@ -235,7 +370,7 @@ class Request implements ArrayAccess
      * @param  mixed  $default A default value to return if not present.
      * @return mixed
      */
-    public function query($key, $default = null)
+    public function query($key = null, $default = null)
     {
         return $this->query->get($key, $default);
     }
@@ -245,11 +380,23 @@ class Request implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
+     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
-    public function files($key, $default = null)
+    public function files($key = null, $default = null)
     {
         return $this->files->get($key, $default);
+    }
+
+    /**
+     * Returns a parameter from the WordPress query vars bag, or a default if not present.
+     *
+     * @param  string $key     The parameter key to look for.
+     * @param  mixed  $default A default value to return if not present.
+     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
+     */
+    public function wp($key = null, $default = null)
+    {
+        return static::$wp->get($key, $default);
     }
 
     /**
@@ -269,7 +416,7 @@ class Request implements ArrayAccess
      * @param string $key The key to check for.
      * @return bool
      */
-    public function has_file($key): bool
+    public function hasFile($key): bool
     {
         return $this->files->has($key);
     }
@@ -279,20 +426,30 @@ class Request implements ArrayAccess
      *
      * @return bool
      */
-    public function has_input(): bool
+    public function hasInput(): bool
     {
-        return !$this->input->is_empty();
+        return !$this->input->isEmpty() || !$this->files->isEmpty();
     }
 
     /**
      * Determine if an input is present and not empty within the query or post bags.
      *
-     * @param string $key The key to check for.
+     * @param array $keys The keys to test.
      * @return bool
      */
-    public function filled($key): bool
+    public function filled(...$keys): bool
     {
-        return $this->has($key) && !empty($this->get($key));
+        foreach ($keys as $key) {
+            if ($this->hasFile($key) === true) {
+                return true;
+            }
+
+            if ($this->has($key) === false || $this->input($key) === null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -301,9 +458,9 @@ class Request implements ArrayAccess
      * @param string $post_template The template to check for.
      * @return bool
      */
-    public function is_post_template($post_template): bool
+    public function isPostTemplate($post_template): bool
     {
-        return \is_page_template(Theme_Utils::get_post_templates_path($post_template));
+        return \is_page_template(Theme::getPostTemplatesPath($post_template));
     }
 
     /**
@@ -311,21 +468,15 @@ class Request implements ArrayAccess
      *
      * @return bool
      */
-    public function is_wp_login()
+    public function isLoginPage()
     {
         $abs_path = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
-
         $files = \get_included_files();
 
-        if (\in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)) {
-            return true;
-        }
-
-        if (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') {
-            return true;
-        }
-
-        if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php') {
+        if (\in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)
+            || isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php'
+            || isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php'
+        ) {
             return true;
         }
 
@@ -343,7 +494,7 @@ class Request implements ArrayAccess
         if (\is_null($offset)) {
             $this->input[] = $value;
         } else {
-            $this->input[ $offset ] = $value;
+            $this->input[$offset] = $value;
         }
     }
 
@@ -353,7 +504,7 @@ class Request implements ArrayAccess
      * @param  mixed $offset An offset to check for.
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->input->has($offset);
     }
@@ -365,7 +516,7 @@ class Request implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->input[ $offset ]);
+        unset($this->input[$offset]);
     }
 
     /**
@@ -380,20 +531,26 @@ class Request implements ArrayAccess
     }
 
     /**
-     * Populates Request class parameters.
+     * Populates params from the global $wp object.
      */
-    private function populate_properties()
+    public function populateWpParams()
     {
         global $wp;
 
-        $this->is_mobile = (bool)\wp_is_mobile();
-        $this->scheme = \is_ssl() ? 'https' : 'http';
-
         $this->matched_query = $wp->matched_query;
         $this->matched_rule = $wp->matched_rule;
+        static::$wp = new Bag($wp->query_vars + $wp->extra_query_vars);
+    }
 
-        $this->url = Theme_Utils::get_current_url();
-
+    /**
+     * Populates Request class parameters.
+     */
+    private function populateProperties()
+    {
+        $this->is_mobile = (bool)\wp_is_mobile();
+        $this->scheme = \is_ssl() ? 'https' : 'http';
+        $this->url = Theme::getCurrentUrl();
+        $this->host = \parse_url($this->getUrl(), PHP_URL_HOST);
         $this->path = \rtrim(\parse_url($this->url, PHP_URL_PATH), '/');
     }
 
@@ -402,13 +559,17 @@ class Request implements ArrayAccess
      *
      * Post parameters take precedence and overwrite query params of the same key.
      */
-    private function populate_input()
+    private function populateInput()
     {
-        if ($this->get_method() === 'GET') {
-            $this->input = new Bag($this->query->to_array());
+        $this->query = new Bag($_GET);
+        $this->post = new Bag($_POST);
+        $this->files = new FileBag($_FILES);
+
+        if ($this->isMethod('GET')) {
+            $this->input = new Bag($_GET);
         } else {
             $this->input = new Bag(
-                \array_merge($this->query->to_array(), $this->post->to_array(), $this->files->to_array())
+                \array_merge($_GET, $_POST)
             );
         }
     }

@@ -12,15 +12,13 @@ class View
     /**
      * The current template rendering strategy.
      *
-     * @since  1.0.0
-     * @var Templating_Interface
+     * @var TemplatingInterface
      */
     private $strategy = null;
 
     /**
      * Holds all shared (global) data.
      *
-     * @since  1.0.0
      * @var array
      */
     private static $global_data = [];
@@ -28,15 +26,13 @@ class View
     /**
      * Holds all callbacks registered via when().
      *
-     * @since  1.0.0
      * @var array
      */
     private static $composers = [];
 
     /**
-     * Holds all additional data added via add_data().
+     * Holds all additional data added via addData().
      *
-     * @since  1.0.0
      * @var array
      */
     private static $additional_data = [];
@@ -44,7 +40,6 @@ class View
     /**
      * The current template.
      *
-     * @since  1.0.0
      * @var string
      */
     private static $context = null;
@@ -52,11 +47,9 @@ class View
     /**
      * Set the current strategy provided by the service container.
      *
-     * @since  1.0.0
-     *
-     * @param Templating_Interface $strategy The current template rendering strategy.
+     * @param TemplatingInterface $strategy The current template rendering strategy.
      */
-    public function __construct(Templating_Interface $strategy)
+    public function __construct(TemplatingInterface $strategy)
     {
         $this->strategy = $strategy;
     }
@@ -65,8 +58,6 @@ class View
      * Adds any global data and dispatches the current strategy's render() method.
      *
      * It is important to note that any data provided to this method takes precedence over global data.
-     *
-     * @since  1.0.0
      *
      * @param  string $view The view to render.
      * @param  array  $data An array of data to pass through.
@@ -81,7 +72,6 @@ class View
      *
      * It is important to note that any data provided to this method takes precedence over global data.
      *
-     * @since  1.0.0
      *
      * @param  string $partial The partial to render.
      * @param  array  $data    An array of data to pass through.
@@ -99,19 +89,17 @@ class View
      * @param string $key   The key of the data to add.
      * @param string $value The data value.
      */
-    public function add_data($key, $value)
+    public function addData($key, $value)
     {
-        static::$additional_data[ static::$context ][ $key ] = $value;
+        static::$additional_data[static::$context][$key] = $value;
     }
 
     /**
      * Returns all shared data which is passed to all templates.
      *
-     * @since  1.0.0
-     *
      * @return array
      */
-    public function get_shared_data()
+    public function getSharedData(): array
     {
         return static::$global_data;
     }
@@ -119,13 +107,11 @@ class View
     /**
      * Gets the current parent view name.
      *
-     * @since  1.0.0
-     *
      * @return string
      */
-    public function get_current_view()
+    public function get_current_view(): string
     {
-        return $this->strategy->get_current_view();
+        return $this->strategy->getCurrentView();
     }
 
     /**
@@ -136,7 +122,6 @@ class View
      *
      * The callback is passed the current view instance, and the current data for the template being rendered.
      *
-     * @since  1.0.0
      *
      * @param  string|array $template The template(s) to add the callback to.
      * @param  callable     $callback The callback function run before the $template is rendered.
@@ -145,55 +130,54 @@ class View
     {
         if (\is_array($template)) {
             foreach ($template as $current) {
-                static::$composers[ $current ][] = $callback;
+                static::$composers[$this->strategy->transformPath($current)][] = $callback;
             }
 
             return;
         }
 
-        static::$composers[ $template ][] = $callback;
+        static::$composers[$this->strategy->transformPath($template)][] = $callback;
     }
 
     /**
      * Adds shared data which is passed to all templates.
      *
-     * @since  1.0.0
-     *
      * @param string|array $key   The key of the data to add.
      *                            Can also be an array of key => values to set multiple data at once.
      * @param mixed        $value Data value if a single key is being added.
      */
-    public function add_shared_data($key, $value = null)
+    public function addSharedData($key, $value = null)
     {
         if (\is_array($key)) {
             static::$global_data = \array_merge(static::$global_data, $key);
             return;
         }
 
-        static::$global_data[ $key ] = $value;
+        static::$global_data[$key] = $value;
     }
 
     /**
      * Executes any callbacks added via when() for the current template, and returns any additional data
      * registered by the callbacks.
      *
-     * @since  1.0.0
      *
      * @param  string $template The template to fetch the additional data for.
      * @param  array  $data     The data manually passed to the current template.
      * @return array
+     * @throws \Hodl\Exceptions\ContainerException
+     * @throws \Hodl\Exceptions\NotFoundException
      */
-    public static function get_additional_data($template, $data = [])
+    public static function getAdditionalData($template, $data = []): array
     {
-        if (isset(static::$composers[ $template ])) {
-            $composers = static::$composers[ $template ];
+        if (isset(static::$composers[$template])) {
+            $composers = static::$composers[$template];
 
             foreach ($composers as $composer) {
-                $composer(Facade::get_root_instance()->set_context($template), $data);
+                $composer(Facade::getRootInstance()->setContext($template), $data);
             }
 
-            if (isset(static::$additional_data[ static::$context ])) {
-                return static::$additional_data[ static::$context ];
+            if (isset(static::$additional_data[static::$context])) {
+                return static::$additional_data[static::$context];
             }
         }
 
@@ -203,12 +187,10 @@ class View
     /**
      * Sets the current template context.
      *
-     * @since  1.0.0
-     *
      * @param string $template The template context to set.
-     * @return  $this
+     * @return $this
      */
-    private function set_context($template)
+    private function setContext($template)
     {
         static::$context = $template;
         return $this;

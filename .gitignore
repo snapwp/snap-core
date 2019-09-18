@@ -10,3 +10,7 @@
 
 vendor
 *.lock
+
+\.idea/
+
+\.phpunit\.result\.cache

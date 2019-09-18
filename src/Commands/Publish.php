@@ -2,15 +2,15 @@
 
 namespace Snap\Commands;
 
-use Snap\Commands\Concerns\Needs_Wordpress;
-use Snap\Commands\Concerns\Uses_Filesystem;
+use Snap\Commands\Concerns\NeedsWordPress;
+use Snap\Commands\Concerns\UsesFilesystem;
 use Snap\Core\Snap;
 use Snap\Services\Config;
 use Snap\Services\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
@@ -19,40 +19,46 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class Publish extends Command
 {
-    use Needs_Wordpress, Uses_Filesystem;
+    use NeedsWordPress, UsesFilesystem;
 
     /**
      * Store the Command Helper instance.
+     *
      * @var \Symfony\Component\Console\Helper\QuestionHelper
      */
     private $helper;
 
     /**
      * All copied file paths.
+     *
      * @var array
      */
     private $copied = [];
 
     /**
      * Whether the force flag has been set.
+     *
      * @var boolean
      */
     private $force = false;
 
     /**
      * Used instead of get_template_directory if present.
+     *
      * @var boolean
      */
     private $root;
 
     /**
      * The input interface.
+     *
      * @var InputInterface
      */
     private $input;
 
     /**
      * The output interface.
+     *
      * @var OutputInterface
      */
     private $output;
@@ -107,10 +113,10 @@ class Publish extends Command
     {
         $this->init($input, $output);
 
-        $this->force_prompt();
-                
-        $this->publish_packages($this->get_packages());
-        
+        $this->forcePrompt();
+
+        $this->publishPackages($this->getPackages());
+
         // Feedback how many files were copied.
         if (\count($this->copied)) {
             $this->output->writeln(
@@ -123,7 +129,7 @@ class Publish extends Command
             );
             exit;
         }
-        
+
         $this->output->writeln("\n<info>Nothing needed to be published</info>");
     }
 
@@ -145,14 +151,14 @@ class Publish extends Command
         $this->force = $input->getOption('force');
         $this->root = $input->getOption('root');
 
-        $this->init_wordpress();
+        $this->initwordpress();
 
         // Setup Snap.
-        Snap::create_container();
-        Snap::init_config($this->root);
+        Snap::createContainer();
+        Snap::initConfig($this->root);
 
         // Setup WP filesystem helper.
-        $this->setup_filesystem();
+        $this->setupFilesystem();
     }
 
     /**
@@ -160,14 +166,14 @@ class Publish extends Command
      *
      * @return array
      */
-    private function get_packages()
+    private function getPackages()
     {
         if ($this->input->getOption('all') === true) {
             $packages = [];
-            
+
             // Add all package files to $packages array.
             foreach (Config::get('services.providers') as $package) {
-                $packages[ $package ] = $package::get_files_to_publish();
+                $packages[$package] = $package::getFilesToPublish();
             }
 
             return $packages;
@@ -177,11 +183,11 @@ class Publish extends Command
 
         // If no package specified.
         if ($package === null) {
-            $package = $this->package_prompt();
+            $package = $this->packagePrompt();
         }
 
         // If the package chosen does not exist.
-        if (! \class_exists($package)) {
+        if (!\class_exists($package)) {
             $this->output->writeln("<error>The package [$package] could not be found.</error>");
             exit;
         }
@@ -216,7 +222,7 @@ class Publish extends Command
         }
 
         return [
-            $package => $package::get_files_to_publish(),
+            $package => $package::getFilesToPublish(),
         ];
     }
 
@@ -225,7 +231,7 @@ class Publish extends Command
      *
      * @param  array $packages Array of package provider => files to publish.
      */
-    private function publish_packages($packages)
+    private function publishPackages($packages)
     {
         if (empty($packages)) {
             return;
@@ -237,7 +243,7 @@ class Publish extends Command
                 continue;
             }
 
-            $this->publish_directories($directories_to_publish);
+            $this->publishDirectories($directories_to_publish);
         }
     }
 
@@ -246,7 +252,7 @@ class Publish extends Command
      *
      * @param  array $directories List of all directories registered by the package to publish.
      */
-    private function publish_directories($directories)
+    private function publishDirectories($directories)
     {
         $root = \get_template_directory();
 
@@ -262,23 +268,23 @@ class Publish extends Command
             $target_path = \trailingslashit($root) . \ltrim($target, '/\\');
 
             // Check if source exists.
-            if (! \is_dir($source)) {
+            if (!\is_dir($source)) {
                 $this->output->writeln("<error>The package source [$source] could not be found or is not readable. Skipping.</error>");
                 continue;
             }
 
             // Check if target exists yet, create if not.
-            if (! \is_dir($target_path)) {
+            if (!\is_dir($target_path)) {
                 $this->mkdir($target_path);
             }
 
             // Now we know it exists, check we can write to it.
-            if (! \is_writable($target_path)) {
+            if (!\is_writable($target_path)) {
                 $this->output->writeln("<error>[$target_path] is not writable. Please check directory permissions.</error>");
                 continue;
             }
-            
-            $this->deep_copy($source, $target_path);
+
+            $this->deepCopy($source, $target_path);
         }
     }
 
@@ -288,7 +294,7 @@ class Publish extends Command
      * @param  string $source      The source directory path.
      * @param  string $target_path The target directory path.
      */
-    private function deep_copy($source, $target_path)
+    private function deepCopy($source, $target_path)
     {
         // Loop through $source dir.
         $contents = \scandir($source);
@@ -307,7 +313,7 @@ class Publish extends Command
 
             if (\is_dir($src_path)) {
                 $this->mkdir($new_path);
-                $this->deep_copy($src_path, $new_path);
+                $this->deepCopy($src_path, $new_path);
                 continue;
             }
 
@@ -328,7 +334,7 @@ class Publish extends Command
             return;
         }
 
-        if (! $this->file->mkdir($target)) {
+        if (!$this->file->mkdir($target)) {
             $this->output->writeln("<error>[$target] could not be created. Please check directory permissions.</error>");
         }
     }
@@ -336,7 +342,7 @@ class Publish extends Command
     /**
      * Ask if the user wishes to continue with the force flag enabled.
      */
-    private function force_prompt()
+    private function forcePrompt()
     {
         if ($this->force === false) {
             return;
@@ -347,7 +353,7 @@ class Publish extends Command
             false
         );
 
-        if (! $this->helper->ask($this->input, $this->output, $question)) {
+        if (!$this->helper->ask($this->input, $this->output, $question)) {
             exit;
         }
     }
@@ -357,7 +363,7 @@ class Publish extends Command
      *
      * @return  string The chosen package provider.
      */
-    private function package_prompt()
+    private function packagePrompt()
     {
         $question = new ChoiceQuestion(
             "\nPlease choose a package to publish:",

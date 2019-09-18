@@ -11,20 +11,20 @@ namespace Snap\Services;
  * @method static string get_current_view() Get the current view name.
  * @method static void add_shared_data($key, $value = null) Adds shared data which is passed to all templates.
  * @method static void when($template, callable $callback) Adds data to a specific templates.
- * @method static \Snap\Templating\View get_root_instance() Return root View instance.
+ * @method static \Snap\Templating\View getRootInstance() Return root View instance.
  *
  * @see \Snap\Templating\View
  */
-class View extends Service_Facade
+class View
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
-    protected static function get_service_name()
+    protected static function getServiceName(): string
     {
         return \Snap\Templating\View::class;
     }

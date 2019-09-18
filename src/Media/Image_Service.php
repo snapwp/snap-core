@@ -3,8 +3,8 @@
 namespace Snap\Media;
 
 use Snap\Services\Config;
-use Snap\Utils\Image_Utils;
-use Snap\Utils\Theme_Utils;
+use Snap\Utils\Image;
+use Snap\Utils\Theme;
 
 /**
  * Image service for providing placeholder and dynamic image sizes.
@@ -52,13 +52,13 @@ class Image_Service
          * @param  array $extensions The file extension list, in order of search preference.
          * @return array $extensions The modified file extension list.
          */
-        $this->placeholder_extensions = apply_filters('snap_placeholder_img_extensions', ['.jpg', '.svg', '.png']);
+        $this->placeholder_extensions = \apply_filters('snap_placeholder_img_extensions', ['.jpg', '.svg', '.png']);
 
-        $this->placeholder_directory = Theme_Utils::get_active_theme_path(
+        $this->placeholder_directory = Theme::getActiveThemePath(
             \trailingslashit(Config::get('images.placeholder_dir'))
         );
 
-        $this->placeholder_directory_uri = Theme_Utils::get_active_theme_uri(
+        $this->placeholder_directory_uri = Theme::getActiveThemeUri(
             \trailingslashit(Config::get('images.placeholder_dir'))
         );
     }
@@ -79,27 +79,27 @@ class Image_Service
      * @param  array        $attr              Array string of attributes.
      * @return string The image HTML
      */
-    public function get_placeholder_image($post_id, $post_thumbnail_id, $size, $attr = [])
+    public function getPlaceholderImage($post_id, $post_thumbnail_id, $size, $attr = [])
     {
         $original_size = $size;
 
         $post_id = $post_id ?? \get_the_id();
 
-        if (Image_Utils::get_image_size($size) === false) {
+        if (Image::getImageSize($size) === false) {
             $size = 'full';
         }
 
         // Search for a size specific placeholder first.
-        $placeholder_url = $this->search_for_placeholder('placeholder-' . $size);
+        $placeholder_url = $this->searchForPlaceholder('placeholder-' . $size);
 
         // Then the post type placeholder.
         if ($placeholder_url === false) {
-            $placeholder_url = $this->search_for_placeholder('placeholder-' . get_post_type($post_id));
+            $placeholder_url = $this->searchForPlaceholder('placeholder-' . get_post_type($post_id));
         }
 
         // Finally a generic placeholder.
         if ($placeholder_url === false) {
-            $placeholder_url = $this->search_for_placeholder('placeholder');
+            $placeholder_url = $this->searchForPlaceholder('placeholder');
         }
 
         if ($placeholder_url !== false) {
@@ -107,10 +107,10 @@ class Image_Service
             /** @lang text */
                 '<img src="%s" alt="%s" width="%d" height="%d" %s>',
                 $placeholder_url,
-                get_the_title($post_id),
-                \is_array($original_size) ? $original_size[0] : Image_Utils::get_image_width($size),
-                \is_array($original_size) ? $original_size[1] : Image_Utils::get_image_height($size),
-                $this->parse_attributes($attr)
+                \get_the_title($post_id),
+                \is_array($original_size) ? $original_size[0] : Image::getImageWidth($size),
+                \is_array($original_size) ? $original_size[1] : Image::getImageHeight($size),
+                $this->parseAttributes($attr)
             );
 
             /**
@@ -143,7 +143,7 @@ class Image_Service
      * @return false|array Array containing the image URL, width, height, and boolean for whether
      *                            the image is an intermediate size. False on failure.
      */
-    public function generate_dynamic_image($image, $id, $size)
+    public function generateDynamicImage($image, $id, $size)
     {
         global $_wp_additional_image_sizes;
 
@@ -175,13 +175,13 @@ class Image_Service
             $crop = !\wp_image_matches_ratio($meta['height'], $meta['width'], $height, $width);
         } else {
             // Short-circuit if $size has not been registered.
-            if (!isset($_wp_additional_image_sizes[ $size ])) {
+            if (!isset($_wp_additional_image_sizes[$size])) {
                 return $image;
             }
 
-            $width = $_wp_additional_image_sizes[ $size ]['width'];
-            $height = $_wp_additional_image_sizes[ $size ]['height'];
-            $crop = $_wp_additional_image_sizes[ $size ]['crop'];
+            $width = $_wp_additional_image_sizes[$size]['width'];
+            $height = $_wp_additional_image_sizes[$size]['height'];
+            $crop = $_wp_additional_image_sizes[$size]['crop'];
         }
 
         $check = \image_get_intermediate_size($id, $size);
@@ -267,7 +267,7 @@ class Image_Service
      * @param  string $file_name The placeholder to look for, minus extension.
      * @return string|bool false if not found, otherwise the public URI to the found placeholder.
      */
-    private function search_for_placeholder($file_name)
+    private function searchForPlaceholder($file_name)
     {
         $placeholder_url = false;
 
@@ -292,7 +292,7 @@ class Image_Service
      * @param  array $attr The $attr array.
      * @return string
      */
-    private function parse_attributes($attr)
+    private function parseAttributes($attr)
     {
         $html = '';
 

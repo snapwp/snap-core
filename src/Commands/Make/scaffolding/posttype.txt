@@ -1,21 +1,14 @@
 <?php
 
-namespace Theme\Content\Post_TypesNAMESPACE;
+namespace Theme\Content\PostTypesNAMESPACE;
 
-use Snap\Hookables\Post_Type;
+use Snap\Hookables\PostType;
 
 /**
  * CLASSNAME description
  */
-class CLASSNAME extends Post_Type
+class CLASSNAME extends PostType
 {
-    /**
-     * Override the plural name.
-     *
-     * @var string
-     */
-    public $plural = 'CLASSNAMEs';
-
     /**
      * Override the post type default options.
      *
@@ -32,12 +25,17 @@ class CLASSNAME extends Post_Type
     /**
      * Attach Taxonomies by supplying the names to attach here.
      *
-     * By default all taxonomies are added to the admin as filters for this post type.
-     * By supplying name => false as a value for your taxonomy, it will not be added as a filter.
-     *
      * @var array|string[]
      */
     public $taxonomies = [
         //'example_taxonomy'
     ];
+
+    /**
+     * Run after the post type is registered.
+     */
+    public function boot()
+    {
+        //$this->columns()->add('example_column', 'Example Column');
+    }
 }

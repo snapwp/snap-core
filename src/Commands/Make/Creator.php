@@ -2,9 +2,10 @@
 
 namespace Snap\Commands\Make;
 
-use Snap\Commands\Concerns\Needs_Wordpress;
+use Snap\Commands\Concerns\NeedsWordPress;
 use Snap\Core\Snap;
 use Snap\Services\Config;
+use Snap\Utils\Str;
 use Symfony\Component\Console\Command\Command;
 
 /**
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Command\Command;
  */
 class Creator extends Command
 {
-    use Needs_Wordpress;
+    use NeedsWordPress;
 
     /**
      * The current working directory.
@@ -51,9 +52,10 @@ class Creator extends Command
      */
     protected function scaffold($scaffold, $args = [], $options = [])
     {
-        $this->init_wordpress();
-        Snap::create_container();
-        Snap::init_config();
+        $this->initWordpress();
+
+        Snap::initConfig();
+
         $original = $this->scaffolding_dir . "{$scaffold}.txt";
 
         if (\file_exists($original)) {
@@ -86,8 +88,8 @@ class Creator extends Command
                 }
             }
 
-            $args = $this->parse_args($args);
-            $target = $this->get_destination($scaffold, $args);
+            $args = $this->parseArgs($args);
+            $target = $this->getDestination($scaffold, $args);
 
             // Substitute arguments.
             $content = \str_replace(
@@ -111,7 +113,7 @@ class Creator extends Command
      * @param  array  $args     The arguments passed from the Maker class.
      * @return string
      */
-    protected function get_destination($scaffold, $args)
+    protected function getDestination($scaffold, $args)
     {
         $sub_dir = '/theme/';
 
@@ -144,7 +146,7 @@ class Creator extends Command
                 $sub_dir .= 'Http/Validation/';
                 break;
             case 'posttype':
-                $dir = 'Post_Types';
+                $dir = 'PostTypes';
                 $sub_dir .= 'Content/';
                 break;
             case 'event':
@@ -160,7 +162,7 @@ class Creator extends Command
         $folder = \str_replace('\\', '/', $args['NAMESPACE']);
 
         $output_path = $base_dir . '/' . $dir . \trailingslashit($folder);
-
+        
         \wp_mkdir_p($output_path);
 
         return $output_path . $args['CLASSNAME'] . '.php';
@@ -172,7 +174,7 @@ class Creator extends Command
      * @param  string $filename The (possibly) name-spaced Hookable class name to create.
      * @return string
      */
-    private function sanitise_filename($filename)
+    private function sanitiseFilename($filename)
     {
         return \str_replace('/', '\\', $filename);
     }
@@ -183,18 +185,22 @@ class Creator extends Command
      * @param  array $args The args passed to the creator.
      * @return array
      */
-    private function parse_args($args = [])
+    private function parseArgs($args = [])
     {
         $args['NAMESPACE'] = '';
 
-        $class_name = $this->sanitise_filename($args['CLASSNAME']);
+        $class_name = $this->sanitiseFilename($args['CLASSNAME']);
+        $args['NAME'] = Str::toSnake($class_name);
+        $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
 
-        if ($this->is_nested_directory($class_name)) {
+        if ($this->isNestedDirectory($class_name)) {
             $parts = \explode('\\', $class_name);
             $class = \array_pop($parts);
 
             $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
             $args['CLASSNAME'] = $class;
+            $args['NAME'] = Str::toSnake($class);
+            $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
         }
 
         return $args;
@@ -206,7 +212,7 @@ class Creator extends Command
      * @param string $class_name The classname.
      * @return bool
      */
-    private function is_nested_directory($class_name)
+    private function isNestedDirectory($class_name)
     {
         return \strpos($class_name, '\\') !== false;
     }

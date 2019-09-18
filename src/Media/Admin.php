@@ -2,21 +2,18 @@
 
 namespace Snap\Media;
 
-use Snap\Core\Snap;
 use Snap\Core\Hookable;
+use Snap\Core\Snap;
 use Snap\Services\Config;
 
 /**
  * Adds the ability to delete dynamic intermediate image sizes from the media admin screen.
- *
- * @since 1.0.0
  */
 class Admin extends Hookable
 {
     /**
      * The filters to run when booted.
      *
-     * @since  1.0.0
      * @var array
      */
     public $filters = [
@@ -39,11 +36,11 @@ class Admin extends Hookable
     public function boot()
     {
         if (Config::get('images.dynamic_image_sizes') !== false) {
-            $this->add_filter('media_meta', 'add_image_sizes_meta_to_media');
-            $this->add_filter('attachment_fields_to_edit', 'add_intermediate_mgmt_fields');
-            $this->add_filter('attachment_fields_to_save', 'handle_delete_intermediate_ajax');
+            $this->addFilter('media_meta', 'add_image_sizes_meta_to_media');
+            $this->addFilter('attachment_fields_to_edit', 'add_intermediate_mgmt_fields');
+            $this->addFilter('attachment_fields_to_save', 'handle_delete_intermediate_ajax');
 
-            $this->add_action('admin_enqueue_scripts', 'enqueue_image_admin_scripts');
+            $this->addAction('admin_enqueue_scripts', 'enqueue_image_admin_scripts');
         }
     }
 
@@ -114,7 +111,7 @@ class Admin extends Hookable
      * @since  1.0.0
      *
      * @param string   $form_meta The form meta html.
-     * @param \WP_Post $post The current attachment post object.
+     * @param \WP_Post $post      The current attachment post object.
      * @return string
      */
     public function add_image_sizes_meta_to_media($form_meta, $post = null)
@@ -135,8 +132,8 @@ class Admin extends Hookable
      *
      * @since 1.0.0
      *
-     * @param  array    $form_fields The current output.
-     * @param \WP_Post $post The current attachment.
+     * @param  array   $form_fields The current output.
+     * @param \WP_Post $post        The current attachment.
      * @return mixed
      */
     public function add_intermediate_mgmt_fields($form_fields, $post = null)
@@ -154,7 +151,7 @@ class Admin extends Hookable
         ) {
             $meta = wp_get_attachment_metadata($post->ID);
 
-            $public_sizes = \array_diff(get_intermediate_image_sizes(), Size_Manager::get_dynamic_sizes());
+            $public_sizes = \array_diff(get_intermediate_image_sizes(), SizeManager::getDynamicSizes());
 
             $output = '<hr><p><strong>Generated sizes:</strong></p>';
 
@@ -199,7 +196,7 @@ class Admin extends Hookable
      *
      * @since 1.0.0
      *
-     * @param \WP_Post $post The current attachment.
+     * @param \WP_Post $post            The current attachment.
      * @param array    $attachment_data The POST data passed from the quest.
      * @return \WP_Post
      */
@@ -215,7 +212,7 @@ class Admin extends Hookable
                     $file = $meta['sizes'][ $size ]['file'];
 
                     // Remove size meta from attachment
-                    unset($meta['sizes'][ $size ]);
+                    unset($meta['sizes'][$size]);
                     \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
                 }
             }
@@ -226,7 +223,7 @@ class Admin extends Hookable
              *
              * @since 1.0.0
              * @param array $sizes List of sizes to be deleted
-             * @param int $id The ID of the current attachment.
+             * @param int   $id    The ID of the current attachment.
              */
             \do_action('snap_dynamic_image_before_delete', $sizes, $post['ID']);
 
@@ -238,7 +235,7 @@ class Admin extends Hookable
              *
              * @since 1.0.0
              * @param array $sizes List of sizes to be deleted
-             * @param int $id The ID of the current attachment.
+             * @param int   $id    The ID of the current attachment.
              */
             \do_action('snap_dynamic_image_after_delete', $sizes, $post['ID']);
 

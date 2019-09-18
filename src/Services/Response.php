@@ -5,25 +5,33 @@ namespace Snap\Services;
 /**
  * Allow static access to the Response service.
  *
- * @method static  redirect($url, $status = 302)
- * @method static  redirect_to_admin($path = null, $status = 302)
- * @method static  redirect_to_login($redirect_after = null, $status = 302)
- * @method static  set_404()
- * @method static  send_json_success($data, $status_code = null)
- * @method static  send_json_error($data, $status_code = null)
+ * @method static  void view($view, $data = [])
+ * @method static  void redirect($url, $status = 302)
+ * @method static  void redirectToAdmin($path = null, $status = 302)
+ * @method static  void redirectToLogin($redirect_after = null, $status = 302)
+ * @method static  \Snap\Http\Response setHeader(string $name, string $value)
+ * @method static  \Snap\Http\Response withHeaders(array $headers = [])
+ * @method static  \Snap\Http\Response removeHeader(...$names)
+ * @method static  \Snap\Http\Response setStatus(int $code, string $description)
+ * @method static  \Snap\Http\Response setCookie(string $name, $value = '', int $expires = 3600, string $path = '/', string $domain = null, bool $secure = null, bool $httponly = true )
+ * @method static  \Snap\Http\Response removeCookie(string $name)
+ * @method static  \Snap\Http\Response set404()
+ * @method static  void json($data = null, $statusCode = null, $disableCaching = true)
+ * @method static  void jsonSuccess($data = null, $statusCode = null, $disableCaching = true)
+ * @method static  void jsonError($data = null, $statusCode = null, $disableCaching = true)
  *
  * @see \Snap\Http\Response
  */
-class Response extends Service_Facade
+class Response
 {
+    use ProvidesServiceFacade;
+
     /**
      * Specify the underlying root class.
      *
-     * @since 1.0.0
-     *
      * @return string
      */
-    protected static function get_service_name()
+    protected static function getServiceName(): string
     {
         return \Snap\Http\Response::class;
     }

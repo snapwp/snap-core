@@ -2,7 +2,7 @@
 
 namespace Theme\Http\Validation\RulesNAMESPACE;
 
-use Snap\Request\Rule;
+use Snap\Http\Validation\Rule;
 
 /**
  * CLASSNAME description
@@ -19,7 +19,7 @@ class CLASSNAME extends Rule
     protected $message = ":value is an invalid value for :attribute";
 
     /**
-     * When true and this rule fails, then no other rules are process for the attribute.
+     * When true and this rule fails, then no other rules are processed for the attribute.
      *
      * For instance if the 'required' rule fails, there is no point validating additional rules.
      *
@@ -33,7 +33,7 @@ class CLASSNAME extends Rule
      * @param mixed $value The input from the Request to validate against.
      * @return bool
      */
-    public function handle($value)
+    protected function handle($value): bool
     {
         return true;
     }
