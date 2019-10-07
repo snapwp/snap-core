@@ -56,7 +56,8 @@ class Menu
                 }
 
                 $menu[$menu_item->ID] = (object)[];
-                $menu[$menu_item->ID]->ID = $menu_item->object_id;
+                $menu[$menu_item->ID]->ID = $menu_item->ID;
+                $menu[$menu_item->ID]->object_id = $menu_item->object_id;
                 $menu[$menu_item->ID]->text = $menu_item->title;
                 $menu[$menu_item->ID]->title = $menu_item->attr_title;
                 $menu[$menu_item->ID]->description = $menu_item->description;
@@ -69,7 +70,7 @@ class Menu
                 $menu[$menu_item->ID]->has_active_child = false;
             }
 
-            foreach ($menu_items->reverse() as $menu_item) {
+            foreach ($menu_items as $menu_item) {
                 if ($menu_item->menu_item_parent !== '0') {
                     $menu[$menu_item->menu_item_parent]->children[$menu_item->ID] = $menu[$menu_item->ID];
 
