@@ -47,6 +47,7 @@ class Loader
         \Snap\Bootstrap\Comments::class,
         \Snap\Bootstrap\I18n::class,
         \Snap\Media\SizeManager::class,
+        \Snap\Media\Placeholders::class,
         \Snap\Templating\HandlePostTemplates::class,
         \Snap\Http\Validation\Rules\Nonce::class,
     ];

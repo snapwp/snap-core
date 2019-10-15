@@ -105,4 +105,27 @@ class Image
 
         return false;
     }
+
+    /**
+     * Returns the amount of registered dynamic image sizes.
+     *
+     * // TODO cache this?
+     *
+     * @return int
+     */
+    public static function getDynamicImageSizesCount(): int
+    {
+        $all_sizes = self::getImageSizes();
+        $count = 0;
+
+        foreach ($all_sizes as $size => $meta) {
+            if ($meta['generated_on_upload'] === true) {
+                continue;
+            }
+
+            $count++;
+        }
+
+        return $count;
+    }
 }
