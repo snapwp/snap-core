@@ -104,12 +104,12 @@ class Theme
     public static function getPostTemplatesPath($post_template): string
     {
         $template = \str_replace(
-            ['.php', '.'],
-            ['', '/'],
+            ['.blade.php', '.php', '.'],
+            ['', '', '/'],
             $post_template
         );
 
-        return static::getTemplatesPath() . "views/post-templates/{$template}.php";
+        return static::getTemplatesPath() . "views/post-templates/{$template}.blade.php";
     }
 
     public static function getTemplatesPath(): string
