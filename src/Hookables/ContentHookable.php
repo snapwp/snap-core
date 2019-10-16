@@ -132,7 +132,7 @@ abstract class ContentHookable extends Hookable
     /**
      * Register all taxonomies defined in $relationships array.
      */
-    public static function registerTaxonomiesForPosts()
+    public function registerTaxonomiesForPosts()
     {
         if (static::$has_attached_taxonomies === false) {
             foreach (static::$relationships as $post_type => $taxes) {
@@ -155,7 +155,7 @@ abstract class ContentHookable extends Hookable
         }
 
         $this->addFilter('init', 'register', 99);
-        $this->addFilter('init', 'self::registerTaxonomiesForPosts', 100);
+        $this->addFilter('init', 'registerTaxonomiesForPosts', 100);
     }
 
     /**

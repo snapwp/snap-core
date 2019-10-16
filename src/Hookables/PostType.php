@@ -90,55 +90,6 @@ class PostType extends ContentHookable
     private $admin_filters = [];
 
     /**
-     * Run any registered accessor methods.
-     *
-     * @param null   $default   Default return value.
-     * @param int    $object_id The ID of the current post object.
-     * @param string $meta_key  The key being looked up.
-     * @param bool   $single    Whether to return only one result.
-     * @return mixed
-     */
-    public static function runAttributeAccessors($default, $object_id, $meta_key, $single)
-    {
-        // Do not run for built-ins.
-        if ($meta_key === '' || $meta_key[0] === '_' || $single === false) {
-            return $default;
-        }
-
-        $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
-
-        // As we are getting post meta, we know it will be loaded in the cache already - so this won't be expensive.
-        $post = \get_post($object_id);
-
-        if ($post === null) {
-            return $default;
-        }
-
-        foreach (static::$has_registered[self::$type] as $post_type => $class) {
-            if ($post->post_type !== $post_type) {
-                continue;
-            }
-
-            // Return taxonomy Collection if the taxonomy exists.
-            if (\in_array($meta_key, static::$taxonomy_plurals)) {
-                $name = \array_search($meta_key, self::$taxonomy_plurals);
-
-                if (\in_array($name, self::$relationships[$post_type])) {
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    return (new self::$has_registered['taxonomy'][$name])->for($object_id)->get();
-                }
-            }
-
-            // Call accessor.
-            if (\method_exists($class, $method)) {
-                return (new $class)->{$method}($post);
-            }
-        }
-
-        return $default;
-    }
-
-    /**
      * Register the post type.
      */
     public function register()
@@ -231,6 +182,55 @@ class PostType extends ContentHookable
         );
 
         return $this;
+    }
+
+    /**
+     * Run any registered accessor methods.
+     *
+     * @param null   $default   Default return value.
+     * @param int    $object_id The ID of the current post object.
+     * @param string $meta_key  The key being looked up.
+     * @param bool   $single    Whether to return only one result.
+     * @return mixed
+     */
+    public function runAttributeAccessors($default, $object_id, $meta_key, $single)
+    {
+        // Do not run for built-ins.
+        if ($meta_key === '' || $meta_key[0] === '_' || $single === false) {
+            return $default;
+        }
+
+        $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
+
+        // As we are getting post meta, we know it will be loaded in the cache already - so this won't be expensive.
+        $post = \get_post($object_id);
+
+        if ($post === null) {
+            return $default;
+        }
+
+        foreach (static::$has_registered[self::$type] as $post_type => $class) {
+            if ($post->post_type !== $post_type) {
+                continue;
+            }
+
+            // Return taxonomy Collection if the taxonomy exists.
+            if (\in_array($meta_key, static::$taxonomy_plurals)) {
+                $name = \array_search($meta_key, self::$taxonomy_plurals);
+
+                if (\in_array($name, self::$relationships[$post_type])) {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    return (new self::$has_registered['taxonomy'][$name])->for($object_id)->get();
+                }
+            }
+
+            // Call accessor.
+            if (\method_exists($class, $method)) {
+                return (new $class)->{$method}($post);
+            }
+        }
+
+        return $default;
     }
 
     /**
@@ -329,7 +329,7 @@ class PostType extends ContentHookable
     private function registerAccessors()
     {
         if (static::$has_registered_accessors === false) {
-            $this->addFilter('get_post_metadata', 'self::runAttributeAccessors', 10, 4);
+            $this->addFilter('get_post_metadata', 'runAttributeAccessors', 10, 4);
             static::$has_registered_accessors = true;
         }
     }
