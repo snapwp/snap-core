@@ -6,7 +6,7 @@ use Snap\Media\SizeManager;
 use Snap\Services\Request;
 use Snap\Utils\Image;
 
-if (!class_exists('WP_List_Table')) {
+if (!\class_exists('WP_List_Table')) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
@@ -17,11 +17,13 @@ class DynamicImagesTable extends \WP_List_Table
      */
     public function __construct()
     {
-        parent::__construct([
-            'singular' => __('Size', 'sp'), //singular name of the listed records
-            'plural' => __('Sizes', 'sp'), //plural name of the listed records
-            'ajax' => false //should this table support ajax?
-        ]);
+        parent::__construct(
+            [
+                'singular' => __('Size', 'sp'), //singular name of the listed records
+                'plural' => __('Sizes', 'sp'), //plural name of the listed records
+                'ajax' => false, //should this table support ajax?
+            ]
+        );
     }
 
     /**
@@ -33,10 +35,12 @@ class DynamicImagesTable extends \WP_List_Table
 
         $this->processBulkAction();
 
-        $this->set_pagination_args([
-            'total_items' => Image::getDynamicImageSizesCount(),
-            'per_page' => 99999,
-        ]);
+        $this->set_pagination_args(
+            [
+                'total_items' => Image::getDynamicImageSizesCount(),
+                'per_page' => 99999,
+            ]
+        );
 
         $this->items = $this->populateItems();
 
@@ -55,6 +59,7 @@ class DynamicImagesTable extends \WP_List_Table
             'name' => __('Name', 'snap'),
             'width' => __('Width', 'snap'),
             'height' => __('Height', 'snap'),
+            'ratio' => __('Ratio', 'snap'),
             'crop' => __('Crop', 'snap'),
             'count' => __('Count of images generated', 'snap'),
         ];
@@ -70,6 +75,7 @@ class DynamicImagesTable extends \WP_List_Table
         return [
             'name' => ['name', true],
             'width' => ['width', true],
+            'ratio' => ['ratio', true],
             'height' => ['height', true],
             'count' => ['count', true],
         ];
@@ -89,6 +95,7 @@ class DynamicImagesTable extends \WP_List_Table
 
     /**
      * Gets all of the dynamic image sizes, and their counts.
+     *
      * @return array
      */
     private function populateItems()
@@ -123,7 +130,6 @@ class DynamicImagesTable extends \WP_List_Table
         return $output;
     }
 
-
     /**
      * Render a column when no column specific method exists.
      *
@@ -135,19 +141,35 @@ class DynamicImagesTable extends \WP_List_Table
     public function column_default($item, $column_name)
     {
         switch ($column_name) {
-            case 'name':
             case 'width':
             case 'height':
+                if ($item[$column_name] <= 0 || $item[$column_name] >= 9000) {
+                    return 'Keep aspect';
+                }
+                return $item[$column_name];
+                break;
+            case 'name':
             case 'count':
                 return $item[$column_name];
+                break;
+            case 'ratio':
+                if ($item['height'] <= 0 || $item['height'] > 9000) {
+                    return 'Scaled to width';
+                }
+
+                if ($item['width'] <= 0 || $item['width'] > 9000) {
+                    return 'Scaled to height';
+                }
+
+                $divisor = \gmp_gcd($item['height'], $item['width']);
+                return $item['width'] / $divisor . ':' . $item['height'] / $divisor;
                 break;
             case 'crop':
                 if ($item['crop'] === false) {
                     return 'Not Cropped';
                 }
 
-                if (is_array($item['crop'])) {
-
+                if (\is_array($item['crop'])) {
                     if ($item['crop'][0] == 'center' && $item['crop'][1] == 'center') {
                         return 'Cropped from center';
                     }
@@ -158,7 +180,7 @@ class DynamicImagesTable extends \WP_List_Table
                 return 'Cropped from center';
                 break;
             default:
-                return print_r($item, true); //Show the whole array for troubleshooting purposes
+                return \print_r($item, true); //Show the whole array for troubleshooting purposes
         }
     }
 
@@ -170,7 +192,7 @@ class DynamicImagesTable extends \WP_List_Table
      */
     function column_cb($item): string
     {
-        return sprintf(
+        return \sprintf(
             '<input type="checkbox" name="bulk-delete[]" value="%s" />',
             \esc_attr($item['name'])
         );
@@ -195,6 +217,9 @@ class DynamicImagesTable extends \WP_List_Table
         return $b[$order_by] <=> $a[$order_by];
     }
 
+    /**
+     * Process the bulk delete action.
+     */
     private function processBulkAction()
     {
         if (Request::post('bulk-delete')) {
@@ -204,7 +229,7 @@ class DynamicImagesTable extends \WP_List_Table
 
             $sizes = Request::post('bulk-delete');
 
-            echo sprintf(
+            echo \sprintf(
                 '<div class="notice notice-success" data-sizes="%s"><p>%s</p></div>',
                 \esc_attr(\implode(' ', $sizes)),
                 __('Deleting the following sizes:<br><b>' . \implode(', ', $sizes) . '</b>', 'snap')

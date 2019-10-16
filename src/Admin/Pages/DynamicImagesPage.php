@@ -2,7 +2,6 @@
 
 namespace Snap\Admin\Pages;
 
-
 class DynamicImagesPage
 {
     /**

@@ -33,7 +33,7 @@ class SizeManager extends Hookable
     public $size_dropdown_names = [];
 
     /**
-     * @var Image_Service
+     * @var ImageService
      */
     private $image_service;
 
@@ -49,9 +49,9 @@ class SizeManager extends Hookable
     /**
      * Inject Image_Service
      *
-     * @param Image_Service $image_service
+     * @param ImageService $image_service
      */
-    public function __construct(Image_Service $image_service)
+    public function __construct(ImageService $image_service)
     {
         $this->image_service = $image_service;
         $this->setDynamicSizes();
@@ -131,7 +131,10 @@ class SizeManager extends Hookable
 
                 // Remove size meta from attachment
                 unset($meta['sizes'][$size]);
-                \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
+
+                if (\wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir) === false) {
+                    throw new \RuntimeException('Could not delete ' . $size . ' for attachment ID: ' . $attachment_id);
+                }
             }
         }
 
@@ -156,7 +159,7 @@ class SizeManager extends Hookable
         \do_action('snap_dynamic_image_after_delete', $sizes, $attachment_id);
 
         if (\wp_update_attachment_metadata($attachment_id, $meta) === false) {
-            // throw summit
+            throw new \RuntimeException('Could not update meta for attachment ID: ' . $attachment_id);
         }
     }
 
@@ -315,7 +318,7 @@ class SizeManager extends Hookable
     /**
      * Enabled theme support for thumbnails.
      *
-     * Uses the value of Config::get( 'images.supports_featured_images' ) enable thumbnails for all post types or a select few.
+     * Uses the value of Config::get('images.supports_featured_images') enable thumbnails for all post types or a select few.
      */
     private function enableThumbnailSupport()
     {

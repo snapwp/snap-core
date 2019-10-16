@@ -10,7 +10,7 @@ use Snap\Exceptions\StartupException;
 use Snap\Http\Request;
 use Snap\Http\Response;
 use Snap\Http\Validation\Validator;
-use Snap\Media\Image_Service;
+use Snap\Media\ImageService;
 use Snap\Services\PostQuery;
 use Snap\Templating\TemplatingInterface;
 use Snap\Templating\View;
@@ -265,14 +265,14 @@ class Snap
     {
         // Add Image service.
         static::$container->addSingleton(
-            Image_Service::class,
+            ImageService::class,
             function () {
-                return new Image_Service();
+                return new ImageService();
             }
         );
 
         // Bind Image service to alias.
-        static::$container->alias(Image_Service::class, 'image');
+        static::$container->alias(ImageService::class, 'image');
     }
 
     /**
