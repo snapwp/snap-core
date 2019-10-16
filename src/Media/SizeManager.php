@@ -5,15 +5,11 @@ namespace Snap\Media;
 use Snap\Core\Hookable;
 use Snap\Services\Config;
 
-/**
- * Controls custom image sizes and thumbnail support.
- */
 class SizeManager extends Hookable
 {
     /**
      * Default WordPress image sizes.
      *
-     * @since  1.0.0
      * @var array
      */
     const DEFAULT_IMAGE_SIZES = [
@@ -25,7 +21,6 @@ class SizeManager extends Hookable
     /**
      * Holds any defined image sizes intended for theme use only.
      *
-     * @since  1.0.0
      * @var array
      */
     private static $dynamic_sizes = [];
@@ -33,7 +28,6 @@ class SizeManager extends Hookable
     /**
      * Holds any defined image dropdown names.
      *
-     * @since  1.0.0
      * @var array
      */
     public $size_dropdown_names = [];
@@ -46,15 +40,10 @@ class SizeManager extends Hookable
     /**
      * The filters to run when booted.
      *
-     * @since  1.0.0
      * @var array
      */
     protected $filters = [
-        'post_thumbnail_html' => 'placeholderImageFallback',
         'wp_editor_set_quality' => 'getUploadQuality',
-        'intermediate_image_sizes_advanced' => 'removeCustomImageSizes',
-        'max_srcset_image_width' => 'max_srcset_image_width',
-        'wp_calculate_image_sizes' => 'update_max_size_attr_in_srcset_size_attr',
     ];
 
     /**
@@ -70,11 +59,13 @@ class SizeManager extends Hookable
 
     /**
      * Register class conditional filters.
-     *
-     * @since  1.0.0
      */
     public function boot()
     {
+        $this->addFilter('intermediate_image_sizes_advanced', 'removeCustomImageSizes');
+        $this->addFilter('max_srcset_image_width', 'maxSrcsetImageWidth');
+        $this->addFilter('wp_calculate_image_sizes', 'updateMaxSizeAttrInSrcsetSizeAttr');
+
         // Enable post-thumbnail support.
         $this->enableThumbnailSupport();
 
@@ -96,9 +87,81 @@ class SizeManager extends Hookable
     }
 
     /**
-     * Return the theme dynamic image sizes.
+     * Deletes dynamic images by size name.
      *
-     * @since  1.0.0
+     * @param string $size Size to delete.
+     */
+    public static function deleteDynamicImageBySize(string $size)
+    {
+        global $wpdb;
+
+        $images = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT post_id 
+                    FROM $wpdb->postmeta
+                    WHERE `meta_key` = '_wp_attachment_metadata'
+                    AND `meta_value` LIKE %s",
+                "%{$size}%"
+            )
+        );
+
+        if (empty($images)) {
+            return;
+        }
+
+        foreach ($images as $id) {
+            self::deleteDynamicImagesForAttachment([$size], $id);
+        }
+    }
+
+    /**
+     * Deletes dynamic sizes for a given attachment id.
+     *
+     * @param array $sizes         Sizes to delete.
+     * @param int   $attachment_id Attachment ID.
+     */
+    public static function deleteDynamicImagesForAttachment(array $sizes, int $attachment_id)
+    {
+        $meta = \wp_get_attachment_metadata($attachment_id);
+        $dir = \pathinfo(get_attached_file($attachment_id), PATHINFO_DIRNAME);
+
+        foreach ($sizes as $size) {
+            if (isset($meta['sizes'][$size])) {
+                $file = $meta['sizes'][$size]['file'];
+
+                // Remove size meta from attachment
+                unset($meta['sizes'][$size]);
+                \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
+            }
+        }
+
+        /**
+         * Fires just before 'delete_attachment' is fired when an intermediate image size is deleted via the
+         * dynamic sizes admin UI.
+         *
+         * @param array $sizes List of sizes to be deleted
+         * @param int   $id    The ID of the current attachment.
+         */
+        \do_action('snap_dynamic_image_before_delete', $sizes, $attachment_id);
+
+        \do_action('delete_attachment', $attachment_id);
+
+        /**
+         * Fires just after 'delete_attachment' is fired when an intermediate image size is deleted via the
+         * dynamic sizes admin UI.
+         *
+         * @param array $sizes List of sizes to be deleted
+         * @param int   $id    The ID of the current attachment.
+         */
+        \do_action('snap_dynamic_image_after_delete', $sizes, $attachment_id);
+
+        if (\wp_update_attachment_metadata($attachment_id, $meta) === false) {
+            // throw summit
+        }
+    }
+
+    /**
+     * Return the theme dynamic image sizes.
      *
      * @return array
      */
@@ -106,8 +169,53 @@ class SizeManager extends Hookable
     {
         return \array_keys(self::$dynamic_sizes);
     }
-    
-    public function update_max_size_attr_in_srcset_size_attr($sizes, $size, $image_src, $image_meta)
+
+    /**
+     * Generate a dynamic image.
+     *
+     * Snap tries to save server space by only generating images needed for admin use.
+     * All other theme images are generated dynamically by this method.
+     *
+     * @param mixed        $image Image array to pass on from this filter.
+     * @param int          $id   Attachment ID for image.
+     * @param array|string $size Optional. Image size to scale to. Accepts any valid image size,
+     *                           or an array of width and height values in pixels (in that order).
+     *                           Default 'medium'.
+     * @return false|array Array containing the image URL, width, height, and boolean for whether
+     *                     the image is an intermediate size. False on failure.
+     */
+    public function generateDynamicImage($image, $id, $size)
+    {
+        if ('full' == $size) {
+            return $image;
+        }
+
+        return $this->image_service->generateDynamicImage($image, $id, $size);
+    }
+
+    /**
+     * Adds any extra sizes to add media sizes dropdown.
+     *
+     * @param  array $sizes Current sizes for inclusion.
+     * @return array Altered $sizes
+     */
+    public function enableCustomImageSizes($sizes)
+    {
+        // Merge custom sizes into $sizes.
+        $sizes = \array_merge($sizes, $this->size_dropdown_names);
+
+        // Ensure 'Full size' is always at end.
+        unset($sizes['full']);
+        unset($sizes['thumbnail']);
+
+        if (Config::get('images.insert_image_allow_full_size') || empty($sizes)) {
+            $sizes['full'] = 'Full Size';
+        }
+
+        return $sizes;
+    }
+
+    public function updateMaxSizeAttrInSrcsetSizeAttr($sizes, $size, $image_src, $image_meta)
     {
         $biggest = $size[0];
 
@@ -128,82 +236,11 @@ class SizeManager extends Hookable
         if ($biggest > $size[0]) {
             return \str_replace("{$size[0]}px", "{$biggest}px", $sizes);
         }
-        
-        return $sizes;
-    }
-
-    /**
-     * Generate a dynamic image.
-     *
-     * Snap tries to save server space by only generating images needed for admin use.
-     * All other theme images are generated dynamically by this method.
-     *
-     * @since  1.0.0
-     *
-     * @param mixed        $image Image array to pass on from this filter.
-     * @param int          $id   Attachment ID for image.
-     * @param array|string $size Optional. Image size to scale to. Accepts any valid image size,
-     *                           or an array of width and height values in pixels (in that order).
-     *                           Default 'medium'.
-     * @return false|array Array containing the image URL, width, height, and boolean for whether
-     *                     the image is an intermediate size. False on failure.
-     */
-    public function generateDynamicImage($image, $id, $size)
-    {
-        if ('full' == $size) {
-            return $image;
-        }
-
-        return $this->image_service->generateDynamicImage($image, $id, $size);
-    }
-
-    /**
-     * If no post_thumbnail was found, find the corresponding placeholder image and return the image HTML.
-     *
-     * @since 1.0.0
-     *
-     * @param  string       $html              The post thumbnail HTML.
-     * @param  int          $post_id           The post ID.
-     * @param  string       $post_thumbnail_id The post thumbnail ID.
-     * @param  string|array $size              The post thumbnail size. Image size or array of width and height
-     *                                         values (in that order). Default 'post-thumbnail'.
-     * @param  string       $attr              Query string of attributes.
-     * @return string The image HTML
-     */
-    public function placeholderImageFallback($html, $post_id, $post_thumbnail_id, $size, $attr)
-    {
-        if ($html === '' && Config::get('images.placeholder_dir') !== false) {
-            $html = $this->image_service->getPlaceholderImage($post_id, $post_thumbnail_id, $size, $attr);
-        }
-
-        return $html;
-    }
-
-    /**
-     * Adds any extra sizes to add media sizes dropdown.
-     *
-     * @since  1.0.0
-     *
-     * @param  array $sizes Current sizes for inclusion.
-     * @return array Altered $sizes
-     */
-    public function enableCustomImageSizes($sizes)
-    {
-        // Merge custom sizes into $sizes.
-        $sizes = \array_merge($sizes, $this->size_dropdown_names);
-
-        // Ensure 'Full size' is always at end.
-        unset($sizes['full']);
-        unset($sizes['thumbnail']);
-
-        if (Config::get('images.insert_image_allow_full_size') || empty($sizes)) {
-            $sizes['full'] = 'Full Size';
-        }
 
         return $sizes;
     }
-    
-    public function max_srcset_image_width()
+
+    public function maxSrcsetImageWidth()
     {
         return 9999;
     }
@@ -211,7 +248,7 @@ class SizeManager extends Hookable
     /**
      * Returns the image quality option.
      *
-     * @since  1.0.0
+     * // TODO move somewhere else
      *
      * @param  int $quality Existing value.
      * @return int A number between 0-100.
@@ -226,41 +263,10 @@ class SizeManager extends Hookable
     }
 
     /**
-     * Removes all built in image sizes, leaving only full and thumbnail.
-     *
-     * @since  1.0.0
-     *
-     * @param  array $sizes Current registered sizes.
-     * @return array Modified $sizes array.
-     */
-    public function removeDefaultImageSizes($sizes = [])
-    {
-        $user_sizes_to_remove = \collect(Config::get('images.image_sizes'))
-            ->filter(
-                function ($value) {
-                    return $value === false;
-                }
-            )
-            ->all();
-
-        $user_sizes_to_remove = \array_keys($user_sizes_to_remove);
-
-        $sizes_to_remove = \array_merge($user_sizes_to_remove, self::DEFAULT_IMAGE_SIZES);
-
-        if (\is_array(\current($sizes))) {
-            $sizes = \array_keys($sizes);
-        }
-
-        return \array_diff($sizes, $sizes_to_remove);
-    }
-
-    /**
      * Removes all custom image sizes that do not have dropdown names.
      *
      * This allows developers to specify which image sizes are choosable within an editor context, and which
      * should only be generated if actually needed.
-     *
-     * @since  1.0.0
      *
      * @param  array $sizes Current registered sizes.
      * @return array Modified $sizes array.
@@ -279,8 +285,6 @@ class SizeManager extends Hookable
      *
      * Defaults to medium_large.
      * Also sets default alignment to center.
-     *
-     * @since  1.0.0
      */
     public function setInsertImageDefaultSize()
     {
@@ -292,8 +296,6 @@ class SizeManager extends Hookable
      * Set the dynamic_sizes array.
      *
      * Adds image sizes declared in config that are not usable in the editor as dynamic sizes.
-     *
-     * @since  1.0.0
      */
     private function setDynamicSizes()
     {
@@ -314,8 +316,6 @@ class SizeManager extends Hookable
      * Enabled theme support for thumbnails.
      *
      * Uses the value of Config::get( 'images.supports_featured_images' ) enable thumbnails for all post types or a select few.
-     *
-     * @since  1.0.0
      */
     private function enableThumbnailSupport()
     {
@@ -334,8 +334,6 @@ class SizeManager extends Hookable
      * Registers image sizes.
      *
      * Also allows easy overwriting of default sizes, as well as the ability to disable them one by one.
-     *
-     * @since 1.0.0
      */
     private function registerImageSizes()
     {
@@ -353,7 +351,7 @@ class SizeManager extends Hookable
 
         // Loop through sizes.
         foreach ($sizes as $name => $size_info) {
-            // Get size properties with basic fallbacks.
+            // Get size properties with basic fallback.
             $width = (int) isset($size_info[0]) ? $size_info[0] : 0;
             $height = (int) isset($size_info[1]) ? $size_info[1] : 0;
             $crop = isset($size_info[2]) ? $size_info[2] : false;

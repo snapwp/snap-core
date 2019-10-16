@@ -2,9 +2,12 @@
 
 namespace Snap\Media;
 
+use Snap\Admin\Pages\DynamicImagesPage;
+use Snap\Admin\Tables\DynamicImagesTable;
 use Snap\Core\Hookable;
 use Snap\Core\Snap;
 use Snap\Services\Config;
+use WP_Post;
 
 /**
  * Adds the ability to delete dynamic intermediate image sizes from the media admin screen.
@@ -23,35 +26,31 @@ class Admin extends Hookable
     /**
      * Only load when is_admin() is true.
      *
-     * @since  1.0.0
      * @var boolean
      */
     protected $public = false;
 
     /**
      * Only enable dynamic image sizes if sizes have been defined.
-     *
-     * @since 1.0.0
      */
     public function boot()
     {
         if (Config::get('images.dynamic_image_sizes') !== false) {
-            $this->addFilter('media_meta', 'add_image_sizes_meta_to_media');
-            $this->addFilter('attachment_fields_to_edit', 'add_intermediate_mgmt_fields');
-            $this->addFilter('attachment_fields_to_save', 'handle_delete_intermediate_ajax');
+            $this->addFilter('media_meta', 'addImageSizesMetaToMedia');
+            $this->addFilter('attachment_fields_to_edit', 'addIntermediateMgmtFields');
+            $this->addFilter('attachment_fields_to_save', 'handleDeleteIntermediateAjax');
 
             $this->addAction('admin_enqueue_scripts', 'enqueue_image_admin_scripts');
+            $this->addAction('admin_menu', 'registerDynamicImagesOptionPage');
         }
     }
 
     /**
      * Enqueue images.js on the admin media view.
-     *
-     * @since  1.0.0
      */
     public function enqueue_image_admin_scripts()
     {
-        if ($this->is_media_screen()) {
+        if ($this->isMediaScreen()) {
             \wp_enqueue_script(
                 'snap_images_admin_js',
                 \get_theme_file_uri('vendor/snapwp/snap-core/assets/images.min.js'),
@@ -65,9 +64,7 @@ class Admin extends Hookable
     /**
      * Add some additional mime type filters to media pages.
      *
-     * @since  1.0.0
-     *
-     * @param  array $post_mime_types The current list of mime types.
+     * @param array $post_mime_types The current list of mime types.
      * @return array The original list with our additional types.
      */
     public function add_additional_mime_type_support($post_mime_types)
@@ -108,13 +105,11 @@ class Admin extends Hookable
      *
      * Only visible to roles with 'manage_options' cap.
      *
-     * @since  1.0.0
-     *
      * @param string   $form_meta The form meta html.
      * @param \WP_Post $post      The current attachment post object.
      * @return string
      */
-    public function add_image_sizes_meta_to_media($form_meta, $post = null)
+    public function addImageSizesMetaToMedia($form_meta, $post = null)
     {
         if (wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
             $meta = wp_get_attachment_metadata($post->ID);
@@ -130,13 +125,11 @@ class Admin extends Hookable
     /**
      * Output the HTML for the dynamic image management.
      *
-     * @since 1.0.0
-     *
-     * @param  array   $form_fields The current output.
+     * @param array    $form_fields The current output.
      * @param \WP_Post $post        The current attachment.
-     * @return mixed
+     * @return array
      */
-    public function add_intermediate_mgmt_fields($form_fields, $post = null)
+    public function addIntermediateMgmtFields($form_fields, $post = null)
     {
         $current_screen = \get_current_screen();
 
@@ -174,8 +167,8 @@ class Admin extends Hookable
                     }
 
                     $output .= '<tr style="display:table-row;"><th class="check-column">';
-                    $output .= '<input type="checkbox" name="[delete-intermediate][]" value="'.$key.'">';
-                    $output .= '</th><td>'.$key.'</td><td>'. $value['width'] . ' x ' . $value['height'].'</td></tr>';
+                    $output .= '<input type="checkbox" name="[delete-intermediate][]" value="' . $key . '">';
+                    $output .= '</th><td>' . $key . '</td><td>' . $value['width'] . ' x ' . $value['height'] . '</td></tr>';
                 }
 
                 $output .= '</tbody></table>
@@ -192,67 +185,46 @@ class Admin extends Hookable
     }
 
     /**
-     * DThe AJAX handler for deleting a dynamic image size.
-     *
-     * @since 1.0.0
+     * The AJAX handler for deleting a dynamic image size.
      *
      * @param \WP_Post $post            The current attachment.
      * @param array    $attachment_data The POST data passed from the quest.
      * @return \WP_Post
      */
-    public function handle_delete_intermediate_ajax($post, $attachment_data)
+    public function handleDeleteIntermediateAjax(WP_Post $post, array $attachment_data): WP_Post
     {
         if (isset($attachment_data['delete-intermediate']) && !empty($attachment_data['delete-intermediate'])) {
             $sizes = $attachment_data['delete-intermediate'];
-            $meta = \wp_get_attachment_metadata($post['ID']);
-            $dir = \pathinfo(get_attached_file($post['ID']), PATHINFO_DIRNAME);
-
-            foreach ($sizes as $size) {
-                if (isset($meta['sizes'][ $size ])) {
-                    $file = $meta['sizes'][ $size ]['file'];
-
-                    // Remove size meta from attachment
-                    unset($meta['sizes'][$size]);
-                    \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
-                }
-            }
-
-            /**
-             * Fires just before 'delete_attachment' is fired when an intermediate image size is deleted via the
-             * dynamic sizes admin UI.
-             *
-             * @since 1.0.0
-             * @param array $sizes List of sizes to be deleted
-             * @param int   $id    The ID of the current attachment.
-             */
-            \do_action('snap_dynamic_image_before_delete', $sizes, $post['ID']);
-
-            \do_action('delete_attachment', $post['ID']);
-
-            /**
-             * Fires just after 'delete_attachment' is fired when an intermediate image size is deleted via the
-             * dynamic sizes admin UI.
-             *
-             * @since 1.0.0
-             * @param array $sizes List of sizes to be deleted
-             * @param int   $id    The ID of the current attachment.
-             */
-            \do_action('snap_dynamic_image_after_delete', $sizes, $post['ID']);
-
-            \wp_update_attachment_metadata($post['ID'], $meta);
+            SizeManager::deleteDynamicImagesForAttachment($sizes, $post['ID']);
         }
 
         return $post;
     }
 
     /**
+     * Registers the dynamic images page under the Media menu.
+     */
+    public function registerDynamicImagesOptionPage()
+    {
+        \add_submenu_page(
+            'upload.php',
+            'Dynamic Images',
+            'Dynamic Images',
+            'manage_options',
+            'dynamic-images',
+            function () {
+                $page = new DynamicImagesPage(new DynamicImagesTable());
+                $page->render();
+            }
+        );
+    }
+
+    /**
      * A simple utility for checking whether to render the media JS or not.
-     *
-     * @since 1.0.0
      *
      * @return bool
      */
-    private function is_media_screen()
+    private function isMediaScreen(): bool
     {
         $current_screen = \get_current_screen();
 
