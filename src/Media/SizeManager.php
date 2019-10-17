@@ -133,7 +133,7 @@ class SizeManager extends Hookable
                 unset($meta['sizes'][$size]);
 
                 if (\wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir) === false) {
-                    throw new \RuntimeException('Could not delete ' . $size . ' for attachment ID: ' . $attachment_id);
+                    // TODO this should return an array of failures not throw exceptions
                 }
             }
         }
