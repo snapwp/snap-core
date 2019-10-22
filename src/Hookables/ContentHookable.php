@@ -266,7 +266,7 @@ abstract class ContentHookable extends Hookable
         }
 
         if (static::$type === 'taxonomy') {
-            static::$taxonomy_plurals[$this->getName()] = \strtolower($this->getPlural());
+            static::$taxonomy_plurals[$this->getName()] = Str::toSnake($this->getPlural());
         }
 
         static::$has_registered[static::$type][$this->getName()] = static::class;
