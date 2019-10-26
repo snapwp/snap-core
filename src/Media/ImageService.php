@@ -106,8 +106,6 @@ class ImageService
 
                         $meta['sizes'][ $size ] = $new_meta;
 
-                        \do_action('snap_dynamic_image_meta', $size, $meta, $id);
-
                         $update = true;
                     } elseif (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
                         /*
@@ -126,9 +124,6 @@ class ImageService
                         }
 
                         $meta['sizes'][ $key ] = $new_meta;
-
-                        \do_action('snap_dynamic_image_meta', $size, $meta, $id);
-
                         $update = true;
                     }
                 }

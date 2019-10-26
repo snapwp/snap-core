@@ -7,6 +7,8 @@ use Snap\Admin\Tables\DynamicImagesTable;
 use Snap\Core\Hookable;
 use Snap\Core\Snap;
 use Snap\Services\Config;
+use Snap\Services\Request;
+use Snap\Services\Response;
 use WP_Post;
 
 /**
@@ -14,15 +16,6 @@ use WP_Post;
  */
 class Admin extends Hookable
 {
-    /**
-     * The filters to run when booted.
-     *
-     * @var array
-     */
-    public $filters = [
-        'post_mime_types' => 'add_additional_mime_type_support',
-    ];
-
     /**
      * Only load when is_admin() is true.
      *
@@ -35,25 +28,38 @@ class Admin extends Hookable
      */
     public function boot()
     {
+        $this->addFilter('post_mime_types', 'addAdditionalMimeTypeSupport');
+
         if (Config::get('images.dynamic_image_sizes') !== false) {
             $this->addFilter('media_meta', 'addImageSizesMetaToMedia');
             $this->addFilter('attachment_fields_to_edit', 'addIntermediateMgmtFields');
             $this->addFilter('attachment_fields_to_save', 'handleDeleteIntermediateAjax');
 
-            $this->addAction('admin_enqueue_scripts', 'enqueue_image_admin_scripts');
+            $this->addAction('admin_enqueue_scripts', 'enqueueImageAdminScripts');
             $this->addAction('admin_menu', 'registerDynamicImagesOptionPage');
+            $this->addAction('wp_ajax_delete_dynamic_image_sizes', 'handleBulkDeleteSizesAjax');
         }
     }
 
     /**
      * Enqueue images.js on the admin media view.
      */
-    public function enqueue_image_admin_scripts()
+    public function enqueueImageAdminScripts()
     {
         if ($this->isMediaScreen()) {
             \wp_enqueue_script(
                 'snap_images_admin_js',
                 \get_theme_file_uri('vendor/snapwp/snap-core/assets/images.min.js'),
+                [],
+                Snap::VERSION,
+                true
+            );
+        }
+
+        if ($this->isDynamicImagesScreen()) {
+            \wp_enqueue_script(
+                'snap_images_admin_js',
+                \get_theme_file_uri('vendor/snapwp/snap-core/assets/dynamic-images.min.js'),
                 [],
                 Snap::VERSION,
                 true
@@ -67,7 +73,7 @@ class Admin extends Hookable
      * @param array $post_mime_types The current list of mime types.
      * @return array The original list with our additional types.
      */
-    public function add_additional_mime_type_support($post_mime_types)
+    public function addAdditionalMimeTypeSupport(array $post_mime_types): array
     {
         $additional_mime_types = [
             'application/msword' => [
@@ -187,11 +193,11 @@ class Admin extends Hookable
     /**
      * The AJAX handler for deleting a dynamic image size.
      *
-     * @param array $post            The current attachment.
+     * @param \WP_Post $post            The current attachment.
      * @param array    $attachment_data The POST data passed from the quest.
-     * @return array
+     * @return \WP_Post
      */
-    public function handleDeleteIntermediateAjax(array $post, array $attachment_data): array
+    public function handleDeleteIntermediateAjax(WP_Post $post, array $attachment_data): WP_Post
     {
         if (isset($attachment_data['delete-intermediate']) && !empty($attachment_data['delete-intermediate'])) {
             $sizes = $attachment_data['delete-intermediate'];
@@ -199,6 +205,27 @@ class Admin extends Hookable
         }
 
         return $post;
+    }
+
+    public function handleBulkDeleteSizesAjax()
+    {
+        \set_time_limit(0);
+
+        if (!\wp_verify_nonce(\esc_attr($_REQUEST['_wpnonce']), 'bulk-sizes')) {
+            Response::jsonError('You have failed our security checks.', 403);
+        }
+
+        if (Request::post('bulk-delete') === null) {
+            Response::jsonError('Please choose at least one size to delete.', 400);
+        }
+
+        $total = Request::post('total');
+
+        if ($total === null) {
+            $total = SizeManager::getCountForSize(Request::post('bulk-delete'));
+        }
+
+        Response::jsonSuccess(['total' => $total, 'complete' => SizeManager::deleteDynamicImageBySizeAjax(Request::post('bulk-delete'))]);
     }
 
     /**
@@ -229,6 +256,22 @@ class Admin extends Hookable
         $current_screen = \get_current_screen();
 
         if (isset($current_screen->base) && $current_screen->base === 'upload') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * A simple utility for checking whether to render the media JS or not.
+     *
+     * @return bool
+     */
+    private function isDynamicImagesScreen(): bool
+    {
+        $current_screen = \get_current_screen();
+
+        if (isset($current_screen->base) && $current_screen->base === 'media_page_dynamic-images') {
             return true;
         }
 

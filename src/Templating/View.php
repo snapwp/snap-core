@@ -109,7 +109,7 @@ class View
      *
      * @return string
      */
-    public function get_current_view(): string
+    public function getCurrentView(): string
     {
         return $this->strategy->getCurrentView();
     }

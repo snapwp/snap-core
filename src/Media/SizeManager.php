@@ -4,6 +4,7 @@ namespace Snap\Media;
 
 use Snap\Core\Hookable;
 use Snap\Services\Config;
+use Tightenco\Collect\Support\Arr;
 
 class SizeManager extends Hookable
 {
@@ -37,16 +38,7 @@ class SizeManager extends Hookable
      */
     private $image_service;
 
-    /**
-     * The filters to run when booted.
-     *
-     * @var array
-     */
-    protected $filters = [
-        'wp_editor_set_quality' => 'getUploadQuality',
-    ];
-
-    /**
+    /*
      * Inject Image_Service
      *
      * @param ImageService $image_service
@@ -62,6 +54,7 @@ class SizeManager extends Hookable
      */
     public function boot()
     {
+        $this->addFilter('wp_editor_set_quality', 'getUploadQuality');
         $this->addFilter('intermediate_image_sizes_advanced', 'removeCustomImageSizes');
         $this->addFilter('max_srcset_image_width', 'maxSrcsetImageWidth');
         $this->addFilter('wp_calculate_image_sizes', 'updateMaxSizeAttrInSrcsetSizeAttr');
@@ -89,29 +82,65 @@ class SizeManager extends Hookable
     /**
      * Deletes dynamic images by size name.
      *
-     * @param string $size Size to delete.
+     * Limited to 25 at a time.
+     *
+     * @param array $sizes Size to delete.
+     * @return bool|int Deleted image count or true if none left.
      */
-    public static function deleteDynamicImageBySize(string $size)
+    public static function deleteDynamicImageBySizeAjax($sizes)
     {
         global $wpdb;
+        $sizes = Arr::wrap($sizes);
+
+        $args = [];
+        $query = "SELECT post_id FROM $wpdb->postmeta WHERE `meta_key` = '_wp_attachment_metadata'";
+
+        foreach ($sizes as $n => $size) {
+            $query .= $n === 0 ? ' AND `meta_value` LIKE %s' : ' OR `meta_value` LIKE %s';
+            $args[] = "%\"{$size}\"%";
+        }
+
+        $query .= ' LIMIT 25';
 
         $images = $wpdb->get_col(
-            $wpdb->prepare(
-                "SELECT post_id 
-                    FROM $wpdb->postmeta
-                    WHERE `meta_key` = '_wp_attachment_metadata'
-                    AND `meta_value` LIKE %s",
-                "%{$size}%"
-            )
+            $wpdb->prepare($query, $args)
         );
 
         if (empty($images)) {
-            return;
+            return true;
         }
 
         foreach ($images as $id) {
-            self::deleteDynamicImagesForAttachment([$size], $id);
+            self::deleteDynamicImagesForAttachment($sizes, $id);
         }
+
+        if (\count($images) < 25) {
+            return true;
+        }
+
+        return \count($images);
+    }
+
+    /**
+     * Returns the amount of images using the provided $sizes.
+     *
+     * @param $sizes
+     * @return string
+     */
+    public static function getCountForSize($sizes)
+    {
+        global $wpdb;
+        $sizes = Arr::wrap($sizes);
+        $args = [];
+
+        $query = "SELECT COUNT(*) FROM $wpdb->postmeta WHERE `meta_key` = '_wp_attachment_metadata'";
+
+        foreach ($sizes as $n => $size) {
+            $query .= $n === 0 ? ' AND `meta_value` LIKE %s' : ' OR `meta_value` LIKE %s';
+            $args[] = "%\"{$size}\"%";
+        }
+
+        return $wpdb->get_var($wpdb->prepare($query, $args)) ?? 0;
     }
 
     /**
@@ -132,9 +161,7 @@ class SizeManager extends Hookable
                 // Remove size meta from attachment
                 unset($meta['sizes'][$size]);
 
-                if (\wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir) === false) {
-                    // TODO this should return an array of failures not throw exceptions
-                }
+                \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
             }
         }
 
@@ -158,9 +185,7 @@ class SizeManager extends Hookable
          */
         \do_action('snap_dynamic_image_after_delete', $sizes, $attachment_id);
 
-        if (\wp_update_attachment_metadata($attachment_id, $meta) === false) {
-            throw new \RuntimeException('Could not update meta for attachment ID: ' . $attachment_id);
-        }
+        \wp_update_attachment_metadata($attachment_id, $meta);
     }
 
     /**
@@ -243,6 +268,11 @@ class SizeManager extends Hookable
         return $sizes;
     }
 
+    /**
+     * Ensure that there is no effective max srcset image size.
+     *
+     * @return int
+     */
     public function maxSrcsetImageWidth()
     {
         return 9999;

@@ -2,8 +2,6 @@
 
 namespace Snap\Admin\Tables;
 
-use Snap\Media\SizeManager;
-use Snap\Services\Request;
 use Snap\Utils\Image;
 
 if (!\class_exists('WP_List_Table')) {
@@ -32,8 +30,6 @@ class DynamicImagesTable extends \WP_List_Table
     public function prepare_items()
     {
         $this->_column_headers = [$this->get_columns(), [], $this->get_sortable_columns()];
-
-        $this->processBulkAction();
 
         $this->set_pagination_args(
             [
@@ -121,7 +117,7 @@ class DynamicImagesTable extends \WP_List_Table
                         FROM $wpdb->postmeta
                         WHERE `meta_key` = '_wp_attachment_metadata'
                         AND `meta_value` LIKE %s",
-                        "%{$size}%"
+                        "%\"{$size}\"%"
                     )
                 ),
             ];
@@ -215,29 +211,5 @@ class DynamicImagesTable extends \WP_List_Table
         }
 
         return $b[$order_by] <=> $a[$order_by];
-    }
-
-    /**
-     * Process the bulk delete action.
-     */
-    private function processBulkAction()
-    {
-        if (Request::post('bulk-delete')) {
-            if (!\wp_verify_nonce(\esc_attr($_REQUEST['_wpnonce']), 'bulk-' . $this->_args['plural'])) {
-                \ wp_die('Go get a life script kiddies');
-            }
-
-            $sizes = Request::post('bulk-delete');
-
-            echo \sprintf(
-                '<div class="notice notice-success" data-sizes="%s"><p>%s</p></div>',
-                \esc_attr(\implode(' ', $sizes)),
-                __('Deleting the following sizes:<br><b>' . \implode(', ', $sizes) . '</b>', 'snap')
-            );
-
-            foreach ($sizes as $size) {
-                SizeManager::deleteDynamicImageBySize($size);
-            }
-        }
     }
 }

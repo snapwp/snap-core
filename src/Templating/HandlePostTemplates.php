@@ -82,16 +82,24 @@ class HandlePostTemplates extends Hookable
                 $types = ['page'];
 
                 if (\preg_match('|Template Post Type:(.*)$|mi', \file_get_contents($full_path), $type)) {
-                    $types = \explode(',', \_cleanup_header_comment(\str_replace(' ', '', $type[1])));
+                    $types = \explode(
+                        ',',
+                        \_cleanup_header_comment(
+                            \str_replace(' ', '', $type[1])
+                        )
+                    );
                 }
 
                 foreach ($types as $type) {
                     $type = sanitize_key($type);
+
                     if (!isset($post_templates[$type])) {
                         $post_templates[$type] = [];
                     }
 
-                    $post_templates[$type][Theme::getTemplatesPath() . 'views/post-templates/' . $tpl] = _cleanup_header_comment($header[1]);
+
+                    $key = Theme::getTemplatesPath() . 'views/post-templates/' . $tpl;
+                    $post_templates[$type][$key] = _cleanup_header_comment($header[1]);
                 }
             }
         }
@@ -113,7 +121,7 @@ class HandlePostTemplates extends Hookable
     /**
      * Ensure post template requests get routed to our main front controller instead of some random file.
      *
-     * @param  string $template_path Path of template to load.
+     * @param string $template_path Path of template to load.
      * @return string Path of template to load.
      */
     public function postTemplateRouting($template_path)

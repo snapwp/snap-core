@@ -48,7 +48,7 @@ class Image
     /**
      * Get size information for a specific image size.
      *
-     * @param string $size The image size for which to retrieve data.
+     * @param  string $size The image size for which to retrieve data.
      * @return bool|array Size data about an image size or false if the size doesn't exist.
      */
     public static function getImageSize(string $size)
@@ -65,7 +65,7 @@ class Image
     /**
      * Get the width of a specific image size.
      *
-     * @param string $size The image size for which to retrieve data.
+     * @param  string $size The image size for which to retrieve data.
      * @return bool|int Width of an image size or false if the size doesn't exist.
      */
     public static function getImageWidth(string $size)
@@ -87,7 +87,7 @@ class Image
     /**
      * Get the height of a specific image size.
      *
-     * @param string $size The image size for which to retrieve data.
+     * @param  string $size The image size for which to retrieve data.
      * @return bool|int Height of an image size or false if the size doesn't exist.
      */
     public static function getImageHeight(string $size)
@@ -104,30 +104,6 @@ class Image
         }
 
         return false;
-    }
-
-    /**
-     * returns the system path to a provided image size.
-     *
-     * @param int    $attachment_id Attachment ID.
-     * @param string $size          Size to get path of.
-     * @return bool|string
-     */
-    public static function getImageSizePath(int $attachment_id, string $size)
-    {
-        $meta = \wp_get_attachment_metadata($attachment_id);
-
-        if ($meta === false || !isset($meta['file']) || !isset($meta['sizes'][$size])) {
-            return false;
-        }
-
-        $image_path = trailingslashit(\wp_get_upload_dir()['basedir']) . \trailingslashit(\dirname($meta['file'])) . $meta['sizes'][$size]['file'];
-
-        if (!\file_exists($image_path)) {
-            return false;
-        }
-
-        return $image_path;
     }
 
     /**

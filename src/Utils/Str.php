@@ -14,21 +14,21 @@ class Str
      *
      * @var array
      */
-    private static $studlyCache = [];
+    private static $studly_cache = [];
 
     /**
      * Camel cache.
      *
      * @var array
      */
-    private static $camelCache = [];
+    private static $camel_cache = [];
 
     /**
      * Snake cache.
      *
      * @var array
      */
-    private static $snakeCache = [];
+    private static $snake_cache = [];
 
     /**
      * Transform a string into valid snake case.
@@ -38,8 +38,8 @@ class Str
      */
     public static function toSnake(string $string): string
     {
-        if (isset(static::$snakeCache[$string])) {
-            return static::$snakeCache[$string];
+        if (isset(static::$snake_cache[$string])) {
+            return static::$snake_cache[$string];
         }
         if (\ctype_lower($string)) {
             return $string;
@@ -48,14 +48,14 @@ class Str
         $string = \preg_replace('/\-+/u', ' ', $string);
         $string = \preg_replace('/\s+/u', '', \ucwords($string));
 
-        static::$snakeCache[$string] = \strtolower(
+        static::$snake_cache[$string] = \strtolower(
             \trim(
                 \preg_replace('/([^_])(?=[A-Z])/', '$1_', $string),
                 '_'
             )
         );
 
-        return static::$snakeCache[$string];
+        return static::$snake_cache[$string];
     }
 
     /**
@@ -66,12 +66,12 @@ class Str
      */
     public static function toStudly(string $string): string
     {
-        if (isset(static::$studlyCache[$string])) {
-            return static::$studlyCache[$string];
+        if (isset(static::$studly_cache[$string])) {
+            return static::$studly_cache[$string];
         }
 
-        static::$studlyCache[$string] = \str_replace(['_', '-', ' '], '', \ucwords($string, " \t\r\n\f\v_-"));
-        return static::$studlyCache[$string];
+        static::$studly_cache[$string] = \str_replace(['_', '-', ' '], '', \ucwords($string, " \t\r\n\f\v_-"));
+        return static::$studly_cache[$string];
     }
 
     /**
@@ -82,12 +82,12 @@ class Str
      */
     public static function toCamel(string $string): string
     {
-        if (isset(static::$camelCache[$string])) {
-            return static::$camelCache[$string];
+        if (isset(static::$camel_cache[$string])) {
+            return static::$camel_cache[$string];
         }
 
-        static::$camelCache[$string] = \lcfirst(static::toStudly($string));
-        return static::$camelCache[$string];
+        static::$camel_cache[$string] = \lcfirst(static::toStudly($string));
+        return static::$camel_cache[$string];
     }
 
     /**
