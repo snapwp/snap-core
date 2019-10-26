@@ -241,16 +241,28 @@ class Taxonomy extends ContentHookable
      */
     private function unRegisterTaxonomy(\WP_Taxonomy $taxonomy)
     {
-        global $wp_taxonomies;
-
         foreach ($taxonomy->object_type as $type) {
             \unregister_taxonomy_for_object_type($this->getName(), $type);
+            \do_action('unregistered_taxonomy_for_object_type', $taxonomy, $type);
         }
 
         $taxonomy->remove_rewrite_rules();
         $taxonomy->remove_hooks();
 
-        unset($wp_taxonomies[$this->getName()]);
+        // Only run this on front end requests.
+        $this->addAction('template_redirect', function () {
+            global $wp_taxonomies;
+            unset($wp_taxonomies[$this->getName()]);
+        });
+
+        // Hide the post types on nav admin.
+        $this->addAction('hidden_meta_boxes', function ($hidden) {
+            global $wp_meta_boxes;
+            if (isset($wp_meta_boxes['nav-menus']['side']['default']['add-' . $this->getName()])) {
+                unset($wp_meta_boxes['nav-menus']['side']['default']['add-' . $this->getName()]);
+            }
+            return $hidden;
+        });
 
         \do_action('unregistered_taxonomy', $taxonomy);
     }
