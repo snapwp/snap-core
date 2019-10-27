@@ -193,11 +193,11 @@ class Admin extends Hookable
     /**
      * The AJAX handler for deleting a dynamic image size.
      *
-     * @param \WP_Post $post            The current attachment.
-     * @param array    $attachment_data The POST data passed from the quest.
-     * @return \WP_Post
+     * @param array $post            The current attachment.
+     * @param array $attachment_data The POST data passed from the quest.
+     * @return array
      */
-    public function handleDeleteIntermediateAjax(WP_Post $post, array $attachment_data): WP_Post
+    public function handleDeleteIntermediateAjax(array $post, array $attachment_data): array
     {
         if (isset($attachment_data['delete-intermediate']) && !empty($attachment_data['delete-intermediate'])) {
             $sizes = $attachment_data['delete-intermediate'];
@@ -207,6 +207,9 @@ class Admin extends Hookable
         return $post;
     }
 
+    /**
+     * The ajax handler for deleting images from the dynamic images admin screen.
+     */
     public function handleBulkDeleteSizesAjax()
     {
         \set_time_limit(0);
