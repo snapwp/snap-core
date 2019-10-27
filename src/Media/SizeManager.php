@@ -57,7 +57,7 @@ class SizeManager extends Hookable
         $this->addFilter('wp_editor_set_quality', 'getUploadQuality');
         $this->addFilter('intermediate_image_sizes_advanced', 'removeCustomImageSizes');
         $this->addFilter('max_srcset_image_width', 'maxSrcsetImageWidth');
-        //$this->addFilter('wp_calculate_image_sizes', 'updateMaxSizeAttrInSrcsetSizeAttr');
+        $this->addFilter('wp_calculate_image_sizes', 'updateMaxSizeAttrInSrcsetSizeAttr');
 
         // Enable post-thumbnail support.
         $this->enableThumbnailSupport();
@@ -262,7 +262,8 @@ class SizeManager extends Hookable
         }
 
         if ($biggest > $size[0]) {
-            return \str_replace("{$size[0]}px", "{$biggest}px", $sizes);
+            // return \str_replace("{$size[0]}px", "{$biggest}px", $sizes);
+            return \str_replace('100vw,', "100vw, (min-width: 1921px) {$biggest}px,", $sizes);
         }
 
         return $sizes;
