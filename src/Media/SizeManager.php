@@ -389,7 +389,7 @@ class SizeManager extends Hookable
             $height = (int) isset($size_info[1]) ? $size_info[1] : 0;
             $crop = isset($size_info[2]) ? $size_info[2] : false;
 
-            if (\in_array($name, self::DEFAULT_IMAGE_SIZES)) {
+            if (\in_array($name, self::DEFAULT_IMAGE_SIZES) || $size_info === false) {
                 if ($size_info !== false) {
                     // Set other built-in sizes.
                     \update_option($name . '_size_w', $width);
