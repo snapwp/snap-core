@@ -57,7 +57,7 @@ class SizeManager extends Hookable
         $this->addFilter('wp_editor_set_quality', 'getUploadQuality');
         $this->addFilter('intermediate_image_sizes_advanced', 'removeCustomImageSizes');
         $this->addFilter('max_srcset_image_width', 'maxSrcsetImageWidth');
-        $this->addFilter('wp_calculate_image_sizes', 'updateMaxSizeAttrInSrcsetSizeAttr');
+        //$this->addFilter('wp_calculate_image_sizes', 'updateMaxSizeAttrInSrcsetSizeAttr');
 
         // Enable post-thumbnail support.
         $this->enableThumbnailSupport();
