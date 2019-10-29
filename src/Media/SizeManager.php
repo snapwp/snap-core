@@ -162,30 +162,30 @@ class SizeManager extends Hookable
                 unset($meta['sizes'][$size]);
 
                 \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
+
+                /**
+                 * Fires just before 'delete_attachment' is fired when an intermediate image size is deleted via the
+                 * dynamic sizes admin UI.
+                 *
+                 * @param array $sizes List of sizes to be deleted
+                 * @param int   $id    The ID of the current attachment.
+                 */
+                \do_action('snap_dynamic_image_before_delete', $sizes, $attachment_id);
+
+                \do_action('delete_attachment', $attachment_id);
+
+                /**
+                 * Fires just after 'delete_attachment' is fired when an intermediate image size is deleted via the
+                 * dynamic sizes admin UI.
+                 *
+                 * @param array $sizes List of sizes to be deleted
+                 * @param int   $id    The ID of the current attachment.
+                 */
+                \do_action('snap_dynamic_image_after_delete', $sizes, $attachment_id);
+
+                \wp_update_attachment_metadata($attachment_id, $meta);
             }
         }
-
-        /**
-         * Fires just before 'delete_attachment' is fired when an intermediate image size is deleted via the
-         * dynamic sizes admin UI.
-         *
-         * @param array $sizes List of sizes to be deleted
-         * @param int   $id    The ID of the current attachment.
-         */
-        \do_action('snap_dynamic_image_before_delete', $sizes, $attachment_id);
-
-        \do_action('delete_attachment', $attachment_id);
-
-        /**
-         * Fires just after 'delete_attachment' is fired when an intermediate image size is deleted via the
-         * dynamic sizes admin UI.
-         *
-         * @param array $sizes List of sizes to be deleted
-         * @param int   $id    The ID of the current attachment.
-         */
-        \do_action('snap_dynamic_image_after_delete', $sizes, $attachment_id);
-
-        \wp_update_attachment_metadata($attachment_id, $meta);
     }
 
     /**

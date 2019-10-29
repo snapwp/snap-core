@@ -9,7 +9,6 @@ use Snap\Core\Snap;
 use Snap\Services\Config;
 use Snap\Services\Request;
 use Snap\Services\Response;
-use WP_Post;
 
 /**
  * Adds the ability to delete dynamic intermediate image sizes from the media admin screen.
@@ -228,7 +227,14 @@ class Admin extends Hookable
             $total = SizeManager::getCountForSize(Request::post('bulk-delete'));
         }
 
-        Response::jsonSuccess(['total' => $total, 'complete' => SizeManager::deleteDynamicImageBySizeAjax(Request::post('bulk-delete'))]);
+        $processed = SizeManager::deleteDynamicImageBySizeAjax(Request::post('bulk-delete'));
+        $completed = (int)Request::post('completed', 0);
+        $totalProcessed = $processed + $completed;
+        
+        Response::jsonSuccess([
+            'total' => $total,
+            'complete' => ($processed === true || $totalProcessed >= $total) ? true : $totalProcessed,
+        ]);
     }
 
     /**

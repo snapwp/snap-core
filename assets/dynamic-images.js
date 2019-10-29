@@ -36,6 +36,9 @@ if ($form.length) {
               data.append('total', response.data.total)
             }
 
+            data.delete('completed')
+            data.append('completed', response.data.complete)
+
             makeAjax(data)
           }
         })
