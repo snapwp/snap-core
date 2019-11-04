@@ -261,7 +261,7 @@ class PostType extends ContentHookable
         $options = \array_replace_recursive($defaults, $this->options);
 
         if (!isset($options['labels'])) {
-            $options['labels'] = $this->getLabels();
+            $options['labels'] = \array_replace_recursive($this->getLabels(), $this->labels);
         }
 
         return $options;
