@@ -10,13 +10,6 @@ use Snap\Core\Snap;
 trait ProvidesServiceFacade
 {
     /**
-     * Holds all resolved facade instances.
-     *
-     * @var array
-     */
-    protected static $instances = [];
-
-    /**
      * Provide static access to the underlying instance methods.
      *
      * @param string $method The method being called.
@@ -28,13 +21,11 @@ trait ProvidesServiceFacade
      */
     public static function __callStatic(string $method, array $args)
     {
-        if (!isset(static::$instances[static::getServiceName()])) {
-            static::resolveService();
-        }
+        $instance = Snap::getContainer()->get(static::getServiceName());
 
-        static::whenResolving(static::$instances[static::getServiceName()]);
+        static::whenResolving($instance);
 
-        return static::$instances[static::getServiceName()]->{$method}(...$args);
+        return $instance->{$method}(...$args);
     }
 
     /**
@@ -47,23 +38,9 @@ trait ProvidesServiceFacade
      */
     public static function getRootInstance()
     {
-        if (!isset(static::$instances[static::getServiceName()])) {
-            static::resolveService();
-        }
-
-        return static::$instances[static::getServiceName()];
+        return Snap::getContainer()->get(static::getServiceName());
     }
 
-    /**
-     * Resolve the underlying instance from the service container.
-     *
-     * @throws \Hodl\Exceptions\ContainerException If the service name is malformed.
-     * @throws \Hodl\Exceptions\NotFoundException When the service does not exist within the container.
-     */
-    protected static function resolveService()
-    {
-        static::$instances[static::getServiceName()] = Snap::getContainer()->get(static::getServiceName());
-    }
 
     /**
      * Allows additional actions to be performed whenever the root instance if resolved.

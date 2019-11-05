@@ -231,10 +231,12 @@ class Admin extends Hookable
         $completed = (int)Request::post('completed', 0);
         $totalProcessed = $processed + $completed;
         
-        Response::jsonSuccess([
-            'total' => $total,
-            'complete' => ($processed === true || $totalProcessed >= $total) ? true : $totalProcessed,
-        ]);
+        Response::jsonSuccess(
+            [
+                'total' => $total,
+                'complete' => ($processed === true || $totalProcessed >= $total) ? true : $totalProcessed,
+            ]
+        );
     }
 
     /**

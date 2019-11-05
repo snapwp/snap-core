@@ -133,7 +133,7 @@ class Response
      * @param string $description The status description.
      * @return $this
      */
-    public function setStatus(int $code, string $description)
+    public function setStatus(int $code, string $description = '')
     {
         \status_header($code, $description);
         return $this;

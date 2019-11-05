@@ -11,6 +11,7 @@ use Snap\Http\Request;
 use Snap\Http\Response;
 use Snap\Http\Validation\Validator;
 use Snap\Media\ImageService;
+use Snap\Routing\Router;
 use Snap\Services\PostQuery;
 use Snap\Templating\TemplatingInterface;
 use Snap\Templating\View;

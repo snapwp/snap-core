@@ -12,7 +12,7 @@ namespace Snap\Services;
  * @method static  \Snap\Http\Response setHeader(string $name, string $value)
  * @method static  \Snap\Http\Response withHeaders(array $headers = [])
  * @method static  \Snap\Http\Response removeHeader(...$names)
- * @method static  \Snap\Http\Response setStatus(int $code, string $description)
+ * @method static  \Snap\Http\Response setStatus(int $code, string $description = '')
  * @method static  \Snap\Http\Response setCookie(string $name, $value = '', int $expires = 3600, string $path = '/', string $domain = null, bool $secure = null, bool $httponly = true )
  * @method static  \Snap\Http\Response removeCookie(string $name)
  * @method static  \Snap\Http\Response set404()

@@ -250,19 +250,25 @@ class Taxonomy extends ContentHookable
         $taxonomy->remove_hooks();
 
         // Only run this on front end requests.
-        $this->addAction('template_redirect', function () {
-            global $wp_taxonomies;
-            unset($wp_taxonomies[$this->getName()]);
-        });
+        $this->addAction(
+            'template_redirect',
+            function () {
+                global $wp_taxonomies;
+                unset($wp_taxonomies[$this->getName()]);
+            }
+        );
 
         // Hide the post types on nav admin.
-        $this->addAction('hidden_meta_boxes', function ($hidden) {
-            global $wp_meta_boxes;
-            if (isset($wp_meta_boxes['nav-menus']['side']['default']['add-' . $this->getName()])) {
-                unset($wp_meta_boxes['nav-menus']['side']['default']['add-' . $this->getName()]);
+        $this->addAction(
+            'hidden_meta_boxes',
+            function ($hidden) {
+                global $wp_meta_boxes;
+                if (isset($wp_meta_boxes['nav-menus']['side']['default']['add-' . $this->getName()])) {
+                    unset($wp_meta_boxes['nav-menus']['side']['default']['add-' . $this->getName()]);
+                }
+                return $hidden;
             }
-            return $hidden;
-        });
+        );
 
         \do_action('unregistered_taxonomy', $taxonomy);
     }
