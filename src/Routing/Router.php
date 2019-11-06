@@ -100,7 +100,7 @@ class Router
         } else {
             $callback();
             // As this is a nested group, remove this level's middleware.
-            $this->middleware = \array_diff($this->middleware, $this->last_middleware);
+            $this->middleware = \array_diff_key($this->middleware, $this->last_middleware);
             $this->last_middleware = [];
         }
 
