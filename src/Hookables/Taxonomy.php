@@ -9,6 +9,7 @@ use Tightenco\Collect\Support\Arr;
 /**
  * The Post Type Hookable.
  *
+ * @method static \Tightenco\Collect\Support\Collection all()
  * @method static \Tightenco\Collect\Support\Collection get()
  * @method static \Tightenco\Collect\Support\Collection|false|\WP_Term find(int|int[]|string|string[] $ids)
  * @method static array getNames()

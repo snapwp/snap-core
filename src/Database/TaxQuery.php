@@ -72,7 +72,25 @@ class TaxQuery extends Query
     }
 
     /**
-     * Return found WP_Terms.
+     * Return all (even empty) found WP_Terms.
+     *
+     * @return \Tightenco\Collect\Support\Collection
+     */
+    public function all(): Collection
+    {
+        $this->includeEmpty();
+
+        return $this->getCollection(
+            $this->createArguments(
+                [
+                    'taxonomy' => $this->name,
+                ]
+            )
+        );
+    }
+
+    /**
+     * Return found (non-empty) WP_Terms.
      *
      * @return \Tightenco\Collect\Support\Collection
      */

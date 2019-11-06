@@ -7,6 +7,7 @@ namespace Snap\Services;
  *
  * @method static \Snap\Database\TaxQuery tax(array|int $type)
  *
+ * @method static \Tightenco\Collect\Support\Collection all()
  * @method static \Tightenco\Collect\Support\Collection get()
  * @method static \Tightenco\Collect\Support\Collection|false|\WP_Term find(int|int[]|string|string[] $ids)
  * @method static array getNames()
