@@ -118,25 +118,6 @@ class Theme
     }
 
     /**
-     * Check if a URL is off-site or not.
-     *
-     * @param string $url The URL to check.
-     * @return bool
-     */
-    public static function isExternalUrl($url)
-    {
-        if (\parse_url($url, PHP_URL_HOST) === Request::getHost()) {
-            return false;
-        }
-
-        if (\strpos($url, "/") === 0) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Parse the contents of mix-manifest.json and store as array.
      */
     private static function parseManifest()

@@ -15,7 +15,9 @@
         "psr-4": {
             "Snap\\": "src/"
         },
-        "files": ["src/Core/functions.php"]
+        "files": [
+            "src/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -44,14 +46,14 @@
     "scripts": {
         "sniff": [
             "phpcs --extensions=php ."
-        ],           
+        ],
         "fix": [
             "php-cs-fixer fix",
             "phpcbf --extensions=php ."
         ],
         "sniff-docs": [
             "phpcs --ignore=*/vendor/* --extensions=php --standard=WordPress-Docs --exclude=Squiz.Commenting.FileComment ."
-        ],         
+        ],
         "fix-docs": [
             "phpcbf --ignore=*/vendor/* --extensions=php --standard=WordPress-Docs --exclude=Squiz.Commenting.FileComment ."
         ],

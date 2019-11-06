@@ -8,7 +8,7 @@ use Snap\Services\Config;
  * Class factories/container fetchers.
  * *********************************************************************************************************************
  */
-if (! \function_exists('collect')) {
+if (!\function_exists('collect')) {
     /**
      * Return a new Collection instance.
      *
@@ -21,12 +21,12 @@ if (! \function_exists('collect')) {
     }
 }
 
-if (! \function_exists('snap_config')) {
+if (!\function_exists('snap_config')) {
     /**
      * Returns a key from the Config service.
      *
-     * @param  string $key     The option name to fetch.
-     * @param  mixed  $default If the option was not found, the default value to be returned instead.
+     * @param string $key     The option name to fetch.
+     * @param mixed  $default If the option was not found, the default value to be returned instead.
      * @return mixed The option value, or default if not found.
      */
     function snap_config($key, $default = null)
@@ -35,7 +35,7 @@ if (! \function_exists('snap_config')) {
     }
 }
 
-if (! \function_exists('container')) {
+if (!\function_exists('container')) {
     /**
      * Returns the service container
      *
@@ -47,11 +47,11 @@ if (! \function_exists('container')) {
     }
 }
 
-if (! \function_exists('get_service')) {
+if (!\function_exists('get_service')) {
     /**
      * Returns an object within the service container.
      *
-     * @param  string $key The service to fetch.
+     * @param string $key The service to fetch.
      * @return object An individual service.
      * @throws \Hodl\Exceptions\ContainerException
      * @throws \Hodl\Exceptions\NotFoundException
@@ -62,7 +62,7 @@ if (! \function_exists('get_service')) {
     }
 }
 
-if (! \function_exists('get_request')) {
+if (!\function_exists('get_request')) {
     /**
      * Returns the current request instance.
      *
@@ -85,7 +85,7 @@ if (! \function_exists('get_request')) {
  * A collection of functions for getting meta information about image sizes.
  * *********************************************************************************************************************
  */
-if (! \function_exists('snap_get_image_sizes')) {
+if (!\function_exists('snap_get_image_sizes')) {
     /**
      * Get size information for all currently registered image sizes.
      *
@@ -97,11 +97,11 @@ if (! \function_exists('snap_get_image_sizes')) {
     }
 }
 
-if (! \function_exists('snap_get_image_size')) {
+if (!\function_exists('snap_get_image_size')) {
     /**
      * Get size information for a specific image size.
      *
-     * @param  string $size The image size for which to retrieve data.
+     * @param string $size The image size for which to retrieve data.
      * @return bool|array Size data about an image size or false if the size doesn't exist.
      */
     function snap_get_image_size($size)
@@ -110,11 +110,11 @@ if (! \function_exists('snap_get_image_size')) {
     }
 }
 
-if (! \function_exists('snap_get_image_width')) {
+if (!\function_exists('snap_get_image_width')) {
     /**
      * Get the width of a specific image size.
      *
-     * @param  string $size The image size for which to retrieve data.
+     * @param string $size The image size for which to retrieve data.
      * @return bool|int Width of an image size or false if the size doesn't exist.
      */
     function snap_get_image_width($size)
@@ -123,11 +123,11 @@ if (! \function_exists('snap_get_image_width')) {
     }
 }
 
-if (! \function_exists('snap_get_image_height')) {
+if (!\function_exists('snap_get_image_height')) {
     /**
      * Get the height of a specific image size.
      *
-     * @param  string $size The image size for which to retrieve data.
+     * @param string $size The image size for which to retrieve data.
      * @return bool|int Height of an image size or false if the size doesn't exist.
      */
     function snap_get_image_height($size)
@@ -142,13 +142,13 @@ if (! \function_exists('snap_get_image_height')) {
  * Menu utilities
  * *********************************************************************************************************************
  */
-if (! \function_exists('snap_get_nav_menu')) {
+if (!\function_exists('snap_get_nav_menu')) {
     /**
      * Returns a multi dimensional array of nav items for a given navigation menu.
      *
      * A better replacement for wp_get_nav_menu_items.
      *
-     * @param  string $theme_location The theme location the menu was registered with.
+     * @param string $theme_location The theme location the menu was registered with.
      * @return array
      */
     function snap_get_nav_menu($theme_location)
@@ -157,11 +157,11 @@ if (! \function_exists('snap_get_nav_menu')) {
     }
 }
 
-if (! \function_exists('snap_get_menu_name')) {
+if (!\function_exists('snap_get_menu_name')) {
     /**
      * For a given menu ID, name, or slug, return the user-set name for the associated menu.
      *
-     * @param  string $theme_location Menu name, ID or slug
+     * @param string $theme_location Menu name, ID or slug
      * @return string|bool The name of the menu, or false if no menu was found
      */
     function snap_get_menu_name($theme_location)
@@ -176,11 +176,11 @@ if (! \function_exists('snap_get_menu_name')) {
  * User utilities
  * *********************************************************************************************************************
  */
-if (! \function_exists('snap_get_user_role_name')) {
+if (!\function_exists('snap_get_user_role_name')) {
     /**
      * Returns the translated role of the current user or for a given user object.
      *
-     * @param  WP_User $user A user to get the role of.
+     * @param WP_User $user  A user to get the role of.
      *                       Defaults to current user.
      * @return string|bool The translated name of the current role, false if no role found.
      **/
@@ -196,11 +196,11 @@ if (! \function_exists('snap_get_user_role_name')) {
  * Sidebar utilities
  * *********************************************************************************************************************
  */
-if (! \function_exists('snap_get_widget_count')) {
+if (!\function_exists('snap_get_widget_count')) {
     /**
      * Counts the number of widgets for a given sidebar ID.
      *
-     * @param  string $sidebar_id The ID of the sidebar.
+     * @param string $sidebar_id The ID of the sidebar.
      * @return int The count of the widgets in the sidebar.
      */
     function snap_get_widget_count($sidebar_id)
@@ -215,11 +215,11 @@ if (! \function_exists('snap_get_widget_count')) {
  * Theme utilities
  * *********************************************************************************************************************
  */
-if (! \function_exists('snap_get_current_url')) {
+if (!\function_exists('snap_get_current_url')) {
     /**
      * Gets the current full URL of the page with query string, host, and scheme.
      *
-     * @param  boolean $remove_query If true, the URL is returned without any query params.
+     * @param boolean $remove_query If true, the URL is returned without any query params.
      * @return string The current URL.
      */
     function snap_get_current_url($remove_query = false)
@@ -228,11 +228,11 @@ if (! \function_exists('snap_get_current_url')) {
     }
 }
 
-if (! \function_exists('snap_get_asset_url')) {
+if (!\function_exists('snap_get_asset_url')) {
     /**
      * Retrieves a filename public URL with Webpack version ID if present.
      *
-     * @param  string $file The asset file to look for.
+     * @param string $file The asset file to look for.
      * @return string The (possibly versioned) asset URL.
      */
     function snap_get_asset_url($file)
@@ -241,7 +241,7 @@ if (! \function_exists('snap_get_asset_url')) {
     }
 }
 
-if (! \function_exists('snap_is_post_template')) {
+if (!\function_exists('snap_is_post_template')) {
     /**
      * Whether the current request is the provided post template.
      *
@@ -254,7 +254,7 @@ if (! \function_exists('snap_is_post_template')) {
     }
 }
 
-if (! \function_exists('snap_is_wp_login')) {
+if (!\function_exists('snap_is_wp_login')) {
     /**
      * Whether the current request is the login page or not.
      *
@@ -272,30 +272,71 @@ if (! \function_exists('snap_is_wp_login')) {
  * Template utilities
  * *********************************************************************************************************************
  */
-if (! \function_exists('snap_get_top_parent_page_id')) {
+
+/**
+ * Get value of top level hierarchical post ID.
+ *
+ * Does not work with the objects returned by get_pages().
+ *
+ * @param int|WP_Post|array $post null Optional. Post object,array, or ID of a post to find the top ancestors for.
+ * @return int ID
+ */
+function snap_get_top_parent_page_id($post = null): int
+{
+    return \Snap\Utils\View::getTopLevelParentId($post);
+}
+
+/**
+ * Get current page depth.
+ *
+ * @param int|\WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
+ * @return integer
+ */
+function snap_get_page_depth($page = null): int
+{
+    return \Snap\Utils\View::getPageDepth($page);
+}
+
+
+/*
+ * *********************************************************************************************************************
+ * URL utilities
+ * *********************************************************************************************************************
+ */
+
+/**
+ * Tests if a provided URL is external or not.
+ *
+ * @param string $url URL to test.
+ * @return bool
+ */
+function snap_is_external_url(string $url): bool
+{
+    return \Snap\Utils\Url::isExternalUrl($url);
+}
+
+if (!\function_exists('leadingslashit')) {
     /**
-     * Get value of top level hierarchical post ID.
+     * Ensures a string begins with a slash.
      *
-     * Does not work with the objects returned by get_pages().
-     *
-     * @param int|WP_Post|array $post null Optional. Post object,array, or ID of a post to find the top ancestors for.
-     * @return int ID
+     * @param string $string
+     * @return string
      */
-    function snap_get_top_parent_page_id($post = null)
+    function leadingslashit(string $string): string
     {
-        return \Snap\Utils\View::getTopLevelParentId($post);
+        return \Snap\Utils\Url::leadingSlashIt($string);
     }
 }
 
-if (! \function_exists('snap_get_page_depth')) {
+if (!\function_exists('untrailingslashit')) {
     /**
-     * Get current page depth.
+     * Removes any leading slashes from a string.
      *
-     * @param int|\WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
-     * @return integer
+     * @param string $string String to remove leading slashes for.
+     * @return string
      */
-    function snap_get_page_depth($page = null)
+    function is_external_url(string $string): string
     {
-        return \Snap\Utils\View::getPageDepth($page);
+        return \Snap\Utils\Url::unLeadingSlashIt($string);
     }
 }
