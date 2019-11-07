@@ -22,6 +22,7 @@ class ServerBag extends Bag
                 },
             ],
             'QUERY_STRING' => FILTER_UNSAFE_RAW,
+            'REQUEST_URI' => FILTER_SANITIZE_URL,
             'REMOTE_ADDR' => FILTER_VALIDATE_IP,
             'HTTP_X_FORWARDED' => FILTER_VALIDATE_IP,
             'HTTP_X_FORWARDED_FOR' => FILTER_VALIDATE_IP,
@@ -35,7 +36,7 @@ class ServerBag extends Bag
             'HTTP_REFERER' => FILTER_SANITIZE_URL,
             'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING,
         ];
-
+        
         $server = \filter_input_array(INPUT_SERVER, $definition);
 
         if ('' !== \preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $server['HTTP_HOST'])) {
