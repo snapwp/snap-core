@@ -8,6 +8,7 @@ use Exception;
 use Snap\Services\Container;
 use Snap\Services\Request;
 use Snap\Services\View;
+use Tightenco\Collect\Support\Arr;
 
 class Router
 {
@@ -31,20 +32,6 @@ class Router
      * @var boolean
      */
     private $has_matched_route = false;
-
-    /**
-     * Middleware stack to apply to the current route.
-     *
-     * @var array
-     */
-    private $middleware = [];
-
-    /**
-     * A record of the current group level's middleware.
-     *
-     * @var array
-     */
-    private $last_middleware = [];
 
     /**
      * Whether the active route is within a group or not.
@@ -92,16 +79,10 @@ class Router
         // If this is a top level group.
         if ($this->is_group === false) {
             $this->is_group = true;
-
             $callback();
-
             $this->is_group = false;
-            $this->can_proceed = true;
         } else {
             $callback();
-            // As this is a nested group, remove this level's middleware.
-            $this->middleware = \array_diff_key($this->middleware, $this->last_middleware);
-            $this->last_middleware = [];
         }
 
         return $this;
@@ -205,6 +186,7 @@ class Router
      */
     public function whenPostTemplate(string $template = null): Router
     {
+
         if ($this->canProceed() === false) {
             return $this;
         }
@@ -213,9 +195,11 @@ class Router
             return $this->when(\is_page_template());
         }
 
+
         if (Request::isPostTemplate($template) === false) {
             $this->stopProcessing();
         }
+
 
         return $this;
     }
@@ -249,9 +233,8 @@ class Router
             return $this;
         }
 
-        if (!\is_array($middleware)) {
-            $middleware = [$middleware];
-        }
+
+        $middleware = Arr::wrap($middleware);
 
         foreach ($middleware as $callback) {
             $parts = \explode('|', $callback);
@@ -265,11 +248,8 @@ class Router
                 throw new BadMethodCallException("No middleware called '{$parts[0]}' found");
             }
 
-            $this->middleware[$parts[0]] = $args;
-
-            // If we are in a nested group, save this level's stack for later removal.
-            if ($this->is_group === true) {
-                $this->last_middleware[$parts[0]] = $args;
+            if (\call_user_func_array($this->registered_middleware[$parts[0]], $args) !== true) {
+                $this->stopProcessing();
             }
         }
 
@@ -285,7 +265,6 @@ class Router
     public function view($view, $data = []): void
     {
         $this->checkMethod();
-        $this->applyMiddleware();
 
         // Passed all middleware.
         if ($this->canProceed() === false) {
@@ -309,17 +288,12 @@ class Router
     public function dispatch($controller): void
     {
         $this->checkMethod();
-        $this->applyMiddleware();
 
         if ($this->canProceed() === false) {
             return;
         }
 
         list($class, $action) = \explode('@', $controller);
-
-        if ($action === null) {
-            $action = 'index';
-        }
 
         $fqn = $this->namespace . $class;
 
@@ -466,9 +440,7 @@ class Router
             $this->current_route = null;
         }
 
-        // Only reset middleware stack if this is not in a group callback.
         if ($this->is_group === false) {
-            $this->middleware = [];
             $this->namespace = '\\Theme\\Http\\Controllers\\';
             $this->methods = null;
         }
@@ -485,24 +457,6 @@ class Router
 
         if (!\in_array(Request::getMethod(), $this->methods)) {
             $this->stopProcessing();
-        }
-    }
-
-    /**
-     * Apply the current stack of middleware to the current route.
-     */
-    private function applyMiddleware(): void
-    {
-        if ($this->canProceed() === false || empty($this->middleware)) {
-            return;
-        }
-
-        foreach ($this->middleware as $hook => $args) {
-            $args = empty($args) ? [null] : $args;
-
-            if (\call_user_func($this->registered_middleware[$hook], ...$args) !== true) {
-                $this->stopProcessing();
-            }
         }
     }
 
