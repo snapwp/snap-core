@@ -163,25 +163,7 @@ class SizeManager extends Hookable
 
                 \wp_delete_file_from_directory(\trailingslashit($dir) . $file, $dir);
 
-                /**
-                 * Fires just before 'delete_attachment' is fired when an intermediate image size is deleted via the
-                 * dynamic sizes admin UI.
-                 *
-                 * @param array $sizes List of sizes to be deleted
-                 * @param int   $id    The ID of the current attachment.
-                 */
-                \do_action('snap_dynamic_image_before_delete', $sizes, $attachment_id);
-
-                \do_action('delete_attachment', $attachment_id);
-
-                /**
-                 * Fires just after 'delete_attachment' is fired when an intermediate image size is deleted via the
-                 * dynamic sizes admin UI.
-                 *
-                 * @param array $sizes List of sizes to be deleted
-                 * @param int   $id    The ID of the current attachment.
-                 */
-                \do_action('snap_dynamic_image_after_delete', $sizes, $attachment_id);
+                \do_action('snap_deleted_dynamic_image', $attachment_id);
 
                 \wp_update_attachment_metadata($attachment_id, $meta);
             }
@@ -218,7 +200,14 @@ class SizeManager extends Hookable
             return $image;
         }
 
-        return $this->image_service->generateDynamicImage($image, $id, $size);
+        $image = $this->image_service->generateDynamicImage($image, $id, $size);
+
+        // Let WP know to treat our dynamic size as an intermediate size.
+        if (isset($image[3])) {
+            $image[3] = true;
+        }
+
+        return $image;
     }
 
     /**
@@ -234,7 +223,10 @@ class SizeManager extends Hookable
 
         // Ensure 'Full size' is always at end.
         unset($sizes['full']);
-        unset($sizes['thumbnail']);
+
+        if (!\defined('DOING_AJAX') || DOING_AJAX === false) {
+            unset($sizes['thumbnail']);
+        }
 
         if (Config::get('images.insert_image_allow_full_size') || empty($sizes)) {
             $sizes['full'] = 'Full Size';
@@ -383,6 +375,11 @@ class SizeManager extends Hookable
             $sizes = \array_merge($sizes, Config::get('images.dynamic_image_sizes'));
         }
 
+        // If thumbnail has not been overwritten, then define it as default post-thumbnail size.
+        if (!isset($sizes['thumbnail']) && !isset($sizes['post-thumbnail'])) {
+            $sizes['thumbnail'] = [266, 266, true];
+        }
+
         // Loop through sizes.
         foreach ($sizes as $name => $size_info) {
             // Get size properties with basic fallback.
@@ -408,6 +405,15 @@ class SizeManager extends Hookable
                     // Remove the size.
                     $this->addFilter('intermediate_image_sizes_advanced', $callback);
                     $this->addFilter('intermediate_image_sizes', $callback);
+
+                    // Since 5.3, WP includes extra high res sizes for medium and large.
+                    if ($name === 'medium') {
+                        \remove_image_size('1536x1536');
+                    }
+
+                    if ($name === 'large') {
+                        \remove_image_size('2048x2048');
+                    }
                 }
             } else {
                 // Add custom image size.
