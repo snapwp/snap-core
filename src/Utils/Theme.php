@@ -32,7 +32,7 @@ class Theme
         }
 
         if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI'])) {
-            return \home_url(filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL));
+            return \home_url(\filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL));
         }
 
         return \home_url(\add_query_arg(null, null));
