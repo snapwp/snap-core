@@ -51,6 +51,7 @@ class Config
             'default_image_quality' => 75,
             'placeholder_dir' => 'public/images/placeholders/',
             'supports_featured_images' => true,
+            'disable_attachment_permalinks' => true,
             'reset_image_sizes' => true,
             'image_sizes' => [],
             'dynamic_image_sizes' => [],

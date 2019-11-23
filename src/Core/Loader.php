@@ -48,6 +48,7 @@ class Loader
         \Snap\Bootstrap\I18n::class,
         \Snap\Media\SizeManager::class,
         \Snap\Media\Placeholders::class,
+        \Snap\Media\AttachmentPermalinks::class,
         \Snap\Templating\HandlePostTemplates::class,
         \Snap\Http\Validation\Rules\Nonce::class,
     ];
