@@ -38,6 +38,8 @@ class Admin extends Hookable
             $this->addAction('admin_menu', 'registerDynamicImagesOptionPage');
             $this->addAction('wp_ajax_delete_dynamic_image_sizes', 'handleBulkDeleteSizesAjax');
         }
+
+        $this->addFilter('admin_post_thumbnail_size', 'featuredImageWidgetSize');
     }
 
     /**
@@ -230,7 +232,7 @@ class Admin extends Hookable
         $processed = SizeManager::deleteDynamicImageBySizeAjax(Request::post('bulk-delete'));
         $completed = (int)Request::post('completed', 0);
         $totalProcessed = $processed + $completed;
-        
+
         Response::jsonSuccess(
             [
                 'total' => $total,
@@ -255,6 +257,21 @@ class Admin extends Hookable
                 $page->render();
             }
         );
+    }
+
+    /**
+     * Set the size of the featured image widget.
+     *
+     * @param string|array $size Original size.
+     * @return string|array
+     */
+    public function featuredImageWidgetSize($size)
+    {
+        if (\snap_get_image_size('thumbnail') !== false) {
+            return 'thumbnail';
+        }
+
+        return $size;
     }
 
     /**
