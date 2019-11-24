@@ -27,6 +27,13 @@ class SizeManager extends Hookable
     private static $dynamic_sizes = [];
 
     /**
+     * Holds any disabled default sizes.
+     *
+     * @var array
+     */
+    private $disabled_default_sizes = [];
+
+    /**
      * Holds any defined image dropdown names.
      *
      * @var array
@@ -65,12 +72,12 @@ class SizeManager extends Hookable
         // Register all image sizes.
         $this->registerImageSizes();
 
-        if (! empty($this->size_dropdown_names)) {
+        if (!empty($this->size_dropdown_names)) {
             $this->addFilter('image_size_names_choose', 'enableCustomImageSizes');
         }
 
         // Set default image size dropdown value.
-        if (! empty(Config::get('images.insert_image_default_size'))) {
+        if (!empty(Config::get('images.insert_image_default_size'))) {
             $this->addFilter('after_setup_theme', 'setInsertImageDefaultSize');
         }
 
@@ -187,12 +194,12 @@ class SizeManager extends Hookable
      * All other theme images are generated dynamically by this method.
      *
      * @param mixed        $image Image array to pass on from this filter.
-     * @param int          $id   Attachment ID for image.
-     * @param array|string $size Optional. Image size to scale to. Accepts any valid image size,
-     *                           or an array of width and height values in pixels (in that order).
-     *                           Default 'medium'.
+     * @param int          $id    Attachment ID for image.
+     * @param array|string $size  Optional. Image size to scale to. Accepts any valid image size,
+     *                            or an array of width and height values in pixels (in that order).
+     *                            Default 'medium'.
      * @return false|array Array containing the image URL, width, height, and boolean for whether
-     *                     the image is an intermediate size. False on failure.
+     *                            the image is an intermediate size. False on failure.
      */
     public function generateDynamicImage($image, $id, $size)
     {
@@ -213,13 +220,19 @@ class SizeManager extends Hookable
     /**
      * Adds any extra sizes to add media sizes dropdown.
      *
-     * @param  array $sizes Current sizes for inclusion.
+     * @param array $sizes Current sizes for inclusion.
      * @return array Altered $sizes
      */
     public function enableCustomImageSizes($sizes)
     {
         // Merge custom sizes into $sizes.
         $sizes = \array_merge($sizes, $this->size_dropdown_names);
+
+        foreach ($sizes as $size => $name) {
+            if ($this->isSizeDisabled($size)) {
+                unset($sizes[$size]);
+            }
+        }
 
         // Ensure 'Full size' is always at end.
         unset($sizes['full']);
@@ -229,12 +242,21 @@ class SizeManager extends Hookable
         }
 
         if (Config::get('images.insert_image_allow_full_size') || empty($sizes)) {
-            $sizes['full'] = 'Full Size';
+            $sizes['full'] = 'Original Size';
         }
 
         return $sizes;
     }
 
+    /**
+     * Rewrite srcset to always have the biggest size last and kicking in above 1920 width by default.
+     *
+     * @param array  $sizes
+     * @param string $size
+     * @param string $image_src
+     * @param array  $image_meta
+     * @return mixed
+     */
     public function updateMaxSizeAttrInSrcsetSizeAttr($sizes, $size, $image_src, $image_meta)
     {
         $biggest = $size[0];
@@ -276,13 +298,13 @@ class SizeManager extends Hookable
      *
      * // TODO move somewhere else
      *
-     * @param  int $quality Existing value.
+     * @param int $quality Existing value.
      * @return int A number between 0-100.
      */
     public function getUploadQuality($quality)
     {
         if (\is_numeric(Config::get('images.default_image_quality'))) {
-            return (int) Config::get('images.default_image_quality');
+            return (int)Config::get('images.default_image_quality');
         }
 
         return $quality;
@@ -294,7 +316,7 @@ class SizeManager extends Hookable
      * This allows developers to specify which image sizes are choosable within an editor context, and which
      * should only be generated if actually needed.
      *
-     * @param  array $sizes Current registered sizes.
+     * @param array $sizes Current registered sizes.
      * @return array Modified $sizes array.
      */
     public function removeCustomImageSizes($sizes = [])
@@ -326,14 +348,14 @@ class SizeManager extends Hookable
     private function setDynamicSizes()
     {
         foreach (Config::get('images.image_sizes') as $size => $data) {
-            if (! isset($data[3]) || ! $data[3]) {
-                self::$dynamic_sizes[ $size ] = true;
+            if (!isset($data[3]) || !$data[3]) {
+                self::$dynamic_sizes[$size] = true;
             }
         }
 
-        if (! empty(Config::get('images.dynamic_image_sizes'))) {
+        if (!empty(Config::get('images.dynamic_image_sizes'))) {
             foreach (Config::get('images.dynamic_image_sizes') as $size => $data) {
-                self::$dynamic_sizes[ $size ] = true;
+                self::$dynamic_sizes[$size] = true;
             }
         }
     }
@@ -341,13 +363,14 @@ class SizeManager extends Hookable
     /**
      * Enabled theme support for thumbnails.
      *
-     * Uses the value of Config::get('images.supports_featured_images') enable thumbnails for all post types or a select few.
+     * Uses the value of Config::get('images.supports_featured_images') enable thumbnails for all post types or a
+     * select few.
      */
     private function enableThumbnailSupport()
     {
         $enabled_thumbnails = Config::get('images.supports_featured_images');
 
-        if (! empty($enabled_thumbnails)) {
+        if (!empty($enabled_thumbnails)) {
             if (\is_array($enabled_thumbnails)) {
                 \add_theme_support('post-thumbnails', $enabled_thumbnails);
             } elseif ($enabled_thumbnails === true) {
@@ -371,7 +394,7 @@ class SizeManager extends Hookable
         $sizes = Config::get('images.image_sizes');
 
         // Merge in dynamic sizes if found
-        if (! empty(Config::get('images.dynamic_image_sizes'))) {
+        if (!empty(Config::get('images.dynamic_image_sizes'))) {
             $sizes = \array_merge($sizes, Config::get('images.dynamic_image_sizes'));
         }
 
@@ -383,8 +406,8 @@ class SizeManager extends Hookable
         // Loop through sizes.
         foreach ($sizes as $name => $size_info) {
             // Get size properties with basic fallback.
-            $width = (int) isset($size_info[0]) ? $size_info[0] : 0;
-            $height = (int) isset($size_info[1]) ? $size_info[1] : 0;
+            $width = (int)isset($size_info[0]) ? $size_info[0] : 0;
+            $height = (int)isset($size_info[1]) ? $size_info[1] : 0;
             $crop = isset($size_info[2]) ? $size_info[2] : false;
 
             if (\in_array($name, self::DEFAULT_IMAGE_SIZES) || $size_info === false) {
@@ -402,6 +425,8 @@ class SizeManager extends Hookable
                         return \array_diff($sizes, [$name]);
                     };
 
+                    $this->disabled_default_sizes[$name] = $name;
+
                     // Remove the size.
                     $this->addFilter('intermediate_image_sizes_advanced', $callback);
                     $this->addFilter('intermediate_image_sizes', $callback);
@@ -409,10 +434,12 @@ class SizeManager extends Hookable
                     // Since 5.3, WP includes extra high res sizes for medium and large.
                     if ($name === 'medium') {
                         \remove_image_size('1536x1536');
+                        $this->disabled_default_sizes['1536x1536'] = '1536x1536';
                     }
 
                     if ($name === 'large') {
                         \remove_image_size('2048x2048');
+                        $this->disabled_default_sizes['2048x2048'] = '2048x2048';
                     }
                 }
             } else {
@@ -421,9 +448,20 @@ class SizeManager extends Hookable
             }
 
             // If a custom dropdown name has been defined.
-            if (isset($size_info[3]) && ! empty($size_info[3])) {
-                $this->size_dropdown_names[ $name ] = $size_info[3];
+            if (isset($size_info[3]) && !empty($size_info[3])) {
+                $this->size_dropdown_names[$name] = $size_info[3];
             }
         }
+    }
+
+    /**
+     * Check if a given size has been disabled via config/images.php.
+     *
+     * @param string $size Size to check.
+     * @return bool
+     */
+    private function isSizeDisabled(string $size): bool
+    {
+        return isset($this->disabled_default_sizes[$size]);
     }
 }
