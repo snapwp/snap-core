@@ -28,6 +28,7 @@ class Admin extends Hookable
     public function boot()
     {
         $this->addFilter('post_mime_types', 'addAdditionalMimeTypeSupport');
+        $this->addFilter('media_view_settings', 'alterMediaViewSettings');
 
         if (Config::get('images.dynamic_image_sizes') !== false) {
             $this->addFilter('media_meta', 'addImageSizesMetaToMedia');
@@ -66,6 +67,20 @@ class Admin extends Hookable
                 true
             );
         }
+    }
+
+    /**
+     * Set better gallery defaults.
+     * 
+     * @param array $settings
+     * @return mixed
+     */
+    public function alterMediaViewSettings($settings): array
+    {
+        $settings['galleryDefaults']['link'] = 'none';
+        $settings['galleryDefaults']['size'] = 'medium';
+        $settings['galleryDefaults']['columns'] = '2';
+        return $settings;
     }
 
     /**
