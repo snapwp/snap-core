@@ -158,19 +158,22 @@ class Pagination
     private function get_defaults()
     {
         return [
-            'echo'                => true,
-            'range'               => 5,
-            'custom_query'        => false,
-            'show_first_last'     => true,
-            'show_previous_next'  => true,
-            'active_link_wrapper' => '<li class="active">%s</li>',
-            'link_wrapper'        => '<li><a href="%s" itemprop="url"><span itemprop="name">%s</span></a></li>',
-            'first_wrapper'       => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('First page', 'snap') . '</span></a></li>',
-            'previous_wrapper'    => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Previous', 'snap') . '</span></a></li>',
-            'next_wrapper'        => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Next', 'snap') . '</span></a></li>',
-            'last_wrapper'        => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Last page', 'snap') . '</span></a></li>',
-            'before_output'       => '<nav aria-label="' . __('Pagination', 'snap') . '"><ul role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">',
-            'after_output'        => '</ul></nav>',
+            'echo'                      => true,
+            'range'                     => 5,
+            'custom_query'              => false,
+            'show_first_last'           => true,
+            'show_previous_next'        => true,
+            'always_show_previous_next' => false,
+            'active_link_wrapper'       => '<li class="active">%s</li>',
+            'link_wrapper'              => '<li><a href="%s" itemprop="url"><span itemprop="name">%s</span></a></li>',
+            'first_wrapper'             => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('First page', 'snap') . '</span></a></li>',
+            'previous_wrapper'          => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Previous', 'snap') . '</span></a></li>',
+            'disabled_previous_wrapper' => '<li><span itemprop="name">' . __('Previous', 'snap') . '</span></li>',
+            'next_wrapper'              => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Next', 'snap') . '</span></a></li>',
+            'disabled_next_wrapper'     => '<li><span itemprop="name">' . __('Previous', 'snap') . '</span></li>',
+            'last_wrapper'              => '<li><a href="%s" itemprop="url"><span itemprop="name">' . __('Last page', 'snap') . '</span></a></li>',
+            'before_output'             => '<nav aria-label="' . __('Pagination', 'snap') . '"><ul role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">',
+            'after_output'              => '</ul></nav>',
         ];
     }
 
@@ -274,6 +277,10 @@ class Pagination
             $output .= \sprintf($this->args['previous_wrapper'], $previous_link);
         }
 
+        if ($this->args['show_previous_next'] && $this->args['always_show_previous_next'] && $this->current_page === 1) {
+            $output .= \sprintf($this->args['disabled_previous_wrapper'], $previous_link);
+        }
+
         return $output;
     }
 
@@ -322,8 +329,12 @@ class Pagination
         $next_link = esc_attr(get_pagenum_link(\intval($this->current_page) + 1));
         $last_page_link = esc_attr(get_pagenum_link($this->page_count));
 
-        if ($this->args['show_previous_next'] && $next_link && $this->page_count != $this->current_page) {
+        if ($this->args['show_previous_next'] && $next_link && $this->page_count !== $this->current_page) {
             $output .= \sprintf($this->args['next_wrapper'], $next_link);
+        }
+
+        if ($this->args['show_previous_next'] && $this->args['always_show_previous_next'] && $this->page_count === $this->current_page) {
+            $output .= \sprintf($this->args['disabled_next_wrapper'], $next_link);
         }
 
         if ($this->args['show_first_last'] && $last_page_link) {
