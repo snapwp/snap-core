@@ -30,28 +30,18 @@ class Loader
     private static $aliases = [];
 
     /**
+     * @var array
+     */
+    private static $theme_hookables = [];
+
+    /**
      * Cached list of scanned folders.
      *
      * @var array
      */
     private $visited = [];
 
-    /**
-     * List of Snap classes to autoload.
-     *
-     * @var array
-     */
-    private $class_list = [
-        \Snap\Bootstrap\Assets::class,
-        \Snap\Bootstrap\Cleanup::class,
-        \Snap\Bootstrap\Comments::class,
-        \Snap\Bootstrap\I18n::class,
-        \Snap\Media\SizeManager::class,
-        \Snap\Media\Placeholders::class,
-        \Snap\Media\AttachmentPermalinks::class,
-        \Snap\Templating\HandlePostTemplates::class,
-        \Snap\Http\Validation\Rules\Nonce::class,
-    ];
+
 
     /**
      * The Snap autoloader.
@@ -86,14 +76,12 @@ class Loader
      *
      * @throws \Exception
      */
-    public function boot()
+    public function __construct()
     {
         \spl_autoload_register(__NAMESPACE__ . '\Loader::classAutoload', true);
         \spl_autoload_register(__NAMESPACE__ . '\Loader::aliasAutoload', true);
 
         static::$aliases = Config::get('services.aliases');
-
-        $this->loadSnapHookables();
 
         $this->initWidgets();
 
@@ -152,6 +140,8 @@ class Loader
                 \get_stylesheet_directory() . '/theme/',
                 static::$theme_includes
             );
+
+            $this->runHookables();
         }
 
         $this->initThemeProviders();
@@ -195,13 +185,14 @@ class Loader
      *
      * @param string $class_name The path to an included file.
      */
-    private function initHookable($class_name)
+    private function initHookable(string $class_name): void
     {
         // If the included class extends the Hookable abstract.
         if (\class_exists($class_name)) {
             if (\is_subclass_of($class_name, Hookable::class)) {
                 // Boot it up and resolve dependencies.
-                Container::resolve($class_name)->run();
+                static::$theme_hookables[] = $class_name;
+
                 return;
             }
 
@@ -237,7 +228,7 @@ class Loader
      * @param  array  $files  An array to append the discovered files to.
      * @return array          $files array with any discovered php files appended.
      */
-    private function scanDir($folder, $files = [])
+    private function scanDir(string $folder, array $files = []): array
     {
         // Ensure maximum portability.
         $folder = \trailingslashit($folder);
@@ -284,40 +275,18 @@ class Loader
     private function initThemeSetup()
     {
         if (isset(static::$theme_includes['Theme\ThemeSetup'])) {
-            $this->initHookable('Theme\ThemeSetup');
+            Container::resolve('Theme\ThemeSetup')->run();
         }
     }
 
-    /**
-     * Adds a class to the list if the provided config $key is true.
-     *
-     * @param string $key
-     * @param string $class
-     */
-    private function conditionalLoad(string $key, string $class)
+
+
+
+
+    private function runHookables()
     {
-        if (Config::get($key) === true) {
-            $this->class_list[] = $class;
-        }
-    }
-
-    private function loadSnapHookables()
-    {
-        if (\is_admin() || Request::isLoginPage()) {
-            $this->class_list[] = \Snap\Admin\Whitelabel::class;
-            $this->class_list[] = \Snap\Admin\Columns\PostTemplate::class;
-            $this->class_list[] = \Snap\Media\Admin::class;
-
-            $this->conditionalLoad('admin.snap_admin_theme', 'Snap\Admin\Theme');
-        } else {
-            $this->class_list[] = \Snap\Http\Middleware\IsLoggedIn::class;
-        }
-
-        $this->conditionalLoad('theme.disable_comments', 'Snap\Admin\DisableComments');
-        $this->conditionalLoad('theme.disable_customizer', 'Snap\Admin\DisableCustomizer');
-
-        foreach ($this->class_list as $module) {
-            $this->initHookable($module);
+        foreach (static::$theme_hookables as $hookable) {
+            Container::resolve($hookable)->run();
         }
     }
 }

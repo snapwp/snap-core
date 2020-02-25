@@ -5,6 +5,7 @@ namespace Snap\Core;
 use Exception;
 use Hodl\Container;
 use Hodl\Exceptions\ContainerException;
+use Snap\Core\Bootstrap\SnapLoader;
 use Snap\Database\TaxQuery;
 use Snap\Exceptions\StartupException;
 use Snap\Http\Request;
@@ -85,9 +86,10 @@ class Snap
                 static::initServices();
                 static::addWordpressGlobals();
 
+                SnapLoader::getInstance(static::getContainer())->load();
+
                 // Run the loader.
                 $loader = new Loader();
-                $loader->boot();
 
                 static::registerProviders();
                 static::initTemplating();

@@ -71,7 +71,7 @@ class Admin extends Hookable
 
     /**
      * Set better gallery defaults.
-     * 
+     *
      * @param array $settings
      * @return mixed
      */
