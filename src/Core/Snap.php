@@ -14,7 +14,7 @@ use Snap\Http\Validation\Validator;
 use Snap\Media\ImageService;
 use Snap\Routing\Router;
 use Snap\Services\PostQuery;
-use Snap\Templating\TemplatingInterface;
+use Snap\Templating\Strategies\TemplatingInterface;
 use Snap\Templating\View;
 
 /**
@@ -211,16 +211,28 @@ class Snap
     {
         // If no templating strategy has already been registered.
         if (!static::$container->has(TemplatingInterface::class)) {
+            static::$container->addSingleton(
+                \Snap\Templating\Blade\Factory::class,
+                function (Container $container) {
+                    return new \Snap\Templating\Blade\Factory(
+                        \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.templates_directory')),
+                        \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.cache_directory')) . '/templates/'
+                    );
+                }
+            );
+
+            static::$container->alias(\Snap\Templating\Blade\Factory::class, 'blade');
+
             // Add the default rendering engine.
             static::$container->addSingleton(
-                \Snap\Templating\Standard\StandardStrategy::class,
-                function () {
-                    return new \Snap\Templating\Standard\StandardStrategy;
+                \Snap\Templating\Strategies\DefaultStrategy::class,
+                function (Container $container) {
+                    return $container->resolve(\Snap\Templating\Strategies\DefaultStrategy::class);
                 }
             );
 
             static::$container->bind(
-                \Snap\Templating\Standard\StandardStrategy::class,
+                \Snap\Templating\Strategies\DefaultStrategy::class,
                 TemplatingInterface::class
             );
         }

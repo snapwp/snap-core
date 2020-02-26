@@ -46,7 +46,7 @@ class Theme
      */
     public static function getActiveThemePath($path)
     {
-        return \trailingslashit(\get_stylesheet_directory()) . $path;
+        return \str_replace('\\', '/', \trailingslashit(\get_stylesheet_directory()) . $path);
     }
 
     /**
