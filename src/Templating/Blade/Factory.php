@@ -2,6 +2,8 @@
 
 namespace Snap\Templating\Blade;
 
+use Snap\Services\Container;
+use Snap\Services\Request;
 use Snap\Services\View;
 
 class Factory extends \Bladezero\Factory
@@ -53,5 +55,62 @@ class Factory extends \Bladezero\Factory
         );
 
         return $this->render($path, $data);
+    }
+
+    /**
+     * Default CSRF token generation.
+     *
+     * A real implementation should save this value to the session or some other store to allow validation.
+     *
+     * @return string
+     */
+    public function defaultCsrfHandler(): string
+    {
+        return \wp_create_nonce(View::getCurrentView());
+    }
+
+    /**
+     * Default auth handler.
+     *
+     * @param string|null $guard
+     * @return bool
+     */
+    protected function defaultAuthHandler(string $guard = null): bool
+    {
+        return \current_user_can($guard);
+    }
+
+    /**
+     * Default can handler.
+     *
+     * @param string|array $abilities
+     * @param string|array $arguments
+     * @return bool
+     */
+    protected function defaultCanHandler($abilities, $arguments = null): bool
+    {
+        return \current_user_can($abilities, $arguments);
+    }
+
+    /**
+     * Default service injection handler.
+     *
+     * @param string $service
+     * @return object
+     */
+    protected function defaultInjectHandler(string $service)
+    {
+        return Container::get($service);
+    }
+
+    /**
+     * Default error handler.
+     *
+     * @param string $error
+     * @return string|false
+     */
+    protected function defaultErrorHandler(string $error)
+    {
+        return Request::getGlobalErrors()->first($error) ?? false;
     }
 }
