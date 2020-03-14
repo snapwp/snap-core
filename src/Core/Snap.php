@@ -14,7 +14,7 @@ use Snap\Http\Validation\Validator;
 use Snap\Media\ImageService;
 use Snap\Routing\Router;
 use Snap\Services\PostQuery;
-use Snap\Templating\Strategies\TemplatingInterface;
+use Snap\Templating\Strategies\StrategyInterface;
 use Snap\Templating\View;
 
 /**
@@ -210,7 +210,7 @@ class Snap
     private static function initTemplating()
     {
         // If no templating strategy has already been registered.
-        if (!static::$container->has(TemplatingInterface::class)) {
+        if (!static::$container->has(StrategyInterface::class)) {
             static::$container->addSingleton(
                 \Snap\Templating\Blade\Factory::class,
                 function (Container $container) {
@@ -233,7 +233,7 @@ class Snap
 
             static::$container->bind(
                 \Snap\Templating\Strategies\DefaultStrategy::class,
-                TemplatingInterface::class
+                StrategyInterface::class
             );
         }
     }
