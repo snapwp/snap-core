@@ -14,7 +14,7 @@ use Snap\Utils\Theme;
 /**
  * The default vanilla PHP templating engine.
  */
-class DefaultStrategy implements TemplatingInterface
+class DefaultStrategy implements StrategyInterface
 {
     use WordpressDirectives;
     use SnapDirectives;

@@ -3,7 +3,7 @@
 namespace Snap\Templating;
 
 use Snap\Services\View as Facade;
-use Snap\Templating\Strategies\TemplatingInterface;
+use Snap\Templating\Strategies\StrategyInterface;
 
 /**
  * Deals with rendering templates and passing data to them.
@@ -13,7 +13,7 @@ class View
     /**
      * The current template rendering strategy.
      *
-     * @var TemplatingInterface
+     * @var StrategyInterface
      */
     private $strategy = null;
 
@@ -41,9 +41,9 @@ class View
     /**
      * Set the current strategy provided by the service container.
      *
-     * @param TemplatingInterface $strategy The current template rendering strategy.
+     * @param StrategyInterface $strategy The current template rendering strategy.
      */
-    public function __construct(TemplatingInterface $strategy)
+    public function __construct(StrategyInterface $strategy)
     {
         $this->strategy = $strategy;
     }
