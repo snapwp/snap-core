@@ -6,6 +6,7 @@ use Exception;
 use Hodl\Container;
 use Hodl\Exceptions\ContainerException;
 use Snap\Core\Bootstrap\SnapLoader;
+use Snap\Database\PostQuery;
 use Snap\Database\TaxQuery;
 use Snap\Exceptions\StartupException;
 use Snap\Http\Request;
@@ -13,7 +14,6 @@ use Snap\Http\Response;
 use Snap\Http\Validation\Validator;
 use Snap\Media\ImageService;
 use Snap\Routing\Router;
-use Snap\Services\PostQuery;
 use Snap\Templating\Strategies\StrategyInterface;
 use Snap\Templating\View;
 
@@ -216,7 +216,7 @@ class Snap
                 function (Container $container) {
                     return new \Snap\Templating\Blade\Factory(
                         \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.templates_directory')),
-                        \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.cache_directory')) . '/templates/'
+                        \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.cache_directory')) . '/templates'
                     );
                 }
             );

@@ -2,8 +2,8 @@
 
 namespace Snap\Utils;
 
+use Snap\Services\Blade;
 use Snap\Services\Config;
-use Snap\Services\Request;
 
 /**
  * Sidebar and widget utilities.
@@ -20,7 +20,7 @@ class Theme
     /**
      * Gets the current full URL of the page with query string, host, and scheme.
      *
-     * @param  boolean $remove_query If true, the URL is returned without any query params.
+     * @param boolean $remove_query If true, the URL is returned without any query params.
      * @return string The current URL.
      */
     public static function getCurrentUrl($remove_query = false)
@@ -63,7 +63,7 @@ class Theme
     /**
      * Retrieves a filename public URL with Webpack version ID if present.
      *
-     * @param  string $file The asset file to look for.
+     * @param string $file The asset file to look for.
      * @return string The (possibly versioned) asset URL.
      */
     public static function getAssetUrl($file)
@@ -81,22 +81,41 @@ class Theme
     }
 
     /**
-     * Transforms a partial name and returns the path to the partial relative to theme root.
+     * Get a system agnostic stylesheet dir.
      *
-     * @param  string $partial The partial name.
      * @return string
      */
-    public static function getPartialPath($partial): string
+    public static function getStylesheetDirectory()
     {
-        $partial = \str_replace(
-            ['.php', '.'],
-            ['', '/'],
-            $partial
-        );
+        return static::normalisePath(\get_stylesheet_directory());
+    }
 
-        $path = static::getTemplatesPath() . 'partials/' . $partial . '.php';
+    /**
+     * Ensure path only uses forward slashes.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function normalisePath(string $path): string
+    {
+        return str_replace('\\', '/', $path);
+    }
 
-        return $path;
+    /**
+     * Transforms a partial name and returns the path to the partial relative to theme root.
+     *
+     * @param string $partial The partial name.
+     * @return string
+     */
+    public static function getPartialPath(string $partial): string
+    {
+        try {
+            $path = Blade::getFinder()->find('partials.' . static::stripExtension($partial));
+        } catch (\Exception $e) {
+            return static::getTemplatesPath();
+        }
+
+        return trim(str_replace(static::getStylesheetDirectory(), '', static::normalisePath($path)), '/');
     }
 
     /**
@@ -105,20 +124,36 @@ class Theme
      * @param string $post_template The template to get the path for.
      * @return string
      */
-    public static function getPostTemplatesPath($post_template): string
+    public static function getPostTemplatesPath(string $post_template): string
     {
-        $template = \str_replace(
-            ['.blade.php', '.php', '.'],
-            ['', '', '/'],
-            $post_template
-        );
+        try {
+            $path = Blade::getFinder()->find('views.post-templates.' . static::stripExtension($post_template));
+        } catch (\Exception $e) {
+            return static::getTemplatesPath();
+        }
 
-        return static::getTemplatesPath() . "views/post-templates/{$template}.blade.php";
+        return trim(str_replace(static::getStylesheetDirectory(), '', static::normalisePath($path)), '/');
     }
 
+    /**
+     * Returns the current templates directory.
+     *
+     * @return string
+     */
     public static function getTemplatesPath(): string
     {
         return \trailingslashit(Config::get('theme.templates_directory'));
+    }
+
+    /**
+     * Strips the extension from a view.
+     *
+     * @param string $path
+     * @return string
+     */
+    private static function stripExtension(string $path): string
+    {
+        return trim(str_replace(Blade::getExtension($path), '', $path), ". \t\n\r\0\x0B");
     }
 
     /**

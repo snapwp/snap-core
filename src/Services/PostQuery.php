@@ -5,6 +5,8 @@ namespace Snap\Services;
 /**
  * PostQuery service facade.
  *
+ * @method static \Snap\Database\PostQuery type(string $type = 'post')
+ *
  * @method static false|\WP_Post first()
  * @method static \Tightenco\Collect\Support\Collection get()
  * @method static \WP_Query getWPQuery()
