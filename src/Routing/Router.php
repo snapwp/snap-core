@@ -5,9 +5,11 @@ namespace Snap\Routing;
 use BadMethodCallException;
 use Closure;
 use Exception;
+use Snap\Services\Config;
 use Snap\Services\Container;
 use Snap\Services\Request;
 use Snap\Services\View;
+use Snap\Utils\Theme;
 use Tightenco\Collect\Support\Arr;
 
 class Router
@@ -186,7 +188,6 @@ class Router
      */
     public function whenPostTemplate(string $template = null): Router
     {
-
         if ($this->canProceed() === false) {
             return $this;
         }
@@ -195,11 +196,9 @@ class Router
             return $this->when(\is_page_template());
         }
 
-
         if (Request::isPostTemplate($template) === false) {
             $this->stopProcessing();
         }
-
 
         return $this;
     }
@@ -232,7 +231,6 @@ class Router
         if ($this->canProceed() === false) {
             return $this;
         }
-
 
         $middleware = Arr::wrap($middleware);
 
@@ -272,6 +270,8 @@ class Router
         }
 
         $this->matchRoute();
+
+        $view = str_replace(Config::get('theme.templates_directory') . '/views/', '', $view);
         View::render($view, $data);
     }
 

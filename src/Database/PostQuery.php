@@ -20,10 +20,22 @@ class PostQuery extends Query
      *
      * @param string|array $type The post type to query.
      */
-    public function __construct($type = 'post')
+    public function __construct(string $type = 'post')
     {
         parent::__construct($type);
         $this->params['ignore_sticky_posts'] = true;
+    }
+
+    /**
+     * Change the queried post type.
+     *
+     * @param string $type
+     * @return $this
+     */
+    public function type(string $type = 'post'): PostQuery
+    {
+        $this->name = $type;
+        return $this;
     }
 
     /**
@@ -31,7 +43,7 @@ class PostQuery extends Query
      *
      * @return null|\WP_Post
      */
-    public function first()
+    public function first(): ?\WP_Post
     {
         return $this->getPost(
             $this->createArguments(
@@ -49,7 +61,7 @@ class PostQuery extends Query
      *
      * @return \Tightenco\Collect\Support\Collection;
      */
-    public function get()
+    public function get(): Collection
     {
         return $this->getCollection(
             $this->createArguments(
@@ -66,7 +78,7 @@ class PostQuery extends Query
      *
      * @return \WP_Query
      */
-    public function getWPQuery()
+    public function getWPQuery(): WP_Query
     {
         return new WP_Query(
             $this->createArguments(
@@ -82,7 +94,7 @@ class PostQuery extends Query
      *
      * @return \Tightenco\Collect\Support\Collection;
      */
-    public function all()
+    public function all(): Collection
     {
         return $this->getCollection(
             $this->createArguments(
@@ -149,6 +161,7 @@ class PostQuery extends Query
     public function withSticky()
     {
         $this->params['ignore_sticky_posts'] = false;
+        return $this;
     }
 
     /**
@@ -202,7 +215,7 @@ class PostQuery extends Query
      *                                                         'EXISTS' and 'NOT EXISTS'.
      * @param bool                           $include_children Whether or not to include children for hierarchical
      *                                                         taxonomies.
-     * @return \Snap\Database\PostQuery
+     * @return $this
      */
     public function whereTerms($objects, string $operator = 'IN', bool $include_children = true)
     {
@@ -241,7 +254,7 @@ class PostQuery extends Query
      *                                                         'EXISTS' and 'NOT EXISTS'.
      * @param bool                           $include_children Whether or not to include children for hierarchical
      *                                                         taxonomies.
-     * @return \Snap\Database\PostQuery
+     * @return $this
      */
     public function orWhereTerms($objects, string $operator = 'IN', bool $include_children = true)
     {

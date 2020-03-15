@@ -17,16 +17,17 @@ namespace Snap\Services;
  * @method static \Snap\Templating\Blade\Factory addNamespace(string $namespace, string|array $hints)
  * @method static \Snap\Templating\Blade\Factory prependNamespace(string $namespace, string|array $hints)
  * @method static \Snap\Templating\Blade\Factory replaceNamespace(string $namespace, string|array $hints)
- * @method static string if($name, callable $callback): void
- * @method static string component($path, $alias = null): void
- * @method static string directive($name, callable $handler): void
- * @method static string include($path, $alias = null): void
- * @method static string addExtension($extension, $engine, $resolver = null): void
+ * @method static void if($name, callable $callback): void
+ * @method static void component($path, $alias = null): void
+ * @method static void directive($name, callable $handler): void
+ * @method static void include($path, $alias = null): void
+ * @method static void addExtension($extension, $engine, $resolver = null): void
  * @method static \Bladezero\View\Engines\EngineResolver getEngineResolver()
  * @method static \Bladezero\View\Compilers\BladeCompiler  getCompiler()
  * @method static \Bladezero\View\ViewFinderInterface  getFinder()
  * @method static \Bladezero\Filesystem\Filesystem  getFiles()
- * @method static mixed  shared($key, $default = null)
+ * @method static string getExtension(string $path)
+ * @method static mixed shared($key, $default = null)
  * @method static array getShared()
  *
  * @see \Snap\Templating\Blade\Factory

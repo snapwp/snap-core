@@ -2,6 +2,7 @@
 
 namespace Snap\Bootstrap;
 
+use Bladezero\View\Engines\CompilerEngine;
 use Snap\Core\Hookable;
 use Snap\Services\Config;
 use Snap\Utils\Theme;
@@ -16,9 +17,7 @@ class Comments extends Hookable
      */
     public function boot()
     {
-        if (Config::get('theme.disable_comments') === false) {
-            $this->addFilter('comments_template', 'mapCommentsTemplateToPartials');
-        }
+        $this->addFilter('comments_template', 'mapCommentsTemplateToPartials');
     }
 
     /**
@@ -29,21 +28,19 @@ class Comments extends Hookable
      */
     public function mapCommentsTemplateToPartials($path)
     {
-        $tpl = \str_replace(
-            [STYLESHEETPATH, TEMPLATEPATH, '.'],
-            ['', '', '/'],
-            $path
-        );
-
-        $locate = \locate_template(Theme::getPartialPath($tpl), false);
-
-        if ($locate !== '') {
-            return $locate;
-        }
-
         $locate = \locate_template(Theme::getPartialPath('comments'), false);
 
         if ($locate !== '') {
+            $compiler = \Snap\Services\Blade::getEngineFromPath($locate);
+
+            if ($compiler instanceof CompilerEngine) {
+                // Compile the template
+                \Snap\Services\Blade::getEngineFromPath($locate)->getCompiler()->compile($locate);
+
+                // return the compiled path instead of the raw path
+                return \Snap\Services\Blade::getEngineFromPath($locate)->getCompiler()->getCompiledPath($locate);
+            }
+
             return $locate;
         }
 

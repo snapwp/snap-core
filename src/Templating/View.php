@@ -58,7 +58,7 @@ class View
      */
     public function render($view, $data = [])
     {
-        $this->strategy->render('views/' . $view, $data);
+        $this->strategy->render('views.' . $view, $data);
     }
 
     /**
@@ -72,7 +72,7 @@ class View
      */
     public function partial($partial, $data = []): void
     {
-        $this->strategy->partial('partials/' . $partial, $data);
+        $this->strategy->partial('partials.' . $partial, $data);
     }
 
     /**

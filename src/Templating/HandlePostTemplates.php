@@ -97,8 +97,7 @@ class HandlePostTemplates extends Hookable
                         $post_templates[$type] = [];
                     }
 
-
-                    $key = Theme::getTemplatesPath() . 'views/post-templates/' . $tpl;
+                    $key = Theme::getPostTemplatesPath($tpl);
                     $post_templates[$type][$key] = _cleanup_header_comment($header[1]);
                 }
             }
