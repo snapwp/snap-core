@@ -98,7 +98,7 @@ class Theme
      */
     public static function normalisePath(string $path): string
     {
-        return str_replace('\\', '/', $path);
+        return \str_replace('\\', '/', $path);
     }
 
     /**
@@ -115,7 +115,7 @@ class Theme
             return static::getTemplatesPath();
         }
 
-        return trim(str_replace(static::getStylesheetDirectory(), '', static::normalisePath($path)), '/');
+        return \trim(\str_replace(static::getStylesheetDirectory(), '', static::normalisePath($path)), '/');
     }
 
     /**
@@ -132,7 +132,7 @@ class Theme
             return static::getTemplatesPath();
         }
 
-        return trim(str_replace(static::getStylesheetDirectory(), '', static::normalisePath($path)), '/');
+        return \trim(\str_replace(static::getStylesheetDirectory(), '', static::normalisePath($path)), '/');
     }
 
     /**
@@ -153,7 +153,7 @@ class Theme
      */
     private static function stripExtension(string $path): string
     {
-        return trim(str_replace(Blade::getExtension($path), '', $path), ". \t\n\r\0\x0B");
+        return \trim(\str_replace(Blade::getExtension($path), '', $path), ". \t\n\r\0\x0B");
     }
 
     /**

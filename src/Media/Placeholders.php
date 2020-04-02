@@ -164,10 +164,10 @@ class Placeholders extends Hookable
     /**
      * Parses image $attr array, turning them into HTML.
      *
-     * @param  array $attr The $attr array.
+     * @param  array|string $attr The $attr array.
      * @return string
      */
-    private function parseAttributes(array $attr): string
+    private function parseAttributes($attr): string
     {
         $html = '';
 

@@ -271,7 +271,7 @@ class Router
 
         $this->matchRoute();
 
-        $view = str_replace(Config::get('theme.templates_directory') . '/views/', '', $view);
+        $view = \str_replace(Config::get('theme.templates_directory') . '/views/', '', $view);
         View::render($view, $data);
     }
 
