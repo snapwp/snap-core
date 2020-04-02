@@ -65,13 +65,17 @@ class HandlePostTemplates extends Hookable
         // Path to  templates folder.
         $path = \get_stylesheet_directory() . '/' . Theme::getTemplatesPath() . 'views/post-templates/';
 
+        if (!\is_dir($path)) {
+            return [];
+        }
+
         $templates = \scandir($path);
 
         if (!empty($templates)) {
             foreach ($templates as $tpl) {
                 $full_path = $path . $tpl;
 
-                if ($tpl === '.' || $tpl === '..' || \is_dir($full_path) || $tpl === '_example.php') {
+                if ($tpl === '.' || $tpl === '..' || \is_dir($full_path) || \strpos($tpl, '_example') !== false) {
                     continue;
                 }
 
