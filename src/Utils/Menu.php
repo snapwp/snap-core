@@ -27,7 +27,7 @@ class Menu
      * @type bool     $has_children     Whether this link has children.
      * @type bool     $is_active        Whether this link is the current link.
      * @type bool     $has_active_child Whether a child link is the current link.
-     *                                  }
+     * }
      */
     public static function getNavMenu(string $theme_location = 'primary'): array
     {
@@ -46,39 +46,20 @@ class Menu
             // Apply WP classes to the menu items. Subject to change.
             \_wp_menu_item_classes_by_context($menu_items_raw);
 
-            foreach ($menu_items as $menu_item) {
-                $is_active = false;
+            $menu = [];
+            $refs = [];
 
-                $item_classes = \array_intersect($menu_item->classes, $custom_classes);
+            foreach ($menu_items as $item) {
+                if ($item->menu_item_parent === '0') {
+                    $menu[$item->ID] = static::generateMenuObject($item, $custom_classes);
+                    $refs[$item->ID] = $menu[$item->ID];
+                } else {
+                    if (isset($refs[(int)$item->menu_item_parent])) {
+                        $refs[(int)$item->menu_item_parent]->children[$item->ID] = static::generateMenuObject($item, $custom_classes);
 
-                if (\in_array('current-menu-item', $menu_item->classes)) {
-                    $is_active = true;
-                }
-
-                $menu[$menu_item->ID] = (object)[];
-                $menu[$menu_item->ID]->ID = $menu_item->ID;
-                $menu[$menu_item->ID]->object_id = $menu_item->object_id;
-                $menu[$menu_item->ID]->text = $menu_item->title;
-                $menu[$menu_item->ID]->title = $menu_item->attr_title;
-                $menu[$menu_item->ID]->description = $menu_item->description;
-                $menu[$menu_item->ID]->target = $menu_item->target;
-                $menu[$menu_item->ID]->custom_classes = \implode(' ', $item_classes);
-                $menu[$menu_item->ID]->url = $menu_item->url;
-                $menu[$menu_item->ID]->children = [];
-                $menu[$menu_item->ID]->has_children = false;
-                $menu[$menu_item->ID]->is_active = $is_active;
-                $menu[$menu_item->ID]->has_active_child = false;
-            }
-
-            foreach ($menu_items as $menu_item) {
-                if ($menu_item->menu_item_parent !== '0') {
-                    $menu[$menu_item->menu_item_parent]->children[$menu_item->ID] = $menu[$menu_item->ID];
-
-                    if ($menu[$menu_item->ID]->is_active || $menu[$menu_item->ID]->has_active_child) {
-                        $menu[$menu_item->menu_item_parent]->has_active_child = true;
+                        $refs[$item->ID] = $refs[(int)$item->menu_item_parent]->children[$item->ID];
+                        $refs[(int)$item->menu_item_parent]->has_children = true;
                     }
-
-                    unset($menu[$menu_item->ID]);
                 }
             }
         }
@@ -103,7 +84,6 @@ class Menu
         return false;
     }
 
-
     /**
      * For a given menu ID, name, or slug, return the user-set name for the associated menu.
      *
@@ -119,5 +99,45 @@ class Menu
         }
 
         return false;
+    }
+
+    /**
+     * Create a simple object from a wp_get_nav_menu_object response.
+     *
+     * @param object $item Source object.
+     * @param array $custom_classes Current allowed custom classes.
+     * @return object
+     */
+    private static function generateMenuObject(object $item, array $custom_classes): object
+    {
+        $is_active = false;
+        $has_active_child = false;
+
+        $item_classes = \array_intersect($item->classes, $custom_classes);
+
+        if (\in_array('current-menu-item', $item->classes)) {
+            $is_active = true;
+        }
+
+        if (\in_array('current-menu-ancestor', $item->classes)) {
+            $has_active_child = true;
+        }
+
+        $output = [
+            'ID' => $item->ID,
+            'object_id' => $item->object_id,
+            'text' => $item->title,
+            'title' => $item->attr_title,
+            'description' => $item->description,
+            'target' => $item->target,
+            'custom_classes' => \implode(' ', $item_classes),
+            'url' => $item->url,
+            'children' => [],
+            'has_children' => false,
+            'is_active' => $is_active,
+            'has_active_child' => $has_active_child,
+        ];
+
+        return (object)$output;
     }
 }
