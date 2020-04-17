@@ -30,9 +30,9 @@ class DisableCustomizer extends Hookable
      * }
      * @return array $all_caps
      */
-    public function shortcircuitCustomizeCap($all_caps, $cap, $args)
+    public function shortcircuitCustomizeCap($all_caps, $cap, $args): array
     {
-        if ($args[0] == 'customize') {
+        if ($args[0] === 'customize') {
             $all_caps[ $cap[0] ] = false;
         }
 

@@ -166,7 +166,7 @@ class DynamicImagesTable extends \WP_List_Table
                 }
 
                 if (\is_array($item['crop'])) {
-                    if ($item['crop'][0] == 'center' && $item['crop'][1] == 'center') {
+                    if ($item['crop'][0] === 'center' && $item['crop'][1] === 'center') {
                         return 'Cropped from center';
                     }
 

@@ -4,9 +4,9 @@ namespace Snap\Hookables;
 
 use Snap\Database\PostQuery;
 use Snap\Hookables\Content\ColumnController;
+use Snap\Utils\Str;
 use Tightenco\Collect\Support\Arr;
 use Tightenco\Collect\Support\Collection;
-use Snap\Utils\Str;
 
 /**
  * Class PostType
@@ -34,10 +34,10 @@ use Snap\Utils\Str;
  *
  * @method static PostQuery WhereDate(\WP_Post|\DateTimeInterface|int $date)
  * @method static PostQuery orWhereDate(\WP_Post|\DateTimeInterface|int $date)
- * @method static PostQuery whereDateBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
- * @method static PostQuery orWhereDateBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
- * @method static PostQuery whereDateNotBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
- * @method static PostQuery orWhereDateNotBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int$end)
+ * @method static PostQuery whereDateBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int $end)
+ * @method static PostQuery orWhereDateBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int $end)
+ * @method static PostQuery whereDateNotBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int $end)
+ * @method static PostQuery orWhereDateNotBetween(\WP_Post|\DateTimeInterface|int $start, \WP_Post|\DateTimeInterface|int $end)
  * @method static PostQuery whereDateBefore(\WP_Post|\DateTimeInterface|int $date)
  * @method static PostQuery orWhereDateBefore(\WP_Post|\DateTimeInterface|int $date)
  * @method static PostQuery whereDateAfter(\WP_Post|\DateTimeInterface|int $date)
@@ -51,8 +51,8 @@ use Snap\Utils\Str;
  * @method static PostQuery whereHour(int $hour, string $operator = '=')
  * @method static PostQuery orWhereHour(int $hour, string $operator = '=')
  *
- * @method static PostQuery childOf(int|int[]|\WP_Post|\WP_Post[]$post_ids)
- * @method static PostQuery notChildOf(int|int[]|\WP_Post|\WP_Post[]$post_ids)
+ * @method static PostQuery childOf(int|int[]|\WP_Post|\WP_Post[] $post_ids)
+ * @method static PostQuery notChildOf(int|int[]|\WP_Post|\WP_Post[] $post_ids)
  * @method static PostQuery in(int|int[] $ids)
  * @method static PostQuery exclude(int|int[] $ids)
  *
@@ -92,7 +92,7 @@ class PostType extends ContentHookable
     /**
      * Register the post type.
      */
-    public function register()
+    public function register(): void
     {
         if ($this->hasRegistered()) {
             return;
@@ -113,7 +113,7 @@ class PostType extends ContentHookable
     /**
      * Register any column hooks.
      */
-    public function registerColumns()
+    public function registerColumns(): void
     {
         if ($this->hasRegisteredColumns() === true) {
             return;
@@ -139,7 +139,7 @@ class PostType extends ContentHookable
                     [$columnController, 'setSortableColumns']
                 );
 
-                $this->addFilter("pre_get_posts", [$columnController, 'handleSortableColumns']);
+                $this->addFilter('pre_get_posts', [$columnController, 'handleSortableColumns']);
             }
         }
 
@@ -152,7 +152,7 @@ class PostType extends ContentHookable
      * @param string|array $taxonomy Taxonomy or array of taxonomies to create a filter for.
      * @return $this
      */
-    public function addTaxonomyFilter($taxonomy)
+    public function addTaxonomyFilter($taxonomy): PostType
     {
         if (!\is_array($taxonomy)) {
             $this->admin_filters[] = $taxonomy;
@@ -169,7 +169,7 @@ class PostType extends ContentHookable
      * @param string|array $taxonomy Taxonomy name to attach.
      * @return $this
      */
-    public function attachTaxonomy($taxonomy)
+    public function attachTaxonomy($taxonomy): PostType
     {
         if (!isset(static::$relationships[$this->getName()])) {
             static::$relationships[$this->getName()] = [];
@@ -187,17 +187,17 @@ class PostType extends ContentHookable
     /**
      * Run any registered accessor methods.
      *
-     * @param null   $default   Default return value.
-     * @param int    $object_id The ID of the current post object.
-     * @param string $meta_key  The key being looked up.
-     * @param bool   $single    Whether to return only one result.
+     * @param null $default Default return value.
+     * @param int $object_id The ID of the current post object.
+     * @param string $meta_key The key being looked up.
+     * @param bool $single Whether to return only one result.
      * @return mixed
      */
     public function runAttributeAccessors($default, $object_id, $meta_key, $single)
     {
         // Do not run for built-ins.
         if ($meta_key === '' || $meta_key[0] === '_' || $single === false) {
-            return $default;
+            return null;
         }
 
         $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
@@ -206,7 +206,7 @@ class PostType extends ContentHookable
         $post = \get_post($object_id);
 
         if ($post === null) {
-            return $default;
+            return null;
         }
 
         foreach (static::$has_registered[self::$type] as $post_type => $class) {
@@ -215,11 +215,10 @@ class PostType extends ContentHookable
             }
 
             // Return taxonomy Collection if the taxonomy exists.
-            if (\in_array($meta_key, static::$taxonomy_plurals)) {
-                $name = \array_search($meta_key, self::$taxonomy_plurals);
+            if (\in_array($meta_key, static::$taxonomy_plurals, true)) {
+                $name = \array_search($meta_key, self::$taxonomy_plurals, true);
 
-                if (\in_array($name, self::$relationships[$post_type])) {
-                    /** @noinspection PhpUndefinedMethodInspection */
+                if (\in_array($name, self::$relationships[$post_type], true)) {
                     return (new self::$has_registered['taxonomy'][$name])->for($object_id)->get();
                 }
             }
@@ -230,7 +229,7 @@ class PostType extends ContentHookable
             }
         }
 
-        return $default;
+        return null;
     }
 
     /**
@@ -238,7 +237,7 @@ class PostType extends ContentHookable
      *
      * @return \Snap\Database\PostQuery
      */
-    protected function makeNewQuery()
+    protected function makeNewQuery(): PostQuery
     {
         return new PostQuery($this->getName());
     }
@@ -278,23 +277,23 @@ class PostType extends ContentHookable
             'name' => $this->getPlural(),
             'singular_name' => $this->getSingular(),
             'menu_name' => $this->getPlural(),
-            'all_items' => \sprintf(__("All %s"), $this->getPlural()),
-            'add_new' => \sprintf(__("Add New %s"), $this->getSingular()),
-            'add_new_item' => \sprintf(__("Add New %s"), $this->getSingular()),
-            'edit_item' => \sprintf(__("Edit %s"), $this->getSingular()),
-            'new_item' => \sprintf(__("New %s"), $this->getSingular()),
-            'view_item' => \sprintf(__("View %s"), $this->getSingular()),
-            'search_items' => \sprintf(__("Search %s"), $this->getPlural()),
-            'not_found' => \sprintf(__("No %s found"), $this->getPlural()),
-            'not_found_in_trash' => \sprintf(__("No %s found in Trash"), $this->getPlural()),
-            'parent_item_colon' => \sprintf(__("Parent %s:"), $this->getSingular()),
+            'all_items' => \sprintf(__('All %s'), $this->getPlural()),
+            'add_new' => \sprintf(__('Add New %s'), $this->getSingular()),
+            'add_new_item' => \sprintf(__('Add New %s'), $this->getSingular()),
+            'edit_item' => \sprintf(__('Edit %s'), $this->getSingular()),
+            'new_item' => \sprintf(__('New %s'), $this->getSingular()),
+            'view_item' => \sprintf(__('View %s'), $this->getSingular()),
+            'search_items' => \sprintf(__('Search %s'), $this->getPlural()),
+            'not_found' => \sprintf(__('No %s found'), $this->getPlural()),
+            'not_found_in_trash' => \sprintf(__('No %s found in Trash'), $this->getPlural()),
+            'parent_item_colon' => \sprintf(__('Parent %s:'), $this->getSingular()),
         ];
     }
 
     /**
      * Add taxonomies based on the taxonomies property.
      */
-    private function registerAttachedTaxonomies()
+    private function registerAttachedTaxonomies(): void
     {
         if ($this->taxonomies !== null) {
             foreach ($this->taxonomies as $taxonomy) {
@@ -306,7 +305,7 @@ class PostType extends ContentHookable
     /**
      * Override existing post type.
      */
-    private function registerExistingPostType()
+    private function registerExistingPostType(): void
     {
         $existing = \get_post_type_object($this->getName());
         $new_args = \array_replace_recursive(\get_object_vars($existing), $this->getOptions());
@@ -318,7 +317,7 @@ class PostType extends ContentHookable
     /**
      * Register the post type.
      */
-    private function registerPostType()
+    private function registerPostType(): void
     {
         \register_post_type($this->getName(), $this->getOptions());
     }
@@ -326,7 +325,7 @@ class PostType extends ContentHookable
     /**
      * Add hook to allow accessor methods.
      */
-    private function registerAccessors()
+    private function registerAccessors(): void
     {
         if (static::$has_registered_accessors === false) {
             $this->addFilter('get_post_metadata', 'runAttributeAccessors', 10, 4);
@@ -353,7 +352,7 @@ class PostType extends ContentHookable
      *
      * @param string $taxonomy The taxonomy name.
      */
-    private function outputTaxonomyFilter(string $taxonomy)
+    private function outputTaxonomyFilter(string $taxonomy): void
     {
         if (!\taxonomy_exists($taxonomy)) {
             return;

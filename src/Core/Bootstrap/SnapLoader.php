@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ClassConstantCanBeUsedInspection */
 
 namespace Snap\Core\Bootstrap;
 
@@ -53,7 +53,7 @@ class SnapLoader
      */
     public static function getInstance(Container $container): SnapLoader
     {
-        if (\is_null(static::$instance)) {
+        if (static::$instance === null) {
             return static::$instance = new static($container);
         }
 

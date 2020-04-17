@@ -2,10 +2,6 @@
 
 namespace Snap\Media;
 
-use Snap\Services\Config;
-use Snap\Utils\Image;
-use Snap\Utils\Theme;
-
 class ImageService
 {
     /**
@@ -14,9 +10,9 @@ class ImageService
      * Snap tries to save server space by only generating images needed for admin use.
      * All other theme images are generated dynamically by this method.
      *
-     * @param mixed        $image Image array to pass on from this filter.
-     * @param int          $id    Attachment ID for image.
-     * @param array|string $size  Optional. Image size to scale to. Accepts any valid image size,
+     * @param mixed $image Image array to pass on from this filter.
+     * @param int $id Attachment ID for image.
+     * @param array|string $size Optional. Image size to scale to. Accepts any valid image size,
      *                            or an array of width and height values in pixels (in that order).
      *                            Default 'medium'.
      * @return false|array Array containing the image URL, width, height, and boolean for whether
@@ -33,13 +29,13 @@ class ImageService
         // Get parent image meta data.
         $meta = \wp_get_attachment_metadata($id);
 
-        // Very rarely the image has no meta - Like if added via fakerpress. Bail early.
+        // Very rarely the image has no meta - Like if added via FakerPress. Bail early.
         if (!isset($meta['file'])) {
             return $image;
         }
 
         if (\is_array($size)) {
-            list($width, $height) = $size;
+            [$width, $height] = $size;
 
             if ($meta['width'] < $width) {
                 $width = $meta['width'];
@@ -83,7 +79,7 @@ class ImageService
                 $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
 
                 if ($new_meta !== false) {
-                    $meta['sizes'][ \implode('x', [$width, $height]) ] = $new_meta;
+                    $meta['sizes'][\implode('x', [$width, $height])] = $new_meta;
                     $update = true;
                 }
             }
@@ -104,9 +100,9 @@ class ImageService
                             continue;
                         }
 
-                        $meta['sizes'][ $size ] = $new_meta;
-                        
-                        // Allow image transormations upon creation
+                        $meta['sizes'][$size] = $new_meta;
+
+                        // Allow image transformations upon creation
                         \do_action('snap_dynamic_image_meta', $size, $meta, $id);
 
                         $update = true;
@@ -126,10 +122,10 @@ class ImageService
                             continue;
                         }
 
-                        $meta['sizes'][ $key ] = $new_meta;
-                        
+                        $meta['sizes'][$key] = $new_meta;
+
                         \do_action('snap_dynamic_image_meta', $size, $meta, $id);
-                        
+
                         $update = true;
                     }
                 }

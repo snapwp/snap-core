@@ -6,27 +6,13 @@ use Snap\Core\Hookable;
 
 /**
  * A base class for simplifying declaring theme supports and menus.
- *
- * @since  1.0.0
  */
 class Theme extends Hookable
 {
     /**
-     * Actions to add on init.
-     *
-     * @var array
-     */
-    protected $actions = [
-        'widgets_init' => 'register_theme_widgets',
-        'wp_enqueue_scripts' => 'enqueue_theme_assets',
-    ];
-
-    /**
      * Declare theme support.
-     *
      * Keys are the feature to enable, and values are any additional arguments to pass to add_theme_support().
      *
-     * @since  1.0.0
      * @var array
      */
     protected $supports = [
@@ -35,37 +21,30 @@ class Theme extends Hookable
     /**
      * Declare theme menus.
      *
-     * @since  1.0.0
      * @var array
      */
-    protected $menus = [
-        'primary' => 'The primary navigation for the site',
-    ];
+    protected $menus = [];
 
     /**
      * Register theme support and menus.
-     *
-     * @since 1.0.0
      */
     public function __construct()
     {
-        $this->add_theme_support();
-        $this->register_theme_menus();
+        $this->addThemeSupport();
+        $this->registerThemeMenus();
     }
 
     /**
      * Loop through the $supports array, and declare theme support.
-     *
-     * @since  1.0.0
      */
-    protected function add_theme_support()
+    protected function addThemeSupport(): void
     {
         if (empty($this->supports)) {
             return;
         }
 
         foreach ($this->supports as $feature => $args) {
-            if (\is_integer($feature)) {
+            if (\is_int($feature)) {
                 \add_theme_support($args);
             } else {
                 \add_theme_support($feature, $args);
@@ -75,33 +54,13 @@ class Theme extends Hookable
 
     /**
      * Register the theme's navigation menus.
-     *
-     * @since 1.0.0
      */
-    protected function register_theme_menus()
+    protected function registerThemeMenus(): void
     {
         if (empty($this->menus)) {
             return;
         }
 
         register_nav_menus($this->menus);
-    }
-
-    /**
-     * Enqueue the theme CSS files.
-     *
-     * @since 1.0.0
-     */
-    public function enqueue_theme_assets()
-    {
-    }
-
-    /**
-     * Register the theme's widgets.
-     *
-     * @since 1.0.0
-     */
-    public function register_theme_widgets()
-    {
     }
 }

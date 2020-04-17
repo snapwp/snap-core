@@ -71,14 +71,14 @@ class Image
     public static function getImageWidth(string $size)
     {
         // Get the size meta array.
-        $size = static::getImageSize($size);
+        $meta = static::getImageSize($size);
 
-        if ($size === false) {
+        if ($meta === false) {
             return false;
         }
 
-        if (isset($size['width'])) {
-            return (int)$size['width'];
+        if (isset($meta['width'])) {
+            return (int)$meta['width'];
         }
 
         return false;
@@ -93,14 +93,14 @@ class Image
     public static function getImageHeight(string $size)
     {
         // Get the size meta array.
-        $size = static::getImageSize($size);
+        $meta = static::getImageSize($size);
 
-        if ($size === false) {
+        if ($meta === false) {
             return false;
         }
 
-        if (isset($size['height'])) {
-            return (int)$size['height'];
+        if (isset($meta['height'])) {
+            return (int)$meta['height'];
         }
 
         return false;

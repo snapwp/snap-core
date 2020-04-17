@@ -10,7 +10,7 @@ class Config
     /**
      * Config directory paths, in order of addition.
      *
-     * @var string
+     * @var array
      */
     private $paths = [];
 
@@ -60,7 +60,7 @@ class Config
         ],
         'services' => [
             'providers' => [],
-            'theme_providers' => [\Theme\ThemeProvider::class],
+            'theme_providers' => [],
             'aliases' => [],
         ],
     ];
@@ -70,7 +70,7 @@ class Config
      *
      * @param string $path Path to config directory.
      */
-    public function addPath(string $path)
+    public function addPath(string $path): void
     {
         $path = \trailingslashit($path);
         $this->paths[] = $path;
@@ -84,7 +84,7 @@ class Config
      *
      * @param string $path Path to config directory.
      */
-    public function addDefaultPath(string $path)
+    public function addDefaultPath(string $path): void
     {
         $path = \trailingslashit($path);
         $this->paths[] = $path;
@@ -113,7 +113,7 @@ class Config
      * @param  string $key The dot notation option key to look for.
      * @return boolean Whether an option exists for the given key.
      */
-    public function has($key)
+    public function has($key): bool
     {
         // Check if already cached.
         if (isset($this->cache[$key])) {
@@ -127,9 +127,9 @@ class Config
             if (\array_key_exists($segment, $root)) {
                 $root = $root[$segment];
                 continue;
-            } else {
-                return false;
             }
+
+            return false;
         }
 
         // Set cache for the given key.
@@ -144,7 +144,7 @@ class Config
      * @param string $key   The key of this option.
      * @param mixed  $value The value to set for this option.
      */
-    public function set($key, $value)
+    public function set($key, $value): void
     {
         $this->cache[$key] = $value;
     }
@@ -165,11 +165,10 @@ class Config
      *
      * @param string $data Serialized config array.
      */
-    public function loadFromCache($data)
+    public function loadFromCache($data): void
     {
-        $this->cache = \unserialize($data);
+        $this->cache = \unserialize($data, false);
     }
-
 
     /**
      * Scans a path for config files, and merges them into the config.
@@ -177,7 +176,7 @@ class Config
      * @param string $path      Directory path to scan.
      * @param bool   $overwrite If true, then the config within the $path will overwrite existing config keys.
      */
-    private function parseFiles($path, $overwrite = true)
+    private function parseFiles($path, $overwrite = true): void
     {
         if (\is_dir($path)) {
             $files = \glob($path . '*.php');
@@ -224,7 +223,7 @@ class Config
      * @param array  $values An array to extract the keys from.
      * @param string $path   The current level's key.
      */
-    private function recurseThroughConfig(array $values, $path = null)
+    private function recurseThroughConfig(array $values, $path = null): void
     {
         if (empty($values)) {
             $this->has($path);

@@ -6,7 +6,11 @@ use Snap\Core\Concerns\ManagesHooks;
 use Snap\Services\Config;
 use Snap\Services\Container;
 use Snap\Services\Request;
+use Snap\Services\ServiceProvider;
 use Snap\Utils\Str;
+use Rakit\Validation\Rule;
+use Rakit\Validation\Validator;
+use Theme\Bootstrap;
 
 /**
  * Initializes Snap classes and child includes.
@@ -48,7 +52,7 @@ class Loader
      *
      * @param string $class The fully qualified class name to load.
      */
-    public static function classAutoload($class)
+    public static function classAutoload($class): void
     {
         // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
         if (isset(static::$theme_includes[$class])) {
@@ -62,9 +66,9 @@ class Loader
      *
      * @param string $class The fully qualified class name to load.
      */
-    public static function aliasAutoload($class)
+    public static function aliasAutoload($class): void
     {
-        if (\in_array($class, \array_keys(static::$aliases))) {
+        if (\array_key_exists($class, static::$aliases)) {
             \class_alias(static::$aliases[$class], $class);
         }
     }
@@ -78,8 +82,8 @@ class Loader
      */
     public function __construct()
     {
-        \spl_autoload_register(__NAMESPACE__ . '\Loader::classAutoload', true);
-        \spl_autoload_register(__NAMESPACE__ . '\Loader::aliasAutoload', true);
+        \spl_autoload_register('self::classAutoload', true);
+        \spl_autoload_register('self::aliasAutoload', true);
 
         static::$aliases = Config::get('services.aliases');
 
@@ -97,10 +101,10 @@ class Loader
      *
      * @param null|string $classmap Cached classmap.
      */
-    public function loadTheme($classmap = null)
+    public function loadTheme($classmap = null): void
     {
         if ($classmap !== null) {
-            static::$theme_includes = \unserialize($classmap);
+            static::$theme_includes = \unserialize($classmap, false);
         } else {
             $hookables_dir = \trim(Config::get('theme.hookables_directory'), '/');
             $root = \trailingslashit(\get_template_directory());
@@ -153,7 +157,7 @@ class Loader
      *
      * @return array
      */
-    public function getThemeIncludes()
+    public function getThemeIncludes(): array
     {
         return static::$theme_includes;
     }
@@ -161,7 +165,7 @@ class Loader
     /**
      * Ensures the the global Request object has access to the global $wp properties.
      */
-    public function populateRequest()
+    public function populateRequest(): void
     {
         /** @noinspection PhpUndefinedMethodInspection */
         Request::populateWpParams();
@@ -170,7 +174,7 @@ class Loader
     /**
      * Register additional Snap widgets.
      */
-    private function initWidgets()
+    private function initWidgets(): void
     {
         \add_action(
             'widgets_init',
@@ -196,10 +200,10 @@ class Loader
                 return;
             }
 
-            if (\is_subclass_of($class_name, 'Rakit\Validation\Rule')) {
+            if (\is_subclass_of($class_name, Rule::class)) {
                 $class_parts = \explode('\\', $class_name);
 
-                Container::get('Rakit\Validation\Validator')->addValidator(
+                Container::get(Validator::class)->addValidator(
                     Str::toSnake(\end($class_parts)),
                     Container::resolve($class_name)
                 );
@@ -210,10 +214,10 @@ class Loader
     /**
      * Initialize any theme service providers.
      */
-    private function initThemeProviders()
+    private function initThemeProviders(): void
     {
         foreach (Config::get('services.theme_providers') as $class_name) {
-            if (\is_subclass_of($class_name, \Snap\Services\ServiceProvider::class)) {
+            if (\is_subclass_of($class_name, ServiceProvider::class)) {
                 $provider = Container::resolve($class_name);
                 Container::resolveMethod($provider, 'register');
                 return;
@@ -272,18 +276,12 @@ class Loader
     /**
      * Include Theme\ThemeSetup
      */
-    private function initThemeSetup()
+    private function initThemeSetup(): void
     {
-        if (isset(static::$theme_includes['Theme\ThemeSetup'])) {
-            Container::resolve('Theme\ThemeSetup')->run();
-        }
+        Container::resolve(Bootstrap::class)->run();
     }
 
-
-
-
-
-    private function runHookables()
+    private function runHookables(): void
     {
         foreach (static::$theme_hookables as $hookable) {
             Container::resolve($hookable)->run();

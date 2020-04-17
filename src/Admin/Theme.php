@@ -27,7 +27,6 @@ class Theme extends Hookable
 
     /**
      * Remove the user color scheme picker to enforce Snap colors.
-     *
      */
     public function boot()
     {
@@ -46,10 +45,10 @@ class Theme extends Hookable
             return true;
         }
 
-        $pages = \array_search('edit.php?post_type=page', $menu_order);
+        $pages = \array_search('edit.php?post_type=page', $menu_order, true);
 
         if ($pages > 0) {
-            $posts = \array_search('edit.php', $menu_order);
+            $posts = \array_search('edit.php', $menu_order, true);
 
             if ($posts === false) {
                 $posts = 2;

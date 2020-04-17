@@ -2,6 +2,7 @@
 
 namespace Snap\Bootstrap;
 
+use Snap\Core\Config;
 use Snap\Core\Hookable;
 
 /**
@@ -35,7 +36,7 @@ class Assets extends Hookable
      *
      * @param \Snap\Core\Config $config
      */
-    public function __construct(\Snap\Core\Config $config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
     }
@@ -67,8 +68,8 @@ class Assets extends Hookable
         $jquery_version = $this->config->get('theme.use_jquery_cdn');
 
         // if a valid jQuery version has been specified.
-        if ($this->config->get('theme.disable_jquery') !== true
-            && $jquery_version !== false
+        if ($jquery_version !== false
+            && $this->config->get('theme.disable_jquery') !== true
             && \version_compare($jquery_version, '0.0.1', '>=') === true
         ) {
             // get all non-deferred scripts, to check for jQuery.

@@ -97,7 +97,7 @@ class DisableComments extends Hookable
             \remove_action('admin_bar_menu', 'wp_admin_bar_comments_menu', 60);
         }
     }
-        
+
     /**
      * Remove comment meta boxes from all post types.
      */
@@ -123,7 +123,7 @@ class DisableComments extends Hookable
         echo '<input type="hidden" name="comment_status" value="closed" />',
             '<input type="hidden" name="ping_status" value="closed" />';
     }
-    
+
     /**
      * Returns a 403 if someone (bots) ends up on a front end comments URL.
      */

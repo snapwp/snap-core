@@ -18,7 +18,7 @@ trait ManagesHooks
      * @param integer      $priority        The priority of the callback.
      * @param integer      $accepted_args   The amount of arguments the callback accepts.
      */
-    final public function addAction($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+    final public function addAction($tag, $function_to_add, $priority = 10, $accepted_args = 1): void
     {
         $this->addFilter($tag, $function_to_add, $priority, $accepted_args);
     }
@@ -32,7 +32,7 @@ trait ManagesHooks
      * @param  callable     $function_to_remove The callback to remove.
      * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
-    final public function removeAction($tag, $function_to_remove, $priority = 10)
+    final public function removeAction($tag, $function_to_remove, $priority = 10): void
     {
         $this->removeHook($tag, $function_to_remove, $priority);
     }
@@ -46,7 +46,7 @@ trait ManagesHooks
      * @param  callable     $function_to_remove The callback to remove.
      * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
-    final public function removeFilter($tag, $function_to_remove, $priority = 10)
+    final public function removeFilter($tag, $function_to_remove, $priority = 10): void
     {
         $this->removeHook($tag, $function_to_remove, $priority);
     }
@@ -58,7 +58,7 @@ trait ManagesHooks
      * @param  callable     $function_to_remove The callback to remove.
      * @param  integer      $priority           Optional. The priority of the callback to remove. Defaults to 10.
      */
-    final public function removeHook($tag, $function_to_remove, $priority = 10)
+    final public function removeHook($tag, $function_to_remove, $priority = 10): void
     {
         if (\is_string($function_to_remove) && \is_callable([$this, $function_to_remove])) {
             $function_to_remove = [$this, $function_to_remove];
@@ -86,7 +86,7 @@ trait ManagesHooks
      * @param integer      $priority        The priority of the callback.
      * @param integer      $accepted_args   The amount of arguments the callback accepts.
      */
-    final public function addFilter($tag, $function_to_add, $priority = 10, $accepted_args = 1)
+    final public function addFilter($tag, $function_to_add, $priority = 10, $accepted_args = 1): void
     {
         $callback = $function_to_add;
 
@@ -104,7 +104,7 @@ trait ManagesHooks
             \add_filter(
                 $hook,
                 $callback,
-                $priority ? $priority : 10,
+                $priority ?: 10,
                 $this->getArgumentCount($function_to_add, $accepted_args)
             );
         }
@@ -117,7 +117,7 @@ trait ManagesHooks
      * @param  integer         $accepted_args The amount of arguments passed into the hook.
      * @return integer
      */
-    final private function getArgumentCount($callback, $accepted_args = 1)
+    private function getArgumentCount($callback, $accepted_args = 1): int
     {
         try {
             if (\is_string($callback) && \is_callable([$this, $callback])) {
@@ -133,6 +133,6 @@ trait ManagesHooks
             \error_log($exception->getMessage());
         }
 
-        return $accepted_args ? $accepted_args : 1;
+        return $accepted_args ?: 1;
     }
 }

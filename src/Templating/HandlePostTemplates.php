@@ -12,23 +12,19 @@ use Snap\Utils\Theme;
  */
 class HandlePostTemplates extends Hookable
 {
-    /**
-     * Filters to add on init.
-     *
-     * @var array
-     */
-    protected $filters = [
-        'after_setup_theme' => 'addThemePostTemplatesToCache',
-        'template_include' => 'postTemplateRouting',
-        'get_search_form' => 'getSearchForm',
-    ];
+    public function boot(): void
+    {
+        $this->addFilter('after_setup_theme', 'addThemePostTemplatesToCache');
+        $this->addFilter('template_include', 'postTemplateRouting');
+        $this->addFilter('get_search_form', 'getSearchForm');
+    }
 
     /**
      * Ensure get_search_form still works and is mapped to modules/searchform.
      *
-     * @return string Markup for parials/searchform.php.
+     * @return string Markup for partials/searchform.php.
      */
-    public function getSearchForm()
+    public function getSearchForm(): string
     {
         $data = [];
 
@@ -48,9 +44,7 @@ class HandlePostTemplates extends Hookable
 
         \ob_start();
         View::partial('searchform', $data);
-        $form = \ob_get_clean();
-
-        return $form;
+        return \ob_get_clean();
     }
 
     /**
@@ -58,7 +52,7 @@ class HandlePostTemplates extends Hookable
      *
      * @return array
      */
-    public function customTemplateLocator()
+    public function customTemplateLocator(): array
     {
         $post_templates = [];
 
@@ -113,7 +107,7 @@ class HandlePostTemplates extends Hookable
     /**
      * Register the page-template loader for all available public post types
      */
-    public function addThemePostTemplatesToCache()
+    public function addThemePostTemplatesToCache(): void
     {
         $cache_key = 'post_templates-' . \md5(\get_theme_root() . '/' . \get_stylesheet());
         $templates = \wp_get_theme()->get_post_templates();
@@ -127,7 +121,7 @@ class HandlePostTemplates extends Hookable
      * @param string $template_path Path of template to load.
      * @return string Path of template to load.
      */
-    public function postTemplateRouting($template_path)
+    public function postTemplateRouting($template_path): string
     {
         $routes_file = \get_template_directory() . '/public/routes.php';
 

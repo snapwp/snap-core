@@ -6,6 +6,7 @@ use Snap\Database\Concerns\QueriesDate;
 use Snap\Database\Concerns\QueriesMeta;
 use Tightenco\Collect\Support\Arr;
 use Tightenco\Collect\Support\Collection;
+use WP_Post;
 use WP_Query;
 use WP_User;
 
@@ -41,9 +42,9 @@ class PostQuery extends Query
     /**
      * Returns the first found WP_Post.
      *
-     * @return null|\WP_Post
+     * @return null|WP_Post
      */
-    public function first(): ?\WP_Post
+    public function first(): ?WP_Post
     {
         return $this->getPost(
             $this->createArguments(
@@ -131,7 +132,7 @@ class PostQuery extends Query
      * Lookup Posts by slugs or IDs.
      *
      * @param string|string[]|int|int[] $search
-     * @return false|\WP_Post|\Tightenco\Collect\Support\Collection;
+     * @return false|WP_Post|\Tightenco\Collect\Support\Collection;
      */
     public function find($search)
     {
@@ -149,7 +150,7 @@ class PostQuery extends Query
      *                                inherit, trash, any.
      * @return $this
      */
-    public function withStatus($status)
+    public function withStatus($status): PostQuery
     {
         $this->params['post_status'] = $status;
         return $this;
@@ -158,7 +159,7 @@ class PostQuery extends Query
     /**
      * Include sticky posts in the results.
      */
-    public function withSticky()
+    public function withSticky(): PostQuery
     {
         $this->params['ignore_sticky_posts'] = false;
         return $this;
@@ -167,15 +168,15 @@ class PostQuery extends Query
     /**
      * Add a tax query.
      *
-     * @param string|callable  $key              Taxonomy, or Callable for nested queries.
-     * @param int|string|array $terms            Taxonomy term(s).
-     * @param string           $operator         Operator to test. Possible values are 'IN', 'NOT IN', 'AND', 'EXISTS'
+     * @param string|callable $key Taxonomy, or Callable for nested queries.
+     * @param int|string|array $terms Taxonomy term(s).
+     * @param string $operator Operator to test. Possible values are 'IN', 'NOT IN', 'AND', 'EXISTS'
      *                                           and 'NOT EXISTS'.
-     * @param bool             $include_children Whether or not to include children for hierarchical taxonomies.
+     * @param bool $include_children Whether or not to include children for hierarchical taxonomies.
      *                                           Defaults to true.
      * @return $this
      */
-    public function whereTaxonomy($key, $terms = '', string $operator = 'IN', bool $include_children = true)
+    public function whereTaxonomy($key, $terms = '', string $operator = 'IN', bool $include_children = true): PostQuery
     {
         if (\is_callable($key)) {
             $child_query = new static($this->name);
@@ -191,15 +192,15 @@ class PostQuery extends Query
     /**
      * Add a tax query, and make the current tax query an OR relation.
      *
-     * @param  string|callable $key              Taxonomy, or Callable for nested queries.
-     * @param int|string|array $terms            Taxonomy term(s).
-     * @param string           $operator         Operator to test. Possible values are 'IN', 'NOT IN', 'AND', 'EXISTS'
+     * @param string|callable $key Taxonomy, or Callable for nested queries.
+     * @param int|string|array $terms Taxonomy term(s).
+     * @param string $operator Operator to test. Possible values are 'IN', 'NOT IN', 'AND', 'EXISTS'
      *                                           and 'NOT EXISTS'.
-     * @param bool             $include_children Whether or not to include children for hierarchical taxonomies.
+     * @param bool $include_children Whether or not to include children for hierarchical taxonomies.
      *                                           Defaults to true.
      * @return $this
      */
-    public function orWhereTaxonomy($key, $terms = '', string $operator = 'IN', bool $include_children = true)
+    public function orWhereTaxonomy($key, $terms = '', string $operator = 'IN', bool $include_children = true): PostQuery
     {
         $this->tax_query = ['relation' => 'OR'] + $this->tax_query;
         $this->whereTaxonomy($key, $terms, $operator, $include_children);
@@ -209,15 +210,15 @@ class PostQuery extends Query
     /**
      * Shorthand for whereTaxonomy that allows working with WP_Term instances directly.
      *
-     * @param \WP_Term|\WP_Term[]|Collection $objects          Wp_Term(s) to query for.
-     * @param string                         $operator         Operator to test. Possible values are 'IN', 'NOT IN',
+     * @param \WP_Term|\WP_Term[]|Collection $objects Wp_Term(s) to query for.
+     * @param string $operator Operator to test. Possible values are 'IN', 'NOT IN',
      *                                                         'AND',
      *                                                         'EXISTS' and 'NOT EXISTS'.
-     * @param bool                           $include_children Whether or not to include children for hierarchical
+     * @param bool $include_children Whether or not to include children for hierarchical
      *                                                         taxonomies.
      * @return $this
      */
-    public function whereTerms($objects, string $operator = 'IN', bool $include_children = true)
+    public function whereTerms($objects, string $operator = 'IN', bool $include_children = true): PostQuery
     {
         if (\is_array($objects) || $objects instanceof Collection) {
             $objects = collect($objects);
@@ -248,15 +249,15 @@ class PostQuery extends Query
     /**
      * Call whereTerms() as an OR relation.
      *
-     * @param \WP_Term|\WP_Term[]|Collection $objects          Wp_Term(s) to query for.
-     * @param string                         $operator         Operator to test. Possible values are 'IN', 'NOT IN',
+     * @param \WP_Term|\WP_Term[]|Collection $objects Wp_Term(s) to query for.
+     * @param string $operator Operator to test. Possible values are 'IN', 'NOT IN',
      *                                                         'AND',
      *                                                         'EXISTS' and 'NOT EXISTS'.
-     * @param bool                           $include_children Whether or not to include children for hierarchical
+     * @param bool $include_children Whether or not to include children for hierarchical
      *                                                         taxonomies.
      * @return $this
      */
-    public function orWhereTerms($objects, string $operator = 'IN', bool $include_children = true)
+    public function orWhereTerms($objects, string $operator = 'IN', bool $include_children = true): PostQuery
     {
         $this->tax_query = ['relation' => 'OR'] + $this->tax_query;
         return $this->whereTerms($objects, $operator, $include_children);
@@ -269,7 +270,7 @@ class PostQuery extends Query
      *
      * @return $this
      */
-    public function whereAuthor($author)
+    public function whereAuthor($author): PostQuery
     {
         if ($author instanceof WP_User) {
             $this->params['author'] = $this->getIdFromWpUser($author);
@@ -300,7 +301,7 @@ class PostQuery extends Query
      *
      * @return $this
      */
-    public function whereAuthorNot($author)
+    public function whereAuthorNot($author): PostQuery
     {
         $author = Arr::wrap($author);
 
@@ -322,7 +323,7 @@ class PostQuery extends Query
      * @param string $search String to search for.
      * @return $this
      */
-    public function whereLike(string $search)
+    public function whereLike(string $search): PostQuery
     {
         $this->params['s'] = $search;
         return $this;
@@ -334,7 +335,7 @@ class PostQuery extends Query
      * @param string $search String to search for.
      * @return $this
      */
-    public function whereExact(string $search)
+    public function whereExact(string $search): PostQuery
     {
         $this->params['exact'] = true;
         return $this->whereLike($search);
@@ -346,7 +347,7 @@ class PostQuery extends Query
      * @param string|string[] $slug Slug(s) to search for.
      * @return $this
      */
-    public function whereSlug($slug)
+    public function whereSlug($slug): PostQuery
     {
         if (\is_array($slug)) {
             $this->params['post_name__in'] = $slug;
@@ -359,10 +360,10 @@ class PostQuery extends Query
     /**
      * Limit results to child terms of the supplied parent term_id/WP_Term.
      *
-     * @param int|int[]|\WP_Post|\WP_Post[] $post_ids
+     * @param int|int[]|WP_Post|WP_Post[] $post_ids
      * @return $this
      */
-    public function childOf($post_ids)
+    public function childOf($post_ids): PostQuery
     {
         if (\is_array($post_ids)) {
             $this->params['post_parent__in'] = $this->maybeConvertPostsToIds($post_ids);
@@ -375,10 +376,10 @@ class PostQuery extends Query
     /**
      * Will remove any children of the supplied term_id(s).
      *
-     * @param int|int[]|\WP_Post|\WP_Post[] $post_ids
+     * @param int|int[]|WP_Post|WP_Post[] $post_ids
      * @return $this
      */
-    public function notChildOf($post_ids)
+    public function notChildOf($post_ids): PostQuery
     {
         $this->params['post_parent__not_in'] = $this->maybeConvertPostsToIds($post_ids);
         return $this;
@@ -390,7 +391,7 @@ class PostQuery extends Query
      * @param int The offset amount.
      * @return $this
      */
-    public function offset(int $amount)
+    public function offset(int $amount): PostQuery
     {
         $this->params['offset'] = $amount;
         return $this;
@@ -402,7 +403,7 @@ class PostQuery extends Query
      * @param int Page number to fetch.
      * @return $this
      */
-    public function page(int $page)
+    public function page(int $page): PostQuery
     {
         $this->params['paged'] = $page;
         return $this;
@@ -414,7 +415,7 @@ class PostQuery extends Query
      * @param int The limit amount.
      * @return $this
      */
-    public function limit(int $amount)
+    public function limit(int $amount): PostQuery
     {
         $this->params['posts_per_page'] = $amount;
         return $this;
@@ -426,7 +427,7 @@ class PostQuery extends Query
      * @param int|int[] $ids Array of ID to search within.
      * @return $this
      */
-    public function in($ids)
+    public function in($ids): PostQuery
     {
         if (!\is_array($ids)) {
             $ids = [$ids];
@@ -443,7 +444,7 @@ class PostQuery extends Query
      * @param int|int[] $exclude ID or IDs to exclude.
      * @return $this
      */
-    public function exclude($exclude)
+    public function exclude($exclude): PostQuery
     {
         if (\is_int($exclude)) {
             $exclude = [$exclude];
@@ -458,7 +459,7 @@ class PostQuery extends Query
      *
      * @return array
      */
-    public function getTaxQuery()
+    public function getTaxQuery(): array
     {
         return $this->tax_query;
     }
@@ -469,7 +470,7 @@ class PostQuery extends Query
      * @param \WP_User $wp_user Instance.
      * @return int
      */
-    private function getIdFromWpUser(\WP_User $wp_user)
+    private function getIdFromWpUser(WP_User $wp_user): int
     {
         return $wp_user->ID;
     }
@@ -490,9 +491,9 @@ class PostQuery extends Query
      * Perform a query and return a WP_Post object.
      *
      * @param array $args WP_Query arguments.
-     * @return null|\WP_Post
+     * @return null|WP_Post
      */
-    private function getPost(array $args): ?\WP_Post
+    private function getPost(array $args): ?WP_Post
     {
         $query = new WP_Query($args);
 
@@ -525,8 +526,8 @@ class PostQuery extends Query
 
         $args = \array_merge_recursive($this->params, $args);
 
-        if (isset($args['paged']) && isset($args['offset'])) {
-            $args['offset'] = $args['offset'] * $args['paged'];
+        if (isset($args['paged'], $args['offset'])) {
+            $args['offset'] *= $args['paged'];
         }
 
         return $args;
@@ -535,11 +536,11 @@ class PostQuery extends Query
     /**
      * Generate tax query args.
      *
-     * @param string|callable  $key              Taxonomy, or Callable for nested queries.
-     * @param int|string|array $terms            Taxonomy term(s).
-     * @param string           $operator         Operator to test. Possible values are 'IN', 'NOT IN', 'AND', 'EXISTS'
+     * @param string|callable $key Taxonomy, or Callable for nested queries.
+     * @param int|string|array $terms Taxonomy term(s).
+     * @param string $operator Operator to test. Possible values are 'IN', 'NOT IN', 'AND', 'EXISTS'
      *                                           and 'NOT EXISTS'.
-     * @param bool             $include_children Whether or not to include children for hierarchical taxonomies.
+     * @param bool $include_children Whether or not to include children for hierarchical taxonomies.
      *                                           Defaults to true.
      * @return array
      */
@@ -605,9 +606,9 @@ class PostQuery extends Query
      * Performs a find() for a single id or slug.
      *
      * @param string|int $search Search term.
-     * @return null|\WP_Post
+     * @return null|WP_Post
      */
-    private function findSingle($search)
+    private function findSingle($search): ?WP_Post
     {
         $args = [
             'post_type' => $this->name,
@@ -629,18 +630,18 @@ class PostQuery extends Query
     /**
      * Convert a WP_Post or array of WP_Posts into IDs.
      *
-     * @param \WP_Post|\WP_Post[] $input Input.
+     * @param WP_Post|WP_Post[]|int $input Input.
      * @return array|int
      */
     private function maybeConvertPostsToIds($input)
     {
         if (\is_array($input)) {
             foreach ($input as $key => $value) {
-                if ($value instanceof \WP_Post) {
+                if ($value instanceof WP_Post) {
                     $input[$key] = $value->ID;
                 }
             }
-        } elseif ($input instanceof \WP_Post) {
+        } elseif ($input instanceof WP_Post) {
             $input = $input->ID;
         }
 

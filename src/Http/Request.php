@@ -94,7 +94,7 @@ class Request extends Validator implements ArrayAccess
      *
      * @var string|null
      */
-    protected $clientIp = null;
+    protected $clientIp;
 
     /**
      * The current request URL.
@@ -167,7 +167,7 @@ class Request extends Validator implements ArrayAccess
      */
     public function __isset($name)
     {
-        return ! \is_null($this->__get($name));
+        return $this->__get($name) !== null;
     }
 
     /**
@@ -473,9 +473,9 @@ class Request extends Validator implements ArrayAccess
         $abs_path = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
         $files = \get_included_files();
 
-        if (\in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)
-            || isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php'
-            || isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] == '/wp-login.php'
+        if ((isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php')
+            || (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/wp-login.php')
+            || \in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)
         ) {
             return true;
         }
@@ -489,9 +489,9 @@ class Request extends Validator implements ArrayAccess
      * @param  mixed $offset The offset to set.
      * @param  mixed $value  The value to set.
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
-        if (\is_null($offset)) {
+        if ($offset === null) {
             $this->input[] = $value;
         } else {
             $this->input[$offset] = $value;

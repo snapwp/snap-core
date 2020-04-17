@@ -93,9 +93,7 @@ class Snap
 
                 static::registerProviders();
                 static::initTemplating();
-
                 static::initDatabase();
-
                 static::initView();
 
                 $classmap = null;

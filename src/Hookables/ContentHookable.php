@@ -3,6 +3,7 @@
 namespace Snap\Hookables;
 
 use Snap\Core\Hookable;
+use Snap\Database\Query;
 use Snap\Hookables\Content\ColumnManager;
 use Snap\Utils\Str;
 
@@ -115,12 +116,12 @@ abstract class ContentHookable extends Hookable
     /**
      * Register the content type.
      */
-    abstract public function register();
+    abstract public function register(): void;
 
     /**
      * Register the admin columns.
      */
-    abstract public function registerColumns();
+    abstract public function registerColumns(): void;
 
     /**
      * Should return a new Query builder object.
@@ -128,22 +129,6 @@ abstract class ContentHookable extends Hookable
      * @return \Snap\Database\Query
      */
     abstract protected function makeNewQuery();
-
-    /**
-     * Register all taxonomies defined in $relationships array.
-     */
-    public function registerTaxonomiesForPosts()
-    {
-        if (static::$has_attached_taxonomies === false) {
-            foreach (static::$relationships as $post_type => $taxes) {
-                foreach ($taxes as $tax) {
-                    \register_taxonomy_for_object_type($tax, $post_type);
-                }
-            }
-        }
-
-        static::$has_attached_taxonomies = true;
-    }
 
     /**
      * Register columns.
@@ -156,6 +141,22 @@ abstract class ContentHookable extends Hookable
 
         $this->addFilter('init', 'register', 99);
         $this->addFilter('init', 'registerTaxonomiesForPosts', 100);
+    }
+
+    /**
+     * Register all taxonomies defined in $relationships array.
+     */
+    public function registerTaxonomiesForPosts(): void
+    {
+        if (static::$has_attached_taxonomies === false) {
+            foreach (static::$relationships as $post_type => $taxes) {
+                foreach ($taxes as $tax) {
+                    \register_taxonomy_for_object_type($tax, $post_type);
+                }
+            }
+        }
+
+        static::$has_attached_taxonomies = true;
     }
 
     /**
@@ -198,7 +199,7 @@ abstract class ContentHookable extends Hookable
      *
      * @return \Snap\Hookables\Content\ColumnManager
      */
-    public function columns()
+    public function columns(): ColumnManager
     {
         if (isset($this->columnManager)) {
             return $this->columnManager;
@@ -261,7 +262,7 @@ abstract class ContentHookable extends Hookable
      */
     final protected function hasRegistered(): bool
     {
-        if (\in_array(static::class, static::$has_registered[static::$type])) {
+        if (\in_array(static::class, static::$has_registered[static::$type], true)) {
             return true;
         }
 
@@ -280,6 +281,6 @@ abstract class ContentHookable extends Hookable
      */
     final protected function hasRegisteredColumns(): bool
     {
-        return \in_array(static::class, static::$registered_columns);
+        return \in_array(static::class, static::$registered_columns, true);
     }
 }

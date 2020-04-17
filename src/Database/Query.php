@@ -14,7 +14,7 @@ abstract class Query
     /**
      * All valid meta query operators.
      */
-    const QUERY_OPERATORS = [
+    public const QUERY_OPERATORS = [
         '=',
         '!=',
         '>',

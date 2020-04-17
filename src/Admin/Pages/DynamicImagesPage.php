@@ -2,6 +2,8 @@
 
 namespace Snap\Admin\Pages;
 
+use WP_List_Table;
+
 class DynamicImagesPage
 {
     /**
@@ -14,7 +16,7 @@ class DynamicImagesPage
      *
      * @param \WP_List_Table $table The table instance to display on this page
      */
-    public function __construct(\WP_List_Table $table)
+    public function __construct(WP_List_Table $table)
     {
         $this->table = $table;
     }
@@ -22,7 +24,7 @@ class DynamicImagesPage
     /**
      * Render the page.
      */
-    public function render()
+    public function render(): void
     {
         ?>
         <div class="wrap">

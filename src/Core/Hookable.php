@@ -44,12 +44,22 @@ class Hookable
     protected $public = true;
 
     /**
+     * Optionally add hooks using methods instead of properties.
+     *
+     * Useful for conditionally adding hooks.
+     */
+    public function boot()
+    {
+        // Intended to be overwritten by child classes.
+    }
+
+    /**
      * Boot up the class.
      *
      * The hooks are registered, then boot is run.
      * This gives some extra options for conditionally adding filters.
      */
-    final public function run()
+    final public function run(): void
     {
         if ($this->admin === false && \is_admin() === true) {
             return;
@@ -62,9 +72,7 @@ class Hookable
         $this->parseFilters();
         $this->parseActions();
 
-        if (\method_exists($this, 'boot')) {
-            $this->boot();
-        }
+        $this->boot();
     }
 
     /**
@@ -83,7 +91,7 @@ class Hookable
      *
      * @param array $hooks The contents of $filters or $actions.
      */
-    final private function addhooks(array $hooks)
+    private function addHooks(array $hooks): void
     {
         foreach ($hooks as $tag => $filter) {
             if (\is_string($filter)) {
@@ -96,7 +104,7 @@ class Hookable
                         $count = \count($callbacks);
 
                         for ($i = 0; $i < $count; $i++) {
-                            $this->addFilter($tag, $callbacks[ $i ], $priority);
+                            $this->addFilter($tag, $callbacks[$i], $priority);
                         }
                     }
                 }
@@ -107,20 +115,20 @@ class Hookable
     /**
      * Check if $actions need to be added.
      */
-    final private function parseActions()
+    private function parseActions(): void
     {
-        if (isset($this->actions) && \is_array($this->actions) && !empty($this->actions)) {
-            $this->addhooks($this->actions);
+        if (!empty($this->actions)) {
+            $this->addHooks($this->actions);
         }
     }
 
     /**
      * Check if $filters need to be added.
      */
-    final private function parseFilters()
+    private function parseFilters(): void
     {
-        if (isset($this->filters) && \is_array($this->filters) && !empty($this->filters)) {
-            $this->addhooks($this->filters);
+        if (!empty($this->filters)) {
+            $this->addHooks($this->filters);
         }
     }
 }
