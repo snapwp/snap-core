@@ -2,15 +2,12 @@
 
 namespace Snap\Routing;
 
-use BadMethodCallException;
 use Closure;
 use Exception;
 use Snap\Services\Config;
 use Snap\Services\Container;
 use Snap\Services\Request;
 use Snap\Services\View;
-use Snap\Utils\Theme;
-use Tightenco\Collect\Support\Arr;
 
 class Router
 {
@@ -47,7 +44,7 @@ class Router
      *
      * @var null|array
      */
-    private $methods = null;
+    private $methods;
 
     /**
      * The current controller namespace.
@@ -57,11 +54,11 @@ class Router
     private $namespace = '\\Theme\\Http\\Controllers\\';
 
     /**
-     * All registered middleware.
+     * Middleware queue for current route/group.
      *
-     * @var array
+     * @var \Snap\Routing\MiddlewareQueue
      */
-    private $registered_middleware = [];
+    private $middleware_queue;
 
     /**
      * Groups routes with the current middleware stack.
@@ -116,7 +113,7 @@ class Router
     /**
      * Checks that a custom expression does not return true.
      *
-     * @param bool $result The result of a custom expression.
+     * @param bool|callable $result The result of a custom expression.
      * @return $this
      */
     public function not($result): Router
@@ -208,10 +205,6 @@ class Router
      */
     public function dispatchPostTemplate(): void
     {
-        if ($this->canProceed() === false) {
-            return;
-        }
-
         $this->view(\get_page_template_slug());
     }
 
@@ -228,28 +221,11 @@ class Router
      */
     public function using($middleware = []): Router
     {
-        if ($this->canProceed() === false) {
-            return $this;
+        if ($this->middleware_queue === null) {
+            $this->middleware_queue = Container::get(MiddlewareQueue::class);
         }
 
-        $middleware = Arr::wrap($middleware);
-
-        foreach ($middleware as $callback) {
-            $parts = \explode('|', $callback);
-            $args = [];
-
-            if (\count($parts) === 2) {
-                $args = \explode(',', $parts[1]);
-            }
-
-            if (!isset($this->registered_middleware[$parts[0]])) {
-                throw new BadMethodCallException("No middleware called '{$parts[0]}' found");
-            }
-
-            if (\call_user_func_array($this->registered_middleware[$parts[0]], $args) !== true) {
-                $this->stopProcessing();
-            }
-        }
+        $this->middleware_queue->add($middleware, $this->is_group);
 
         return $this;
     }
@@ -263,6 +239,7 @@ class Router
     public function view($view, $data = []): void
     {
         $this->checkMethod();
+        $this->maybeRunMiddleware();
 
         // Passed all middleware.
         if ($this->canProceed() === false) {
@@ -288,12 +265,13 @@ class Router
     public function dispatch($controller): void
     {
         $this->checkMethod();
+        $this->maybeRunMiddleware();
 
         if ($this->canProceed() === false) {
             return;
         }
 
-        list($class, $action) = \explode('@', $controller);
+        [$class, $action] = \explode('@', $controller);
 
         $fqn = $this->namespace . $class;
 
@@ -420,17 +398,6 @@ class Router
     }
 
     /**
-     * Registers a middleware handler.
-     *
-     * @param string   $name     Name of middleware.
-     * @param callable $callback Handler callback.
-     */
-    public function registerMiddleware(string $name, callable $callback): void
-    {
-        $this->registered_middleware[$name] = $callback;
-    }
-
-    /**
      * Resets internal variables.
      */
     public function reset(): void
@@ -443,6 +410,7 @@ class Router
         if ($this->is_group === false) {
             $this->namespace = '\\Theme\\Http\\Controllers\\';
             $this->methods = null;
+            $this->middleware_queue = null;
         }
     }
 
@@ -455,7 +423,7 @@ class Router
             return;
         }
 
-        if (!\in_array(Request::getMethod(), $this->methods)) {
+        if (!\in_array(Request::getMethod(), $this->methods, true)) {
             $this->stopProcessing();
         }
     }
@@ -504,5 +472,19 @@ class Router
     private function matchRoute(): void
     {
         $this->has_matched_route = true;
+    }
+
+    /**
+     * Maybe run middleware if needed, and descope current middleware stack if in group
+     */
+    private function maybeRunMiddleware(): void
+    {
+        if ($this->middleware_queue !== null && $this->canProceed() && $this->middleware_queue->passes() === false) {
+            $this->can_proceed = false;
+        }
+
+        if ($this->middleware_queue !== null) {
+            $this->middleware_queue->deScope();
+        }
     }
 }

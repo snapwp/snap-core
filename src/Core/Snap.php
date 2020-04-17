@@ -13,6 +13,7 @@ use Snap\Http\Request;
 use Snap\Http\Response;
 use Snap\Http\Validation\Validator;
 use Snap\Media\ImageService;
+use Snap\Routing\MiddlewareQueue;
 use Snap\Routing\Router;
 use Snap\Templating\Strategies\StrategyInterface;
 use Snap\Templating\View;
@@ -326,6 +327,13 @@ class Snap
             Validator::class,
             function () {
                 return new Validator();
+            }
+        );
+
+        static::$container->add(
+            MiddlewareQueue::class,
+            static function () {
+                return new MiddlewareQueue();
             }
         );
 

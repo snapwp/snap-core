@@ -4,6 +4,7 @@ namespace Snap\Hookables;
 
 use ReflectionMethod;
 use Snap\Core\Hookable;
+use Snap\Routing\MiddlewareQueue;
 use Snap\Services\Router;
 use Snap\Services\Container;
 
@@ -33,7 +34,7 @@ class Middleware extends Hookable
      */
     public function boot()
     {
-        Router::registerMiddleware($this->getName(), [$this, 'handler']);
+        MiddlewareQueue::registerMiddleware($this->getName(), [$this, 'handler']);
     }
 
     /**

@@ -23,7 +23,6 @@ namespace Snap\Services;
  * @method static \Snap\Routing\Router delete()
  * @method static \Snap\Routing\Router any(string[] ...$methods)
  * @method static array getRouteParams()
- * @method static void registerMiddleware(string $name, callable $callback)
  * @method static \Snap\Routing\Router getRootInstance()
  *
  * @see \Snap\Routing\Router
