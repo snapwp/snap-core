@@ -86,7 +86,7 @@ class UrlRoute
      *
      * @return array
      */
-    public function getParams(): array
+    public function parameters(): array
     {
         return $this->params;
     }

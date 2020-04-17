@@ -7,6 +7,7 @@ use Exception;
 use Snap\Services\Config;
 use Snap\Services\Container;
 use Snap\Services\Request;
+use Snap\Services\Response;
 use Snap\Services\View;
 
 class Router
@@ -391,7 +392,7 @@ class Router
     public function getRouteParams(): array
     {
         if (isset($this->current_route)) {
-            return $this->current_route->getParams();
+            return $this->current_route->parameters();
         }
 
         return [];
@@ -472,6 +473,11 @@ class Router
     private function matchRoute(): void
     {
         $this->has_matched_route = true;
+
+        if ($this->current_route) {
+            Response::setStatus(200);
+            Request::setCurrentRoute($this->current_route);
+        }
     }
 
     /**

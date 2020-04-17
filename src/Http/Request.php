@@ -8,6 +8,7 @@ use Snap\Http\Request\FileBag;
 use Snap\Http\Request\ServerBag;
 use Snap\Http\Validation\Traits\ValidatesInput;
 use Snap\Http\Validation\Validator;
+use Snap\Routing\UrlRoute;
 use Snap\Utils\Theme;
 
 /**
@@ -60,6 +61,8 @@ class Request extends Validator implements ArrayAccess
      * @var \Snap\Http\Request\Bag
      */
     public $input;
+
+    public $route;
 
     /**
      * WordPress query vars.
@@ -400,6 +403,18 @@ class Request extends Validator implements ArrayAccess
     }
 
     /**
+     * Returns a parameter from the WordPress query vars bag, or a default if not present.
+     *
+     * @param  string $key     The parameter key to look for.
+     * @param  mixed  $default A default value to return if not present.
+     * @return mixed
+     */
+    public function route($key = null, $default = null)
+    {
+        return $this->route->get($key, $default);
+    }
+
+    /**
      * Check if the $key exists within the post or query bags.
      *
      * @param string $key The key to check for.
@@ -473,7 +488,8 @@ class Request extends Validator implements ArrayAccess
         $abs_path = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
         $files = \get_included_files();
 
-        if ((isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php')
+        if (
+            (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php')
             || (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/wp-login.php')
             || \in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)
         ) {
@@ -540,6 +556,16 @@ class Request extends Validator implements ArrayAccess
         $this->matched_query = $wp->matched_query;
         $this->matched_rule = $wp->matched_rule;
         static::$wp = new Bag($wp->query_vars + $wp->extra_query_vars);
+    }
+
+    /**
+     * Set the current matched static route.
+     *
+     * @param \Snap\Routing\UrlRoute $route
+     */
+    public function setCurrentRoute(UrlRoute $route)
+    {
+        $this->route = new Bag($route->parameters());
     }
 
     /**

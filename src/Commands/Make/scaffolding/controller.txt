@@ -3,7 +3,7 @@
 namespace Theme\Http\ControllersNAMESPACE;
 
 use Snap\Http\Request;
-use Snap\Services\View;
+use Snap\Http\Response;
 
 /**
  * CLASSNAME description
@@ -13,10 +13,11 @@ class CLASSNAME
     /**
      * Method description.
      *
-     * @param Request $request The current request object.
+     * @param Request  $request  The current request object.
+     * @param Response $response The response object.
      */
-    public function index(Request $request)
+    public function index(Request $request, Response $response)
     {
-        View::render('index');
+        $response->view('index');
     }
 }

@@ -68,7 +68,8 @@ class Assets extends Hookable
         $jquery_version = $this->config->get('theme.use_jquery_cdn');
 
         // if a valid jQuery version has been specified.
-        if ($jquery_version !== false
+        if (
+            $jquery_version !== false
             && $this->config->get('theme.disable_jquery') !== true
             && \version_compare($jquery_version, '0.0.1', '>=') === true
         ) {

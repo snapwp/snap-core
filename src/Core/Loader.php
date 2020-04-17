@@ -68,7 +68,7 @@ class Loader
      */
     public static function aliasAutoload($class): void
     {
-        if (\array_key_exists($class, static::$aliases)) {
+        if (array_key_exists($class, static::$aliases)) {
             \class_alias(static::$aliases[$class], $class);
         }
     }
