@@ -177,7 +177,9 @@ class Taxonomy extends ContentHookable
     private function getOptions(): array
     {
         $defaults = [
+            'hierarchical' => false,
             'show_admin_column' => true,
+            'show_in_rest' => true,
             'public' => true,
             'rewrite' => [
                 'slug' => $this->getName(),

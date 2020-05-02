@@ -251,6 +251,8 @@ class PostType extends ContentHookable
     {
         $defaults = [
             'public' => true,
+            'show_in_rest' => true,
+            'has_archive' => sanitize_title_with_dashes($this->getPlural()),
             'rewrite' => [
                 'slug' => $this->getName(),
                 'with_front' => false,
