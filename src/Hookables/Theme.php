@@ -11,12 +11,12 @@ class Theme extends Hookable
 {
     /**
      * Declare theme support.
+     *
      * Keys are the feature to enable, and values are any additional arguments to pass to add_theme_support().
      *
      * @var array
      */
-    protected $supports = [
-    ];
+    protected $supports = [];
 
     /**
      * Declare theme menus.
