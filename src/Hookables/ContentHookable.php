@@ -3,7 +3,6 @@
 namespace Snap\Hookables;
 
 use Snap\Core\Hookable;
-use Snap\Database\Query;
 use Snap\Hookables\Content\ColumnManager;
 use Snap\Utils\Str;
 
@@ -176,7 +175,7 @@ abstract class ContentHookable extends Hookable
      *
      * @param string $name      Method name.
      * @param array  $arguments Method arguments.
-     * @return mixed
+     * @return mixed|null
      */
     public function __call(string $name, array $arguments)
     {
@@ -191,7 +190,11 @@ abstract class ContentHookable extends Hookable
             return $this->{$scoped}($this->makeNewQuery(), ...$arguments);
         }
 
-        return $this->makeNewQuery()->{$name}(...$arguments);
+        if (!\is_callable($name)) {
+            return $this->makeNewQuery()->{$name}(...$arguments);
+        }
+
+        return null;
     }
 
     /**

@@ -253,6 +253,14 @@ class Taxonomy extends ContentHookable
         $taxonomy->remove_rewrite_rules();
         $taxonomy->remove_hooks();
 
+        if ($this->getName() === 'category') {
+            $this->addFilter('get_the_categories', '__return_empty_array');
+        }
+
+        if ($this->getName() === 'post_tag') {
+            $this->addFilter('get_the_tags', '__return_empty_array');
+        }
+
         // Only run this on front end requests.
         $this->addAction(
             'template_redirect',
