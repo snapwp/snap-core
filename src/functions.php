@@ -39,7 +39,7 @@ if (!\function_exists('container')) {
     /**
      * Returns the service container
      *
-     * @return mixed The service container or an individual service.
+     * @return \Hodl\Container The service container
      */
     function container()
     {
