@@ -488,8 +488,7 @@ class Request extends Validator implements ArrayAccess
         $abs_path = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
         $files = \get_included_files();
 
-        if (
-            (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php')
+        if ((isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php')
             || (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/wp-login.php')
             || \in_array($abs_path . 'wp-login.php', $files) || \in_array($abs_path . 'wp-register.php', $files)
         ) {

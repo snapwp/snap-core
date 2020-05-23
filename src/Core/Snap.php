@@ -8,6 +8,7 @@ use Hodl\Exceptions\ContainerException;
 use Snap\Core\Bootstrap\SnapLoader;
 use Snap\Database\PostQuery;
 use Snap\Database\TaxQuery;
+use Snap\Email\Email;
 use Snap\Exceptions\StartupException;
 use Snap\Http\Request;
 use Snap\Http\Response;
@@ -26,12 +27,12 @@ class Snap
     /**
      * SnapWP website.
      */
-    const SNAPWP_HOME = 'https://snapwp.io';
+    public const SNAPWP_HOME = 'https://snapwp.io';
 
     /**
      * Current Snap version.
      */
-    const VERSION = '1.0.0';
+    public const VERSION = '1.0.0';
 
     /**
      * Whether Snap has been setup yet.
@@ -77,7 +78,7 @@ class Snap
      *
      * @throws StartupException
      */
-    public static function setup()
+    public static function setup(): void
     {
         if (static::$setup === false) {
             try {
@@ -86,6 +87,7 @@ class Snap
                 static::initRouting();
                 static::initServices();
                 static::addWordpressGlobals();
+                static::addEmails();
 
                 SnapLoader::getInstance(static::getContainer())->load();
 
@@ -118,7 +120,7 @@ class Snap
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    public static function createContainer()
+    public static function createContainer(): void
     {
         if (static::$setup === false) {
             static::$container = new Container();
@@ -134,7 +136,7 @@ class Snap
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    public static function initConfig($theme_root = null)
+    public static function initConfig($theme_root = null): void
     {
         if (static::$setup === false) {
             $config = new Config();
@@ -167,7 +169,7 @@ class Snap
      *
      * @return Container
      */
-    public static function getContainer()
+    public static function getContainer(): Container
     {
         return static::$container;
     }
@@ -178,7 +180,7 @@ class Snap
      * @throws \Hodl\Exceptions\ContainerException
      * @throws \ReflectionException
      */
-    public static function registerProviders()
+    public static function registerProviders(): void
     {
         $provider_instances = [];
 
@@ -206,13 +208,13 @@ class Snap
      *
      * Adds the View class, and if no other templating strategy is present, adds and binds the default.
      */
-    private static function initTemplating()
+    private static function initTemplating(): void
     {
         // If no templating strategy has already been registered.
         if (!static::$container->has(StrategyInterface::class)) {
             static::$container->addSingleton(
                 \Snap\Templating\Blade\Factory::class,
-                function (Container $container) {
+                static function (Container $container) {
                     return new \Snap\Templating\Blade\Factory(
                         \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.templates_directory')),
                         \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.cache_directory')) . '/templates'
@@ -225,7 +227,7 @@ class Snap
             // Add the default rendering engine.
             static::$container->addSingleton(
                 \Snap\Templating\Strategies\DefaultStrategy::class,
-                function (Container $container) {
+                static function (Container $container) {
                     return $container->resolve(\Snap\Templating\Strategies\DefaultStrategy::class);
                 }
             );
@@ -240,11 +242,11 @@ class Snap
     /**
      * Add the View class ot the container.
      */
-    private static function initView()
+    private static function initView(): void
     {
         static::$container->addSingleton(
             View::class,
-            function (Container $container) {
+            static function (Container $container) {
                 return $container->resolve(View::class);
             }
         );
@@ -255,18 +257,18 @@ class Snap
     /**
      * Include any database classes.
      */
-    private static function initDatabase()
+    private static function initDatabase(): void
     {
         static::$container->add(
             TaxQuery::class,
-            function () {
+            static function () {
                 return new TaxQuery();
             }
         );
 
         static::$container->add(
             PostQuery::class,
-            function () {
+            static function () {
                 return new PostQuery();
             }
         );
@@ -275,12 +277,12 @@ class Snap
     /**
      * Add Snap services to the container.
      */
-    private static function initServices()
+    private static function initServices(): void
     {
         // Add Image service.
         static::$container->addSingleton(
             ImageService::class,
-            function () {
+            static function () {
                 return new ImageService();
             }
         );
@@ -292,25 +294,25 @@ class Snap
     /**
      * Add Snap routing, request, and validation services to the container.
      */
-    private static function initRouting()
+    private static function initRouting(): void
     {
         static::$container->addSingleton(
             Router::class,
-            function () {
+            static function () {
                 return new Router();
             }
         );
 
         static::$container->addSingleton(
             Request::class,
-            function () {
+            static function () {
                 return new Request();
             }
         );
 
         static::$container->addSingleton(
             Response::class,
-            function (Container $container) {
+            static function (Container $container) {
                 return $container->resolve(Response::class);
             }
         );
@@ -318,14 +320,14 @@ class Snap
         // This is required to fill with any custom rules.
         static::$container->addSingleton(
             \Rakit\Validation\Validator::class,
-            function () {
+            static function () {
                 return new \Rakit\Validation\Validator();
             }
         );
 
         static::$container->add(
             Validator::class,
-            function () {
+            static function () {
                 return new Validator();
             }
         );
@@ -344,11 +346,26 @@ class Snap
     }
 
     /**
+     * Add Emails.
+     */
+    private static function addEmails(): void
+    {
+        static::$container->add(
+            Email::class,
+            static function () {
+                return new Email();
+            }
+        );
+
+        static::$container->alias(Email::class, 'email');
+    }
+
+    /**
      * Add WordPress globals into container.
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    private static function addWordpressGlobals()
+    private static function addWordpressGlobals(): void
     {
         // Add global WP classes.
         global $wpdb, $wp_query;

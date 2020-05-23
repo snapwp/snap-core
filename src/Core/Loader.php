@@ -68,7 +68,7 @@ class Loader
      */
     public static function aliasAutoload($class): void
     {
-        if (array_key_exists($class, static::$aliases)) {
+        if (\array_key_exists($class, static::$aliases)) {
             \class_alias(static::$aliases[$class], $class);
         }
     }
@@ -169,6 +169,12 @@ class Loader
     {
         /** @noinspection PhpUndefinedMethodInspection */
         Request::populateWpParams();
+
+        global $post;
+
+        if ($post instanceof \WP_Post) {
+            Container::addInstance($post);
+        }
     }
 
     /**
@@ -178,7 +184,7 @@ class Loader
     {
         \add_action(
             'widgets_init',
-            function () {
+            static function () {
                 \register_widget(\Snap\Widgets\RelatedPages::class);
             }
         );
@@ -281,6 +287,9 @@ class Loader
         Container::resolve(Bootstrap::class)->run();
     }
 
+    /**
+     * Run the registered Hookables.
+     */
     private function runHookables(): void
     {
         foreach (static::$theme_hookables as $hookable) {

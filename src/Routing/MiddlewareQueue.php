@@ -95,7 +95,7 @@ class MiddlewareQueue
      */
     public function deScope(): void
     {
-        $this->stack = array_diff_key($this->stack, $this->scoped);
+        $this->stack = \array_diff_key($this->stack, $this->scoped);
         $this->scoped = [];
     }
 }
