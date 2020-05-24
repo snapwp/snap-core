@@ -4,11 +4,15 @@ namespace Snap\Utils;
 
 use Snap\Media\SizeManager;
 
-/**
- * Class Image_Utils
- */
 class Image
 {
+    /**
+     * Size cache.
+     *
+     * @var array
+     */
+    private static $sizes;
+
     /**
      * Get size information for all currently registered image sizes.
      *
@@ -17,6 +21,10 @@ class Image
     public static function getImageSizes(): array
     {
         global $_wp_additional_image_sizes;
+
+        if (isset(self::$sizes)) {
+            return self::$sizes;
+        }
 
         $sizes = [];
 
@@ -28,7 +36,7 @@ class Image
                     'width' => \get_option("{$size}_size_w"),
                     'height' => \get_option("{$size}_size_h"),
                     'crop' => (bool)\get_option("{$size}_crop"),
-                    'generated_on_upload' => !\in_array($size, $dynamic_sizes),
+                    'generated_on_upload' => !\in_array($size, $dynamic_sizes, true),
                 ];
             }
 
@@ -37,12 +45,14 @@ class Image
                     'width' => $_wp_additional_image_sizes[$size]['width'],
                     'height' => $_wp_additional_image_sizes[$size]['height'],
                     'crop' => $_wp_additional_image_sizes[$size]['crop'],
-                    'generated_on_upload' => !\in_array($size, $dynamic_sizes),
+                    'generated_on_upload' => !\in_array($size, $dynamic_sizes, true),
                 ];
             }
         }
 
-        return $sizes;
+        self::$sizes = $sizes;
+
+        return self::$sizes;
     }
 
     /**
@@ -108,8 +118,6 @@ class Image
 
     /**
      * Returns the amount of registered dynamic image sizes.
-     *
-     * // TODO cache this?
      *
      * @return int
      */
