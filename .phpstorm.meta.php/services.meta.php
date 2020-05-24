@@ -22,8 +22,8 @@ namespace PHPSTORM_META {
                 \Snap\Http\Request => \Snap\Http\Request::class,
                 "validator" => \Snap\Http\Validation\Validator::class,
                 \Snap\Http\Validation\Validator => \Snap\Http\Validation\Validator::class,
-                "email" => \Snap\Email\Email::class,
-                \Snap\Email\Email => \Snap\Email\Email::class,
+                "email" => \Snap\Utils\Email::class,
+                \Snap\Utils\Email => \Snap\Utils\Email::class,
 
                 "WP_Query" => \WP_Query::class,
                 "wpdb" => \wpdb::class,
@@ -54,8 +54,8 @@ namespace PHPSTORM_META {
                 \Snap\Http\Request => \Snap\Http\Request::class,
                 "validator" => \Snap\Http\Validation\Validator::class,
                 \Snap\Http\Validation\Validator => \Snap\Http\Validation\Validator::class,
-                "email" => \Snap\Email\Email::class,
-                \Snap\Email\Email => \Snap\Email\Email::class,
+                "email" => \Snap\Utils\Email::class,
+                \Snap\Utils\Email => \Snap\Utils\Email::class,
 
                 "WP_Query" => \WP_Query::class,
                 "wpdb" => \wpdb::class,

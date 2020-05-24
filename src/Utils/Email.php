@@ -1,6 +1,6 @@
 <?php
 
-namespace Snap\Email;
+namespace Snap\Utils;
 
 use Snap\Core\Concerns\ManagesHooks;
 use Snap\Exceptions\EmailException;

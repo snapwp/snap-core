@@ -8,7 +8,6 @@ use Hodl\Exceptions\ContainerException;
 use Snap\Core\Bootstrap\SnapLoader;
 use Snap\Database\PostQuery;
 use Snap\Database\TaxQuery;
-use Snap\Email\Email;
 use Snap\Exceptions\StartupException;
 use Snap\Http\Request;
 use Snap\Http\Response;
@@ -18,6 +17,7 @@ use Snap\Routing\MiddlewareQueue;
 use Snap\Routing\Router;
 use Snap\Templating\Strategies\StrategyInterface;
 use Snap\Templating\View;
+use Snap\Utils\Email;
 
 /**
  * The main Snap class.
