@@ -227,7 +227,7 @@ class Email
     public function with($key, $value = null): Email
     {
         if (\is_array($key)) {
-            \array_merge($this->data, $key);
+            $this->data = \array_merge($this->data, $key);
             return $this;
         }
 
