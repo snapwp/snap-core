@@ -15,6 +15,9 @@ class HandlePostTemplates extends Hookable
     public function boot(): void
     {
         $this->addFilter('after_setup_theme', 'addThemePostTemplatesToCache');
+        // Helpful to caches such as Redis, which may purge on post save
+        $this->addFilter('edit_post', 'addThemePostTemplatesToCache', 99);
+
         $this->addFilter('template_include', 'postTemplateRouting');
         $this->addFilter('get_search_form', 'getSearchForm');
     }
@@ -111,8 +114,7 @@ class HandlePostTemplates extends Hookable
     {
         $cache_key = 'post_templates-' . \md5(\get_theme_root() . '/' . \get_stylesheet());
         $templates = \wp_get_theme()->get_post_templates();
-        \wp_cache_delete($cache_key, 'themes');
-        \wp_cache_add($cache_key, \array_merge($templates, $this->customTemplateLocator()), 'themes', 1800);
+        \wp_cache_replace($cache_key, \array_merge($templates, $this->customTemplateLocator()), 'themes', 1800);
     }
 
     /**
