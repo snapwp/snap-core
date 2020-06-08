@@ -124,7 +124,7 @@ class Theme
      * @param string $post_template The template to get the path for.
      * @return string
      */
-    public static function getPostTemplatesPath(string $post_template): string
+    public static function getPostTemplatePath(string $post_template): string
     {
         try {
             $path = Blade::getFinder()->find('views.post-templates.' . static::stripExtension($post_template));

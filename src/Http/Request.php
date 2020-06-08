@@ -475,7 +475,7 @@ class Request extends Validator implements ArrayAccess
      */
     public function isPostTemplate($post_template): bool
     {
-        return \is_page_template(Theme::getPostTemplatesPath($post_template));
+        return \is_page_template(Theme::getPostTemplatePath($post_template));
     }
 
     /**
