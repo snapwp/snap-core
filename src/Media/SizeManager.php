@@ -408,14 +408,24 @@ class SizeManager extends Hookable
             // Get size properties with basic fallback.
             $width = (int)isset($size_info[0]) ? $size_info[0] : 0;
             $height = (int)isset($size_info[1]) ? $size_info[1] : 0;
-            $crop = isset($size_info[2]) ? $size_info[2] : false;
+            $crop = $size_info[2] ?? false;
 
-            if (\in_array($name, self::DEFAULT_IMAGE_SIZES) || $size_info === false) {
+            if ($size_info === false || \in_array($name, self::DEFAULT_IMAGE_SIZES, true)) {
                 if ($size_info !== false) {
                     // Set other built-in sizes.
-                    \update_option($name . '_size_w', $width);
-                    \update_option($name . '_size_h', $height);
-                    \update_option($name . '_crop', $crop);
+                    $saved_value = \snap_get_image_size($name);
+
+                    if ($saved_value['crop'] !== $crop) {
+                        \update_option($name . '_crop', $crop, true);
+                    }
+
+                    if ((int)$saved_value['width'] !== (int)$width) {
+                        \update_option($name . '_size_w', $width, true);
+                    }
+
+                    if ((int)$saved_value['height'] !== (int)$height) {
+                        \update_option($name . '_size_h', $height, true);
+                    }
                 } else {
                     $callback = function ($sizes = []) use ($name) {
                         if (!\is_string(\current($sizes))) {
