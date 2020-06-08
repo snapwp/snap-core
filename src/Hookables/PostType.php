@@ -50,6 +50,13 @@ use Tightenco\Collect\Support\Collection;
  * @method static PostQuery orWhereDay(int $day, string $operator = '=')
  * @method static PostQuery whereHour(int $hour, string $operator = '=')
  * @method static PostQuery orWhereHour(int $hour, string $operator = '=')
+ * Inherited from QueriesMeta
+ * @method static PostQuery where($key, $value, string $operator = '=', string $type = 'CHAR')
+ * @method static PostQuery orWhere($key, $value = null, string $operator = '=', string $type = 'CHAR')
+ * @method static PostQuery whereExists(string $key)
+ * @method static PostQuery orWhereExists(string $key)
+ * @method static PostQuery whereNotExists(string $key)
+ * @method static PostQuery orWhereNotExists(string $key)
  *
  * @method static PostQuery childOf(int|int[]|\WP_Post|\WP_Post[] $post_ids)
  * @method static PostQuery notChildOf(int|int[]|\WP_Post|\WP_Post[] $post_ids)
