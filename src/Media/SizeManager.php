@@ -13,7 +13,7 @@ class SizeManager extends Hookable
      *
      * @var array
      */
-    const DEFAULT_IMAGE_SIZES = [
+    public const DEFAULT_IMAGE_SIZES = [
         'thumbnail',
         'medium',
         'medium_large',
@@ -59,7 +59,7 @@ class SizeManager extends Hookable
     /**
      * Register class conditional filters.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->addFilter('wp_editor_set_quality', 'getUploadQuality');
         $this->addFilter('intermediate_image_sizes_advanced', 'removeCustomImageSizes');
@@ -75,6 +75,8 @@ class SizeManager extends Hookable
         if (!empty($this->size_dropdown_names)) {
             $this->addFilter('image_size_names_choose', 'enableCustomImageSizes');
         }
+
+        $this->addFilter('acf/get_image_sizes', 'acfImageSizes');
 
         // Set default image size dropdown value.
         if (!empty(Config::get('images.insert_image_default_size'))) {
@@ -132,9 +134,9 @@ class SizeManager extends Hookable
      * Returns the amount of images using the provided $sizes.
      *
      * @param $sizes
-     * @return string
+     * @return null|string
      */
-    public static function getCountForSize($sizes)
+    public static function getCountForSize($sizes): ?string
     {
         global $wpdb;
         $sizes = Arr::wrap($sizes);
@@ -147,7 +149,7 @@ class SizeManager extends Hookable
             $args[] = "%\"{$size}\"%";
         }
 
-        return $wpdb->get_var($wpdb->prepare($query, $args)) ?? 0;
+        return $wpdb->get_var($wpdb->prepare($query, $args)) ?? '0';
     }
 
     /**
@@ -156,7 +158,7 @@ class SizeManager extends Hookable
      * @param array $sizes         Sizes to delete.
      * @param int   $attachment_id Attachment ID.
      */
-    public static function deleteDynamicImagesForAttachment(array $sizes, int $attachment_id)
+    public static function deleteDynamicImagesForAttachment(array $sizes, int $attachment_id): void
     {
         $meta = \wp_get_attachment_metadata($attachment_id);
         $dir = \pathinfo(get_attached_file($attachment_id), PATHINFO_DIRNAME);
@@ -182,7 +184,7 @@ class SizeManager extends Hookable
      *
      * @return array
      */
-    public static function getDynamicSizes()
+    public static function getDynamicSizes(): array
     {
         return \array_keys(self::$dynamic_sizes);
     }
@@ -203,7 +205,7 @@ class SizeManager extends Hookable
      */
     public function generateDynamicImage($image, $id, $size)
     {
-        if ('full' == $size) {
+        if ('full' === $size) {
             return $image;
         }
 
@@ -223,7 +225,7 @@ class SizeManager extends Hookable
      * @param array $sizes Current sizes for inclusion.
      * @return array Altered $sizes
      */
-    public function enableCustomImageSizes($sizes)
+    public function enableCustomImageSizes($sizes): array
     {
         // Merge custom sizes into $sizes.
         $sizes = \array_merge($sizes, $this->size_dropdown_names);
@@ -241,7 +243,7 @@ class SizeManager extends Hookable
             unset($sizes['thumbnail']);
         }
 
-        if (Config::get('images.insert_image_allow_full_size') || empty($sizes)) {
+        if (empty($sizes) || Config::get('images.insert_image_allow_full_size')) {
             $sizes['full'] = 'Original Size';
         }
 
@@ -256,6 +258,8 @@ class SizeManager extends Hookable
      * @param string $image_src
      * @param array  $image_meta
      * @return mixed
+     *
+     * @noinspection PhpUnusedParameterInspection
      */
     public function updateMaxSizeAttrInSrcsetSizeAttr($sizes, $size, $image_src, $image_meta)
     {
@@ -267,10 +271,10 @@ class SizeManager extends Hookable
                     continue;
                 }
 
-                if (\wp_image_matches_ratio($size[0], $size[1], $s['width'], $s['height'])) {
-                    if ($s['width'] > $biggest) {
-                        $biggest = $s['width'];
-                    }
+                if ($s['width'] > $biggest
+                    && \wp_image_matches_ratio($size[0], $size[1], $s['width'], $s['height'])
+                ) {
+                    $biggest = $s['width'];
                 }
             }
         }
@@ -288,7 +292,7 @@ class SizeManager extends Hookable
      *
      * @return int
      */
-    public function maxSrcsetImageWidth()
+    public function maxSrcsetImageWidth(): int
     {
         return 9999;
     }
@@ -301,7 +305,7 @@ class SizeManager extends Hookable
      * @param int $quality Existing value.
      * @return int A number between 0-100.
      */
-    public function getUploadQuality($quality)
+    public function getUploadQuality(int $quality): int
     {
         if (\is_numeric(Config::get('images.default_image_quality'))) {
             return (int)Config::get('images.default_image_quality');
@@ -319,7 +323,7 @@ class SizeManager extends Hookable
      * @param array $sizes Current registered sizes.
      * @return array Modified $sizes array.
      */
-    public function removeCustomImageSizes($sizes = [])
+    public function removeCustomImageSizes(array $sizes = []): array
     {
         if (Config::get('images.dynamic_image_sizes') !== false) {
             return \array_diff_key($sizes, self::$dynamic_sizes);
@@ -334,10 +338,23 @@ class SizeManager extends Hookable
      * Defaults to medium_large.
      * Also sets default alignment to center.
      */
-    public function setInsertImageDefaultSize()
+    public function setInsertImageDefaultSize(): void
     {
         \update_option('image_default_align', 'center');
         \update_option('image_default_size', Config::get('images.insert_image_default_size'));
+    }
+
+    /**
+     * Sets ACF available image sizes and removes disabled sizes.
+     *
+     * @hook acf/get_image_sizes
+     *
+     * @param array $sizes
+     * @return array
+     */
+    public function acfImageSizes(array $sizes): array
+    {
+        return \array_merge(\array_diff_key($sizes, $this->disabled_default_sizes), $this->size_dropdown_names);
     }
 
     /**
@@ -345,7 +362,7 @@ class SizeManager extends Hookable
      *
      * Adds image sizes declared in config that are not usable in the editor as dynamic sizes.
      */
-    private function setDynamicSizes()
+    private function setDynamicSizes(): void
     {
         foreach (Config::get('images.image_sizes') as $size => $data) {
             if (!isset($data[3]) || !$data[3]) {
@@ -366,7 +383,7 @@ class SizeManager extends Hookable
      * Uses the value of Config::get('images.supports_featured_images') enable thumbnails for all post types or a
      * select few.
      */
-    private function enableThumbnailSupport()
+    private function enableThumbnailSupport(): void
     {
         $enabled_thumbnails = Config::get('images.supports_featured_images');
 
@@ -384,7 +401,7 @@ class SizeManager extends Hookable
      *
      * Also allows easy overwriting of default sizes, as well as the ability to disable them one by one.
      */
-    private function registerImageSizes()
+    private function registerImageSizes(): void
     {
         // No image sizes found.
         if (empty(Config::get('images.image_sizes')) && empty(Config::get('images.dynamic_image_sizes'))) {
@@ -427,7 +444,7 @@ class SizeManager extends Hookable
                         \update_option($name . '_size_h', $height, true);
                     }
                 } else {
-                    $callback = function ($sizes = []) use ($name) {
+                    $callback = static function ($sizes = []) use ($name) {
                         if (!\is_string(\current($sizes))) {
                             return $sizes;
                         }

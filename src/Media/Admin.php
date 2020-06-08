@@ -25,7 +25,7 @@ class Admin extends Hookable
     /**
      * Only enable dynamic image sizes if sizes have been defined.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->addFilter('post_mime_types', 'addAdditionalMimeTypeSupport');
         $this->addFilter('media_view_settings', 'alterMediaViewSettings');
@@ -46,7 +46,7 @@ class Admin extends Hookable
     /**
      * Enqueue images.js on the admin media view.
      */
-    public function enqueueImageAdminScripts()
+    public function enqueueImageAdminScripts(): void
     {
         if ($this->isMediaScreen()) {
             \wp_enqueue_script(
@@ -131,7 +131,7 @@ class Admin extends Hookable
      * @param \WP_Post $post      The current attachment post object.
      * @return string
      */
-    public function addImageSizesMetaToMedia($form_meta, $post = null)
+    public function addImageSizesMetaToMedia($form_meta, $post = null): string
     {
         if (wp_attachment_is_image($post->ID) && current_user_can('manage_options')) {
             $meta = wp_get_attachment_metadata($post->ID);
@@ -151,7 +151,7 @@ class Admin extends Hookable
      * @param \WP_Post $post        The current attachment.
      * @return array
      */
-    public function addIntermediateMgmtFields($form_fields, $post = null)
+    public function addIntermediateMgmtFields($form_fields, $post = null): array
     {
         $current_screen = \get_current_screen();
 
@@ -159,6 +159,7 @@ class Admin extends Hookable
             return $form_fields;
         }
 
+        /** @noinspection NotOptimalIfConditionsInspection */
         // Only display for admin level users, and only if an image.
         if (\strpos(\wp_get_referer(), 'upload.php') !== false
             && \wp_attachment_is_image($post->ID)
@@ -184,7 +185,7 @@ class Admin extends Hookable
                     <tbody>';
 
                 foreach ($meta['sizes'] as $key => $value) {
-                    if (\in_array($key, $public_sizes)) {
+                    if (\in_array($key, $public_sizes, true)) {
                         continue;
                     }
 
@@ -226,7 +227,7 @@ class Admin extends Hookable
     /**
      * The ajax handler for deleting images from the dynamic images admin screen.
      */
-    public function handleBulkDeleteSizesAjax()
+    public function handleBulkDeleteSizesAjax(): void
     {
         \set_time_limit(0);
 
@@ -259,7 +260,7 @@ class Admin extends Hookable
     /**
      * Registers the dynamic images page under the Media menu.
      */
-    public function registerDynamicImagesOptionPage()
+    public function registerDynamicImagesOptionPage(): void
     {
         \add_submenu_page(
             'upload.php',
@@ -267,7 +268,7 @@ class Admin extends Hookable
             'Dynamic Images',
             'manage_options',
             'dynamic-images',
-            function () {
+            static function () {
                 $page = new DynamicImagesPage(new DynamicImagesTable());
                 $page->render();
             }
@@ -298,11 +299,7 @@ class Admin extends Hookable
     {
         $current_screen = \get_current_screen();
 
-        if (isset($current_screen->base) && $current_screen->base === 'upload') {
-            return true;
-        }
-
-        return false;
+        return isset($current_screen->base) && $current_screen->base === 'upload';
     }
 
     /**
@@ -313,11 +310,6 @@ class Admin extends Hookable
     private function isDynamicImagesScreen(): bool
     {
         $current_screen = \get_current_screen();
-
-        if (isset($current_screen->base) && $current_screen->base === 'media_page_dynamic-images') {
-            return true;
-        }
-
-        return false;
+        return isset($current_screen->base) && $current_screen->base === 'media_page_dynamic-images';
     }
 }
