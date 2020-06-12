@@ -107,4 +107,48 @@ trait WordpressDirectives
     {
         return '<?php wp_reset_postdata(); ?>';
     }
+
+    /**
+     * Implement checked().
+     *
+     * @param string $input
+     * @return string
+     */
+    public function compileChecked(string $input): string
+    {
+        return '<?php checked(' . $input . '); ?>';
+    }
+
+    /**
+     * Implement selected().
+     *
+     * @param string $input
+     * @return string
+     */
+    public function compileSelected(string $input): string
+    {
+        return '<?php selected(' . $input . '); ?>';
+    }
+
+    /**
+     * Implement readonly().
+     *
+     * @param string $input
+     * @return string
+     */
+    public function compileReadonly(string $input): string
+    {
+        return '<?php readonly(' . $input . '); ?>';
+    }
+
+    /**
+     * Implement disabled().
+     *
+     * @param string $input
+     * @return string
+     */
+    public function compileDisabled(string $input): string
+    {
+        return '<?php disabled(' . $input . '); ?>';
+    }
 }

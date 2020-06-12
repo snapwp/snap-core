@@ -11,9 +11,6 @@ use Snap\Templating\Blade\SnapDirectives;
 use Snap\Templating\Blade\WordpressDirectives;
 use Snap\Utils\Theme;
 
-/**
- * The default vanilla PHP templating engine.
- */
 class DefaultStrategy implements StrategyInterface
 {
     use WordpressDirectives;
@@ -30,6 +27,10 @@ class DefaultStrategy implements StrategyInterface
         'searchform',
         'setpostdata',
         'resetpostdata',
+        'checked',
+        'selected',
+        'disabled',
+        'readonly',
     ];
 
     protected $snap_directives = [
@@ -69,7 +70,7 @@ class DefaultStrategy implements StrategyInterface
      * @throws \Snap\Exceptions\TemplatingException
      * @throws \Throwable
      */
-    public function render(string $slug, array $data = [])
+    public function render(string $slug, array $data = []): void
     {
         $slug = $this->normalizePath($slug);
 
@@ -82,7 +83,7 @@ class DefaultStrategy implements StrategyInterface
         global $wp_query, $post;
 
         $this->default_data = \array_merge(
-            View::getAdditionalData("$slug", $data),
+            View::getAdditionalData($slug, $data),
             [
                 'wp_query' => $wp_query,
                 'request' => Request::getRootInstance(),
@@ -101,7 +102,7 @@ class DefaultStrategy implements StrategyInterface
      * @throws \Snap\Exceptions\TemplatingException
      * @throws \Throwable
      */
-    public function partial(string $slug, array $data = [])
+    public function partial(string $slug, array $data = []): void
     {
         if ($this->factory->exists($slug) === false) {
             throw new TemplatingException("Could not find partial: $slug");
@@ -146,7 +147,7 @@ class DefaultStrategy implements StrategyInterface
     /**
      * Adds any basic WordPress directives to Blade.
      */
-    private function addWordpressDirectives()
+    private function addWordpressDirectives(): void
     {
         foreach ($this->wordpress_directives as $directive) {
             $this->factory->directive($directive, [$this, 'compile' . \ucfirst($directive)]);
@@ -156,7 +157,7 @@ class DefaultStrategy implements StrategyInterface
     /**
      * Adds any Snap specific directives to Blade.
      */
-    private function addSnapDirectives()
+    private function addSnapDirectives(): void
     {
         foreach ($this->snap_directives as $directive) {
             $this->factory->directive($directive, [$this, 'compile' . \ucfirst($directive)]);
