@@ -69,10 +69,12 @@ trait SnapDirectives
             $init_loop = ' $__loop_query = ' . $input . ';';
         }
 
-        $init_loop .= '$__currentLoopData = $__loop_query->posts; $__env->addLoop($__currentLoopData); global $post;';
+        $init_loop .= '$__currentLoopData = isset($__loop_query->posts) ? $__loop_query->posts : $__loop_query; $__env->addLoop($__currentLoopData); global $post;';
         $iterate_loop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
+        $setup_post = 'if ($__loop_query instanceof \WP_Query) { $__loop_query->the_post(); } else { setup_postdata($GLOBALS[\'post\'] =& $post); }';
 
-        return "<?php {$init_loop} while (\$__loop_query->have_posts()): \$__loop_query->the_post(); {$iterate_loop} ?>";
+        return "<?php {$init_loop} foreach(\$__currentLoopData as \$post): {$iterate_loop} 
+        {$setup_post} ?>";
     }
 
     /**
@@ -82,7 +84,7 @@ trait SnapDirectives
      */
     public function compileEndloop()
     {
-        return '<?php wp_reset_postdata(); endwhile; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        return '<?php wp_reset_postdata(); endforeach; if ($__loop_query instanceof \WP_Query) { $__loop_query->have_posts(); } $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
     }
 
     /**
