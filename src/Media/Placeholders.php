@@ -92,7 +92,7 @@ class Placeholders extends Hookable
      */
     public function placeholderAttributes(array $attr): array
     {
-        if ($attr['alt'] === '' && \strpos($attr['src'], Config::get('images.placeholder_dir')) !== false) {
+        if ($attr['alt'] === '' && strpos($attr['src'], Config::get('images.placeholder_dir')) !== false) {
             $attr['alt'] = get_bloginfo('name') . ' placeholder image';
             $attr['aria-hidden'] = 'true';
         }
@@ -121,7 +121,7 @@ class Placeholders extends Hookable
                     $placeholder_url,
                     Image::getImageWidth($size),
                     Image::getImageHeight($size),
-                    true,
+                    true
                 ];
             }
         }

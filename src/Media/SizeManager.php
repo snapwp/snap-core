@@ -271,7 +271,8 @@ class SizeManager extends Hookable
                     continue;
                 }
 
-                if ($s['width'] > $biggest
+                if (
+                    $s['width'] > $biggest
                     && \wp_image_matches_ratio($size[0], $size[1], $s['width'], $s['height'])
                 ) {
                     $biggest = $s['width'];
@@ -354,7 +355,7 @@ class SizeManager extends Hookable
      */
     public function acfImageSizes(array $sizes): array
     {
-        return \array_merge(\array_diff_key($sizes, $this->disabled_default_sizes), $this->size_dropdown_names);
+        return array_merge(\array_diff_key($sizes, $this->disabled_default_sizes), $this->size_dropdown_names);
     }
 
     /**

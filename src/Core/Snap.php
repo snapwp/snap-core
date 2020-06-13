@@ -6,6 +6,7 @@ use Exception;
 use Hodl\Container;
 use Hodl\Exceptions\ContainerException;
 use Snap\Core\Bootstrap\SnapLoader;
+use Snap\Database\MediaQuery;
 use Snap\Database\PostQuery;
 use Snap\Database\TaxQuery;
 use Snap\Exceptions\StartupException;
@@ -225,12 +226,7 @@ class Snap
             static::$container->alias(\Snap\Templating\Blade\Factory::class, 'blade');
 
             // Add the default rendering engine.
-            static::$container->addSingleton(
-                \Snap\Templating\Strategies\DefaultStrategy::class,
-                static function (Container $container) {
-                    return $container->resolve(\Snap\Templating\Strategies\DefaultStrategy::class);
-                }
-            );
+            self::addSingleton(\Snap\Templating\Strategies\DefaultStrategy::class, true);
 
             static::$container->bind(
                 \Snap\Templating\Strategies\DefaultStrategy::class,
@@ -244,14 +240,7 @@ class Snap
      */
     private static function initView(): void
     {
-        static::$container->addSingleton(
-            View::class,
-            static function (Container $container) {
-                return $container->resolve(View::class);
-            }
-        );
-
-        static::$container->alias(View::class, 'view');
+        self::addSingleton(View::class, true, 'view');
     }
 
     /**
@@ -259,19 +248,9 @@ class Snap
      */
     private static function initDatabase(): void
     {
-        static::$container->add(
-            TaxQuery::class,
-            static function () {
-                return new TaxQuery();
-            }
-        );
-
-        static::$container->add(
-            PostQuery::class,
-            static function () {
-                return new PostQuery();
-            }
-        );
+        self::addFactory(PostQuery::class);
+        self::addFactory(TaxQuery::class);
+        self::addFactory(MediaQuery::class);
     }
 
     /**
@@ -279,16 +258,7 @@ class Snap
      */
     private static function initServices(): void
     {
-        // Add Image service.
-        static::$container->addSingleton(
-            ImageService::class,
-            static function () {
-                return new ImageService();
-            }
-        );
-
-        // Bind Image service to alias.
-        static::$container->alias(ImageService::class, 'image');
+        self::addSingleton(ImageService::class, false, 'image');
     }
 
     /**
@@ -296,53 +266,12 @@ class Snap
      */
     private static function initRouting(): void
     {
-        static::$container->addSingleton(
-            Router::class,
-            static function () {
-                return new Router();
-            }
-        );
-
-        static::$container->addSingleton(
-            Request::class,
-            static function () {
-                return new Request();
-            }
-        );
-
-        static::$container->addSingleton(
-            Response::class,
-            static function (Container $container) {
-                return $container->resolve(Response::class);
-            }
-        );
-
-        // This is required to fill with any custom rules.
-        static::$container->addSingleton(
-            \Rakit\Validation\Validator::class,
-            static function () {
-                return new \Rakit\Validation\Validator();
-            }
-        );
-
-        static::$container->add(
-            Validator::class,
-            static function () {
-                return new Validator();
-            }
-        );
-
-        static::$container->add(
-            MiddlewareQueue::class,
-            static function () {
-                return new MiddlewareQueue();
-            }
-        );
-
-        static::$container->alias(Router::class, 'router');
-        static::$container->alias(Request::class, 'request');
-        static::$container->alias(Response::class, 'response');
-        static::$container->alias(Validator::class, 'validator');
+        self::addSingleton(Router::class, false, 'router');
+        self::addSingleton(Request::class, false, 'request');
+        self::addSingleton(Response::class, true, 'response');
+        self::addSingleton(\Rakit\Validation\Validator::class);
+        self::addFactory(Validator::class, 'validator');
+        self::addFactory(MiddlewareQueue::class);
     }
 
     /**
@@ -350,14 +279,7 @@ class Snap
      */
     private static function addEmails(): void
     {
-        static::$container->add(
-            Email::class,
-            static function () {
-                return new Email();
-            }
-        );
-
-        static::$container->alias(Email::class, 'email');
+        self::addFactory(Email::class, 'email');
     }
 
     /**
@@ -371,5 +293,50 @@ class Snap
         global $wpdb, $wp_query;
         static::$container->addInstance($wp_query);
         static::$container->addInstance($wpdb);
+    }
+
+    /**
+     * Shorthand to add a factory definition.
+     *
+     * @param string    $class
+     * @param bool|null $alias
+     */
+    private static function addFactory(string $class, ?bool $alias = null): void
+    {
+        static::$container->add(
+            $class,
+            static function () use ($class) {
+                return new $class;
+            }
+        );
+
+        if ($alias !== null) {
+            static::$container->alias($class, $alias);
+        }
+    }
+
+    /**
+     * Shorthand to add a singleton definition.
+     *
+     * @param string    $class
+     * @param bool      $needsResolving
+     * @param bool|null $alias
+     */
+    private static function addSingleton(string $class, bool $needsResolving = false, ?bool $alias = null): void
+    {
+        static::$container->addSingleton(
+            $class,
+            static function (Container $container) use ($class, $needsResolving) {
+                if ($needsResolving === true) {
+                    return $container->resolve($class);
+                }
+
+                return new $class;
+            }
+        );
+
+        if ($alias !== null) {
+            static::$container->alias($class, $alias);
+        }
     }
 }

@@ -161,7 +161,8 @@ class Admin extends Hookable
 
         /** @noinspection NotOptimalIfConditionsInspection */
         // Only display for admin level users, and only if an image.
-        if (\strpos(\wp_get_referer(), 'upload.php') !== false
+        if (
+            \strpos(\wp_get_referer(), 'upload.php') !== false
             && \wp_attachment_is_image($post->ID)
             && \current_user_can('manage_options')
         ) {
