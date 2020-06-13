@@ -299,9 +299,9 @@ class Snap
      * Shorthand to add a factory definition.
      *
      * @param string    $class
-     * @param bool|null $alias
+     * @param string|null $alias
      */
-    private static function addFactory(string $class, ?bool $alias = null): void
+    private static function addFactory(string $class, ?string $alias = null): void
     {
         static::$container->add(
             $class,
@@ -320,9 +320,9 @@ class Snap
      *
      * @param string    $class
      * @param bool      $needsResolving
-     * @param bool|null $alias
+     * @param string|null $alias
      */
-    private static function addSingleton(string $class, bool $needsResolving = false, ?bool $alias = null): void
+    private static function addSingleton(string $class, bool $needsResolving = false, ?string $alias = null): void
     {
         static::$container->addSingleton(
             $class,
