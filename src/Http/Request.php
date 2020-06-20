@@ -62,6 +62,9 @@ class Request extends Validator implements ArrayAccess
      */
     public $input;
 
+    /**
+     * @var \Snap\Http\Request\Bag
+     */
     public $route;
 
     /**
@@ -323,10 +326,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
+     * @return mixed|\Snap\Http\Request\Bag|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
-    public function input($key = null, $default = null)
+    public function input(string $key = null, $default = null)
     {
+        if ($key === null) {
+            return $this->input;
+        }
         return $this->input->get($key, $default);
     }
 
@@ -335,10 +341,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed
+     * @return \Snap\Http\Request\Bag|mixed
      */
-    public function server($key = null, $default = null)
+    public function server(string $key = null, $default = null)
     {
+        if ($key === null) {
+            return $this->server;
+        }
         return $this->server->get($key, $default);
     }
 
@@ -347,10 +356,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed
+     * @return \Snap\Http\Request\Bag|mixed
      */
-    public function cookie($key = null, $default = null)
+    public function cookie(string $key = null, $default = null)
     {
+        if ($key === null) {
+            return $this->cookies;
+        }
         return $this->cookies->get($key, $default);
     }
 
@@ -359,10 +371,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed
+     * @return \Snap\Http\Request\Bag|mixed
      */
-    public function post($key = null, $default = null)
+    public function post(string $key = null, $default = null)
     {
+        if ($key === null) {
+            return $this->post;
+        }
         return $this->post->get($key, $default);
     }
 
@@ -371,10 +386,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed
+     * @return \Snap\Http\Request\Bag|mixed
      */
-    public function query($key = null, $default = null)
+    public function query(string $key = null, $default = null)
     {
+        if ($key === null) {
+            return $this->query;
+        }
         return $this->query->get($key, $default);
     }
 
@@ -383,10 +401,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
+     * @return \Snap\Http\Request\FileBag|mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
-    public function files($key = null, $default = null)
+    public function files(string $key = null, $default = null)
     {
+        if ($key === null) {
+            return $this->files;
+        }
         return $this->files->get($key, $default);
     }
 
@@ -395,10 +416,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
+     * @return \Snap\Http\Request\Bag|mixed
      */
-    public function wp($key = null, $default = null)
+    public function wp(string $key = null, $default = null)
     {
+        if ($key === null) {
+            static::$wp;
+        }
         return static::$wp->get($key, $default);
     }
 
@@ -407,10 +431,13 @@ class Request extends Validator implements ArrayAccess
      *
      * @param  string $key     The parameter key to look for.
      * @param  mixed  $default A default value to return if not present.
-     * @return mixed
+     * @return \Snap\Http\Request\Bag|mixed
      */
-    public function route($key = null, $default = null)
+    public function route(string $key = null, $default = null)
     {
+        if ($key === null) {
+            return $this->route;
+        }
         return $this->route->get($key, $default);
     }
 
