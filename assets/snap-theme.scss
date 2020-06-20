@@ -166,6 +166,10 @@ body {
         .edit-post-layout__content {
             margin-left: $sidebarWidth;
         }
+
+        .edit-post-layout .components-editor-notices__snackbar {
+            left: $sidebarWidth;
+        }
     }
 }
 
