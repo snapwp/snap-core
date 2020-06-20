@@ -35,7 +35,7 @@ class Config
             'login_logo_url' => '/',
         ],
         'theme' => [
-            'templates_directory' => 'resources/templates',
+            'templates_directory' => 'resources/views',
             'hookables_directory' => 'Hookables/',
             'cache_directory' => 'cache',
             'disable_xmlrpc' => true,

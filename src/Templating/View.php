@@ -58,7 +58,7 @@ class View
      */
     public function render($view, $data = [])
     {
-        $this->strategy->render('views.' . $view, $data);
+        $this->strategy->render($view, $data);
     }
 
     /**
