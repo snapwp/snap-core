@@ -127,7 +127,7 @@ class Theme
     public static function getPostTemplatePath(string $post_template): string
     {
         try {
-            $path = Blade::getFinder()->find('post-templates.' . static::stripExtension($post_template));
+            $path = Blade::getFinder()->find('page-templates.' . static::stripExtension($post_template));
         } catch (\Exception $e) {
             return static::getTemplatesPath();
         }
