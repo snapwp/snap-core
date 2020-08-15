@@ -23,6 +23,7 @@ class SnapLoader
         \Snap\Bootstrap\Cleanup::class,
         \Snap\Bootstrap\Comments::class,
         \Snap\Bootstrap\I18n::class,
+        \Snap\Admin\Gutenberg::class,
         \Snap\Media\SizeManager::class,
         \Snap\Media\Placeholders::class,
         \Snap\Media\AttachmentPermalinks::class,
@@ -67,7 +68,7 @@ class SnapLoader
      * @throws \Hodl\Exceptions\NotFoundException
      * @throws \ReflectionException
      */
-    public function load()
+    public function load(): void
     {
         if (\is_admin() || $this->container->get('request')->isLoginPage()) {
             $this->class_list[] = \Snap\Admin\Whitelabel::class;

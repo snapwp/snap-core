@@ -52,9 +52,11 @@ class MediaQuery extends PostQuery
      */
     public function whereExtension($extensions): MediaQuery
     {
-        collect($extensions)->map(function ($ext) {
-            $this->maybeAddMime($ext);
-        });
+        collect($extensions)->map(
+            function ($ext) {
+                $this->maybeAddMime($ext);
+            }
+        );
 
         return $this;
     }

@@ -69,7 +69,7 @@ trait SnapDirectives
             $init_loop = ' $__loop_query = ' . $input . ';';
         }
 
-        $init_loop .= '$__currentLoopData = isset($__loop_query->posts) ? collect($__loop_query->posts)->splice($__loop_query->current_post + 1) : $__loop_query; $__env->addLoop($__currentLoopData); global $post;';
+        $init_loop .= '$__currentLoopData = isset($__loop_query->posts) ? $__loop_query->posts : $__loop_query; $__env->addLoop($__currentLoopData); global $post;';
         $iterate_loop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
         $setup_post = 'if ($__loop_query instanceof \WP_Query) { $__loop_query->the_post(); } else { setup_postdata($GLOBALS[\'post\'] =& $post); }';
 

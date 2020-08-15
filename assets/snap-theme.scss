@@ -159,7 +159,8 @@ body {
     // Gutenberg fixes
     body.auto-fold {
         .edit-post-header,
-        .block-editor-editor-skeleton {
+        .block-editor-editor-skeleton,
+        .interface-interface-skeleton {
             left: $sidebarWidth;
         }
 
@@ -174,11 +175,16 @@ body {
 }
 
 @media (min-width: 782px) {
-    .block-editor-editor-skeleton {
+    .block-editor-editor-skeleton,
+    .interface-interface-skeleton {
         top: $adminBarHeight;
     }
 
     .block-editor__container {
         min-height: calc(100vh - #{$adminBarHeight});
+    }
+
+    .interface-interface-skeleton__body {
+        overflow-y: hidden;
     }
 }

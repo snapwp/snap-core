@@ -32,12 +32,16 @@ class Whitelabel extends Hookable
         if (Config::get('admin.login_extra_css') !== false) {
             $this->addAction('login_enqueue_scripts', 'enqueueLoginCss');
         }
+
+        if (Config::get('admin.login_message') !== false) {
+            $this->addFilter('login_message', 'addLoginMessage');
+        }
     }
 
     /**
      * Outputs the SnapWP footer in WordPress admin.
      */
-    public function brandingAdminFooter()
+    public function brandingAdminFooter(): void
     {
         if (Config::get('admin.footer_text')) {
             echo \esc_html(Config::get('admin.footer_text'));
@@ -82,8 +86,18 @@ class Whitelabel extends Hookable
     /**
      * Enqueue custom login page css.
      */
-    public function enqueueLoginCss()
+    public function enqueueLoginCss(): void
     {
         \wp_enqueue_style('theme_custom_login_css', Config::get('admin.login_extra_css'));
+    }
+
+    /**
+     * Format and output admin.login_message config setting.
+     *
+     * @return string
+     */
+    public function addLoginMessage(): string
+    {
+        return \sprintf('<p class="login-message">%s</p>', (string)Config::get('admin.login_message'));
     }
 }

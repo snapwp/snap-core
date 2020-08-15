@@ -58,6 +58,9 @@ class Config
             'insert_image_default_size' => 'medium',
             'insert_image_allow_full_size' => true,
         ],
+        'gutenberg' => [
+            'disabled_block_patterns' => [],
+        ],
         'services' => [
             'providers' => [],
             'theme_providers' => [],
