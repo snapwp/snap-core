@@ -36,12 +36,13 @@ class Cleanup extends Hookable
      */
     protected $filters = [
         'style_loader_tag' => 'cleanAssetTags',
+        'body_class' => 'cleanupBodyClasses'
     ];
 
     /**
      * Conditionally add filters.
      */
-    public function boot()
+    public function boot(): void
     {
         // xmlrpc is a potential security weakness. Most of the time it is completely irrelevant.
         if (Config::get('disable_xmlrpc')) {
@@ -52,7 +53,7 @@ class Cleanup extends Hookable
     /**
      * Move all frontend admin bar css and js to footer.
      */
-    public function moveAdminBarInlineStyles()
+    public function moveAdminBarInlineStyles(): void
     {
         if (!\is_admin()) {
             // Remove the inline styles normally added by the admin bar and move to the footer.
@@ -77,7 +78,7 @@ class Cleanup extends Hookable
     /**
      * Remove some useless default widgets.
      */
-    public function removePointlessWidgets()
+    public function removePointlessWidgets(): void
     {
         // Just why?
         \unregister_widget('WP_Widget_Meta');
@@ -91,7 +92,7 @@ class Cleanup extends Hookable
      *
      * @param  \WP_Admin_Bar $wp_admin_bar Global WP_Admin_Bar instance.
      */
-    public function cleanAdminBar($wp_admin_bar)
+    public function cleanAdminBar(\WP_Admin_Bar $wp_admin_bar): void
     {
         $wp_admin_bar->remove_node('wp-logo');
     }
@@ -102,7 +103,7 @@ class Cleanup extends Hookable
      * We do not disable via DISALLOW_FILE_EDIT as some plugins need this.
      * Feel free to override this in your wp-config.
      */
-    public function removeEditorLinks()
+    public function removeEditorLinks(): void
     {
         \remove_submenu_page('themes.php', 'theme-editor.php');
         \remove_submenu_page('plugins.php', 'plugin-editor.php');
@@ -114,7 +115,7 @@ class Cleanup extends Hookable
      * @param  string $tag Original asset tag.
      * @return string
      */
-    public function cleanAssetTags($tag)
+    public function cleanAssetTags(string $tag): string
     {
         \preg_match_all(
             "!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!",
@@ -135,7 +136,7 @@ class Cleanup extends Hookable
      * Sends 403 header and related message to the browser.
      *
      */
-    public function restrictAccess()
+    public function restrictAccess(): void
     {
         \wp_die('You are not allowed to be here', 403);
     }
@@ -143,7 +144,7 @@ class Cleanup extends Hookable
     /**
      * Clean up wp_head().
      */
-    public function cleanWpHead()
+    public function cleanWpHead(): void
     {
         global $wp_widget_factory;
 
@@ -180,9 +181,31 @@ class Cleanup extends Hookable
     }
 
     /**
+     * Remove extra classes from body_class and tidy up output.
+     *
+     * @param array $classes
+     * @return array
+     */
+    public function cleanupBodyClasses(array $classes): array
+    {
+        if (\is_page_template()) {
+            $classes = \array_filter($classes, static function (string $class) {
+                return !\strpos($class, '-template') !== false;
+            });
+
+            // Add the sanitized class
+            $template = \explode('/', \get_page_template_slug());
+
+            $classes[] = \get_post_type() . '-template-' .  \str_replace(['.php', '.blade'], '', \end($template));
+        }
+
+        return $classes;
+    }
+
+    /**
      * Remove emoji js and css site-wide.
      */
-    private function removeEmojis()
+    private function removeEmojis(): void
     {
         $this->removeHook(['the_content_feed', 'comment_text_rss'], 'wp_staticize_emoji');
         $this->removeHook('wp_head', 'print_emoji_detection_script', 7);
