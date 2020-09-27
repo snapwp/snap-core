@@ -5,7 +5,6 @@ namespace Snap\Hookables;
 use ReflectionMethod;
 use Snap\Core\Hookable;
 use Snap\Routing\MiddlewareQueue;
-use Snap\Services\Router;
 use Snap\Services\Container;
 
 /**
@@ -20,7 +19,7 @@ class Middleware extends Hookable
      *
      * @var null|string
      */
-    protected $name = null;
+    protected $name;
 
     /**
      * Run this Hookable only on the frontend.
@@ -32,7 +31,7 @@ class Middleware extends Hookable
     /**
      * Boot the AJAX Hookable, and register the handler.
      */
-    public function boot()
+    public function boot(): void
     {
         MiddlewareQueue::registerMiddleware($this->getName(), [$this, 'handler']);
     }
@@ -53,10 +52,8 @@ class Middleware extends Hookable
 
         foreach ($ref->getParameters() as $param) {
             // Let classes get auto-wired.
-            if ($param->getClass() === null) {
-                if (\count($args) >= 1) {
-                    $params[$param->getName()] = \array_shift($args);
-                }
+            if (($param->getClass() === null) && \count($args) >= 1) {
+                $params[$param->getName()] = \array_shift($args);
             }
         }
 
@@ -70,10 +67,6 @@ class Middleware extends Hookable
      */
     private function getName(): string
     {
-        if ($this->name === null) {
-            return $this->getClassname();
-        }
-
-        return $this->name;
+        return $this->name ?? $this->getClassname();
     }
 }

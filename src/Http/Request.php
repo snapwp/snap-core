@@ -154,7 +154,7 @@ class Request extends Validator implements ArrayAccess
     /**
      * Get an item from the request bag.
      *
-     * @param  mixed $name The offset to get.
+     * @param mixed $name The offset to get.
      * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
     public function __get($name)
@@ -168,7 +168,7 @@ class Request extends Validator implements ArrayAccess
     /**
      * Check if an input element is set on the request.
      *
-     * @param  mixed $name The offset to get.
+     * @param mixed $name The offset to get.
      * @return bool
      */
     public function __isset($name)
@@ -313,10 +313,10 @@ class Request extends Validator implements ArrayAccess
     /**
      * Checks if the current request matches the supplied HTTP method.
      *
-     * @param  string $method HTTP method to check against. Case insensitive.
+     * @param string $method HTTP method to check against. Case insensitive.
      * @return boolean
      */
-    public function isMethod($method): bool
+    public function isMethod(string $method): bool
     {
         return \strtoupper($method) === $this->getMethod();
     }
@@ -324,8 +324,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the request bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return mixed|\Snap\Http\Request\Bag|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
     public function input(string $key = null, $default = null)
@@ -339,8 +339,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the server bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return \Snap\Http\Request\Bag|mixed
      */
     public function server(string $key = null, $default = null)
@@ -354,8 +354,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the cookie bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return \Snap\Http\Request\Bag|mixed
      */
     public function cookie(string $key = null, $default = null)
@@ -369,8 +369,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the post bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return \Snap\Http\Request\Bag|mixed
      */
     public function post(string $key = null, $default = null)
@@ -384,8 +384,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the query bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return \Snap\Http\Request\Bag|mixed
      */
     public function query(string $key = null, $default = null)
@@ -399,8 +399,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the files bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return \Snap\Http\Request\FileBag|mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
      */
     public function files(string $key = null, $default = null)
@@ -414,8 +414,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the WordPress query vars bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return \Snap\Http\Request\Bag|mixed
      */
     public function wp(string $key = null, $default = null)
@@ -429,8 +429,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Returns a parameter from the WordPress query vars bag, or a default if not present.
      *
-     * @param  string $key     The parameter key to look for.
-     * @param  mixed  $default A default value to return if not present.
+     * @param string|null $key     The parameter key to look for.
+     * @param mixed       $default A default value to return if not present.
      * @return \Snap\Http\Request\Bag|mixed
      */
     public function route(string $key = null, $default = null)
@@ -447,7 +447,7 @@ class Request extends Validator implements ArrayAccess
      * @param string $key The key to check for.
      * @return bool
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return $this->post->has($key) ?: $this->query->has($key) ?: false;
     }
@@ -458,7 +458,7 @@ class Request extends Validator implements ArrayAccess
      * @param string $key The key to check for.
      * @return bool
      */
-    public function hasFile($key): bool
+    public function hasFile(string $key): bool
     {
         return $this->files->has($key);
     }
@@ -500,7 +500,7 @@ class Request extends Validator implements ArrayAccess
      * @param string $post_template The template to check for.
      * @return bool
      */
-    public function isPostTemplate($post_template): bool
+    public function isPostTemplate(string $post_template): bool
     {
         return \is_page_template(Theme::getPostTemplatePath($post_template));
     }
@@ -510,7 +510,7 @@ class Request extends Validator implements ArrayAccess
      *
      * @return bool
      */
-    public function isLoginPage()
+    public function isLoginPage(): bool
     {
         $abs_path = \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ABSPATH);
         $files = \get_included_files();
@@ -528,8 +528,8 @@ class Request extends Validator implements ArrayAccess
     /**
      * Set a item on the request bag.
      *
-     * @param  mixed $offset The offset to set.
-     * @param  mixed $value  The value to set.
+     * @param mixed $offset The offset to set.
+     * @param mixed $value  The value to set.
      */
     public function offsetSet($offset, $value): void
     {
@@ -543,7 +543,7 @@ class Request extends Validator implements ArrayAccess
     /**
      * Whether an item exists in the request bag.
      *
-     * @param  mixed $offset An offset to check for.
+     * @param mixed $offset An offset to check for.
      * @return boolean
      */
     public function offsetExists($offset): bool
@@ -554,9 +554,9 @@ class Request extends Validator implements ArrayAccess
     /**
      * Remove an item from the request bag.
      *
-     * @param  mixed $offset The offset to unset.
+     * @param mixed $offset The offset to unset.
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->input[$offset]);
     }
@@ -564,7 +564,7 @@ class Request extends Validator implements ArrayAccess
     /**
      * Get an item from the request bag.
      *
-     * @param  mixed $offset The offset to get.
+     * @param mixed $offset The offset to get.
      * @return mixed
      */
     public function offsetGet($offset)
@@ -575,7 +575,7 @@ class Request extends Validator implements ArrayAccess
     /**
      * Populates params from the global $wp object.
      */
-    public function populateWpParams()
+    public function populateWpParams(): void
     {
         global $wp;
 
@@ -589,7 +589,7 @@ class Request extends Validator implements ArrayAccess
      *
      * @param \Snap\Routing\UrlRoute $route
      */
-    public function setCurrentRoute(UrlRoute $route)
+    public function setCurrentRoute(UrlRoute $route): void
     {
         $this->route = new Bag($route->parameters());
     }
@@ -597,7 +597,7 @@ class Request extends Validator implements ArrayAccess
     /**
      * Populates Request class parameters.
      */
-    private function populateProperties()
+    private function populateProperties(): void
     {
         $this->is_mobile = (bool)\wp_is_mobile();
         $this->scheme = \is_ssl() ? 'https' : 'http';
@@ -611,7 +611,7 @@ class Request extends Validator implements ArrayAccess
      *
      * Post parameters take precedence and overwrite query params of the same key.
      */
-    private function populateInput()
+    private function populateInput(): void
     {
         $this->query = new Bag($_GET);
         $this->post = new Bag($_POST);

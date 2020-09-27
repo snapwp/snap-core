@@ -237,7 +237,7 @@ class Router
      * @param string $view The slug of the view to render.
      * @param array  $data Array of data to pass to the view.
      */
-    public function view($view, $data = []): void
+    public function view(string $view, $data = []): void
     {
         $this->checkMethod();
         $this->maybeRunMiddleware();
@@ -263,7 +263,7 @@ class Router
      *                            If no action is supplied, then 'index' is presumed.
      * @throws Exception If the supplied controller doesn't exist.
      */
-    public function dispatch($controller): void
+    public function dispatch(string $controller): void
     {
         $this->checkMethod();
         $this->maybeRunMiddleware();
@@ -476,6 +476,7 @@ class Router
 
         if ($this->current_route) {
             Response::setStatus(200);
+            /** @noinspection PhpUndefinedMethodInspection */
             Request::setCurrentRoute($this->current_route);
         }
     }

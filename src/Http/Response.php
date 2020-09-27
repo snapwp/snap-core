@@ -35,7 +35,7 @@ class Response
      * @param string $view The view to dispatch.
      * @param array  $data Optional. Data to pass to the view.
      */
-    public function view(string $view, array $data = [])
+    public function view(string $view, array $data = []): void
     {
         $this->view->render($view, $data);
     }
@@ -46,7 +46,7 @@ class Response
      * @param  string  $url    The destination URL.
      * @param  integer $status Optional. The HTTP status to send. Defaults to 302.
      */
-    public function redirect($url, $status = 302)
+    public function redirect(string $url, int $status = 302): void
     {
         if (\wp_redirect($url, $status)) {
             exit;
@@ -58,10 +58,10 @@ class Response
      *
      * After login, the user will be returned to the original URL before redirection took place.
      *
-     * @param string $path   The path to append to the admin URL.
+     * @param string|null $path   The path to append to the admin URL.
      * @param int    $status Optional. The HTTP status to send when redirecting. Default 302.
      */
-    public function redirectToAdmin($path = null, $status = 302)
+    public function redirectToAdmin(string $path = null, int $status = 302): void
     {
         $this->redirect(\admin_url($path), $status);
     }
@@ -71,10 +71,10 @@ class Response
      *
      * After login, the user will be returned to the original URL before redirection took place.
      *
-     * @param string $redirect_after The URL the user should be sent to after the login screen. Defaults to current URL.
+     * @param string|null $redirect_after The URL the user should be sent to after the login screen. Defaults to current URL.
      * @param int    $status         Optional. The HTTP status to send when redirecting. Default 302.
      */
-    public function redirectToLogin($redirect_after = null, $status = 302)
+    public function redirectToLogin(string $redirect_after = null, int $status = 302): void
     {
         if ($redirect_after === null) {
             $redirect_after = Theme::getCurrentUrl();
@@ -90,7 +90,7 @@ class Response
      * @param string $value The value to set for the header.
      * @return $this
      */
-    public function setHeader(string $name, string $value)
+    public function setHeader(string $name, string $value): Response
     {
         \header($name . ': ' . $value, true);
         return $this;
@@ -102,7 +102,7 @@ class Response
      * @param array $headers Array of headers to set.
      * @return $this
      */
-    public function withHeaders(array $headers = [])
+    public function withHeaders(array $headers = []): Response
     {
         foreach ($headers as $name => $value) {
             $this->setHeader($name, $value);
@@ -117,7 +117,7 @@ class Response
      * @param string ...$names Header[s] to remove.
      * @return $this
      */
-    public function removeHeader(...$names)
+    public function removeHeader(...$names): Response
     {
         foreach ($names as $name) {
             @\header_remove($name);
@@ -133,7 +133,7 @@ class Response
      * @param string $description The status description.
      * @return $this
      */
-    public function setStatus(int $code, string $description = '')
+    public function setStatus(int $code, string $description = ''): Response
     {
         \status_header($code, $description);
         return $this;
@@ -160,7 +160,7 @@ class Response
         string $domain = null,
         bool $secure = null,
         bool $http_only = true
-    ) {
+    ): Response {
         $domain = $domain ?: \Snap\Services\Request::getHost();
         $secure = $secure ?: \is_ssl();
         $this->setCookieHeader($name, $value, $expires, $path, $domain, $secure, $http_only);
@@ -173,7 +173,7 @@ class Response
      * @param string $name The name of the cookie to unset.
      * @return $this
      */
-    public function removeCookie(string $name)
+    public function removeCookie(string $name): Response
     {
         $this->setCookie($name, '', 0);
         return $this;
@@ -184,7 +184,7 @@ class Response
      *
      * Useful in middleware or on privately accessed content.
      */
-    public function set404()
+    public function set404(): void
     {
         global $wp_query;
         $wp_query->set_404();
@@ -195,11 +195,11 @@ class Response
     /**
      * Send a JSON generic response.
      *
-     * @param null $data
-     * @param null $status_code     Optional. Status code to send with the response.
-     * @param bool $disable_caching Whether to disable browser caching on the response.
+     * @param mixed    $data
+     * @param int|null $status_code     Optional. Status code to send with the response.
+     * @param bool     $disable_caching Whether to disable browser caching on the response.
      */
-    public function json($data = null, $status_code = null, $disable_caching = true)
+    public function json($data = null, int $status_code = null, bool $disable_caching = true): void
     {
         if ($disable_caching) {
             \nocache_headers();
@@ -213,10 +213,10 @@ class Response
      * Send a JSON success response.
      *
      * @param mixed $data            Data to JSON encode.
-     * @param null  $status_code     Optional. Status code to send with the response.
+     * @param int|null  $status_code     Optional. Status code to send with the response.
      * @param bool  $disable_caching Whether to disable browser caching on the response.
      */
-    public function jsonSuccess($data = null, $status_code = null, $disable_caching = true)
+    public function jsonSuccess($data = null, int $status_code = null, bool $disable_caching = true): void
     {
         if ($disable_caching) {
             \nocache_headers();
@@ -230,10 +230,10 @@ class Response
      * Send a JSON error response.
      *
      * @param mixed $data            Data to JSON encode.
-     * @param null  $status_code     Optional. Status code to send with the response.
+     * @param int|null  $status_code     Optional. Status code to send with the response.
      * @param bool  $disable_caching Whether to disable browser caching on the response.
      */
-    public function jsonError($data = null, $status_code = null, $disable_caching = true)
+    public function jsonError($data = null, int $status_code = null, bool $disable_caching = true): void
     {
         if ($disable_caching) {
             \nocache_headers();
@@ -262,7 +262,7 @@ class Response
         string $domain,
         bool $secure,
         bool $http_only
-    ) {
+    ): void {
         $attr = [
             \rawurlencode($name) . '=' . \rawurlencode($value),
         ];

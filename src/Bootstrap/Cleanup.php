@@ -36,7 +36,7 @@ class Cleanup extends Hookable
      */
     protected $filters = [
         'style_loader_tag' => 'cleanAssetTags',
-        'body_class' => 'cleanupBodyClasses'
+        'body_class' => 'cleanupBodyClasses',
     ];
 
     /**
@@ -189,9 +189,12 @@ class Cleanup extends Hookable
     public function cleanupBodyClasses(array $classes): array
     {
         if (\is_page_template()) {
-            $classes = \array_filter($classes, static function (string $class) {
-                return !\strpos($class, '-template') !== false;
-            });
+            $classes = \array_filter(
+                $classes,
+                static function (string $class) {
+                    return !\strpos($class, '-template') !== false;
+                }
+            );
 
             // Add the sanitized class
             $template = \explode('/', \get_page_template_slug());

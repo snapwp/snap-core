@@ -12,6 +12,15 @@ use Snap\Http\Response;
 class CLASSNAME extends Middleware
 {
     /**
+     * The name of the Middleware.
+     *
+     * If not present, then the snake_case class name is used instead.
+     *
+     * @var null|string
+     */
+    protected $name = 'NAME';
+
+    /**
      * Handle the request.
      *
      * Return true to continue to the next middleware or dispatch the current view.
@@ -21,7 +30,7 @@ class CLASSNAME extends Middleware
      *
      * @param \Snap\Http\Request  $request  The current Request instance.
      * @param \Snap\Http\Response $response The current Response instance.
-     * @return bool
+     * @return bool|void
      */
     public function handle(Request $request, Response $response)
     {

@@ -55,7 +55,7 @@ class MiddlewareQueue
         $middleware = Arr::wrap($middleware);
 
         foreach ($middleware as $callback) {
-            $parts = \explode('|', $callback);
+            $parts = \explode(':', $callback);
             $args = [];
 
             if (\count($parts) === 2) {
