@@ -2,7 +2,7 @@
 
 namespace Snap\Utils;
 
-use Doctrine\Common\Inflector\Inflector;
+use Bladezero\Support\Str as BladeStr;
 
 /**
  * Provides some basic string utilities.
@@ -45,7 +45,7 @@ class Str
             return $string;
         }
 
-        $string = \preg_replace('/\-+/u', ' ', $string);
+        $string = \preg_replace('/-+/u', ' ', $string);
         $string = \preg_replace('/\s+/u', '', \ucwords($string));
 
         static::$snake_cache[$string] = \strtolower(
@@ -98,7 +98,7 @@ class Str
      */
     public static function toPlural(string $string): string
     {
-        return Inflector::pluralize($string);
+        return BladeStr::plural($string);
     }
 
     /**
@@ -109,6 +109,6 @@ class Str
      */
     public static function toSingular(string $string): string
     {
-        return Inflector::singularize($string);
+        return BladeStr::singular($string);
     }
 }
