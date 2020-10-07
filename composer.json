@@ -11,6 +11,8 @@
     "keywords": [
         "wordpress"
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Snap\\": "src/"
@@ -32,7 +34,7 @@
         "symfony/process": "^4.1",
         "doctrine/inflector": "^1.3",
         "tightenco/collect": "^6.0",
-        "jakewhiteley/bladezero": "^1.0.0"
+        "jakewhiteley/bladezero": "^6.18.42"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~3.3.2",
