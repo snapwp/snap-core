@@ -40,7 +40,11 @@ class Gutenberg extends Hookable
         if (Config::get('gutenberg.disable_block_patterns') === true) {
             remove_theme_support('core-block-patterns');
         } else {
-            $this->addAction('admin_head', 'filterDefaultBlockPatterns');
+            $this->addAction('admin_init', 'filterDefaultBlockPatterns');
+        }
+
+        if (Config::get('gutenberg.disable_drop_cap') === true) {
+            $this->addFilter('block_editor_settings', 'disableDropCap');
         }
     }
 
@@ -85,5 +89,17 @@ class Gutenberg extends Hookable
         }
 
         \wp_localize_script('snap-gutenberg', 'snapGutenbergOptions', $data);
+    }
+
+    /**
+     * Disable dropCap post WP 5.6.
+     *
+     * @param array $editor_settings
+     * @return array
+     */
+    public function disableDropCap(array $editor_settings): array
+    {
+        $editor_settings['__experimentalFeatures']['global']['typography']['dropCap'] = false;
+        return $editor_settings;
     }
 }

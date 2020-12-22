@@ -6,12 +6,12 @@ window.wp.hooks.addFilter('blocks.registerBlockType', 'snap/hideBlocks', functio
 	}
 
 	return settings
-})
+});
 
 window.wp.domReady(function() {
 	if (window.snapGutenbergOptions.disableDropCaps) {
 		var pBlock = window.wp.blocks.getBlockType('core/paragraph');
-		if (pBlock) {
+		if (pBlock && pBlock.supports.__experimentalFeatures && pBlock.supports.__experimentalFeatures.typography) {
 			pBlock.supports.__experimentalFeatures.typography.dropCap = false;
 		}
 	}

@@ -123,12 +123,12 @@ class HandlePostTemplates extends Hookable
      * @param string $template_path Path of template to load.
      * @return string Path of template to load.
      */
-    public function postTemplateRouting($template_path): string
+    public function postTemplateRouting(string $template_path): string
     {
-        $routes_file = \get_template_directory() . '/public/routes.php';
+        $routes_file = \get_template_directory() . '/routes/web.php';
 
         if (\is_child_theme()) {
-            $routes_file = \locate_template('public/routes.php');
+            $routes_file = \locate_template('routes/web.php');
         }
 
         if ('' !== $routes_file) {
