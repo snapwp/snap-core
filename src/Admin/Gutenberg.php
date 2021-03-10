@@ -99,7 +99,7 @@ class Gutenberg extends Hookable
      */
     public function disableDropCap(array $editor_settings): array
     {
-        $editor_settings['__experimentalFeatures']['global']['typography']['dropCap'] = false;
+        $editor_settings['__experimentalFeatures']['defaults']['typography']['dropCap'] = false;
         return $editor_settings;
     }
 }
