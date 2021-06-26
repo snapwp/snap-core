@@ -13,9 +13,8 @@ class CLASSNAME extends PostType
      * Override the post type default options.
      *
      * @see https://codex.wordpress.org/Function_Reference/register_post_type#Parameters
-     * @var null|array
      */
-    public $options = [
+    public array $options = [
         //'public' => true,
         //'hierarchical' => true,
         //'has_archive' => true,
@@ -27,14 +26,14 @@ class CLASSNAME extends PostType
      *
      * @var array|string[]
      */
-    public $taxonomies = [
+    public array $taxonomies = [
         //'example_taxonomy'
     ];
 
     /**
      * Run after the post type is registered.
      */
-    public function boot()
+    public function boot(): void
     {
         //$this->columns()->add('example_column', 'Example Column');
     }

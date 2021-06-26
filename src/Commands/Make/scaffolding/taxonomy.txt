@@ -9,12 +9,10 @@ use Snap\Hookables\Taxonomy;
  */
 class CLASSNAME extends Taxonomy
 {
-   /**
+    /**
     * Post types to register this taxonomy for.
-    *
-    * @var array
     */
-   protected $post_types = [
+   protected array $post_types = [
        //'post'
    ];
 
@@ -22,9 +20,8 @@ class CLASSNAME extends Taxonomy
     * Override the post type default options.
     *
     * @see https://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
-    * @var array
     */
-   public $options = [
+   public array $options = [
        //
    ];
 
