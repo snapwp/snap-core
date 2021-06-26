@@ -10,85 +10,63 @@ abstract class ContentHookable extends Hookable
 {
     /**
      * Array of Content Hookables that have registered their columns.
-     *
-     * @var array
      */
-    protected static $registered_columns = [];
+    protected static array $registered_columns = [];
 
     /**
      * Whether the content is registered.
-     *
-     * @var array
      */
-    protected static $has_registered = [
+    protected static array $has_registered = [
         'post' => [],
         'taxonomy' => [],
     ];
 
     /**
      * The content type.
-     *
-     * @var string
      */
-    protected static $type;
+    protected static string $type;
 
     /**
      * Flag to indicate if taxonomies have been attached yet.
-     *
-     * @var bool
      */
-    protected static $has_attached_taxonomies = false;
+    protected static bool $has_attached_taxonomies = false;
 
     /**
      * Map of scope methods.
-     *
-     * @var array
      */
-    protected static $scope_cache = [];
+    protected static array $scope_cache = [];
 
     /**
      * Holds all relationships to be registered.
-     *
-     * @var array
      */
-    protected static $relationships = [];
+    protected static array $relationships = [];
 
     /**
      * Holds all registered taxonomies with their plurals.
-     *
-     * @var array
      */
-    protected static $taxonomy_plurals = [];
+    protected static array $taxonomy_plurals = [];
 
     /**
      * Override the name to register with (defaults to snake case class name).
-     *
-     * @var null|string
      */
-    protected $name;
+    protected ?string $name = null;
 
     /**
      * Front-facing singular name for the Content. For example Post, Page, Color, Category.
      * If not present, default to the capitalised class name.
-     *
-     * @var null|string
      */
-    protected $singular;
+    protected ?string $singular = null;
 
     /**
      * Front-facing plural name for the Content. For example Posts, Pages, Colors, Categories.
      * If not present, default to a pluralized and capitalised class name.
-     *
-     * @var null|string
      */
-    protected $plural;
+    protected ?string $plural = null;
 
     /**
      * Labels to register with.
-     *
-     * @var array
      */
-    protected $labels = [];
+    protected array $labels = [];
 
     /**
      * Override the content options to register with.
@@ -96,21 +74,17 @@ abstract class ContentHookable extends Hookable
      * @see https://codex.wordpress.org/Function_Reference/register_post_type#Parameters
      * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Shorthand setting of admin columns.
-     *
-     * @var array
      */
-    protected $columns = [];
+    protected array $columns = [];
 
     /**
      * ColumnManager instance.
-     *
-     * @var ColumnManager
      */
-    protected $columnManager;
+    protected ColumnManager $columnManager;
 
     /**
      * Register the content type.
@@ -124,10 +98,8 @@ abstract class ContentHookable extends Hookable
 
     /**
      * Should return a new Query builder object.
-     *
-     * @return \Snap\Database\Query
      */
-    abstract protected function makeNewQuery();
+    abstract protected function makeNewQuery(): \Snap\Database\Query;
 
     /**
      * Register columns.

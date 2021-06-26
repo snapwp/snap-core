@@ -4,6 +4,7 @@ namespace Snap\Hookables;
 
 use Snap\Database\PostQuery;
 use Snap\Hookables\Content\ColumnController;
+use Snap\Hookables\Content\Concerns\InteractsWithAcf;
 use Snap\Utils\Str;
 use Tightenco\Collect\Support\Arr;
 use Tightenco\Collect\Support\Collection;
@@ -70,31 +71,27 @@ use Tightenco\Collect\Support\Collection;
  */
 class PostType extends ContentHookable
 {
+    use InteractsWithAcf;
+
     /**
      * Taxonomies to register for the current post type.
-     *
-     * @var array
      */
-    protected $taxonomies = [];
+    protected array $taxonomies = [];
 
     /**
      * @inherit
      */
-    protected static $type = 'post';
+    protected static string $type = 'post';
 
     /**
      * Whether accessors have been registered yet.
-     *
-     * @var bool
      */
-    protected static $has_registered_accessors = false;
+    protected static bool $has_registered_accessors = false;
 
     /**
      * Registered admin filters.
-     *
-     * @var array
      */
-    private $admin_filters = [];
+    private array $admin_filters = [];
 
     /**
      * Register the post type.
@@ -207,14 +204,16 @@ class PostType extends ContentHookable
             return null;
         }
 
-        $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
-
-        // As we are getting post meta, we know it will be loaded in the cache already - so this won't be expensive.
         $post = \get_post($object_id);
 
         if ($post === null) {
             return null;
         }
+
+        $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
+
+        // Handle ACF data
+        $this->primeAcfCache($object_id);
 
         foreach (static::$has_registered[self::$type] as $post_type => $class) {
             if ($post->post_type !== $post_type) {
@@ -232,8 +231,14 @@ class PostType extends ContentHookable
 
             // Call accessor.
             if (\method_exists($class, $method)) {
-                return (new $class)->{$method}($post);
+                $returnValue = (new $class)->{$method}($post);
+                return \is_array($returnValue) ? collect($returnValue) : $returnValue;
             }
+        }
+
+        // Try to find the meta key in the ACF cache
+        if ($this->hasKeyInAcfCache($meta_key)) {
+            return $this->getKeyFromAcfCache($meta_key);
         }
 
         return null;
@@ -282,6 +287,7 @@ class PostType extends ContentHookable
      */
     private function getLabels(): array
     {
+        /** @noinspection PhpUndefinedFunctionInspection */
         return [
             'name' => $this->getPlural(),
             'singular_name' => $this->getSingular(),
@@ -338,6 +344,7 @@ class PostType extends ContentHookable
     {
         if (static::$has_registered_accessors === false) {
             $this->addFilter('get_post_metadata', 'runAttributeAccessors', 10, 4);
+            $this->addFilter('default_post_metadata', '__return_null', 10, 4);
             static::$has_registered_accessors = true;
         }
     }
@@ -396,7 +403,7 @@ class PostType extends ContentHookable
             'name' => $taxonomy,
             'orderby' => 'name',
             'hierarchical' => true,
-            'show_option_none' => "Show all {$tax->label}",
+            'show_option_none' => "Show all $tax->label",
             'value_field' => 'slug',
             'selected' => $selected,
         ];

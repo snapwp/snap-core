@@ -49,14 +49,14 @@ class Taxonomy extends ContentHookable
     /**
      * Post types to attach to.
      */
-    protected $post_types;
+    protected array $post_types;
 
     /**
      * The content type.
      *
      * @var string
      */
-    protected static $type = 'taxonomy';
+    protected static string $type = 'taxonomy';
 
     /**
      * Register the Taxonomy.
@@ -226,11 +226,8 @@ class Taxonomy extends ContentHookable
 
     /**
      * When overloading an existing taxonomy, we dont want to use any of the getOptions() defaults.
-     *
-     * @param object $existing Original taxonomy object.
-     * @return array
      */
-    private function getOptionsForExisting($existing): array
+    private function getOptionsForExisting(WP_Taxonomy $existing): array
     {
         $new_args = \array_replace_recursive(\get_object_vars($existing), $this->options);
         $new_args['label'] = $this->getPlural();
@@ -240,8 +237,6 @@ class Taxonomy extends ContentHookable
 
     /**
      * Removes a taxonomy.
-     *
-     * @param \WP_Taxonomy $taxonomy The taxonomy to unset.
      */
     private function unRegisterTaxonomy(WP_Taxonomy $taxonomy): void
     {
