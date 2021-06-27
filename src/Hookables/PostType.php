@@ -313,6 +313,7 @@ class PostType extends ContentHookable
         if ($this->taxonomies !== null) {
             foreach ($this->taxonomies as $taxonomy) {
                 $this->attachTaxonomy($taxonomy);
+                $this->addTaxonomyFilter($taxonomy);
             }
         }
     }
