@@ -20,7 +20,7 @@ class Gutenberg extends Hookable
         $this->addFilter('enqueue_block_editor_assets', 'enqueueSnapGutenberg');
 
         if (Config::get('gutenberg.disable_custom_colors') === true) {
-            add_theme_support('editor-color-palette');
+            add_theme_support('editor-color-palette', []);
             add_theme_support('editor-gradient-presets');
 
             add_theme_support('disable-custom-colors');
@@ -28,7 +28,7 @@ class Gutenberg extends Hookable
         }
 
         if (Config::get('gutenberg.disable_custom_font_sizes') === true) {
-            add_theme_support('editor-font-sizes');
+            add_theme_support('editor-font-sizes', []);
             add_theme_support('disable-custom-font-sizes');
         }
 
@@ -44,7 +44,7 @@ class Gutenberg extends Hookable
         }
 
         if (Config::get('gutenberg.disable_drop_cap') === true) {
-            $this->addFilter('block_editor_settings', 'disableDropCap');
+            $this->addFilter('block_editor_settings_all', 'disableDropCap');
         }
     }
 
@@ -99,7 +99,7 @@ class Gutenberg extends Hookable
      */
     public function disableDropCap(array $editor_settings): array
     {
-        $editor_settings['__experimentalFeatures']['defaults']['typography']['dropCap'] = false;
+        $editor_settings['__experimentalFeatures']['typography']['dropCap'] = false;
         return $editor_settings;
     }
 }
