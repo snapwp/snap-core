@@ -345,7 +345,16 @@ class PostType extends ContentHookable
     {
         if (static::$has_registered_accessors === false) {
             $this->addFilter('get_post_metadata', 'runAttributeAccessors', 10, 4);
-            $this->addFilter('default_post_metadata', '__return_null', 10, 4);
+
+            $this->addFilter(
+                'default_post_metadata',
+                function() {
+                    return null;
+                },
+                10,
+                4
+            );
+            
             static::$has_registered_accessors = true;
         }
     }
