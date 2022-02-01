@@ -210,6 +210,12 @@ class PostType extends ContentHookable
             return null;
         }
 
+        $shortCircuit = \apply_filters('snap_run_attribute_accessors', false, $default, $object_id, $meta_key, $single);
+
+        if ($shortCircuit !== false) {
+            return null;
+        }
+
         $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
 
         // Handle ACF data
@@ -354,7 +360,7 @@ class PostType extends ContentHookable
                 10,
                 4
             );
-            
+
             static::$has_registered_accessors = true;
         }
     }
