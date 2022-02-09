@@ -21,7 +21,7 @@ class Gutenberg extends Hookable
 
         if (Config::get('gutenberg.disable_custom_colors') === true) {
             add_theme_support('editor-color-palette', []);
-            add_theme_support('editor-gradient-presets');
+            add_theme_support('editor-gradient-presets', []);
 
             add_theme_support('disable-custom-colors');
             add_theme_support('disable-custom-gradients');
