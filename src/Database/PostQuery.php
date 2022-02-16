@@ -157,6 +157,15 @@ class PostQuery extends Query
     }
 
     /**
+     * Set the return fields
+     */
+    public function fields(string $fields): PostQuery
+    {
+        $this->params['fields'] = $fields;
+        return $this;
+    }
+
+    /**
      * Include sticky posts in the results.
      */
     public function withSticky(): PostQuery
