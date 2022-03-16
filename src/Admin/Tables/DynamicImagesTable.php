@@ -48,13 +48,14 @@ class DynamicImagesTable extends \WP_List_Table
      *
      * @return array
      */
-    function get_columns(): array
+    public function get_columns()
     {
         return [
             'cb' => '<input type="checkbox" />',
             'name' => __('Name', 'snap'),
             'width' => __('Width', 'snap'),
             'height' => __('Height', 'snap'),
+            'matches' => __('Matches', 'snap'),
             'ratio' => __('Ratio', 'snap'),
             'crop' => __('Crop', 'snap'),
             'count' => __('Count of images generated', 'snap'),
@@ -94,7 +95,7 @@ class DynamicImagesTable extends \WP_List_Table
      *
      * @return array
      */
-    private function populateItems()
+    private function populateItems(): array
     {
         global $wpdb;
 
@@ -129,7 +130,7 @@ class DynamicImagesTable extends \WP_List_Table
     /**
      * Render a column when no column specific method exists.
      *
-     * @param array  $item
+     * @param array $item
      * @param string $column_name
      *
      * @return mixed
@@ -143,23 +144,53 @@ class DynamicImagesTable extends \WP_List_Table
                     return 'Keep aspect';
                 }
                 return $item[$column_name];
-                break;
             case 'name':
             case 'count':
                 return $item[$column_name];
-                break;
+            case 'matches':
+                $all_sizes = \snap_get_image_sizes();
+                $matches = [];
+
+                foreach ($all_sizes as $name => $size) {
+                    if ($name === $item['name']) {
+                        continue;
+                    }
+
+                    if (wp_image_matches_ratio($item['width'], $item['height'], (int)$size['width'], (int)$size['height'])) {
+                        $matches[] = $name;
+                    }
+
+                    $threshold = (int)apply_filters('big_image_size_threshold', 2560);
+
+                    if (
+                        (
+                            ($item['height'] === 0 || $item['height'] > $threshold)
+                            || ($item['width'] === 0 || $item['width'] > $threshold)
+                        )
+                        && (
+                            (int)$size['width'] === 0
+                            || (int)$size['width'] > $threshold
+                            || (int)$size['height'] === 0
+                            || (int)$size['height'] > $threshold
+                        )
+                    ) {
+                        $matches[] = $name;
+                    }
+                }
+                return implode(', ', array_unique($matches));
             case 'ratio':
-                if ($item['height'] <= 0 || $item['height'] > 9000) {
+                $threshold = (int)apply_filters('big_image_size_threshold', 2560);
+
+                if ($item['height'] <= 0 || $item['height'] > $threshold) {
                     return 'Scaled to width';
                 }
 
-                if ($item['width'] <= 0 || $item['width'] > 9000) {
+                if ($item['width'] <= 0 || $item['width'] > $threshold) {
                     return 'Scaled to height';
                 }
 
                 $divisor = \gmp_gcd($item['height'], $item['width']);
                 return $item['width'] / $divisor . ':' . $item['height'] / $divisor;
-                break;
             case 'crop':
                 if ($item['crop'] === false) {
                     return 'Not Cropped';
@@ -174,7 +205,6 @@ class DynamicImagesTable extends \WP_List_Table
                 }
 
                 return 'Cropped from center';
-                break;
             default:
                 return \print_r($item, true); //Show the whole array for troubleshooting purposes
         }
