@@ -410,7 +410,7 @@ class TaxQuery extends Query
     private function getArray(array $args): array
     {
         $query = new WP_Term_Query($args);
-        return $query->terms;
+        return $query->terms ?? [];
     }
 
     /**
