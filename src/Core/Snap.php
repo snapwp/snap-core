@@ -37,29 +37,23 @@ class Snap
 
     /**
      * Whether Snap has been setup yet.
-     *
-     * @var boolean
      */
-    public static $short_setup = false;
+    public static bool $short_setup = false;
 
     /**
      * Container instance.
-     *
-     * @var Container
      */
-    private static $container;
+    private static Container $container;
 
     /**
      * Whether Snap has been setup yet.
-     *
-     * @var boolean
      */
-    private static $setup = false;
+    private static bool $setup = false;
 
     /**
      * This class never needs to be instantiated.
      */
-    final private function __construct()
+    private function __construct()
     {
         // No code here...
     }
@@ -67,7 +61,7 @@ class Snap
     /**
      * This class never needs to be instantiated.
      */
-    final private function __clone()
+    private function __clone()
     {
         // No code here...
     }
@@ -119,7 +113,7 @@ class Snap
     /**
      * Create the static Container instance.
      *
-     * @throws \Hodl\Exceptions\ContainerException
+     * @throws ContainerException
      */
     public static function createContainer(): void
     {
@@ -133,11 +127,11 @@ class Snap
     /**
      * Create a config instance, provide config directories, and add to the container.
      *
-     * @param string $theme_root Used by the publish command when not the current active theme.
+     * @param string|null $theme_root Used by the publish command when not the current active theme.
      *
-     * @throws \Hodl\Exceptions\ContainerException
+     * @throws ContainerException
      */
-    public static function initConfig($theme_root = null): void
+    public static function initConfig(?string $theme_root = null): void
     {
         if (static::$setup === false) {
             $config = new Config();
@@ -178,7 +172,7 @@ class Snap
     /**
      * Registers any service providers defined in theme config.
      *
-     * @throws \Hodl\Exceptions\ContainerException
+     * @throws ContainerException
      * @throws \ReflectionException
      */
     public static function registerProviders(): void
@@ -285,7 +279,7 @@ class Snap
     /**
      * Add WordPress globals into container.
      *
-     * @throws \Hodl\Exceptions\ContainerException
+     * @throws ContainerException
      */
     private static function addWordpressGlobals(): void
     {

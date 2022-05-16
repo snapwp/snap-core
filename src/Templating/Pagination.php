@@ -7,47 +7,33 @@ use WP_User_Query;
 
 /**
  * A simple wrapper to output paginated links at the bottom of Query loops.
- *
- * @since  1.0.0
  */
 class Pagination
 {
     /**
      * Pagination arguments array.
-     *
-     * @since  1.0.0
-     * @var array
      */
-    private $args = [];
+    private array $args;
 
     /**
      * The current query to paginate.
      *
-     * @since  1.0.0
      * @var WP_Query|WP_User_Query|null
      */
-    private $wp_query = null;
+    private $wp_query;
 
     /**
      * Total number of pages in the query.
-     *
-     * @since  1.0.0
-     * @var integer
      */
-    private $page_count = 0;
+    private int $page_count;
 
     /**
      * The current page number.
-     *
-     * @since  1.0.0
-     * @var integer
      */
-    private $current_page = 1;
+    private int $current_page = 1;
 
     /**
      * Create $args array and assign object properties.
-     *
-     * @since  1.0.0
      *
      * @param array    $args {
      *     Optional. An array of arguments.
@@ -74,14 +60,12 @@ class Pagination
      * }
      * @param WP_Query $global_query Global WP_Query instance.
      */
-    public function __construct($args = [], WP_Query $global_query)
+    public function __construct(array $args, WP_Query $global_query)
     {
         $this->args = wp_parse_args(
             $args,
             /**
              * Filter the default arguments.
-             *
-             * @since  1.0.0
              *
              * @param  array $defaults The default arguments.
              * @return array
@@ -102,22 +86,16 @@ class Pagination
 
     /**
      * Output pagination HTML.
-     *
-     * @since  1.0.0
      */
-    public function render()
+    public function render(): void
     {
         echo $this->get();
     }
 
     /**
      * Return pagination HTML.
-     *
-     * @since  1.0.0
-     *
-     * @return string Pagination HTML.
      */
-    public function get()
+    public function get(): string
     {
         if ($this->page_count <= 1) {
             return '';
@@ -150,12 +128,8 @@ class Pagination
 
     /**
      * Return Pagination default arguments.
-     *
-     * @since 1.0.0
-     *
-     * @return array Default arguments.
      */
-    private function get_defaults()
+    private function get_defaults(): array
     {
         return [
             'echo'                      => true,
@@ -178,13 +152,9 @@ class Pagination
     }
 
     /**
-     * Sets the page_count variable from $this->wp_query.
-     *
-     * @since  1.0.0
-     *
-     * @return int
+     * Gets the page_count variable from $this->wp_query.
      */
-    private function get_page_count()
+    private function get_page_count(): int
     {
         if ($this->wp_query instanceof WP_User_Query) {
             if (empty($this->wp_query->get_results())) {
@@ -199,20 +169,16 @@ class Pagination
 
     /**
      * Sets the current_page variable.
-     *
-     * @since  1.0.0
      */
-    private function set_current_page()
+    private function set_current_page(): void
     {
-        $this->current_page = empty(get_query_var('paged')) ? 1 : \intval(get_query_var('paged'));
+        $this->current_page = empty(get_query_var('paged')) ? 1 : (int)get_query_var('paged');
     }
 
     /**
      * Sets the ranges used when calculating how many links to display.
-     *
-     * @since  1.0.0
      */
-    private function set_ranges()
+    private function set_ranges(): void
     {
         $this->args['range'] = (int) $this->args['range'] - 1;
         $this->args['ceil'] = absint(\ceil($this->args['range'] / 2));
@@ -221,11 +187,9 @@ class Pagination
     /**
      * Returns the min and max ranges used when calculating the page links.
      *
-     * @since  1.0.0
-     *
      * @return array [$min, $max]
      */
-    private function get_min_max()
+    private function get_min_max(): array
     {
         if ($this->page_count > $this->args['range']) {
             if ($this->current_page <= $this->args['range']) {
@@ -242,13 +206,11 @@ class Pagination
                 ];
             }
 
-            if ($this->current_page >= $this->args['range']
-                && $this->current_page < ($this->page_count - $this->args['ceil'])
-            ) {
-                 return [
-                     $this->current_page - $this->args['ceil'],
-                     $this->current_page + $this->args['ceil'],
-                 ];
+            if ($this->current_page < ($this->page_count - $this->args['ceil'])) {
+                return [
+                    $this->current_page - $this->args['ceil'],
+                    $this->current_page + $this->args['ceil'],
+                ];
             }
         }
 
@@ -256,18 +218,14 @@ class Pagination
     }
 
     /**
-     * Create HTML for the first/previous page links.
-     *
-     * @since  1.0.0
-     *
-     * @return string
+     * Create and return HTML for the first/previous page links.
      */
-    private function get_opening_links()
+    private function get_opening_links(): string
     {
         $output = '';
 
-        $previous_link = esc_attr(get_pagenum_link(\intval($this->current_page) - 1));
-        $first_page_link = esc_attr(get_pagenum_link(1));
+        $previous_link = esc_attr(get_pagenum_link($this->current_page - 1));
+        $first_page_link = esc_attr(get_pagenum_link());
 
         if ($this->args['show_first_last'] && $first_page_link && $this->current_page > 2) {
             $output .= \sprintf($this->args['first_wrapper'], $first_page_link);
@@ -285,20 +243,16 @@ class Pagination
     }
 
     /**
-     * Create HTML for the pagination links.
-     *
-     * @since  1.0.0
-     *
-     * @return string
+     * Create and return HTML for the pagination links.
      */
-    private function get_links()
+    private function get_links(): string
     {
-        list($min, $max) = $this->get_min_max();
+        [$min, $max] = $this->get_min_max();
         $output = '';
 
         if (! empty($min) && ! empty($max) && $this->args['range'] >= 0) {
             for ($i = $min; $i <= $max; $i++) {
-                if ($this->current_page == $i) {
+                if ($this->current_page === $i) {
                     // output active HTML.
                     $output .= \sprintf($this->args['active_link_wrapper'], $i);
                 } else {
@@ -316,17 +270,13 @@ class Pagination
     }
 
     /**
-     * Create HTML for the next/last page links.
-     *
-     * @since  1.0.0
-     *
-     * @return string
+     * Create and return HTML for the next/last page links.
      */
-    private function get_closing_links()
+    private function get_closing_links(): string
     {
         $output = '';
 
-        $next_link = esc_attr(get_pagenum_link(\intval($this->current_page) + 1));
+        $next_link = esc_attr(get_pagenum_link($this->current_page + 1));
         $last_page_link = esc_attr(get_pagenum_link($this->page_count));
 
         if ($this->args['show_previous_next'] && $next_link && $this->page_count !== $this->current_page) {
