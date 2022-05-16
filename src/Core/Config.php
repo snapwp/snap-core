@@ -40,6 +40,7 @@ class Config
             'cache_directory' => 'cache',
             'disable_xmlrpc' => true,
             'disable_comments' => true,
+            'disable_widgets_block_editor' => false,
             'disable_customizer' => true,
             'remove_asset_versions' => true,
             'defer_scripts' => true,
@@ -59,7 +60,13 @@ class Config
             'insert_image_allow_full_size' => true,
         ],
         'gutenberg' => [
+            'disable_block_patterns' => false,
             'disabled_block_patterns' => [],
+            'disable_block_directory' => false,
+            'disable_drop_cap' => false,
+            'disable_custom_font_sizes' => false,
+            'disable_custom_colors' => false,
+            'disable_block_library_css' => false,
         ],
         'services' => [
             'providers' => [],
