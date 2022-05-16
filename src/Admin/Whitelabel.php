@@ -71,10 +71,10 @@ class Whitelabel extends Hookable
     /**
      * Removes the admin footer version text.
      *
-     * @param  string $version The current WP version string.
-     * @return string
+     * @param  ?string $version The current WP version string.
+     * @return ?string
      */
-    public function removeVersionText($version): string
+    public function removeVersionText(?string $version): ?string
     {
         if (true === Config::get('admin.show_version')) {
             return $version;

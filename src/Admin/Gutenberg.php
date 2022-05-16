@@ -46,6 +46,14 @@ class Gutenberg extends Hookable
         if (Config::get('gutenberg.disable_drop_cap') === true) {
             $this->addFilter('block_editor_settings_all', 'disableDropCap');
         }
+
+        if (Config::get('theme.disable_widgets_block_editor') === true) {
+            $this->addFilter('use_widgets_block_editor', '__return_false');
+        }
+
+        if (Config::get('gutenberg.disable_block_library_css') === true) {
+            $this->addAction('wp_enqueue_scripts', 'disableBlockFrontendStyles');
+        }
     }
 
     /**
@@ -72,6 +80,12 @@ class Gutenberg extends Hookable
      */
     public function enqueueSnapGutenberg(): void
     {
+        $screen = get_current_screen();
+
+        if ($screen && $screen->base === 'widgets') {
+            return;
+        }
+
         \wp_enqueue_script(
             'snap-gutenberg',
             \get_theme_file_uri('vendor/snapwp/snap-core/assets/gutenberg.js'),
@@ -101,5 +115,16 @@ class Gutenberg extends Hookable
     {
         $editor_settings['__experimentalFeatures']['typography']['dropCap'] = false;
         return $editor_settings;
+    }
+
+    /**
+     * Disable the css added to website frontends to style Gutenberg blocks.
+     */
+    public function disableBlockFrontendStyles(): void
+    {
+        wp_dequeue_style('wp-block-library');
+        wp_dequeue_style('wp-block-library-theme');
+        wp_dequeue_style('wc-block-style');
+        wp_dequeue_style('global-styles');
     }
 }

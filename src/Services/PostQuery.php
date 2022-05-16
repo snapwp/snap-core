@@ -16,6 +16,7 @@ namespace Snap\Services;
  *
  * @method static \Snap\Database\PostQuery withStatus(string|string[]|int|int[] $status)
  * @method static \Snap\Database\PostQuery withSticky()
+ * @method static \Snap\Database\PostQuery fields(string $fields)
  *
  * @method static \Snap\Database\PostQuery whereTaxonomy(string|callable $key, int|string|array $terms = '', string $operator = 'IN', bool $include_children = true)
  * @method static \Snap\Database\PostQuery orWhereTaxonomy(string|callable $key, int|string|array $terms = '', string $operator = 'IN', bool $include_children = true)

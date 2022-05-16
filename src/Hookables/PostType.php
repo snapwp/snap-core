@@ -21,6 +21,7 @@ use Tightenco\Collect\Support\Collection;
  *
  * @method static PostQuery withStatus(string|string[]|int|int[] $status)
  * @method static PostQuery withSticky()
+ * @method static PostQuery fields(string $fields)
  *
  * @method static PostQuery whereTaxonomy(string|callable $key, int|string|array $terms = '', string $operator = 'IN', bool $include_children = true)
  * @method static PostQuery orWhereTaxonomy(string|callable $key, int|string|array $terms = '', string $operator = 'IN', bool $include_children = true)
