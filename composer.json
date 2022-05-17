@@ -34,7 +34,7 @@
         "symfony/process": "^6.0",
         "doctrine/inflector": "^2.0",
         "tightenco/collect": "^8.0",
-        "jakewhiteley/bladezero": "^6.18.42"
+        "jakewhiteley/bladezero": "^8.83.10"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~3.6",
