@@ -41,6 +41,7 @@ class Str
         if (isset(static::$snake_cache[$string])) {
             return static::$snake_cache[$string];
         }
+
         if (\ctype_lower($string)) {
             return $string;
         }
@@ -72,6 +73,14 @@ class Str
 
         static::$studly_cache[$string] = \str_replace(['_', '-', ' '], '', \ucwords($string, " \t\r\n\f\v_-"));
         return static::$studly_cache[$string];
+    }
+
+    /**
+     * Converts a string to kebab-case.
+     */
+    public static function toKebab(string $string): string
+    {
+        return BladeStr::kebab($string);
     }
 
     /**

@@ -219,6 +219,8 @@ class Snap
 
             static::$container->alias(\Snap\Templating\Blade\Factory::class, 'blade');
 
+            \Snap\Templating\Blade\Factory::setComponentNamespace('\\Theme\\Components\\');
+
             // Add the default rendering engine.
             self::addSingleton(\Snap\Templating\Strategies\DefaultStrategy::class, true);
 

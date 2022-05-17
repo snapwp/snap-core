@@ -9,7 +9,17 @@ if (! @include_once __DIR__ . '/../vendor/autoload.php') {
 }
 
 use Snap\Commands\Cache;
-use Snap\Commands\Make\{Event, Middleware, Request, Rule, Hookable, Controller, Ajax, Post, Taxonomy, Shortcode};
+use Snap\Commands\Make\{Component,
+    Event,
+    Middleware,
+    Request,
+    Rule,
+    Hookable,
+    Controller,
+    Ajax,
+    Post,
+    Taxonomy,
+    Shortcode};
 use Snap\Commands\Publish;
 use Symfony\Component\Console\Application;
 
@@ -26,6 +36,7 @@ $application->add(new Shortcode());
 $application->add(new Event());
 $application->add(new Request());
 $application->add(new Rule());
+$application->add(new Component());
 
 // Other commands
 $application->add(new Publish());

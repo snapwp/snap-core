@@ -7,6 +7,8 @@ use Snap\Core\Snap;
 use Snap\Services\Config;
 use Snap\Utils\Str;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Base class for all make:* commands.
@@ -43,14 +45,13 @@ class Creator extends Command
     /**
      * Update a scaffold file and put into the active theme.
      *
-     * @param  string $scaffold The file to scaffold.
-     * @param  array  $args     Any replacement arguments.
-     * @param  array  $options  Any replacement options. Used for toggling sections of the scaffold.
-     * @return boolean
+     * @param string $scaffold The file to scaffold.
+     * @param array $args Any replacement arguments.
+     * @param array $options Any replacement options. Used for toggling sections of the scaffold.
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
-    protected function scaffold($scaffold, $args = [], $options = [])
+    protected function scaffold(string $scaffold, array $args = [], array $options = []): bool
     {
         $this->initWordpress();
 
@@ -107,17 +108,28 @@ class Creator extends Command
     }
 
     /**
-     * Returns the full path of the new file to be created.
-     *
-     * @param  string $scaffold The file to scaffold.
-     * @param  array  $args     The arguments passed from the Maker class.
-     * @return string
+     * Print output to console.
      */
-    protected function getDestination($scaffold, $args)
+    protected function writeOutput(bool $created, InputInterface $input, OutputInterface $output): int
+    {
+        if ($created) {
+            $output->writeln("<info>{$input->getArgument('name')} was created successfully</info>");
+        } else {
+            $output->writeln("<error>{$input->getArgument('name')} could not be created</error>");
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Returns the full path of the new file to be created.
+     */
+    protected function getDestination(string $scaffoldType, array $args): string
     {
         $sub_dir = '/theme/';
 
-        switch ($scaffold) {
+        switch ($scaffoldType) {
             case 'shortcode':
                 $dir = 'Shortcodes';
                 $sub_dir .= 'Content/';
@@ -156,13 +168,16 @@ class Creator extends Command
                 $dir = 'Taxonomies';
                 $sub_dir .= 'Content/';
                 break;
+            case 'component':
+                $dir = 'Components';
+                break;
         }
 
         $base_dir = $this->theme_dir . $sub_dir;
         $folder = \str_replace('\\', '/', $args['NAMESPACE']);
 
         $output_path = $base_dir . '/' . $dir . \trailingslashit($folder);
-        
+
         \wp_mkdir_p($output_path);
 
         return $output_path . $args['CLASSNAME'] . '.php';
@@ -171,27 +186,24 @@ class Creator extends Command
     /**
      * Ensure a name-spaced $filename can be created as a directory.
      *
-     * @param  string $filename The (possibly) name-spaced Hookable class name to create.
-     * @return string
+     * @param string $filename The (possibly) name-spaced Hookable class name to create.
      */
-    private function sanitiseFilename($filename)
+    private function sanitiseFilename(string $filename): string
     {
         return \str_replace('/', '\\', $filename);
     }
 
     /**
      * Populates the NAMESPACE argument based off the passed CLASSNAME.
-     *
-     * @param  array $args The args passed to the creator.
-     * @return array
      */
-    private function parseArgs($args = [])
+    private function parseArgs(array $args = []): array
     {
         $args['NAMESPACE'] = '';
 
         $class_name = $this->sanitiseFilename($args['CLASSNAME']);
         $args['NAME'] = Str::toSnake($class_name);
         $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
+        $args['KEBABCLASS'] = Str::toKebab($class_name);
 
         if ($this->isNestedDirectory($class_name)) {
             $parts = \explode('\\', $class_name);
@@ -200,6 +212,7 @@ class Creator extends Command
             $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
             $args['CLASSNAME'] = $class;
             $args['NAME'] = Str::toSnake($class);
+            $args['KEBABCLASS'] = str_replace('\\-', '.', $args['KEBABCLASS']);
             $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
         }
 
@@ -208,11 +221,8 @@ class Creator extends Command
 
     /**
      * Whether the current classname contains a directory.
-     *
-     * @param string $class_name The classname.
-     * @return bool
      */
-    private function isNestedDirectory($class_name)
+    private function isNestedDirectory(string $class_name): bool
     {
         return \strpos($class_name, '\\') !== false;
     }

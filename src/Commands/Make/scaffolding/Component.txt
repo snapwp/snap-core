@@ -1,0 +1,26 @@
+<?php
+
+namespace Theme\ComponentsNAMESPACE;
+
+use Bladezero\View\Component;
+
+class CLASSNAME extends Component
+{
+    /**
+     * Create the component instance.
+     */
+    public function __construct($type, $message)
+    {
+
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     *
+     * @return \Closure|string
+     */
+    public function render()
+    {
+        return 'components.KEBABCLASS';
+    }
+}

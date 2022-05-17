@@ -6,18 +6,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
-class Shortcode extends Creator
+class Component extends Creator
 {
     /**
      * Setup the command signature and help text.
      */
     protected function configure(): void
     {
-        $this->setName('make:shortcode')
-            ->setDescription('Creates a new Shortcode.')
-            ->setHelp('Creates a new Shortcode class within your theme/Shortcodes directory');
+        $this->setName('make:component')
+            ->setDescription('Creates a new Component.')
+            ->setHelp('Creates a new Component class within your theme/Component directory');
 
-        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created shortcode.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the created Component.');
     }
 
     /**
@@ -28,7 +28,7 @@ class Shortcode extends Creator
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $created = $this->scaffold(
-            'shortcode',
+            'component',
             [
                 'CLASSNAME' => $input->getArgument('name'),
             ]
