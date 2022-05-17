@@ -26,4 +26,9 @@ class CLASSNAME extends Hookable
     protected $actions = [
         //
     ];
+
+    public function boot()
+    {
+        //
+    }
 }

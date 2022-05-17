@@ -40,7 +40,7 @@ class Factory extends \Bladezero\Factory
      */
     public function make($view, $data = [], $mergeData = [])
     {
-        $path = $this->finder->find(
+        $path = static::$finder->find(
             $view = $this->normalizeName($view)
         );
 
@@ -54,7 +54,7 @@ class Factory extends \Bladezero\Factory
             $this->parseData($data)
         );
 
-        return $this->render($path, $data);
+        return $this->viewInstance($view, $path, $data);
     }
 
     /**
