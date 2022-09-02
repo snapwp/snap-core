@@ -196,30 +196,24 @@ class Bag implements ArrayAccess
 
     /**
      * Callback for performing recursive sanitization on an array of values.
-     *
-     * @param  array|string $value The array to sanitise.
-     * @return mixed
      */
-    public function sanitiseArray($value)
+    public function sanitiseArray(array|string|File $value): string|array|File
     {
         if (\is_array($value)) {
             return $value;
-        } else {
-            if ($value instanceof File) {
-                return $value;
-            }
-
-            return \trim(\sanitize_textarea_field($value));
         }
+
+        if ($value instanceof File) {
+            return $value;
+        }
+
+        return \trim(\sanitize_textarea_field($value));
     }
 
     /**
      * Set an item.
-     *
-     * @param  mixed $offset The offset to set.
-     * @param  mixed $value  The value to set.
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (\is_null($offset)) {
             $this->data[] = $value;
@@ -230,32 +224,24 @@ class Bag implements ArrayAccess
 
     /**
      * Whether an item exists.
-     *
-     * @param  mixed $offset An offset to check for.
-     * @return boolean
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return $this->has($offset);
     }
 
     /**
      * Remove an item.
-     *
-     * @param  mixed $offset The offset to unset.
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->data[$offset]);
     }
 
     /**
      * Get an item.
-     *
-     * @param  mixed $offset The offset to get.
-     * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->get($offset, null);
     }
@@ -265,7 +251,7 @@ class Bag implements ArrayAccess
      *
      * @param array $contents The array of params to set.
      */
-    protected function setData(array $contents = [])
+    protected function setData(array $contents = []): void
     {
         $this->data = $contents;
     }
