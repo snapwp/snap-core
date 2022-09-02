@@ -421,7 +421,7 @@ class Request extends Validator implements ArrayAccess
     public function wp(string $key = null, $default = null)
     {
         if ($key === null) {
-            static::$wp;
+            return static::$wp;
         }
         return static::$wp->get($key, $default);
     }
@@ -526,12 +526,9 @@ class Request extends Validator implements ArrayAccess
     }
 
     /**
-     * Set a item on the request bag.
-     *
-     * @param mixed $offset The offset to set.
-     * @param mixed $value  The value to set.
+     * Set an item on the request bag.
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if ($offset === null) {
             $this->input[] = $value;
@@ -542,32 +539,24 @@ class Request extends Validator implements ArrayAccess
 
     /**
      * Whether an item exists in the request bag.
-     *
-     * @param mixed $offset An offset to check for.
-     * @return boolean
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return $this->input->has($offset);
     }
 
     /**
      * Remove an item from the request bag.
-     *
-     * @param mixed $offset The offset to unset.
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->input[$offset]);
     }
 
     /**
      * Get an item from the request bag.
-     *
-     * @param mixed $offset The offset to get.
-     * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->input->get($offset, null);
     }
@@ -587,7 +576,7 @@ class Request extends Validator implements ArrayAccess
     /**
      * Set the current matched static route.
      *
-     * @param \Snap\Routing\UrlRoute $route
+     * @param UrlRoute $route
      */
     public function setCurrentRoute(UrlRoute $route): void
     {

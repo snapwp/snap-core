@@ -71,7 +71,7 @@ class FileBag extends Bag
      *
      * @param array $contents
      */
-    protected function setData(array $contents = [])
+    protected function setData(array $contents = []): void
     {
         foreach ($contents as $key => $file) {
             $this->data[$key] = $this->addFile($file);
