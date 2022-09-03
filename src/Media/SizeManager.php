@@ -10,8 +10,6 @@ class SizeManager extends Hookable
 {
     /**
      * Default WordPress image sizes.
-     *
-     * @var array
      */
     public const DEFAULT_IMAGE_SIZES = [
         'thumbnail',
@@ -21,38 +19,21 @@ class SizeManager extends Hookable
     ];
     /**
      * Holds any defined image sizes intended for theme use only.
-     *
-     * @var array
      */
-    private static $dynamic_sizes = [];
+    private static array $dynamic_sizes = [];
 
     /**
      * Holds any disabled default sizes.
-     *
-     * @var array
      */
-    private $disabled_default_sizes = [];
+    private array $disabled_default_sizes = [];
 
     /**
      * Holds any defined image dropdown names.
-     *
-     * @var array
      */
-    public $size_dropdown_names = [];
+    public array $size_dropdown_names = [];
 
-    /**
-     * @var ImageService
-     */
-    private $image_service;
-
-    /*
-     * Inject Image_Service
-     *
-     * @param ImageService $image_service
-     */
-    public function __construct(ImageService $image_service)
+    public function __construct(public ImageService $image_service)
     {
-        $this->image_service = $image_service;
         $this->setDynamicSizes();
     }
 
@@ -96,7 +77,7 @@ class SizeManager extends Hookable
      * @param array $sizes Size to delete.
      * @return bool|int Deleted image count or true if none left.
      */
-    public static function deleteDynamicImageBySizeAjax($sizes)
+    public static function deleteDynamicImageBySizeAjax(array $sizes): bool|int
     {
         global $wpdb;
         $sizes = Arr::wrap($sizes);
@@ -196,14 +177,14 @@ class SizeManager extends Hookable
      * All other theme images are generated dynamically by this method.
      *
      * @param mixed        $image Image array to pass on from this filter.
-     * @param int          $id    Attachment ID for image.
+     * @param int $id    Attachment ID for image.
      * @param array|string $size  Optional. Image size to scale to. Accepts any valid image size,
      *                            or an array of width and height values in pixels (in that order).
      *                            Default 'medium'.
      * @return false|array Array containing the image URL, width, height, and boolean for whether
      *                            the image is an intermediate size. False on failure.
      */
-    public function generateDynamicImage($image, $id, $size)
+    public function generateDynamicImage(mixed $image, int $id, array|string $size): bool|array
     {
         if ('full' === $size) {
             return $image;
@@ -225,7 +206,7 @@ class SizeManager extends Hookable
      * @param array $sizes Current sizes for inclusion.
      * @return array Altered $sizes
      */
-    public function enableCustomImageSizes($sizes): array
+    public function enableCustomImageSizes(array $sizes): array
     {
         // Merge custom sizes into $sizes.
         $sizes = \array_merge($sizes, $this->size_dropdown_names);
@@ -302,9 +283,6 @@ class SizeManager extends Hookable
      * Returns the image quality option.
      *
      * // TODO move somewhere else
-     *
-     * @param int $quality Existing value.
-     * @return int A number between 0-100.
      */
     public function getUploadQuality(int $quality): int
     {
