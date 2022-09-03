@@ -11,10 +11,8 @@ class FileBag extends Bag
 {
     /**
      * Expected file keys.
-     *
-     * @var array
      */
-    private $file_keys = [
+    private array $file_keys = [
         'error',
         'name',
         'size',
@@ -27,20 +25,15 @@ class FileBag extends Bag
      *
      * Use get_raw to get an un-sanitized version (should you need to).
      *
-     * @param  string $key     Item key to fetch.
-     * @param  mixed  $default Default value if the key is not present.
-     * @return mixed|\Snap\Http\Request\File|\Snap\Http\Request\File[]
+     * @return mixed|File|File[]
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return Helper::arrayGet($this->data, $key, $default);
     }
 
     /**
      * Checks if a key is present in the bag.
-     *
-     * @param  string $key Item key to check.
-     * @return boolean
      */
     public function has(string $key): bool
     {
@@ -49,9 +42,6 @@ class FileBag extends Bag
 
     /**
      * Return how many files were uploaded for a given key.
-     *
-     * @param string $key Item key to check.
-     * @return int
      */
     public function count(string $key): int
     {
@@ -68,8 +58,6 @@ class FileBag extends Bag
 
     /**
      * Add the individual files to the bag.
-     *
-     * @param array $contents
      */
     protected function setData(array $contents = []): void
     {
@@ -80,11 +68,8 @@ class FileBag extends Bag
 
     /**
      * Turn $_FILES data into File instances, or null if no file was uploaded.
-     *
-     * @param array $file
-     * @return array|null|File
      */
-    protected function addFile($file = [])
+    protected function addFile(array|File $file = []): File|array|null
     {
         if ($file instanceof File) {
             return $file;
@@ -96,7 +81,7 @@ class FileBag extends Bag
             $keys = \array_keys($normalised);
             \sort($keys);
 
-            if ($keys == $this->file_keys) {
+            if ($keys === $this->file_keys) {
                 if (UPLOAD_ERR_NO_FILE === $normalised['error']) {
                     $normalised = null;
                 } else {
@@ -126,19 +111,22 @@ class FileBag extends Bag
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
-     * @param $data
-     * @return array
      */
-    protected function formatFilesArray($data): array
+    protected function formatFilesArray(mixed $data): ?array
     {
         if (!\is_array($data)) {
             return $data;
         }
 
+        // PHP 8.1 introduced a new key into the $_FILES array. We don't need it, so unset.
+        if (isset($data['full_path'])) {
+            unset($data['full_path']);
+        }
+
         $keys = \array_keys($data);
         \sort($keys);
 
-        if ($this->file_keys != $keys || !isset($data['name']) || !\is_array($data['name'])) {
+        if ($this->file_keys !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 

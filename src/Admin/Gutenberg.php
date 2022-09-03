@@ -43,7 +43,7 @@ class Gutenberg extends Hookable
             $this->addAction('admin_init', 'filterDefaultBlockPatterns');
         }
 
-        if (Config::get('gutenberg.disable_drop_cap') === true) {
+        if (Config::get('gutenberg.disable_typography_features.drop_cap') === true) {
             $this->addFilter('block_editor_settings_all', 'disableDropCap');
         }
 
@@ -53,6 +53,10 @@ class Gutenberg extends Hookable
 
         if (Config::get('gutenberg.disable_block_library_css') === true) {
             $this->addAction('wp_enqueue_scripts', 'disableBlockFrontendStyles');
+        }
+
+        if (Config::get('gutenberg.simplify_image_size_controls') === true) {
+            $this->addAction('admin_head', 'simplifyImageSizeControls');
         }
     }
 
@@ -94,13 +98,11 @@ class Gutenberg extends Hookable
         );
 
         $data = [
-            'disableDropCaps' => false,
             'disabledBlocks' => Config::get('gutenberg.disabled_blocks', []),
+            'disableStyles' => Config::get('gutenberg.disable_default_block_styles', false),
         ];
 
-        if (Config::get('gutenberg.disable_drop_cap') === true) {
-            $data['disableDropCaps'] = true;
-        }
+        $data['disabledTypographyFeatures'] = Config::get('gutenberg.disable_typography_features');
 
         \wp_localize_script('snap-gutenberg', 'snapGutenbergOptions', $data);
     }
@@ -126,5 +128,17 @@ class Gutenberg extends Hookable
         wp_dequeue_style('wp-block-library-theme');
         wp_dequeue_style('wc-block-style');
         wp_dequeue_style('global-styles');
+    }
+
+    public function simplifyImageSizeControls(): void
+    {
+        echo '
+            <style>
+                .components-resizable-box__handle,
+                .block-editor-image-size-control {
+                    display: none !important;
+                }
+            </style>
+        ';
     }
 }
