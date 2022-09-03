@@ -8,17 +8,12 @@ use Snap\Utils\Str;
 
 class SnapLoader
 {
-    /**
-     * @var \Snap\Core\Bootstrap\SnapLoader
-     */
-    private static $instance;
+    private static SnapLoader $instance;
 
     /**
      * List of Snap classes to autoload.
-     *
-     * @var array
      */
-    private $class_list = [
+    private array $class_list = [
         \Snap\Bootstrap\Assets::class,
         \Snap\Bootstrap\Cleanup::class,
         \Snap\Bootstrap\Comments::class,
@@ -31,15 +26,12 @@ class SnapLoader
         \Snap\Http\Validation\Rules\Nonce::class,
     ];
 
-    /**
-     * @var \Hodl\Container
-     */
-    private $container;
+    private Container $container;
 
     /**
      * SnapLoader constructor.
      *
-     * @param \Hodl\Container $container
+     * @param Container $container
      */
     private function __construct(Container $container)
     {
@@ -49,16 +41,12 @@ class SnapLoader
     /**
      * Get singleton instance.
      *
-     * @param \Hodl\Container $container
+     * @param Container $container
      * @return static
      */
     public static function getInstance(Container $container): SnapLoader
     {
-        if (static::$instance === null) {
-            return static::$instance = new static($container);
-        }
-
-        return static::$instance;
+        return static::$instance ?? (static::$instance = new static($container));
     }
 
     /**
@@ -82,6 +70,7 @@ class SnapLoader
 
         $this->conditionallyLoad('theme.disable_comments', 'Snap\Admin\DisableComments');
         $this->conditionallyLoad('theme.disable_customizer', 'Snap\Admin\DisableCustomizer');
+        $this->conditionallyLoad('theme.disable_lazy_loading', 'Snap\Admin\DisableLazyLoading');
 
         foreach ($this->class_list as $module) {
             $this->initHookable($module);
