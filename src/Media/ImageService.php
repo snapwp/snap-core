@@ -13,12 +13,12 @@ class ImageService
      * @param mixed $image Image array to pass on from this filter.
      * @param int $id Attachment ID for image.
      * @param array|string $size Optional. Image size to scale to. Accepts any valid image size,
-     *                            or an array of width and height values in pixels (in that order).
-     *                            Default 'medium'.
-     * @return false|array Array containing the image URL, width, height, and boolean for whether
-     *                            the image is an intermediate size. False on failure.
+     *                           or an array of width and height values in pixels (in that order).
+     *                           Default 'medium'.
+     * @return false|array Array containing the image URL, width, height, and boolean for whether the image is an
+     *                     intermediate size. False on failure.
      */
-    public function generateDynamicImage($image, $id, $size)
+    public function generateDynamicImage(mixed $image, int $id, array|string $size): bool|array
     {
         global $_wp_additional_image_sizes;
 
@@ -59,81 +59,56 @@ class ImageService
             $crop = $_wp_additional_image_sizes[$size]['crop'];
         }
 
-        $check = \image_get_intermediate_size($id, $size);
-
-        // Bail early if we can.
-        if ($check !== false) {
-            return [$check['url'], $check['width'], $check['height'], false];
-        }
-
         $parent_image_path = apply_filters(
             'snap_dynamic_image_source',
             \wp_upload_dir()['basedir'] . '/' . $meta['file'],
             $id
         );
 
-        if ($check === false || !\file_exists(\wp_upload_dir()['basedir'] . '/' . $check['path'])) {
-            $update = false;
 
-            if (\is_array($size)) {
-                $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
+        $update = false;
 
-                if ($new_meta !== false) {
-                    $meta['sizes'][\implode('x', [$width, $height])] = $new_meta;
-                    $update = true;
+        if (\is_array($size)) {
+            $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
+
+            if ($new_meta !== false) {
+                $meta['sizes'][\implode('x', [$width, $height])] = $new_meta;
+                $update = true;
+            }
+        }
+
+        // check to see if there are any matching sizes to create
+        foreach ($_wp_additional_image_sizes as $key => $size_data) {
+            if (\array_key_exists($key, $meta['sizes']) === true) {
+                continue;
+            }
+
+            if (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
+                /*
+                 * This size is has not been requested, but matches the requested size ratio so should be generated
+                 * for use within the srcset.
+                 */
+                $new_meta = \image_make_intermediate_size(
+                    $parent_image_path,
+                    $size_data['width'],
+                    $size_data['height'],
+                    $size_data['crop']
+                );
+
+                if ($new_meta === false) {
+                    continue;
                 }
+
+                $meta['sizes'][$key] = $new_meta;
+
+                \do_action('snap_dynamic_image_meta', $size, $meta, $id);
+
+                $update = true;
             }
+        }
 
-            if ($update === false) {
-                foreach ($_wp_additional_image_sizes as $key => $size_data) {
-                    if (\array_key_exists($key, $meta['sizes']) === true) {
-                        continue;
-                    }
-
-                    if ($key == $size) {
-                        /*
-                         * Generate the requested dynamic size.
-                         */
-                        $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
-
-                        if ($new_meta === false) {
-                            continue;
-                        }
-
-                        $meta['sizes'][$size] = $new_meta;
-
-                        // Allow image transformations upon creation
-                        \do_action('snap_dynamic_image_meta', $size, $meta, $id);
-
-                        $update = true;
-                    } elseif (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
-                        /*
-                         * This size is has not been requested, but matches the requested size ratio so should be generated
-                         * for use within the srcset.
-                         */
-                        $new_meta = \image_make_intermediate_size(
-                            $parent_image_path,
-                            $size_data['width'],
-                            $size_data['height'],
-                            $size_data['crop']
-                        );
-
-                        if ($new_meta === false) {
-                            continue;
-                        }
-
-                        $meta['sizes'][$key] = $new_meta;
-
-                        \do_action('snap_dynamic_image_meta', $size, $meta, $id);
-
-                        $update = true;
-                    }
-                }
-            }
-
-            if ($update === true) {
-                \wp_update_attachment_metadata($id, $meta);
-            }
+        if ($update === true) {
+            \wp_update_attachment_metadata($id, $meta);
         }
 
         return $image;
