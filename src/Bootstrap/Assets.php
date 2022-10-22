@@ -47,12 +47,12 @@ class Assets extends Hookable
     public function boot()
     {
         // Whether to add 'defer' to enqueued scripts.
-        if ($this->config->get('theme.defer_scripts')) {
+        if ($this->config->get('assets.defer_scripts')) {
             $this->addFilter('script_loader_tag', 'deferScripts', 10, 2);
         }
 
         // Whether to remove asset version strings.
-        if ($this->config->get('theme.remove_asset_versions')) {
+        if ($this->config->get('assets.remove_asset_versions')) {
             $this->addFilter('style_loader_src', 'removeVersionsFromAssets', 15);
             $this->addFilter('script_loader_src', 'removeVersionsFromAssets', 15);
         }
@@ -65,15 +65,15 @@ class Assets extends Hookable
     public function enqueueScripts()
     {
         // Get specified jQuery version.
-        $jquery_version = $this->config->get('theme.use_jquery_cdn');
+        $jquery_version = $this->config->get('assets.use_jquery_cdn');
 
         // if a valid jQuery version has been specified.
         if ($jquery_version !== false
-            && $this->config->get('theme.disable_jquery') !== true
+            && $this->config->get('assets.disable_jquery') !== true
             && \version_compare($jquery_version, '0.0.1', '>=') === true
         ) {
             // get all non-deferred scripts, to check for jQuery.
-            $defer_exclude_list = $this->config->get('theme.defer_scripts_skip');
+            $defer_exclude_list = $this->config->get('assets.defer_scripts_skip');
 
             \wp_deregister_script('jquery');
 
@@ -89,7 +89,7 @@ class Assets extends Hookable
         }
 
         // Completely remove jQuery
-        if ($this->config->get('theme.disable_jquery') === true) {
+        if ($this->config->get('assets.disable_jquery') === true) {
             \wp_deregister_script('jquery');
         }
 
@@ -111,7 +111,7 @@ class Assets extends Hookable
      */
     public function deferScripts($tag, $handle)
     {
-        $excludes = $this->config->get('theme.defer_scripts_skip');
+        $excludes = $this->config->get('assets.defer_scripts_skip');
 
         // Get the script handles to exclude.
         if (empty($excludes)) {

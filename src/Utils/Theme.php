@@ -12,22 +12,17 @@ class Theme
 {
     /**
      * Mix-manifest.json contents stored as array.
-     *
-     * @var array|null
      */
-    private static $manifest = null;
+    private static ?array $manifest = null;
 
     /**
      * Gets the current full URL of the page with query string, host, and scheme.
-     *
-     * @param boolean $remove_query If true, the URL is returned without any query params.
-     * @return string The current URL.
      */
-    public static function getCurrentUrl($remove_query = false)
+    public static function getCurrentUrl(bool $remove_query_params = false): string
     {
         global $wp;
 
-        if ($remove_query === true) {
+        if ($remove_query_params) {
             return \trailingslashit(\home_url($wp->request));
         }
 
@@ -40,22 +35,16 @@ class Theme
 
     /**
      * Shortcut to get the include path relative to the active theme directory.
-     *
-     * @param string $path Path to append relative to active theme.
-     * @return string
      */
-    public static function getActiveThemePath($path)
+    public static function getActiveThemePath(string $path): string
     {
         return \str_replace('\\', '/', \trailingslashit(\get_stylesheet_directory()) . $path);
     }
 
     /**
      * Shortcut to get the file URL relative to the active theme directory.
-     *
-     * @param string $path Path to append relative to active theme directory URL.
-     * @return string
      */
-    public static function getActiveThemeUri($path)
+    public static function getActiveThemeUri(string $path): string
     {
         return \trailingslashit(\get_stylesheet_directory_uri()) . $path;
     }
@@ -63,10 +52,9 @@ class Theme
     /**
      * Retrieves a filename public URL with Webpack version ID if present.
      *
-     * @param string $file The asset file to look for.
-     * @return string The (possibly versioned) asset URL.
+     * @throws \JsonException
      */
-    public static function getAssetUrl($file)
+    public static function getAssetUrl(string $file): string
     {
         if (static::$manifest === null) {
             static::parseManifest();
@@ -77,24 +65,35 @@ class Theme
             return static::getActiveThemeUri('public/') . \ltrim($file, '/');
         }
 
+        if (Vite::isActive()) {
+            return static::getActiveThemeUri('public/') . \ltrim(static::$manifest[$file]->file, '/');
+        }
+
         return static::getActiveThemeUri('public/') . \ltrim(static::$manifest[$file], '/');
     }
 
     /**
-     * Get a system agnostic stylesheet dir.
-     *
-     * @return string
+     * Get the current manifest JSON if exists.
      */
-    public static function getStylesheetDirectory()
+    public static function getManifest(): ?array
+    {
+        if (static::$manifest === null) {
+            static::parseManifest();
+        }
+
+        return static::$manifest;
+    }
+
+    /**
+     * Get a system agnostic stylesheet dir.
+     */
+    public static function getStylesheetDirectory(): string
     {
         return static::normalisePath(\get_stylesheet_directory());
     }
 
     /**
      * Ensure path only uses forward slashes.
-     *
-     * @param string $path
-     * @return string
      */
     public static function normalisePath(string $path): string
     {
@@ -103,9 +102,6 @@ class Theme
 
     /**
      * Transforms a partial name and returns the path to the partial relative to theme root.
-     *
-     * @param string $partial The partial name.
-     * @return string
      */
     public static function getPartialPath(string $partial): string
     {
@@ -122,7 +118,6 @@ class Theme
      * Returns the full include path for a given post template.
      *
      * @param string $post_template The template to get the path for.
-     * @return string
      */
     public static function getPostTemplatePath(string $post_template): string
     {
@@ -158,15 +153,16 @@ class Theme
 
     /**
      * Parse the contents of mix-manifest.json and store as array.
+     *
+     * @throws \JsonException When the manifest is present but corrupt.
      */
-    private static function parseManifest()
+    private static function parseManifest(): void
     {
-        $manifest_path = \get_stylesheet_directory() . '/public/mix-manifest.json';
+        $manifest_path = \get_stylesheet_directory() . leadingslashit(Config::get('assets.manifest_path'));
 
         if (\file_exists($manifest_path)) {
             $manifest = \file_get_contents($manifest_path);
-
-            static::$manifest = (array)\json_decode($manifest);
+            static::$manifest = (array)\json_decode($manifest, false, 512, JSON_THROW_ON_ERROR);
         }
     }
 }
