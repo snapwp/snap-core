@@ -34,11 +34,14 @@ class Config
             'disable_widgets_block_editor' => false,
             'disable_customizer' => true,
             'disable_lazy_loading' => false,
+        ],
+        'assets' => [
             'remove_asset_versions' => true,
             'defer_scripts' => true,
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
             'disable_jquery' => false,
+            'manifest_path' => '/public/manifest.json'
         ],
         'images' => [
             'default_image_quality' => 75,
