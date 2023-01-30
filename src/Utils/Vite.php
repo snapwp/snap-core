@@ -46,6 +46,20 @@ class Vite
     }
 
     /**
+     * Add editor css/scss/less src.
+     */
+    public static function registerEditorStyle(string $path): void
+    {
+        self::$isActive = true;
+        self::enqueueVite();
+        self::addActions();
+
+        $url = self::$viteServer ? self::$viteServer . $path : snap_get_asset_url($path);
+
+        add_editor_style($url);
+    }
+
+    /**
      * Return the Vite server URL if it is running.
      * @return string|null
      */
