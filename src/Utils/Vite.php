@@ -110,6 +110,26 @@ class Vite
                 return $tag;
             }, 10, 2);
         }
+        
+        private static function addActions(): void
+    {
+        if (!self::$addedHooks) {
+            add_action('script_loader_tag', static function($tag, $scriptPath) {
+                if (str_starts_with($scriptPath, 'module/')) {
+                    return str_replace('<script', '<script type="module"', $tag);
+                }
+
+                return $tag;
+            }, 10, 2);
+
+            add_action('style_loader_tag', static function($tag, $scriptPath) {
+                if (str_starts_with($scriptPath, 'module/')) {
+                    return str_replace('<link', '<link crossorigin="anonymous"', $tag);
+                }
+
+                return $tag;
+            }, 10, 2);
+        }
 
         self::$addedHooks = true;
     }
