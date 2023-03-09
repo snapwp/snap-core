@@ -77,7 +77,7 @@ class Factory extends \Bladezero\Factory
      */
     protected function defaultAuthHandler(string $guard = null): bool
     {
-        return \current_user_can($guard);
+        return $guard ? \current_user_can($guard) : is_user_logged_in();
     }
 
     /**

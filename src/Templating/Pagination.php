@@ -172,7 +172,11 @@ class Pagination
      */
     private function set_current_page(): void
     {
-        $this->current_page = empty(get_query_var('paged')) ? 1 : (int)get_query_var('paged');
+		if ($this->wp_query->get('paged')) {
+			$this->current_page = $this->wp_query->get('paged');
+		} else {
+			$this->current_page = empty(get_query_var('paged')) ? 1 : (int)get_query_var('paged');
+		}
     }
 
     /**
