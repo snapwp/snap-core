@@ -98,7 +98,7 @@ class Hookable
      *
      * @param array $hooks The contents of $filters or $actions.
      */
-    final private function add_hooks($hooks)
+    private function add_hooks($hooks)
     {
         foreach ($hooks as $tag => $filter) {
             if (\is_string($filter)) {
@@ -124,7 +124,7 @@ class Hookable
      *
      * @since 1.0.0
      */
-    final private function parse_actions()
+    private function parse_actions()
     {
         if (isset($this->actions) && \is_array($this->actions) && !empty($this->actions)) {
             $this->add_hooks($this->actions);
@@ -136,7 +136,7 @@ class Hookable
      *
      * @since 1.0.0
      */
-    final private function parse_filters()
+    private function parse_filters()
     {
         if (isset($this->filters) && \is_array($this->filters) && !empty($this->filters)) {
             $this->add_hooks($this->filters);
