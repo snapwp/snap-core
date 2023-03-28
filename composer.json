@@ -19,7 +19,7 @@
     },
     "require": {
         "php": ">=8",
-        "jakewhiteley/hodl": "~1.3",
+        "jakewhiteley/hodl": "~1.7",
         "jjgrainger/posttypes": "~2.2",
         "rakit/validation": "~1.0",
         "symfony/console": "^6.0",
