@@ -50,7 +50,7 @@ class Snap
      *
      * @since  1.0.0
      */
-    final private function __construct()
+    private function __construct()
     {
         // No code here...
     }
@@ -60,7 +60,7 @@ class Snap
      *
      * @since  1.0.0
      */
-    final private function __clone()
+    private function __clone()
     {
         // No code here...
     }
