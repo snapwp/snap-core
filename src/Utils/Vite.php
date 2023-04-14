@@ -109,8 +109,16 @@ class Vite
 
                 return $tag;
             }, 10, 2);
-        }
+			
+			add_action('style_loader_tag', static function($tag, $scriptPath) {
+				if (str_starts_with($scriptPath, 'module/')) {
+					return str_replace('<link', '<link crossorigin="anonymous"', $tag);
+				}
 
-        self::$addedHooks = true;
+				return $tag;
+			}, 10, 2);
+		}
+
+		self::$addedHooks = true;
     }
 }
