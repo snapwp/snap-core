@@ -232,15 +232,15 @@ class Pagination
         $first_page_link = esc_attr(get_pagenum_link());
 
         if ($this->args['show_first_last'] && $first_page_link && $this->current_page > 2) {
-            $output .= \sprintf($this->args['first_wrapper'], $first_page_link);
+            $output .= \sprintf($this->args['first_wrapper'], $first_page_link, 1);
         }
 
         if ($this->args['show_previous_next'] && $previous_link && $this->current_page !== 1) {
-            $output .= \sprintf($this->args['previous_wrapper'], $previous_link);
+            $output .= \sprintf($this->args['previous_wrapper'], $previous_link, $this->current_page - 1);
         }
 
         if ($this->args['show_previous_next'] && $this->args['always_show_previous_next'] && $this->current_page === 1) {
-            $output .= \sprintf($this->args['disabled_previous_wrapper'], $previous_link);
+            $output .= \sprintf($this->args['disabled_previous_wrapper'], $previous_link, $this->current_page - 1);
         }
 
         return $output;
@@ -284,15 +284,15 @@ class Pagination
         $last_page_link = esc_attr(get_pagenum_link($this->page_count));
 
         if ($this->args['show_previous_next'] && $next_link && $this->page_count !== $this->current_page) {
-            $output .= \sprintf($this->args['next_wrapper'], $next_link);
+            $output .= \sprintf($this->args['next_wrapper'], $next_link, $this->current_page + 1);
         }
 
         if ($this->args['show_previous_next'] && $this->args['always_show_previous_next'] && $this->page_count === $this->current_page) {
-            $output .= \sprintf($this->args['disabled_next_wrapper'], $next_link);
+            $output .= \sprintf($this->args['disabled_next_wrapper'], $next_link, $this->current_page + 1);
         }
 
         if ($this->args['show_first_last'] && $last_page_link) {
-            $output .= \sprintf($this->args['last_wrapper'], $last_page_link);
+            $output .= \sprintf($this->args['last_wrapper'], $last_page_link, $this->page_count);
         }
 
         return $output;
