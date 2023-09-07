@@ -45,8 +45,6 @@ class Loader
      */
     private $visited = [];
 
-
-
     /**
      * The Snap autoloader.
      *
@@ -145,10 +143,10 @@ class Loader
                 static::$theme_includes
             );
 
+            $this->initThemeProviders();
             $this->runHookables();
         }
 
-        $this->initThemeProviders();
         $this->initThemeSetup();
     }
 
