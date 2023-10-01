@@ -14,22 +14,22 @@ class Server_Bag extends Bag
      *
      * @param array $contents Kept for compatibility.
      */
-    protected function set_data(array $contents = [])
+    protected function set_data(array $contents = []): void
     {
         $definition = [
             'REQUEST_METHOD' => [
                 'filter' => FILTER_CALLBACK,
                 'options' => function ($method) {
-                    return \strtoupper(\filter_var($method, FILTER_SANITIZE_STRING));
+                    return \strtoupper(\filter_var($method, FILTER_UNSAFE_RAW));
                 },
             ],
             'QUERY_STRING' => FILTER_UNSAFE_RAW,
             'REMOTE_ADDR' => FILTER_VALIDATE_IP,
             'SERVER_PORT' => FILTER_SANITIZE_NUMBER_INT,
-            'SERVER_NAME' => FILTER_SANITIZE_STRING,
+            'SERVER_NAME' => FILTER_UNSAFE_RAW,
             'HTTP_HOST' => FILTER_SANITIZE_URL,
             'HTTP_REFERER' => FILTER_SANITIZE_URL,
-            'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING,
+            'HTTP_USER_AGENT' => FILTER_UNSAFE_RAW,
         ];
 
         $server = \filter_input_array(INPUT_SERVER, $definition);

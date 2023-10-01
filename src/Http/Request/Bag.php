@@ -34,10 +34,10 @@ class Bag implements ArrayAccess
      * Use get_raw to get an un-sanitized version (should you need to).
      *
      * @param  string $key     Item key to fetch.
-     * @param  mixed  $default Default value if the key is not present.
+     * @param mixed|null $default Default value if the key is not present.
      * @return mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if ($this->has($key)) {
             if ($this->get_raw($key) === null) {
@@ -62,19 +62,16 @@ class Bag implements ArrayAccess
      * Returns a value from the bag without any sanitation.
      *
      * @param  string $key     Item key to fetch.
-     * @param  mixed  $default Default value if the key is not present.
+     * @param mixed|null $default Default value if the key is not present.
      * @return mixed
      */
-    public function get_raw(string $key, $default = null)
+    public function get_raw(string $key, mixed $default = null): mixed
     {
         return Helper::arrayGet($this->data, $key, $default);
     }
 
     /**
      * Checks if a key is present in the bag.
-     *
-     * @param  string $key Item key to check.
-     * @return boolean
      */
     public function has(string $key): bool
     {
@@ -129,12 +126,12 @@ class Bag implements ArrayAccess
      *
      * Otherwise the $default is returned.
      *
-     * @param  string $key     Item key to fetch.
-     * @param  string $pattern A regex pattern to check against.
-     * @param  mixed  $default Default value if the key is not present.
+     * @param string $key     Item key to fetch.
+     * @param string $pattern A regex pattern to check against.
+     * @param mixed|null $default Default value if the key is not present.
      * @return mixed
      */
-    public function get_regex($key, $pattern, $default = null)
+    public function get_regex(string $key, string $pattern, mixed $default = null): mixed
     {
         $filtered = \filter_var(
             $this->get($key),
@@ -165,12 +162,11 @@ class Bag implements ArrayAccess
 
     /**
      * Returns a JSON representation of all the raw values in this bag.
-     *
-     * @return string
+     * @throws \JsonException
      */
     public function to_json(): string
     {
-        return \json_encode($this->data);
+        return \json_encode($this->data, JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -185,30 +181,24 @@ class Bag implements ArrayAccess
 
     /**
      * Callback for performing recursive sanitization on an array of values.
-     *
-     * @param  array|string $value The array to sanitise.
-     * @return mixed
      */
-    public function sanitise_array($value)
+    public function sanitise_array($value): string|array|File
     {
         if (\is_array($value)) {
             return $value;
-        } else {
-            if ($value instanceof File) {
-                return $value;
-            }
-
-            return \sanitize_textarea_field($value);
         }
+
+        if ($value instanceof File) {
+            return $value;
+        }
+
+        return \sanitize_textarea_field($value);
     }
 
     /**
      * Set an item.
-     *
-     * @param  mixed $offset The offset to set.
-     * @param  mixed $value  The value to set.
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (\is_null($offset)) {
             $this->data[] = $value;
@@ -219,42 +209,32 @@ class Bag implements ArrayAccess
 
     /**
      * Whether an item exists.
-     *
-     * @param  mixed $offset An offset to check for.
-     * @return boolean
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return $this->has($offset);
     }
 
     /**
      * Remove an item.
-     *
-     * @param  mixed $offset The offset to unset.
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->data[ $offset ]);
     }
 
     /**
      * Get an item.
-     *
-     * @param  mixed $offset The offset to get.
-     * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->get($offset, null);
     }
 
     /**
      * Add the contents into the bag.
-     *
-     * @param array $contents The array of params to set.
      */
-    protected function set_data(array $contents = [])
+    protected function set_data(array $contents = []): void
     {
         $this->data = $contents;
     }

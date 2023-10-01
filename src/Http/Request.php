@@ -18,82 +18,60 @@ class Request implements ArrayAccess
 
     /**
      * Request query params.
-     *
-     * @var \Snap\Http\Request\Bag
      */
-    public $query = null;
+    public ?Bag $query = null;
 
     /**
      * Request post params.
-     *
-     * @var \Snap\Http\Request\Bag
      */
-    public $post = null;
+    public ?Bag $post = null;
 
     /**
      * Request server params.
-     *
-     * @var Bag
      */
-    public $server = null;
+    public ?Server_Bag $server = null;
 
     /**
      * Request file params.
-     *
-     * @var File_Bag
      */
-    public $files = null;
+    public ?File_Bag $files = null;
 
     /**
      * Holds all available request parameters.
      *
      * POST takes precedence.
-     *
-     * @var \Snap\Http\Request\Bag
      */
-    public $input = null;
+    public ?Bag $input = null;
 
     /**
      * The current query being run by WordPress.
-     *
-     * @var string
      */
-    public $matched_query;
+    public string $matched_query;
 
     /**
      * The current rewrite rule being run.
-     *
-     * @var string
      */
-    public $matched_rule;
+    public string $matched_rule;
 
     /**
      * Whether WordPress thinks the current request is from a mobile.
-     *
-     * @var boolean
      */
-    public $is_mobile = false;
+    public bool $is_mobile = false;
 
     /**
      * The current request URL.
-     *
-     * @var string
      */
-    protected $url;
+    protected string $url;
 
     /**
      * The current request path.
-     *
-     * @var string
      */
-    protected $path;
+    protected string $path;
 
     /**
      * The current request scheme.
-     *
-     * @var string
      */
-    protected $scheme;
+    protected string $scheme;
 
     /**
      * Populate request variables and properties.
@@ -123,10 +101,8 @@ class Request implements ArrayAccess
 
     /**
      * Get the request HTTP method.
-     *
-     * @return string
      */
-    public function get_method()
+    public function get_method(): string
     {
         return $this->server('REQUEST_METHOD');
     }
@@ -290,7 +266,7 @@ class Request implements ArrayAccess
      * @param string $key The key to check for.
      * @return bool
      */
-    public function filled($key): bool
+    public function filled(string $key): bool
     {
         return $this->has($key) && !empty($this->get($key));
     }
@@ -301,7 +277,7 @@ class Request implements ArrayAccess
      * @param string $post_template The template to check for.
      * @return bool
      */
-    public function is_post_template($post_template): bool
+    public function is_post_template(string $post_template): bool
     {
         return \is_page_template(Theme_Utils::get_post_templates_path($post_template));
     }
@@ -333,12 +309,9 @@ class Request implements ArrayAccess
     }
 
     /**
-     * Set a item on the request bag.
-     *
-     * @param  mixed $offset The offset to set.
-     * @param  mixed $value  The value to set.
+     * Set an item on the request bag.
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (\is_null($offset)) {
             $this->input[] = $value;
@@ -349,32 +322,24 @@ class Request implements ArrayAccess
 
     /**
      * Whether an item exists in the request bag.
-     *
-     * @param  mixed $offset An offset to check for.
-     * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return $this->input->has($offset);
     }
 
     /**
      * Remove an item from the request bag.
-     *
-     * @param  mixed $offset The offset to unset.
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->input[ $offset ]);
     }
 
     /**
      * Get an item from the request bag.
-     *
-     * @param  mixed $offset The offset to get.
-     * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->input->get($offset, null);
     }

@@ -2,8 +2,6 @@
 
 namespace Snap\Http\Request;
 
-use finfo;
-use Snap\Http\Request\Bag;
 use Snap\Http\Request\File\File;
 
 /**
@@ -13,11 +11,8 @@ class File_Bag extends Bag
 {
     /**
      * Expected file keys.
-     *
-     * @since 1.0.0
-     * @var array
      */
-    private $file_keys = [
+    private array $file_keys = [
         'error',
         'name',
         'size',
@@ -30,13 +25,12 @@ class File_Bag extends Bag
      *
      * Use get_raw to get an un-sanitized version (should you need to).
      *
-     * @since 1.0.0
-     *
      * @param  string $key     Item key to fetch.
-     * @param  mixed  $default Default value if the key is not present.
-     * @return mixed|\Snap\Http\Request\File\File|\Snap\Http\Request\File\File[]
+     * @param  mixed|null  $default Default value if the key is not present.
+     * @return mixed|File|File[]
+     * @since 1.0.0
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return parent::get($key, $default);
     }
@@ -56,13 +50,8 @@ class File_Bag extends Bag
 
     /**
      * Return how many files were uploaded for a given key.
-     *
-     * @since 1.0.0
-     *
-     * @param string $key Item key to check.
-     * @return int
      */
-    public function count($key)
+    public function count(string $key): int
     {
         if ($this->has($key)) {
             if (\is_array($this->get($key))) {
@@ -82,7 +71,7 @@ class File_Bag extends Bag
      *
      * @param array $contents
      */
-    protected function set_data(array $contents = [])
+    protected function set_data(array $contents = []): void
     {
         foreach ($contents as $key => $file) {
             $this->data[ $key ] = $this->add_file($file);

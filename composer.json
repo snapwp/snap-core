@@ -19,7 +19,7 @@
     },
     "require": {
         "php": ">=8",
-        "jakewhiteley/hodl": "1.3.3",
+        "jakewhiteley/hodl": "~1.7",
         "jjgrainger/posttypes": "~2.2",
         "rakit/validation": "~1.0",
         "symfony/console": "^5.4.21",
@@ -49,5 +49,10 @@
         "fix-docs": [
             "phpcbf --ignore=*/vendor/* --extensions=php --standard=WordPress-Docs --exclude=Squiz.Commenting.FileComment ."
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
