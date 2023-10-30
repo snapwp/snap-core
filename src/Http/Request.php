@@ -102,7 +102,7 @@ class Request implements ArrayAccess
     /**
      * Get the request HTTP method.
      */
-    public function get_method(): string
+    public function get_method(): ?string
     {
         return $this->server('REQUEST_METHOD');
     }
