@@ -14,6 +14,7 @@ class FileBag extends Bag
      */
     private array $file_keys = [
         'error',
+        'full_path',
         'name',
         'size',
         'tmp_name',
