@@ -18,7 +18,6 @@ class Cleanup extends Hookable
     protected $actions = [
         'widgets_init' => 'removePointlessWidgets',
         'init' => 'cleanWpHead',
-        'admin_bar_init' => 'moveAdminBarInlineStyles',
         'admin_menu' => [
             999 => 'removeEditorLinks',
         ],
@@ -47,31 +46,6 @@ class Cleanup extends Hookable
         // xmlrpc is a potential security weakness. Most of the time it is completely irrelevant.
         if (Config::get('disable_xmlrpc')) {
             $this->addFilter('xmlrpc_enabled', '__return_false');
-        }
-    }
-
-    /**
-     * Move all frontend admin bar css and js to footer.
-     */
-    public function moveAdminBarInlineStyles(): void
-    {
-        if (!\is_admin()) {
-            // Remove the inline styles normally added by the admin bar and move to the footer.
-            $this->removeAction('wp_head', '_admin_bar_bump_cb');
-            $this->removeAction('wp_head', 'wp_admin_bar_header');
-            $this->addAction('wp_footer', 'wp_admin_bar_header');
-            $this->addAction('wp_footer', '_admin_bar_bump_cb');
-
-            // Unregister the main admin bar css files...
-            \wp_dequeue_style('admin-bar');
-
-            // ... and print to footer.
-            $this->addAction(
-                'wp_footer',
-                function () {
-                    \wp_enqueue_style('admin-bar');
-                }
-            );
         }
     }
 
