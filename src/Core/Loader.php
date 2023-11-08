@@ -80,8 +80,8 @@ class Loader
      */
     public function __construct()
     {
-        \spl_autoload_register('self::classAutoload', true);
-        \spl_autoload_register('self::aliasAutoload', true);
+        \spl_autoload_register(self::class . '::classAutoload', true);
+        \spl_autoload_register(self::class . '::aliasAutoload', true);
 
         static::$aliases = Config::get('services.aliases');
 
