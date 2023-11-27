@@ -355,7 +355,10 @@ class PostType extends ContentHookable
 
             $this->addFilter(
                 'default_post_metadata',
-                function() {
+                function($value, $object_id, $meta_key) {
+                    if (in_array($meta_key, ['_wp_attachment_image_alt'], true)) {
+                        return '';
+                    }
                     return null;
                 },
                 10,
