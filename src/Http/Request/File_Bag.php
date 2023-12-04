@@ -14,7 +14,6 @@ class File_Bag extends Bag
      */
     private array $file_keys = [
         'error',
-        'full_path',
         'name',
         'size',
         'tmp_name',
@@ -158,7 +157,6 @@ class File_Bag extends Bag
                 [
                     'error' => $data['error'][ $key ],
                     'name' => $name,
-                    'full_path' => $data['full_path'][ $key ],
                     'type' => $data['type'][ $key ],
                     'tmp_name' => $data['tmp_name'][ $key ],
                     'size' => $data['size'][ $key ],

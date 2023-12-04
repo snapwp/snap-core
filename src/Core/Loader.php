@@ -100,8 +100,8 @@ class Loader
      */
     public function boot()
     {
-        \spl_autoload_register(__NAMESPACE__ . '\Loader::class_autoload', true);
-        \spl_autoload_register(__NAMESPACE__ . '\Loader::alias_autoload', true);
+        \spl_autoload_register(self::class . '::class_autoload', true);
+        \spl_autoload_register(self::class . '::alias_autoload', true);
 
         static::$aliases = Config::get('services.aliases');
 

@@ -21,7 +21,6 @@ class Cleanup extends Hookable
     protected $actions = [
         'widgets_init' => 'remove_pointless_widgets',
         'init' => 'clean_wp_head',
-        'admin_bar_init' => 'move_admin_bar_inline_styles',
         'admin_menu' => [
             999 => 'remove_editor_links',
         ],
@@ -52,33 +51,6 @@ class Cleanup extends Hookable
         // xmlrpc is a potential security weakness. Most of the time it is completely irrelevant.
         if (Config::get('disable_xmlrpc')) {
             $this->add_filter('xmlrpc_enabled', '__return_false');
-        }
-    }
-    
-    /**
-     * Move all frontend admin bar css and js to footer.
-     *
-     * @since  1.0.0
-     */
-    public function move_admin_bar_inline_styles()
-    {
-        if (! is_admin()) {
-            // Remove the inline styles normally added by the admin bar and move to the footer.
-            $this->remove_action('wp_head', '_admin_bar_bump_cb');
-            $this->remove_action('wp_head', 'wp_admin_bar_header');
-            $this->add_action('wp_footer', 'wp_admin_bar_header');
-            $this->add_action('wp_footer', '_admin_bar_bump_cb');
-
-            // Unregister the main admin bar css files...
-            wp_dequeue_style('admin-bar');
-
-            // ... and print to footer.
-            $this->add_action(
-                'wp_footer',
-                function () {
-                    wp_enqueue_style('admin-bar');
-                }
-            );
         }
     }
 
@@ -137,7 +109,7 @@ class Cleanup extends Hookable
             $tag,
             $matches
         );
-       
+
         if (empty($matches[2])) {
             return $tag;
         }
@@ -167,13 +139,13 @@ class Cleanup extends Hookable
         global $wp_widget_factory;
 
         $this->remove_action('wp_head', 'feed_links_extra', 3);
-        
+
         // Remove emojis.
         $this->remove_emojis();
 
         // Remove next/previous links.
         $this->remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10);
-        
+
         // Remove oembed.
         $this->remove_action('wp_head', 'wp_oembed_add_discovery_links');
         $this->remove_action('wp_head', 'wp_oembed_add_host_js');
@@ -184,7 +156,7 @@ class Cleanup extends Hookable
         $this->remove_action('wp_head', 'wp_generator');
         $this->remove_action('wp_head', 'wp_shortlink_wp_head', 10);
         $this->remove_action('wp_head', 'rest_output_link_wp_head', 10);
-        
+
         if (isset($wp_widget_factory->widgets['WP_Widget_Recent_Comments'])) {
             $this->remove_action('wp_head', [$wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style']);
         }
