@@ -2,6 +2,7 @@
 
 namespace Snap\Templating;
 
+use Snap\Services\Container;
 use WP_Query;
 use WP_User_Query;
 
@@ -72,9 +73,8 @@ class Pagination
      *     @type string $last_wrapper        sprintf() wrapper for 'last page' link.
      *                                       Default '<li><a href="%s">' . __('Last page', 'snap') . '</a></li>'.
      * }
-     * @param WP_Query $global_query Global WP_Query instance.
      */
-    public function __construct($args = [], WP_Query $global_query)
+    public function __construct($args = [])
     {
         $this->args = wp_parse_args(
             $args,
@@ -92,7 +92,7 @@ class Pagination
         if ($this->args['custom_query'] !== false) {
             $this->wp_query = $this->args['custom_query'];
         } else {
-            $this->wp_query = $global_query;
+            $this->wp_query = Container::get(WP_Query::class);
         }
 
         $this->page_count = $this->get_page_count();
@@ -242,10 +242,10 @@ class Pagination
             if ($this->current_page >= $this->args['range']
                 && $this->current_page < ($this->page_count - $this->args['ceil'])
             ) {
-                 return [
-                     $this->current_page - $this->args['ceil'],
-                     $this->current_page + $this->args['ceil'],
-                 ];
+                return [
+                    $this->current_page - $this->args['ceil'],
+                    $this->current_page + $this->args['ceil'],
+                ];
             }
         }
 
@@ -286,7 +286,7 @@ class Pagination
      */
     private function get_links()
     {
-        list($min, $max) = $this->get_min_max();
+        [$min, $max] = $this->get_min_max();
         $output = '';
 
         if (! empty($min) && ! empty($max) && $this->args['range'] >= 0) {
