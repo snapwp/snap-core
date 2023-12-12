@@ -98,7 +98,7 @@ class File_Bag extends Bag
             $keys = \array_keys($normalised);
             \sort($keys);
 
-            if ($keys == $this->file_keys) {
+            if ($keys === $this->file_keys) {
                 if (UPLOAD_ERR_NO_FILE === $normalised['error']) {
                     $normalised = null;
                 } else {
@@ -139,10 +139,14 @@ class File_Bag extends Bag
             return $data;
         }
 
+        if (isset($data['full_path'])) {
+            unset ($data['full_path']);
+        }
+
         $keys = \array_keys($data);
         \sort($keys);
 
-        if ($this->file_keys != $keys || !isset($data['name']) || !\is_array($data['name'])) {
+        if ($this->file_keys !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 
