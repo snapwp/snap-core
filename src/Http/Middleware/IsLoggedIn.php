@@ -13,7 +13,7 @@ class IsLoggedIn extends Middleware
     /**
      * Check if the current user is logged in, and perform the redirect if not.
      *
-     * Example: is_logged_in|login
+     * Example: is_logged_in:login
      *
      * @param \Snap\Http\Response $response
      * @param  string|null        $redirect The middleware argument. How to redirect this request.

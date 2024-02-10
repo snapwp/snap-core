@@ -69,7 +69,7 @@ class FileBag extends Bag
     /**
      * Turn $_FILES data into File instances, or null if no file was uploaded.
      */
-    protected function addFile(array|File $file = []): File|array|null
+    protected function addFile(array|File|string $file = []): File|array|null
     {
         if ($file instanceof File) {
             return $file;
