@@ -1,13 +1,3 @@
-window.wp.hooks.addFilter('blocks.registerBlockType', 'snap/hideBlocks', function (settings, name) {
-	if (window.snapGutenbergOptions.disabledBlocks.indexOf(name) !== -1) {
-		return Object.assign({}, settings, {
-			supports: Object.assign({}, settings.supports, { inserter: false })
-		})
-	}
-
-	return settings
-});
-
 window.wp.domReady(function () {
 	window.wp.blocks.getBlockTypes().forEach(block => {
 		if (block.supports && block.supports.typography) {
@@ -33,10 +23,11 @@ window.wp.domReady(function () {
 
 		if (block.variations && block.variations.length) {
 			for (let i = 0; i < block.variations.length; i++) {
-				if (window.snapGutenbergOptions.disabledBlocks.indexOf(block.name + '/' + block.variations[i].name) !== -1) {
+				if (
+					window.snapGutenbergOptions.enabledBlocks.indexOf(block.name + '/' + block.variations[i].name) === -1
+					&& window.snapGutenbergOptions.enabledBlocks.indexOf(block.name + '/*') === -1
+				) {
 					wp.blocks.unregisterBlockVariation(block.name, block.variations[i].name)
-				} else {
-					// console.log(block.name + '/' + block.variations[i].name) // useful for debugging
 				}
 			}
 		}
