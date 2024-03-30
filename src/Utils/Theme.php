@@ -38,7 +38,15 @@ class Theme
      */
     public static function getActiveThemePath(string $path): string
     {
-        return \str_replace('\\', '/', \trailingslashit(\get_stylesheet_directory()) . $path);
+        return \str_replace('\\', '/', \trailingslashit(\get_stylesheet_directory()) . ltrim($path, '/\\'));
+    }
+
+    /**
+     * Shortcut to get the include path relative to the parent theme directory.
+     */
+    public static function getParentThemePath($path): string
+    {
+        return \str_replace('\\', '/', \trailingslashit(\get_template_directory()) . ltrim($path, '/\\'));
     }
 
     /**
@@ -47,6 +55,14 @@ class Theme
     public static function getActiveThemeUri(string $path): string
     {
         return \trailingslashit(\get_stylesheet_directory_uri()) . $path;
+    }
+
+    /**
+     * Shortcut to get the file URL relative to the active theme directory.
+     */
+    public static function getParentThemeUri(string $path): string
+    {
+        return \trailingslashit(\get_template_directory_uri()) . $path;
     }
 
     /**
@@ -62,14 +78,18 @@ class Theme
 
         // There was no manifest or no file present.
         if (static::$manifest === null || !isset(static::$manifest[$file])) {
-            return static::getActiveThemeUri('public/') . \ltrim($file, '/');
+            return static::getActiveThemeUri('public/') . $file;
+        }
+
+        if (is_child_theme() && file_exists(static::getParentThemePath('public/' . static::$manifest[$file]->file))) {
+            return static::getParentThemeUri('public/' . static::$manifest[$file]->file);
         }
 
         if (Vite::isActive()) {
-            return static::getActiveThemeUri('public/') . \ltrim(static::$manifest[$file]->file, '/');
+            return static::getActiveThemeUri('public/') . static::$manifest[$file]->file;
         }
 
-        return static::getActiveThemeUri('public/') . \ltrim(static::$manifest[$file], '/');
+        return static::getActiveThemeUri('public/') . static::$manifest[$file];
     }
 
     /**
@@ -162,11 +182,22 @@ class Theme
      */
     private static function parseManifest(): void
     {
-        $manifest_path = \get_stylesheet_directory() . leadingslashit(Config::get('assets.manifest_path'));
+        static::$manifest = [];
 
-        if (\file_exists($manifest_path)) {
-            $manifest = \file_get_contents($manifest_path);
-            static::$manifest = (array)\json_decode($manifest, false, 512, JSON_THROW_ON_ERROR);
+        if (is_child_theme()) {
+            $manifest_path = self::getParentThemePath(Config::get('assets.manifest_path'));
+
+            if (file_exists($manifest_path)) {
+                $manifest = file_get_contents($manifest_path);
+                static::$manifest = (array)json_decode($manifest, false, 512, JSON_THROW_ON_ERROR);
+            }
+        }
+
+        $manifest_path = self::getActiveThemePath(Config::get('assets.manifest_path'));
+
+        if (file_exists($manifest_path)) {
+            $manifest = file_get_contents($manifest_path);
+            static::$manifest = array_merge(static::$manifest, (array)json_decode($manifest, false, 512, JSON_THROW_ON_ERROR));
         }
     }
 }

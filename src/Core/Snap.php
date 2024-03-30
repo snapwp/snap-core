@@ -210,10 +210,16 @@ class Snap
             static::$container->addSingleton(
                 \Snap\Templating\Blade\Factory::class,
                 static function (Container $container) {
-                    return new \Snap\Templating\Blade\Factory(
+                    $factory =  new \Snap\Templating\Blade\Factory(
                         \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.templates_directory')),
                         \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.cache_directory')) . '/templates'
                     );
+
+                    if (\is_child_theme()) {
+                        $factory->addLocation(\Snap\Utils\Theme::getParentThemePath($container->get('config')->get('theme.templates_directory')));
+                    }
+
+                    return $factory;
                 }
             );
 
