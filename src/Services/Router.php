@@ -6,7 +6,7 @@ namespace Snap\Services;
  * Allow static access to the Config service.
  *
  * @method static void dispatchPostTemplate()
- * @method static void dispatch(string $controller)
+ * @method static void dispatch(string|array $controller)
  * @method static void view(string $view, array $data)
  * @method static \Snap\Routing\Router when(bool|callable $result)
  * @method static \Snap\Routing\Router not(bool|callable $result)
