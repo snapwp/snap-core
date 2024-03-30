@@ -5,19 +5,15 @@ namespace Snap\Admin;
 use Snap\Core\Hookable;
 use Snap\Core\Snap;
 use Snap\Services\Config;
+use WP_Block_Type_Registry;
+use WP_Block_Editor_Context;
 
-/**
- * Enables the Snap admin theme.
- *
- * Based on Slate admin theme.
- *
- * @see   https://wordpress.org/plugins/slate-admin-theme/
- */
 class Gutenberg extends Hookable
 {
     public function boot(): void
     {
         $this->addFilter('enqueue_block_editor_assets', 'enqueueSnapGutenberg');
+        $this->addFilter('allowed_block_types_all', 'restrictBlocksByPostType', 99);
 
         if (Config::get('gutenberg.disable_custom_colors') === true) {
             add_theme_support('editor-color-palette', []);
@@ -53,6 +49,7 @@ class Gutenberg extends Hookable
 
         if (Config::get('gutenberg.disable_block_library_css') === true) {
             $this->addAction('wp_enqueue_scripts', 'disableBlockFrontendStyles');
+            $this->addAction('wp_footer', 'disableFooterBlockFrontendStyles');
         }
 
         if (Config::get('gutenberg.simplify_image_size_controls') === true) {
@@ -77,10 +74,6 @@ class Gutenberg extends Hookable
      *
      * @url https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/
      * @url https://developer.wordpress.org/block-editor/developers/themes/theme-json/
-     *
-     * The disabled_blocks feature is also temporary until the below github issue is resolved.
-     *
-     * @url https://github.com/WordPress/gutenberg/issues/12484
      */
     public function enqueueSnapGutenberg(): void
     {
@@ -98,13 +91,55 @@ class Gutenberg extends Hookable
         );
 
         $data = [
-            'disabledBlocks' => Config::get('gutenberg.disabled_blocks', []),
             'disableStyles' => Config::get('gutenberg.disable_default_block_styles', false),
         ];
 
         $data['disabledTypographyFeatures'] = Config::get('gutenberg.disable_typography_features');
 
+        if ($screen->post_type) {
+            $data['enabledBlocks'] = Config::get('gutenberg.enabled_blocks')[$screen->post_type] ?? [];
+        }
+
         \wp_localize_script('snap-gutenberg', 'snapGutenbergOptions', $data);
+    }
+
+    public function restrictBlocksByPostType(bool|array $allowed_block_types, WP_Block_Editor_Context $block_editor_context): bool|array
+    {
+        $registry = WP_Block_Type_Registry::get_instance();
+        $enabledBlocks = Config::get('gutenberg.enabled_blocks');
+        $restrictedBlocks = [];
+
+        if (!$block_editor_context->post) {
+            return $allowed_block_types;
+        }
+
+        foreach ($enabledBlocks as $postType => $blocks) {
+            // continue if the post type does not match the current editor context
+            if ($block_editor_context->post->post_type !== $postType) {
+                continue;
+            }
+
+            if (empty($blocks) || $blocks === true || $blocks === ['*']) {
+                return $allowed_block_types;
+            }
+
+            foreach ($registry->get_all_registered() as $block => $blockData) {
+                // get the simple block matches
+                if (in_array($block, $blocks, true)) {
+                    $restrictedBlocks[] = $block;
+                }
+
+                // get everything before the first forwards lash
+                $blockName = explode('/', $block)[0];
+
+                // get the global block matches
+                if (in_array($blockName .'/*', $blocks, true)) {
+                    $restrictedBlocks[] = $block;
+                }
+            }
+        }
+
+        return $restrictedBlocks;
     }
 
     /**
@@ -125,16 +160,27 @@ class Gutenberg extends Hookable
     public function disableBlockFrontendStyles(): void
     {
         wp_dequeue_style('wp-block-library');
+        wp_dequeue_style('classic-theme-styles');
         wp_dequeue_style('wp-block-library-theme');
         wp_dequeue_style('wc-block-style');
         wp_dequeue_style('global-styles');
     }
 
+    /**
+     * Disable the footer css added to website frontends to style Gutenberg blocks.
+     */
+    public function disableFooterBlockFrontendStyles()
+    {
+        wp_dequeue_style('core-block-supports');
+    }
+
     public function simplifyImageSizeControls(): void
     {
+        // todo this is in an iframe now
         echo '
             <style>
                 .components-resizable-box__handle,
+                .components-resizable-box__container.has-show-handle .components-resizable-box__handle,
                 .block-editor-image-size-control {
                     display: none !important;
                 }

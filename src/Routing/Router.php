@@ -263,7 +263,7 @@ class Router
      *                            If no action is supplied, then 'index' is presumed.
      * @throws Exception If the supplied controller doesn't exist.
      */
-    public function dispatch(string $controller): void
+    public function dispatch(string|array $controller): void
     {
         $this->checkMethod();
         $this->maybeRunMiddleware();
@@ -272,9 +272,13 @@ class Router
             return;
         }
 
-        [$class, $action] = \explode('@', $controller);
+        if (is_array($controller)) {
+            [$fqn, $action] = $controller;
+        } else {
+            [$class, $action] = \explode('@', $controller);
 
-        $fqn = $this->namespace . $class;
+            $fqn = $this->namespace . $class;
+        }
 
         if (\class_exists($fqn)) {
             $this->matchRoute();
