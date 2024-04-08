@@ -6,7 +6,9 @@ class Vite
 {
     private static bool $isActive = false;
     private static bool $enqueuedVite = false;
+    private static bool $parentEnqueuedVite = false;
     private static ?string $viteServer = null;
+    private static ?string $parentViteServer = null;
     private static bool $addedHooks = false;
     private static bool $isDev = false;
 
@@ -41,6 +43,19 @@ class Vite
         self::addActions();
 
         $url = self::$viteServer ? self::$viteServer . $path : snap_get_asset_url($path);
+
+        if (is_child_theme()) {
+            $url = snap_get_asset_url($path);
+
+            // if the current theme is running vite
+            if (self::$enqueuedVite && file_exists(Theme::getActiveThemePath($path))) {
+                $url = self::$viteServer . $path;
+            }
+
+            if (self::$parentEnqueuedVite && file_exists(Theme::getParentThemePath($path))) {
+                $url = self::$parentViteServer . $path;
+            }
+        }
 
         wp_enqueue_style('module/' . $path, $url, [], null);
     }
@@ -81,7 +96,21 @@ class Vite
      */
     private static function enqueueVite(): void
     {
-        $hotFilePath = get_theme_file_path('/public/hot');
+        if (is_child_theme()) {
+            $hotFilePath = get_template_directory() . '/public/hot';
+            if (!self::$parentEnqueuedVite && file_exists($hotFilePath)) {
+                self::$parentViteServer = trailingslashit(file_get_contents($hotFilePath));
+                self::$isDev = true;
+
+                add_action('wp_print_styles', function () {
+                    echo '<script type="module" src="' . Vite::getViteServerUrl() . '@vite/client"></script>';
+                });
+
+                self::$parentEnqueuedVite = true;
+            }
+        }
+
+        $hotFilePath = get_stylesheet_directory() . '/public/hot';
 
         if (!self::$enqueuedVite && file_exists($hotFilePath)) {
             self::$viteServer = trailingslashit(file_get_contents($hotFilePath));
@@ -109,16 +138,16 @@ class Vite
 
                 return $tag;
             }, 10, 2);
-			
-			add_action('style_loader_tag', static function($tag, $scriptPath) {
-				if (str_starts_with($scriptPath, 'module/')) {
-					return str_replace('<link', '<link crossorigin="anonymous"', $tag);
-				}
 
-				return $tag;
-			}, 10, 2);
-		}
+            add_action('style_loader_tag', static function($tag, $scriptPath) {
+                if (str_starts_with($scriptPath, 'module/')) {
+                    return str_replace('<link', '<link crossorigin="anonymous"', $tag);
+                }
 
-		self::$addedHooks = true;
+                return $tag;
+            }, 10, 2);
+        }
+
+        self::$addedHooks = true;
     }
 }
