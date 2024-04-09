@@ -359,6 +359,11 @@ class PostType extends ContentHookable
                     if (in_array($meta_key, ['_wp_attachment_image_alt', '_wp_attached_file'], true)) {
                         return '';
                     }
+
+                    if (str_starts_with($meta_key, '_icl')) {
+                         return '';
+                    }
+
                     return null;
                 },
                 10,
