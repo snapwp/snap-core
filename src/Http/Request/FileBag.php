@@ -2,7 +2,7 @@
 
 namespace Snap\Http\Request;
 
-use Rakit\Validation\Helper;
+use Somnambulist\Components\Validation\Helper;
 
 /**
  * File parameter bag.

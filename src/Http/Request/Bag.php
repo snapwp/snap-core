@@ -3,7 +3,7 @@
 namespace Snap\Http\Request;
 
 use ArrayAccess;
-use Rakit\Validation\Helper;
+use Somnambulist\Components\Validation\Helper;
 
 /**
  * Parameter bag.

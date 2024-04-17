@@ -15,7 +15,7 @@ namespace Snap\Services;
  * @method static int getErrorCount()
  * @method static array getAllErrors(string $format = ':message')
  * @method static bool hasErrors(string $key)
- * @method static \Rakit\Validation\ErrorBag errors()
+ * @method static \Somnambulist\Components\Validation\ErrorBag errors()
  * @method static array getValidatedData()
  * @method static array getValidData()
  * @method static array getInvalidData()

@@ -271,7 +271,7 @@ class Snap
         self::addSingleton(Router::class, false, 'router');
         self::addSingleton(Request::class, false, 'request');
         self::addSingleton(Response::class, true, 'response');
-        self::addSingleton(\Rakit\Validation\Validator::class);
+        self::addSingleton(\Somnambulist\Components\Validation\Factory::class, false, 'validationFactory');
         self::addFactory(Validator::class, 'validator');
         self::addFactory(MiddlewareQueue::class);
     }

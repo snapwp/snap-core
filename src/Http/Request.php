@@ -10,6 +10,7 @@ use Snap\Http\Validation\Traits\ValidatesInput;
 use Snap\Http\Validation\Validator;
 use Snap\Routing\UrlRoute;
 use Snap\Utils\Theme;
+use Somnambulist\Components\Validation\ErrorBag;
 
 /**
  * Gathers all request variables into one place, and provides a simple API for changes affecting the response.
@@ -19,116 +20,102 @@ class Request extends Validator implements ArrayAccess
     use ValidatesInput;
 
     /**
-     * Request query params.
-     *
-     * @var \Snap\Http\Request\Bag
+     * Holds the global ErrorBag instance for use in templates.
      */
-    public $query;
+    protected static ErrorBag $globalErrors;
+
+    /**
+     * Returns the ErrorBag being used by the current request.
+     */
+    public static function getGlobalErrors(): ErrorBag
+    {
+        return static::$globalErrors;
+    }
+
+    /**
+     * Request query params.
+     */
+    public Bag $query;
 
     /**
      * Request post params.
-     *
-     * @var \Snap\Http\Request\Bag
      */
-    public $post;
+    public Bag $post;
 
     /**
      * Request server params.
-     *
-     * @var \Snap\Http\Request\Bag
+
      */
-    public $server;
+    public ServerBag $server;
 
     /**
      * Cookies bag.
-     *
-     * @var \Snap\Http\Request\Bag
      */
-    public $cookies;
+    public Bag $cookies;
 
     /**
      * Request file params.
-     *
-     * @var \Snap\Http\Request\FileBag
      */
-    public $files;
+    public FileBag $files;
 
     /**
      * Holds all available request parameters.
      *
      * POST takes precedence.
-     *
-     * @var \Snap\Http\Request\Bag
      */
-    public $input;
+    public Bag $input;
 
     /**
-     * @var \Snap\Http\Request\Bag
+     * Route parameters.
      */
-    public $route;
+    public Bag $route;
 
     /**
      * WordPress query vars.
-     *
-     * @var \Snap\Http\Request\Bag
      */
-    protected static $wp;
+    protected static Bag $wp;
 
     /**
      * The current query being run by WordPress.
      *
      * @var string
      */
-    protected $matched_query;
+    protected string $matched_query;
 
     /**
      * The current rewrite rule being run.
-     *
-     * @var string
      */
-    protected $matched_rule;
+    protected string $matched_rule;
 
     /**
      * Whether WordPress thinks the current request is from a mobile.
-     *
-     * @var boolean
      */
-    protected $is_mobile = false;
+    protected bool $is_mobile = false;
 
     /**
      * The client IP address.
-     *
-     * @var string|null
      */
-    protected $clientIp;
+    protected ?string $clientIp;
 
     /**
      * The current request URL.
-     *
-     * @var string
      */
-    protected $url;
+    protected string $url;
 
     /**
      * The current request host (domain).
-     *
-     * @var string
      */
-    protected $host;
+    protected string $host;
 
     /**
      * The current request path.
-     *
-     * @var string
      */
-    protected $path;
+    protected string $path;
 
     /**
      * The current request scheme.
-     *
-     * @var string
      */
-    protected $scheme;
+    protected string $scheme;
 
     /**
      * Populate request variables and properties.
@@ -140,11 +127,12 @@ class Request extends Validator implements ArrayAccess
         $this->populateInput();
         $this->populateProperties();
 
-        // Set up the Validation instance.
-        parent::__construct($_GET + $_POST + $_FILES, $this->rules(), $this->messages());
+        if (!empty($this->rules())) {
+            $this->make($_GET + $_POST + $_FILES, $this->rules(), $this->messages());
+        }
 
         // Set blank global ErrorBag.
-        static::$globalErrors = $this->validation->errors();
+        static::$globalErrors = new ErrorBag([]);
 
         if (!empty($this->aliases())) {
             $this->setAliases($this->aliases());
@@ -162,7 +150,7 @@ class Request extends Validator implements ArrayAccess
         if ($name === 'wp') {
             return static::$wp;
         }
-        return $this->input->get($name, null) ?? $this->files->get($name, null);
+        return $this->input->get($name) ?? $this->files->get($name);
     }
 
     /**
@@ -175,6 +163,37 @@ class Request extends Validator implements ArrayAccess
     {
         return $this->__get($name) !== null;
     }
+
+    /*
+     * *****************************************************************************************************************
+     * Validation Methods
+     * *****************************************************************************************************************
+     */
+
+    public function validate(array $rules = [], array $messages = []): static
+    {
+        $this->make($_GET + $_POST + $_FILES, $rules, $messages);
+        return $this;
+    }
+
+
+    /**
+     * Validates the request using the rules and messages set on the internal validation instance.
+     *
+     * @return boolean If the validation passed or not.
+     */
+    public function isValid(): bool
+    {
+        $this->validation->validate();
+        static::$globalErrors = $this->validation->errors();
+        return !$this->validation->fails();
+    }
+
+    /*
+     * *****************************************************************************************************************
+     * Request Information Methods
+     * *****************************************************************************************************************
+     */
 
     /**
      * Get the request HTTP method.
@@ -320,6 +339,12 @@ class Request extends Validator implements ArrayAccess
     {
         return \strtoupper($method) === $this->getMethod();
     }
+
+    /*
+     * *****************************************************************************************************************
+     * Input Methods
+     * *****************************************************************************************************************
+     */
 
     /**
      * Returns a parameter from the request bag, or a default if not present.

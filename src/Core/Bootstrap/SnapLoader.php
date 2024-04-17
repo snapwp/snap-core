@@ -96,10 +96,10 @@ class SnapLoader
                 return;
             }
 
-            if (\is_subclass_of($class_name, 'Rakit\Validation\Rule')) {
+            if (\is_subclass_of($class_name, 'Somnambulist\Components\Validation\Rule')) {
                 $class_parts = \explode('\\', $class_name);
 
-                $this->container->get('Rakit\Validation\Validator')->addValidator(
+                $this->container->get('validationFactory')->addRule(
                     Str::toSnake(\end($class_parts)),
                     $this->container->resolve($class_name)
                 );
