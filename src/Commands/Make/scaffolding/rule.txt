@@ -1,37 +1,36 @@
 <?php
 
-namespace Theme\Http\Validation\RulesNAMESPACE;
+namespace Theme\Http\Validation\Rules;
 
 use Snap\Http\Validation\Rule;
 
 /**
- * CLASSNAME description
+ * MyExampleRule description
  *
- * @see https://github.com/rakit/validation#registeroverride-rule For more information about complex rules.
+ * @see https://github.com/somnambulist-tech/validation?tab=readme-ov-file#registeroverride-rules
  */
-class CLASSNAME extends Rule
+class MyExampleRule extends Rule
 {
     /**
      * The default error message when this rule is not met.
-     *
-     * @var string
      */
-    protected $message = ":value is an invalid value for :attribute";
+    protected string $message = ":value is an invalid value for :attribute";
+
+    /**
+     * Access these in your handler with $this->>parameter($key, default = null))
+     */
+    protected array $fillableParams = [];
 
     /**
      * When true and this rule fails, then no other rules are processed for the attribute.
      *
      * For instance if the 'required' rule fails, there is no point validating additional rules.
-     *
-     * @var bool
+
      */
-    protected $implicit = false;
+    protected bool $implicit = false;
 
     /**
      * Validate the $value to see if it passes the rule.
-     *
-     * @param mixed $value The input from the Request to validate against.
-     * @return bool
      */
     protected function handle($value): bool
     {

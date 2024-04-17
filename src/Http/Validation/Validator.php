@@ -2,59 +2,39 @@
 
 namespace Snap\Http\Validation;
 
-use Rakit\Validation\ErrorBag;
+use Somnambulist\Components\Validation\ErrorBag;
 use Snap\Services\Container;
 
 /**
- * A handy wrapper around Rakit\Validation.
+ * A handy wrapper around Somnambulist\Components\Validation.
  */
 class Validator
 {
     /**
      * Holds the ErrorBag instance.
      *
-     * @var \Rakit\Validation\ErrorBag
+     * @var ErrorBag
      */
-    public static $errors;
+    public static ErrorBag $errors;
 
     /**
      * Holds the validation instance.
      *
-     * @var \Rakit\Validation\validation
+     * @var \Somnambulist\Components\Validation\validation
      */
-    protected $validation;
+    protected \Somnambulist\Components\Validation\validation $validation;
 
-    /**
-     * Validation constructor.
-     *
-     * @param null|array $data     Optional. Input data to validate.
-     * @param array      $rules    Optional. Validation rules array.
-     * @param array      $messages Optional. Validation messages.
-     */
-    public function __construct($data = null, array $rules = [], array $messages = [])
-    {
-        $this->make($data, $rules, $messages);
-    }
 
     /**
      * Setup the validation instance.
-     *
-     * @param null|array $data     Optional. Input data to validate.
-     * @param array      $rules    Optional. Validation rules array.
-     * @param array      $messages Optional. Validation messages.
-     * @return $this
      */
-    public function make($data = null, array $rules = [], array $messages = [])
+    public function make(array $data = [], array $rules = [], array $messages = []): static
     {
         if ($data !== null) {
-            $this->validation = Container::get('Rakit\Validation\Validator')->make(
+            $this->validation = Container::get('validationFactory')->make(
                 $data,
-                []
+                $rules
             );
-        }
-
-        if (!empty($rules)) {
-            $this->setRules($rules);
         }
 
         if (!empty($messages)) {
@@ -66,32 +46,10 @@ class Validator
 
     /**
      * Set the validation error messages.
-     *
-     * @see    https://github.com/rakit/validation#custom-validation-message for format.
-     *
-     * @param array $messages Error messages as key value pairs.
-     * @return $this
      */
-    public function setMessages(array $messages = [])
+    public function setMessages(array $messages = [], string $lang = 'en'): static
     {
-        $this->validation->setMessages($messages);
-        return $this;
-    }
-
-    /**
-     * Set the validation rules.
-     *
-     * @see    https://github.com/rakit/validation#available-rules for format.
-     *
-     * @param array $rule_set Rules as key value pairs.
-     * @return $this
-     */
-    public function setRules(array $rule_set = [])
-    {
-        foreach ($rule_set as $attribute_key => $rules) {
-            $this->validation->addAttribute($attribute_key, $rules);
-        }
-
+        $this->validation->messages()->add($lang, $messages);
         return $this;
     }
 
@@ -104,21 +62,11 @@ class Validator
      * @param array $aliases Key value pairs as original => alias.
      * @return $this
      */
-    public function setAliases(array $aliases = [])
+    public function setAliases(array $aliases = []): static
     {
-        $this->validation->setAliases($aliases);
-        return $this;
-    }
-
-    /**
-     * Optionally set translations for any built-in error messages.
-     *
-     * @param array $translations Translations to set.
-     * @return $this
-     */
-    public function setTranslations(array $translations)
-    {
-        $this->validation->setTranslations($translations);
+        foreach ($aliases as $original => $alias) {
+            $this->validation->setAlias($original, $alias);
+        }
         return $this;
     }
 
@@ -140,7 +88,7 @@ class Validator
      * Calling with no arguments returns a numerically index array of inputs and their errors - great for AJAX
      * responses.
      *
-     * @param null   $key    Optional. The key to search for. EG. 'name' or 'uploads.*'.
+     * @param null $key Optional. The key to search for. EG. 'name' or 'uploads.*'.
      * @param string $format Optional. Format of the returned errors.
      *                       Defaults to :message.
      * @return array
@@ -194,8 +142,6 @@ class Validator
 
     /**
      * Return the underlying Validation instance's ErrorBag.
-     *
-     * @return \Rakit\Validation\ErrorBag
      */
     public function errors(): ErrorBag
     {
@@ -204,30 +150,24 @@ class Validator
 
     /**
      * Return all data which had a validation rule run against it.
-     *
-     * @return array
      */
-    public function getValidatedData()
+    public function getValidatedData(): array
     {
         return $this->validation->getValidatedData();
     }
 
     /**
      * Return all data which had a validation rule run against it and passed.
-     *
-     * @return array
      */
-    public function getValidData()
+    public function getValidData(): array
     {
         return $this->validation->getValidData();
     }
 
     /**
      * Return all data which had a validation rule run against it and failed.
-     *
-     * @return array
      */
-    public function getInvalidData()
+    public function getInvalidData(): array
     {
         return $this->validation->getInvalidData();
     }

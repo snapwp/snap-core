@@ -27,14 +27,14 @@
         }
     },
     "require": {
-        "php": "^8.0",
+        "php": "^8.2",
         "jakewhiteley/hodl": "~1.6",
-        "rakit/validation": "~1.4",
         "symfony/console": "^6.0",
         "symfony/process": "^6.0",
         "doctrine/inflector": "^2.0",
         "tightenco/collect": "^8.0",
-        "jakewhiteley/bladezero": "^8.83.10"
+        "jakewhiteley/bladezero": "^9.52.16",
+        "somnambulist/validation": "^1.9"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~3.6",

@@ -8,8 +8,8 @@ use Snap\Services\Container;
 use Snap\Services\Request;
 use Snap\Services\ServiceProvider;
 use Snap\Utils\Str;
-use Rakit\Validation\Rule;
-use Rakit\Validation\Validator;
+use Somnambulist\Components\Validation\Rule;
+use Somnambulist\Components\Validation\Validator;
 use Theme\Bootstrap;
 
 /**
@@ -54,7 +54,6 @@ class Loader
     {
         // If it is a Theme namespace, check the includes cache to avoid filesystem calls.
         if (isset(static::$theme_includes[$class])) {
-            /** @noinspection PhpIncludeInspection */
             require static::$theme_includes[$class];
         }
     }
@@ -207,7 +206,7 @@ class Loader
             if (\is_subclass_of($class_name, Rule::class)) {
                 $class_parts = \explode('\\', $class_name);
 
-                Container::get(Validator::class)->addValidator(
+                Container::get('validationFactory')->addRule(
                     Str::toSnake(\end($class_parts)),
                     Container::resolve($class_name)
                 );

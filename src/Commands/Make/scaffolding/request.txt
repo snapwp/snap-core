@@ -11,12 +11,8 @@ class CLASSNAME extends Request
 {
     /**
      * Provides default rules to the Validation instance.
-     *
-     * @see https://snapwp.io/docs/1.0.0/validation/#rules
-     *
-     * @return array Array of rules.
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //
@@ -25,10 +21,8 @@ class CLASSNAME extends Request
 
     /**
      * Default error messages.
-     *
-     * @return array Array of messages.
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             //
@@ -37,10 +31,8 @@ class CLASSNAME extends Request
 
     /**
      * Default aliases to be used in error messages.
-     *
-     * @return array Array of aliases.
      */
-    public function aliases()
+    public function aliases(): array
     {
         return [
             //
