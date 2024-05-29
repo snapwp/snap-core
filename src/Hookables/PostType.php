@@ -66,6 +66,7 @@ use Tightenco\Collect\Support\Collection;
  * @method static PostQuery exclude(int|int[] $ids)
  *
  * @method static PostQuery orderBy(string $order_by, string $order = 'ASC')
+ * @method static PostQuery orderByMeta(string $metaKey, string $order = 'ASC', $metaType = 'CHAR')
  * @method static PostQuery limit(int $amount)
  * @method static PostQuery offset(int $amount)
  * @method static PostQuery page(int $page)
@@ -359,6 +360,11 @@ class PostType extends ContentHookable
                     if (in_array($meta_key, ['_wp_attachment_image_alt', '_wp_attached_file'], true)) {
                         return '';
                     }
+
+                    if (str_starts_with($meta_key, '_icl')) {
+                         return '';
+                    }
+
                     return null;
                 },
                 10,
