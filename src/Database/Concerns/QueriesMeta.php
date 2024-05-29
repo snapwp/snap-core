@@ -147,6 +147,22 @@ trait QueriesMeta
     }
 
     /**
+     * Set ordering params.
+     */
+    public function orderByMeta(string $key, string $order = 'ASC', $metaType = null): self
+    {
+        $this->params['meta_key'] = $key;
+        $this->params['orderby'] = 'meta_value';
+        $this->params['order'] = \strtoupper($order);
+
+        if ($metaType) {
+            $this->params['meta_type'] = $metaType;
+        }
+
+        return $this;
+    }
+
+    /**
      * Try to guess the comparison type for a meta query.
      *
      * @param string $comparison The supplied comparison type.

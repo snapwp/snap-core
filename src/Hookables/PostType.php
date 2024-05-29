@@ -66,6 +66,7 @@ use Tightenco\Collect\Support\Collection;
  * @method static PostQuery exclude(int|int[] $ids)
  *
  * @method static PostQuery orderBy(string $order_by, string $order = 'ASC')
+ * @method static PostQuery orderByMeta(string $metaKey, string $order = 'ASC', $metaType = 'CHAR')
  * @method static PostQuery limit(int $amount)
  * @method static PostQuery offset(int $amount)
  * @method static PostQuery page(int $page)
