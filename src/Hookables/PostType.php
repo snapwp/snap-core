@@ -232,7 +232,7 @@ class PostType extends ContentHookable
             if (\in_array($meta_key, static::$taxonomy_plurals, true)) {
                 $name = \array_search($meta_key, self::$taxonomy_plurals, true);
 
-                if (\in_array($name, self::$relationships[$post_type], true)) {
+                if (isset(self::$relationships[$post_type]) && \in_array($name, self::$relationships[$post_type], true)) {
                     return (new self::$has_registered['taxonomy'][$name])->for($object_id)->get();
                 }
             }
@@ -362,7 +362,7 @@ class PostType extends ContentHookable
                     }
 
                     if (str_starts_with($meta_key, '_icl')) {
-                         return '';
+                        return '';
                     }
 
                     return null;
