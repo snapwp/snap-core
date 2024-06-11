@@ -126,6 +126,8 @@ class Menu
         $output = [
             'ID' => $item->ID,
             'object_id' => $item->object_id,
+            'object' => $item->object,
+            'type' => $item->type,
             'text' => $item->title,
             'title' => $item->attr_title,
             'description' => $item->description,
