@@ -109,7 +109,15 @@ class Theme
      */
     public static function getStylesheetDirectory(): string
     {
-        return static::normalisePath(\get_stylesheet_directory());
+        return static::normalisePath(get_stylesheet_directory());
+    }
+
+    /**
+     * Get a system agnostic template dir.
+     */
+    public static function getTemplateDirectory(): string
+    {
+        return static::normalisePath(get_template_directory());
     }
 
     /**
@@ -147,7 +155,7 @@ class Theme
             return static::getTemplatesPath();
         }
 
-        return \trim(\str_replace(static::getStylesheetDirectory(), '', static::normalisePath($path)), '/');
+        return \trim(\str_replace([static::getStylesheetDirectory(), static::getTemplateDirectory()], '', static::normalisePath($path)), '/');
     }
 
     /**
