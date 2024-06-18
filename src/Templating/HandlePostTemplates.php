@@ -57,25 +57,37 @@ class HandlePostTemplates extends Hookable
      */
     public function customTemplateLocator(): array
     {
-        $post_templates = [];
+        $postTemplates = [];
+        $paths = [];
 
         // Path to  templates folder.
-        $path = \get_stylesheet_directory() . '/' . Theme::getTemplatesPath() . 'page-templates/';
+        if (is_child_theme()) {
+            $parentPath = get_template_directory() . '/' . Theme::getTemplatesPath() . 'page-templates/';
 
-        if (!\is_dir($path)) {
-            return [];
+            if (is_dir($parentPath)) {
+                $paths[] = $parentPath;
+            }
         }
 
-        $templates = \scandir($path);
+        $path = \get_stylesheet_directory() . '/' . Theme::getTemplatesPath() . 'page-templates/';
+        
+        if (is_dir($path)) {
+            $paths[] = $path;
+        }
 
-        if (!empty($templates)) {
-            foreach ($templates as $tpl) {
-                $full_path = $path . $tpl;
-
-                if ($tpl === '.' || $tpl === '..' || \is_dir($full_path) || \strpos($tpl, '_example') !== false) {
+        $possibleTemplates = [];
+        
+        foreach ($paths as $path) {
+            foreach (scandir($path) as $file) {
+                if ($file === '.' || $file === '..' || \is_dir($path.$file) || \strpos($file, '_example') !== false) {
                     continue;
                 }
+                $possibleTemplates[$file] = $path.$file;
+            }
+        }
 
+        if (!empty($possibleTemplates)) {
+            foreach ($possibleTemplates as $tpl => $full_path) {
                 if (!\preg_match('|Template Name:(.*)$|mi', \file_get_contents($full_path), $header)) {
                     continue;
                 }
@@ -94,17 +106,17 @@ class HandlePostTemplates extends Hookable
                 foreach ($types as $type) {
                     $type = sanitize_key($type);
 
-                    if (!isset($post_templates[$type])) {
-                        $post_templates[$type] = [];
+                    if (!isset($postTemplates[$type])) {
+                        $postTemplates[$type] = [];
                     }
 
                     $key = Theme::getPostTemplatePath($tpl);
-                    $post_templates[$type][$key] = _cleanup_header_comment($header[1]);
+                    $postTemplates[$type][$key] = _cleanup_header_comment($header[1]);
                 }
             }
         }
 
-        return $post_templates;
+        return $postTemplates;
     }
 
     /**
