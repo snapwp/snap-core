@@ -89,7 +89,7 @@ class Theme
             return static::getActiveThemeUri('public/') . static::$manifest[$file]->file;
         }
 
-        return static::getActiveThemeUri('public/') . static::$manifest[$file];
+        return static::getActiveThemeUri('public/') . static::$manifest[$file]->file;
     }
 
     /**
