@@ -57,6 +57,7 @@ namespace Snap\Services;
  * @method static \Snap\Database\PostQuery limit(int $amount)
  * @method static \Snap\Database\PostQuery offset(int $amount)
  * @method static \Snap\Database\PostQuery page(int $page)
+ * @method static \Snap\Database\PostQuery set(mixed $key, mixed $value)
  */
 class PostQuery
 {

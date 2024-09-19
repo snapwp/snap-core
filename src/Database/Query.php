@@ -61,4 +61,13 @@ abstract class Query
         $this->params['order'] = \strtoupper($order);
         return $this;
     }
+
+    /**
+     * Set arbitrary query parameters.
+     */
+    public function set(mixed $key, mixed $value)
+    {
+        $this->params[$key] = $value;
+        return $this;
+    }
 }
