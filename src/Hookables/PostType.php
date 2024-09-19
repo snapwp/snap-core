@@ -70,6 +70,7 @@ use Tightenco\Collect\Support\Collection;
  * @method static PostQuery limit(int $amount)
  * @method static PostQuery offset(int $amount)
  * @method static PostQuery page(int $page)
+ * @method static PostQuery set(mixed $key, mixed $value)
  */
 class PostType extends ContentHookable
 {
@@ -357,7 +358,7 @@ class PostType extends ContentHookable
             $this->addFilter(
                 'default_post_metadata',
                 function($value, $object_id, $meta_key) {
-                    if (in_array($meta_key, ['_wp_attachment_image_alt', '_wp_attached_file', 'footnotes'], true)) {
+                    if (in_array($meta_key, ['_wp_attachment_image_alt', '_wp_attached_file', 'footnotes', 'inline_featured_image'], true)) {
                         return '';
                     }
 
