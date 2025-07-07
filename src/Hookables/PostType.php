@@ -355,7 +355,15 @@ class PostType extends ContentHookable
 
             $this->addFilter(
                 'default_post_metadata',
-                function() {
+                function($value, $object_id, $meta_key) {
+                    if (in_array($meta_key, ['_wp_attachment_image_alt', '_wp_attached_file', 'footnotes', 'inline_featured_image'], true)) {
+                        return '';
+                    }
+
+                    if (str_starts_with($meta_key, '_icl')) {
+                        return '';
+                    }
+
                     return null;
                 },
                 10,
