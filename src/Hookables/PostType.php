@@ -366,6 +366,10 @@ class PostType extends ContentHookable
                         return '';
                     }
 
+                    if (str_starts_with($meta_key, '_yoast')) {
+                        return '';
+                    }
+
                     return null;
                 },
                 10,
