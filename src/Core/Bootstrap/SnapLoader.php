@@ -20,6 +20,7 @@ class SnapLoader
         \Snap\Bootstrap\Cleanup::class,
         \Snap\Bootstrap\Comments::class,
         \Snap\Bootstrap\I18n::class,
+        \Snap\Bootstrap\Security::class,
         \Snap\Admin\Gutenberg::class,
         \Snap\Media\SizeManager::class,
         \Snap\Media\Placeholders::class,

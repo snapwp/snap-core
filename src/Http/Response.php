@@ -41,12 +41,30 @@ class Response
     }
 
     /**
-     * Redirect the current request to a separate URL.
+     * Redirect the current request to a URL on this site.
+     *
+     * Uses wp_safe_redirect, so URLs on hosts not allowed by the allowed_redirect_hosts filter are replaced with
+     * the admin URL. This makes it safe to pass user supplied URLs, such as a redirect_to parameter.
      *
      * @param  string  $url    The destination URL.
      * @param  integer $status Optional. The HTTP status to send. Defaults to 302.
      */
     public function redirect(string $url, int $status = 302): void
+    {
+        if (\wp_safe_redirect($url, $status)) {
+            exit;
+        }
+    }
+
+    /**
+     * Redirect the current request to any URL, including external sites.
+     *
+     * Never pass user supplied URLs to this method, as it allows open redirects. Use redirect() instead.
+     *
+     * @param  string  $url    The destination URL.
+     * @param  integer $status Optional. The HTTP status to send. Defaults to 302.
+     */
+    public function redirectAway(string $url, int $status = 302): void
     {
         if (\wp_redirect($url, $status)) {
             exit;
@@ -61,7 +79,7 @@ class Response
      * @param string|null $path   The path to append to the admin URL.
      * @param int    $status Optional. The HTTP status to send when redirecting. Default 302.
      */
-    public function redirectToAdmin(string $path = null, int $status = 302): void
+    public function redirectToAdmin(?string $path = null, int $status = 302): void
     {
         $this->redirect(\admin_url($path), $status);
     }
@@ -74,7 +92,7 @@ class Response
      * @param string|null $redirect_after The URL the user should be sent to after the login screen. Defaults to current URL.
      * @param int    $status         Optional. The HTTP status to send when redirecting. Default 302.
      */
-    public function redirectToLogin(string $redirect_after = null, int $status = 302): void
+    public function redirectToLogin(?string $redirect_after = null, int $status = 302): void
     {
         if ($redirect_after === null) {
             $redirect_after = Theme::getCurrentUrl();
@@ -150,6 +168,8 @@ class Response
      * @param bool        $secure    Optional. Whether the cookie is HTTPS only.
      * @param bool        $http_only Optional. Whether the cookie is only accessed via PHP. Set to false to open to js.
      *                               Default: true.
+     * @param string      $same_site Optional. The SameSite policy: Lax, Strict or None. None forces Secure.
+     *                               Default: Lax.
      * @return $this
      */
     public function setCookie(
@@ -157,13 +177,14 @@ class Response
         $value = '',
         int $expires = 3600,
         string $path = '/',
-        string $domain = null,
-        bool $secure = null,
-        bool $http_only = true
+        ?string $domain = null,
+        ?bool $secure = null,
+        bool $http_only = true,
+        string $same_site = 'Lax'
     ): Response {
         $domain = $domain ?: \Snap\Services\Request::getHost();
-        $secure = $secure ?: \is_ssl();
-        $this->setCookieHeader($name, $value, $expires, $path, $domain, $secure, $http_only);
+        $secure = $secure ?? \is_ssl();
+        $this->setCookieHeader($name, $value, $expires, $path, $domain, $secure, $http_only, $same_site);
         return $this;
     }
 
@@ -171,11 +192,12 @@ class Response
      * Attempts to remove a previously set cookie.
      *
      * @param string $name The name of the cookie to unset.
+     * @param string $path Optional. The path the cookie was set with. Default: '/'.
      * @return $this
      */
-    public function removeCookie(string $name): Response
+    public function removeCookie(string $name, string $path = '/'): Response
     {
-        $this->setCookie($name, '', 0);
+        $this->setCookie($name, '', 0, $path);
         return $this;
     }
 
@@ -199,7 +221,7 @@ class Response
      * @param int|null $status_code     Optional. Status code to send with the response.
      * @param bool     $disable_caching Whether to disable browser caching on the response.
      */
-    public function json($data = null, int $status_code = null, bool $disable_caching = true): void
+    public function json($data = null, ?int $status_code = null, bool $disable_caching = true): void
     {
         if ($disable_caching) {
             \nocache_headers();
@@ -216,7 +238,7 @@ class Response
      * @param int|null  $status_code     Optional. Status code to send with the response.
      * @param bool  $disable_caching Whether to disable browser caching on the response.
      */
-    public function jsonSuccess($data = null, int $status_code = null, bool $disable_caching = true): void
+    public function jsonSuccess($data = null, ?int $status_code = null, bool $disable_caching = true): void
     {
         if ($disable_caching) {
             \nocache_headers();
@@ -233,7 +255,7 @@ class Response
      * @param int|null  $status_code     Optional. Status code to send with the response.
      * @param bool  $disable_caching Whether to disable browser caching on the response.
      */
-    public function jsonError($data = null, int $status_code = null, bool $disable_caching = true): void
+    public function jsonError($data = null, ?int $status_code = null, bool $disable_caching = true): void
     {
         if ($disable_caching) {
             \nocache_headers();
@@ -253,6 +275,8 @@ class Response
      * @param string|null $domain    The domain for the cookie.
      * @param bool        $secure    Whether the cookie is HTTPS only.
      * @param bool        $http_only Whether the cookie is only accessed via PHP. Set to false to open to js.
+     * @param string      $same_site The SameSite policy: Lax, Strict or None.
+     * @throws \InvalidArgumentException If an unknown SameSite policy is given.
      */
     private function setCookieHeader(
         string $name,
@@ -261,8 +285,20 @@ class Response
         string $path,
         string $domain,
         bool $secure,
-        bool $http_only
+        bool $http_only,
+        string $same_site
     ): void {
+        $same_site = \ucfirst(\strtolower($same_site));
+
+        if (!\in_array($same_site, ['Lax', 'Strict', 'None'], true)) {
+            throw new \InvalidArgumentException("Invalid SameSite policy [$same_site]. Use Lax, Strict or None.");
+        }
+
+        // Browsers reject SameSite=None cookies which are not also Secure.
+        if ($same_site === 'None') {
+            $secure = true;
+        }
+
         $attr = [
             \rawurlencode($name) . '=' . \rawurlencode($value),
         ];
@@ -287,6 +323,8 @@ class Response
         if ($http_only) {
             $attr[] = 'HttpOnly';
         }
+
+        $attr[] = 'SameSite=' . $same_site;
 
         \header('Set-Cookie: ' . \implode('; ', $attr), false);
     }

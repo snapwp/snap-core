@@ -34,6 +34,10 @@ class Config
             'disable_widgets_block_editor' => false,
             'disable_customizer' => true,
             'disable_lazy_loading' => false,
+            'disable_user_enumeration' => true,
+            'disable_application_passwords' => false,
+            'generic_login_errors' => true,
+            'restrict_rest_api' => false,
         ],
         'assets' => [
             'remove_asset_versions' => true,
