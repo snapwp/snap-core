@@ -9,5 +9,4 @@ namespace Snap\Exceptions;
  */
 class StartupException extends BaseException
 {
-    
 }

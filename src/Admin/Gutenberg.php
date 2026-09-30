@@ -125,15 +125,15 @@ class Gutenberg extends Hookable
 
             foreach ($registry->get_all_registered() as $block => $blockData) {
                 // get the simple block matches
-                if (in_array($block, $blocks, true)) {
+                if (\in_array($block, $blocks, true)) {
                     $restrictedBlocks[] = $block;
                 }
 
                 // get everything before the first forwards lash
-                $blockName = explode('/', $block)[0];
+                $blockName = \explode('/', $block)[0];
 
                 // get the global block matches
-                if (in_array($blockName .'/*', $blocks, true)) {
+                if (\in_array($blockName . '/*', $blocks, true)) {
                     $restrictedBlocks[] = $block;
                 }
             }

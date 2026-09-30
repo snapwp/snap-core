@@ -352,7 +352,7 @@ class Snap
         static::$container->add(
             $class,
             static function () use ($class) {
-                return new $class;
+                return new $class();
             }
         );
 
@@ -377,7 +377,7 @@ class Snap
                     return $container->resolve($class);
                 }
 
-                return new $class;
+                return new $class();
             }
         );
 

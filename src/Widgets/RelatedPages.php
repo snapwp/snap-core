@@ -98,13 +98,13 @@ class RelatedPages extends WP_Widget
 
         if (\count($this->pages) > 0) {
             $title = apply_filters('widget_title', $instance['title']);
-     
+
             echo $args['before_widget'];
 
             if (! empty($title)) {
                 echo $args['before_title'] . $title . $args['after_title'];
             }
-             
+
             $this->render();
 
             echo $args['after_widget'];
@@ -155,7 +155,7 @@ class RelatedPages extends WP_Widget
             </p>
         <?php
     }
-         
+
     /**
      * Update the widget upon saving.
      *

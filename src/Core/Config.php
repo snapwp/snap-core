@@ -41,7 +41,7 @@ class Config
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
             'disable_jquery' => false,
-            'manifest_path' => '/public/manifest.json'
+            'manifest_path' => '/public/manifest.json',
         ],
         'images' => [
             'default_image_quality' => 75,

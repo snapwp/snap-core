@@ -38,7 +38,7 @@ class Theme
      */
     public static function getActiveThemePath(string $path): string
     {
-        return \str_replace('\\', '/', \trailingslashit(\get_stylesheet_directory()) . ltrim($path, '/\\'));
+        return \str_replace('\\', '/', \trailingslashit(\get_stylesheet_directory()) . \ltrim($path, '/\\'));
     }
 
     /**
@@ -46,7 +46,7 @@ class Theme
      */
     public static function getParentThemePath($path): string
     {
-        return \str_replace('\\', '/', \trailingslashit(\get_template_directory()) . ltrim($path, '/\\'));
+        return \str_replace('\\', '/', \trailingslashit(\get_template_directory()) . \ltrim($path, '/\\'));
     }
 
     /**
@@ -81,7 +81,7 @@ class Theme
             return static::getActiveThemeUri('public/') . $file;
         }
 
-        if (is_child_theme() && file_exists(static::getParentThemePath('public/' . static::$manifest[$file]->file))) {
+        if (is_child_theme() && \file_exists(static::getParentThemePath('public/' . static::$manifest[$file]->file))) {
             return static::getParentThemeUri('public/' . static::$manifest[$file]->file);
         }
 
@@ -195,17 +195,17 @@ class Theme
         if (is_child_theme()) {
             $manifest_path = self::getParentThemePath(Config::get('assets.manifest_path'));
 
-            if (file_exists($manifest_path)) {
-                $manifest = file_get_contents($manifest_path);
-                static::$manifest = (array)json_decode($manifest, false, 512, JSON_THROW_ON_ERROR);
+            if (\file_exists($manifest_path)) {
+                $manifest = \file_get_contents($manifest_path);
+                static::$manifest = (array)\json_decode($manifest, false, 512, JSON_THROW_ON_ERROR);
             }
         }
 
         $manifest_path = self::getActiveThemePath(Config::get('assets.manifest_path'));
 
-        if (file_exists($manifest_path)) {
-            $manifest = file_get_contents($manifest_path);
-            static::$manifest = array_merge(static::$manifest, (array)json_decode($manifest, false, 512, JSON_THROW_ON_ERROR));
+        if (\file_exists($manifest_path)) {
+            $manifest = \file_get_contents($manifest_path);
+            static::$manifest = \array_merge(static::$manifest, (array)\json_decode($manifest, false, 512, JSON_THROW_ON_ERROR));
         }
     }
 }

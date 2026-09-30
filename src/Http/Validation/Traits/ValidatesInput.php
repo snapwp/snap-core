@@ -2,7 +2,7 @@
 
 namespace Snap\Http\Validation\Traits;
 
-use \Somnambulist\Components\Validation\ErrorBag;
+use Somnambulist\Components\Validation\ErrorBag;
 
 trait ValidatesInput
 {

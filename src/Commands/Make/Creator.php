@@ -212,7 +212,7 @@ class Creator extends Command
             $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
             $args['CLASSNAME'] = $class;
             $args['NAME'] = Str::snake($class);
-            $args['KEBABCLASS'] = str_replace('\\-', '.', $args['KEBABCLASS']);
+            $args['KEBABCLASS'] = \str_replace('\\-', '.', $args['KEBABCLASS']);
             $args['PLURAL'] = \ucwords(Str::plural(\str_replace('_', ' ', $args['NAME'])));
         }
 

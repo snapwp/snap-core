@@ -19,7 +19,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class Publish extends Command
 {
-    use NeedsWordPress, UsesFilesystem;
+    use NeedsWordPress;
+    use UsesFilesystem;
 
     /**
      * Store the Command Helper instance.

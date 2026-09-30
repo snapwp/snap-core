@@ -16,7 +16,7 @@ trait NeedsWordPress
         \define('DOING_AJAX', true);
         \define('BASE_PATH', $this->findWordpressBasePath());
         \define('WP_USE_THEMES', false);
-        
+
         /** @noinspection PhpIncludeInspection */
         require(BASE_PATH . 'wp-load.php');
     }

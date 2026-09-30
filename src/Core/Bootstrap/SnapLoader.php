@@ -1,4 +1,6 @@
-<?php /** @noinspection ClassConstantCanBeUsedInspection */
+<?php
+
+/** @noinspection ClassConstantCanBeUsedInspection */
 
 namespace Snap\Core\Bootstrap;
 

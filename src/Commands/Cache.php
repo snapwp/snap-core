@@ -18,7 +18,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class Cache extends Command
 {
-    use NeedsWordPress, UsesFilesystem;
+    use NeedsWordPress;
+    use UsesFilesystem;
 
     /**
      * Setup the command signature and help text.
@@ -74,7 +75,7 @@ class Cache extends Command
         $cache_path = \trailingslashit($root) . \trailingslashit($config->get('theme.cache_directory'));
 
         // Clear any previously cached templates
-        $this->file->rmdir($cache_path.'templates/', true);
+        $this->file->rmdir($cache_path . 'templates/', true);
 
         // Make the cache directory if it doesn't exist.
         if (!\is_dir($cache_path)) {

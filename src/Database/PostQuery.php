@@ -12,7 +12,8 @@ use WP_User;
 
 class PostQuery extends Query
 {
-    use QueriesDate, QueriesMeta;
+    use QueriesDate;
+    use QueriesMeta;
 
     private $tax_query = [];
 
