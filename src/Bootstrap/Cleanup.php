@@ -3,7 +3,6 @@
 namespace Snap\Bootstrap;
 
 use Snap\Core\Hookable;
-use Snap\Services\Config;
 
 /**
  * Cleanup WordPress output and functionality.
@@ -36,18 +35,10 @@ class Cleanup extends Hookable
     protected $filters = [
         'style_loader_tag' => 'cleanAssetTags',
         'body_class' => 'cleanupBodyClasses',
+        // Removes the WordPress version from feeds and exports (wp_generator only covers wp_head).
+        'the_generator' => '__return_empty_string',
+        'wp_img_tag_add_auto_sizes' => '__return_false',
     ];
-
-    /**
-     * Conditionally add filters.
-     */
-    public function boot(): void
-    {
-        // xmlrpc is a potential security weakness. Most of the time it is completely irrelevant.
-        if (Config::get('disable_xmlrpc')) {
-            $this->addFilter('xmlrpc_enabled', '__return_false');
-        }
-    }
 
     /**
      * Remove some useless default widgets.

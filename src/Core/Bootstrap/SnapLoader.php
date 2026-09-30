@@ -1,10 +1,12 @@
-<?php /** @noinspection ClassConstantCanBeUsedInspection */
+<?php
+
+/** @noinspection ClassConstantCanBeUsedInspection */
 
 namespace Snap\Core\Bootstrap;
 
 use Hodl\Container;
+use Illuminate\Support\Str;
 use Snap\Core\Hookable;
-use Snap\Utils\Str;
 
 class SnapLoader
 {
@@ -18,6 +20,7 @@ class SnapLoader
         \Snap\Bootstrap\Cleanup::class,
         \Snap\Bootstrap\Comments::class,
         \Snap\Bootstrap\I18n::class,
+        \Snap\Bootstrap\Security::class,
         \Snap\Admin\Gutenberg::class,
         \Snap\Media\SizeManager::class,
         \Snap\Media\Placeholders::class,
@@ -100,7 +103,7 @@ class SnapLoader
                 $class_parts = \explode('\\', $class_name);
 
                 $this->container->get('validationFactory')->addRule(
-                    Str::toSnake(\end($class_parts)),
+                    Str::snake(\end($class_parts)),
                     $this->container->resolve($class_name)
                 );
             }

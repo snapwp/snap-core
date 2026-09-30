@@ -2,7 +2,7 @@
 
 namespace Theme\ComponentsNAMESPACE;
 
-use Bladezero\View\Component;
+use Illuminate\View\Component;
 
 class CLASSNAME extends Component
 {

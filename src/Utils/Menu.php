@@ -2,7 +2,7 @@
 
 namespace Snap\Utils;
 
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 /**
  * Utilities for nav menus.

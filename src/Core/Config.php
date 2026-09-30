@@ -34,6 +34,10 @@ class Config
             'disable_widgets_block_editor' => false,
             'disable_customizer' => true,
             'disable_lazy_loading' => false,
+            'disable_user_enumeration' => true,
+            'disable_application_passwords' => false,
+            'generic_login_errors' => true,
+            'restrict_rest_api' => false,
         ],
         'assets' => [
             'remove_asset_versions' => true,
@@ -41,7 +45,7 @@ class Config
             'defer_scripts_skip' => [],
             'use_jquery_cdn' => '3.2.1',
             'disable_jquery' => false,
-            'manifest_path' => '/public/manifest.json'
+            'manifest_path' => '/public/manifest.json',
         ],
         'images' => [
             'default_image_quality' => 75,

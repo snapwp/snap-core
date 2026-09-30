@@ -13,6 +13,32 @@ class Vite
     private static bool $isDev = false;
 
     /**
+     * Stylesheet extensions which are enqueued as styles rather than scripts.
+     */
+    private const STYLE_EXTENSIONS = ['css', 'scss', 'sass', 'less', 'styl', 'stylus', 'pcss', 'postcss'];
+
+    /**
+     * Register one or more entry points, enqueueing each as a script or style based on its extension.
+     *
+     * Used by the @vite Blade directive.
+     *
+     * @param string|string[] $entries
+     */
+    public static function register(string|array $entries): void
+    {
+        foreach ((array) $entries as $entry) {
+            $extension = \strtolower(\pathinfo($entry, PATHINFO_EXTENSION));
+
+            if (\in_array($extension, self::STYLE_EXTENSIONS, true)) {
+                self::registerStyle($entry);
+                continue;
+            }
+
+            self::registerScript($entry);
+        }
+    }
+
+    /**
      * Add a script src.
      */
     public static function registerScript(string $path): void
@@ -48,11 +74,11 @@ class Vite
             $url = snap_get_asset_url($path);
 
             // if the current theme is running vite
-            if (self::$enqueuedVite && file_exists(Theme::getActiveThemePath($path))) {
+            if (self::$enqueuedVite && \file_exists(Theme::getActiveThemePath($path))) {
                 $url = self::$viteServer . $path;
             }
 
-            if (self::$parentEnqueuedVite && file_exists(Theme::getParentThemePath($path))) {
+            if (self::$parentEnqueuedVite && \file_exists(Theme::getParentThemePath($path))) {
                 $url = self::$parentViteServer . $path;
             }
         }
@@ -98,13 +124,16 @@ class Vite
     {
         if (is_child_theme()) {
             $hotFilePath = get_template_directory() . '/public/hot';
-            if (!self::$parentEnqueuedVite && file_exists($hotFilePath)) {
-                self::$parentViteServer = trailingslashit(file_get_contents($hotFilePath));
+            if (!self::$parentEnqueuedVite && \file_exists($hotFilePath)) {
+                self::$parentViteServer = trailingslashit(\file_get_contents($hotFilePath));
                 self::$isDev = true;
 
-                add_action('wp_print_styles', function () {
-                    echo '<script type="module" src="' . Vite::getViteServerUrl() . '@vite/client"></script>';
-                });
+                add_action(
+                    'wp_print_styles',
+                    function () {
+                        echo '<script type="module" src="' . Vite::getViteServerUrl() . '@vite/client"></script>';
+                    }
+                );
 
                 self::$parentEnqueuedVite = true;
             }
@@ -112,17 +141,19 @@ class Vite
 
         $hotFilePath = get_stylesheet_directory() . '/public/hot';
 
-        if (!self::$enqueuedVite && file_exists($hotFilePath)) {
-            self::$viteServer = trailingslashit(file_get_contents($hotFilePath));
+        if (!self::$enqueuedVite && \file_exists($hotFilePath)) {
+            self::$viteServer = trailingslashit(\file_get_contents($hotFilePath));
             self::$isDev = true;
 
-            add_action('wp_print_styles', function () {
-                echo '<script type="module" src="' . Vite::getViteServerUrl() . '@vite/client"></script>';
-            });
+            add_action(
+                'wp_print_styles',
+                function () {
+                    echo '<script type="module" src="' . Vite::getViteServerUrl() . '@vite/client"></script>';
+                }
+            );
 
             self::$enqueuedVite = true;
         }
-
     }
 
     /**
@@ -131,21 +162,31 @@ class Vite
     private static function addActions(): void
     {
         if (!self::$addedHooks) {
-            add_action('script_loader_tag', static function($tag, $scriptPath) {
-                if (str_starts_with($scriptPath, 'module/')) {
-                    return str_replace('<script', '<script type="module"', $tag);
-                }
+            add_action(
+                'script_loader_tag',
+                static function ($tag, $scriptPath) {
+                    if (\str_starts_with($scriptPath, 'module/')) {
+                        return \str_replace('<script', '<script type="module"', $tag);
+                    }
 
-                return $tag;
-            }, 10, 2);
+                    return $tag;
+                },
+                10,
+                2
+            );
 
-            add_action('style_loader_tag', static function($tag, $scriptPath) {
-                if (str_starts_with($scriptPath, 'module/')) {
-                    return str_replace('<link', '<link crossorigin="anonymous"', $tag);
-                }
+            add_action(
+                'style_loader_tag',
+                static function ($tag, $scriptPath) {
+                    if (\str_starts_with($scriptPath, 'module/')) {
+                        return \str_replace('<link', '<link crossorigin="anonymous"', $tag);
+                    }
 
-                return $tag;
-            }, 10, 2);
+                    return $tag;
+                },
+                10,
+                2
+            );
         }
 
         self::$addedHooks = true;

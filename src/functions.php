@@ -8,19 +8,6 @@ use Snap\Services\Config;
  * Class factories/container fetchers.
  * *********************************************************************************************************************
  */
-if (!\function_exists('collect')) {
-    /**
-     * Return a new Collection instance.
-     *
-     * @param array $items Items to add.
-     * @return \Tightenco\Collect\Support\Collection
-     */
-    function collect($items)
-    {
-        return new \Tightenco\Collect\Support\Collection($items);
-    }
-}
-
 if (!\function_exists('snap_config')) {
     /**
      * Returns a key from the Config service.
@@ -273,28 +260,32 @@ if (!\function_exists('snap_is_wp_login')) {
  * *********************************************************************************************************************
  */
 
-/**
- * Get value of top level hierarchical post ID.
- *
- * Does not work with the objects returned by get_pages().
- *
- * @param int|WP_Post|array $post null Optional. Post object,array, or ID of a post to find the top ancestors for.
- * @return int ID
- */
-function snap_get_top_parent_page_id($post = null): int
-{
-    return \Snap\Utils\View::getTopLevelParentId($post);
+if (!\function_exists('snap_get_top_parent_page_id')) {
+    /**
+     * Get value of top level hierarchical post ID.
+     *
+     * Does not work with the objects returned by get_pages().
+     *
+     * @param int|WP_Post|array $post null Optional. Post object,array, or ID of a post to find the top ancestors for.
+     * @return int ID
+     */
+    function snap_get_top_parent_page_id($post = null): int
+    {
+        return \Snap\Utils\View::getTopLevelParentId($post);
+    }
 }
 
-/**
- * Get current page depth.
- *
- * @param int|\WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
- * @return integer
- */
-function snap_get_page_depth($page = null): int
-{
-    return \Snap\Utils\View::getPageDepth($page);
+if (!\function_exists('snap_get_page_depth')) {
+    /**
+     * Get current page depth.
+     *
+     * @param int|\WP_Post|null $page Optional. Post ID or post object. Defaults to the current queried object.
+     * @return integer
+     */
+    function snap_get_page_depth($page = null): int
+    {
+        return \Snap\Utils\View::getPageDepth($page);
+    }
 }
 
 
@@ -304,15 +295,17 @@ function snap_get_page_depth($page = null): int
  * *********************************************************************************************************************
  */
 
-/**
- * Tests if a provided URL is external or not.
- *
- * @param string $url URL to test.
- * @return bool
- */
-function snap_is_external_url(string $url): bool
-{
-    return \Snap\Utils\Url::isExternalUrl($url);
+if (!\function_exists('snap_is_external_url')) {
+    /**
+     * Tests if a provided URL is external or not.
+     *
+     * @param string $url URL to test.
+     * @return bool
+     */
+    function snap_is_external_url(string $url): bool
+    {
+        return \Snap\Utils\Url::isExternalUrl($url);
+    }
 }
 
 if (!\function_exists('leadingslashit')) {
@@ -328,14 +321,14 @@ if (!\function_exists('leadingslashit')) {
     }
 }
 
-if (!\function_exists('untrailingslashit')) {
+if (!\function_exists('unleadingslashit')) {
     /**
      * Removes any leading slashes from a string.
      *
      * @param string $string String to remove leading slashes for.
      * @return string
      */
-    function is_external_url(string $string): string
+    function unleadingslashit(string $string): string
     {
         return \Snap\Utils\Url::unLeadingSlashIt($string);
     }

@@ -6,7 +6,6 @@ use Exception;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Snap\Core\Snap;
-use Symfony\Component\Process\Process;
 
 /**
  * Installs additional features after a snap is pulled in via composer.

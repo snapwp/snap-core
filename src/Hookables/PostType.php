@@ -2,12 +2,12 @@
 
 namespace Snap\Hookables;
 
+use Illuminate\Support\Str;
 use Snap\Database\PostQuery;
 use Snap\Hookables\Content\ColumnController;
 use Snap\Hookables\Content\Concerns\InteractsWithAcf;
-use Snap\Utils\Str;
-use Tightenco\Collect\Support\Arr;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 /**
  * Class PostType
@@ -219,7 +219,7 @@ class PostType extends ContentHookable
             return null;
         }
 
-        $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
+        $method = 'get' . Str::studly($meta_key) . 'Attribute';
 
         // Handle ACF data
         $this->primeAcfCache($object_id);
@@ -234,13 +234,13 @@ class PostType extends ContentHookable
                 $name = \array_search($meta_key, self::$taxonomy_plurals, true);
 
                 if (isset(self::$relationships[$post_type]) && \in_array($name, self::$relationships[$post_type], true)) {
-                    return (new self::$has_registered['taxonomy'][$name])->for($object_id)->get();
+                    return (new self::$has_registered['taxonomy'][$name]())->for($object_id)->get();
                 }
             }
 
             // Call accessor.
             if (\method_exists($class, $method)) {
-                $returnValue = (new $class)->{$method}($post);
+                $returnValue = (new $class())->{$method}($post);
                 return \is_array($returnValue) ? collect($returnValue) : $returnValue;
             }
         }
@@ -357,16 +357,16 @@ class PostType extends ContentHookable
 
             $this->addFilter(
                 'default_post_metadata',
-                function($value, $object_id, $meta_key) {
-                    if (in_array($meta_key, ['_wp_attachment_image_alt', '_wp_attached_file', 'footnotes', 'inline_featured_image'], true)) {
+                function ($value, $object_id, $meta_key) {
+                    if (\in_array($meta_key, ['_wp_attachment_image_alt', '_wp_attached_file', 'footnotes', 'inline_featured_image'], true)) {
                         return '';
                     }
 
-                    if (str_starts_with($meta_key, '_icl')) {
+                    if (\str_starts_with($meta_key, '_icl')) {
                         return '';
                     }
 
-                    if (str_starts_with($meta_key, '_yoast')) {
+                    if (\str_starts_with($meta_key, '_yoast')) {
                         return '';
                     }
 

@@ -7,5 +7,4 @@ namespace Snap\Exceptions;
  */
 class EmailException extends BaseException
 {
-
 }

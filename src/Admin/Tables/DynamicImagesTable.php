@@ -177,7 +177,7 @@ class DynamicImagesTable extends \WP_List_Table
                         $matches[] = $name;
                     }
                 }
-                return implode(', ', array_unique($matches));
+                return \implode(', ', \array_unique($matches));
             case 'ratio':
                 $threshold = (int)apply_filters('big_image_size_threshold', 2560);
 

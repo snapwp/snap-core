@@ -23,6 +23,16 @@ class DisableComments extends Hookable
         ],
         'pre_option_default_pingback_flag' => '__return_zero',
         'admin_init' => 'removePostTypeSupport',
+        'pings_open' => [
+            20 => '__return_false',
+        ],
+        'pre_option_default_ping_status' => 'returnClosed',
+        'pre_option_default_comment_status' => 'returnClosed',
+        'xmlrpc_methods' => 'removePingbackMethods',
+        'wp_headers' => 'removePingbackHeader',
+        'init' => [
+            9999 => 'removePostTypeSupport',
+        ],
     ];
 
     /**
@@ -41,6 +51,7 @@ class DisableComments extends Hookable
         'add_meta_boxes' => [
             9999 => 'removeCommentsMetaBoxes',
         ],
+        'pre_ping' => 'removeOutgoingPings',
     ];
 
     /**
@@ -54,6 +65,7 @@ class DisableComments extends Hookable
         // Ensures all new posts are set to comments closed by default.
         $this->addAction(['edit_form_advanced', 'edit_page_form'], 'removeCommentsSetClosedStatus');
     }
+
 
     /**
      * Stop admin access to comments pages.
@@ -76,8 +88,8 @@ class DisableComments extends Hookable
     public function removeCommentsDashboardCss()
     {
         echo '<style>',
-            '#dashboard_right_now .comment-count,#latest-comments, #welcome-panel .welcome-comments {display: none;}',
-            '</style>';
+        '#dashboard_right_now .comment-count,#latest-comments, #welcome-panel .welcome-comments {display: none;}',
+        '</style>';
     }
 
     /**
@@ -121,7 +133,7 @@ class DisableComments extends Hookable
     public function removeCommentsSetClosedStatus()
     {
         echo '<input type="hidden" name="comment_status" value="closed" />',
-            '<input type="hidden" name="ping_status" value="closed" />';
+        '<input type="hidden" name="ping_status" value="closed" />';
     }
 
     /**
@@ -147,8 +159,36 @@ class DisableComments extends Hookable
      */
     public function removePostTypeSupport()
     {
-        \remove_post_type_support('page', 'comments');
-        \remove_post_type_support('post', 'comments');
-        \remove_post_type_support('attachment', 'comments');
+        foreach (\get_post_types() as $post_type) {
+            \remove_post_type_support($post_type, 'comments');
+            \remove_post_type_support($post_type, 'trackbacks');
+        }
+    }
+
+    public function returnClosed()
+    {
+        return 'closed';
+    }
+
+    public function removePingbackMethods($methods)
+    {
+        unset($methods['pingback.ping'], $methods['pingback.extensions.getPingbacks']);
+
+        return $methods;
+    }
+
+    public function removePingbackHeader($headers)
+    {
+        unset($headers['X-Pingback']);
+
+        return $headers;
+    }
+
+    /**
+     * Empties the link list so nothing is pinged, including self-pings and queued pings.
+     */
+    public function removeOutgoingPings(&$links)
+    {
+        $links = [];
     }
 }

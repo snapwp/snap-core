@@ -64,25 +64,25 @@ class HandlePostTemplates extends Hookable
         if (is_child_theme()) {
             $parentPath = get_template_directory() . '/' . Theme::getTemplatesPath() . 'page-templates/';
 
-            if (is_dir($parentPath)) {
+            if (\is_dir($parentPath)) {
                 $paths[] = $parentPath;
             }
         }
 
         $path = \get_stylesheet_directory() . '/' . Theme::getTemplatesPath() . 'page-templates/';
-        
-        if (is_dir($path)) {
+
+        if (\is_dir($path)) {
             $paths[] = $path;
         }
 
         $possibleTemplates = [];
-        
+
         foreach ($paths as $path) {
-            foreach (scandir($path) as $file) {
-                if ($file === '.' || $file === '..' || \is_dir($path.$file) || \strpos($file, '_example') !== false) {
+            foreach (\scandir($path) as $file) {
+                if ($file === '.' || $file === '..' || \is_dir($path . $file) || \strpos($file, '_example') !== false) {
                     continue;
                 }
-                $possibleTemplates[$file] = $path.$file;
+                $possibleTemplates[$file] = $path . $file;
             }
         }
 

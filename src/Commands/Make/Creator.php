@@ -2,10 +2,10 @@
 
 namespace Snap\Commands\Make;
 
+use Illuminate\Support\Str;
 use Snap\Commands\Concerns\NeedsWordPress;
 use Snap\Core\Snap;
 use Snap\Services\Config;
-use Snap\Utils\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -201,9 +201,9 @@ class Creator extends Command
         $args['NAMESPACE'] = '';
 
         $class_name = $this->sanitiseFilename($args['CLASSNAME']);
-        $args['NAME'] = Str::toSnake($class_name);
-        $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
-        $args['KEBABCLASS'] = Str::toKebab($class_name);
+        $args['NAME'] = Str::snake($class_name);
+        $args['PLURAL'] = \ucwords(Str::plural(\str_replace('_', ' ', $args['NAME'])));
+        $args['KEBABCLASS'] = Str::kebab($class_name);
 
         if ($this->isNestedDirectory($class_name)) {
             $parts = \explode('\\', $class_name);
@@ -211,9 +211,9 @@ class Creator extends Command
 
             $args['NAMESPACE'] = '\\' . \implode('\\', $parts);
             $args['CLASSNAME'] = $class;
-            $args['NAME'] = Str::toSnake($class);
-            $args['KEBABCLASS'] = str_replace('\\-', '.', $args['KEBABCLASS']);
-            $args['PLURAL'] = \ucwords(Str::toPlural(\str_replace('_', ' ', $args['NAME'])));
+            $args['NAME'] = Str::snake($class);
+            $args['KEBABCLASS'] = \str_replace('\\-', '.', $args['KEBABCLASS']);
+            $args['PLURAL'] = \ucwords(Str::plural(\str_replace('_', ' ', $args['NAME'])));
         }
 
         return $args;

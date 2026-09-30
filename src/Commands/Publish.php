@@ -19,7 +19,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class Publish extends Command
 {
-    use NeedsWordPress, UsesFilesystem;
+    use NeedsWordPress;
+    use UsesFilesystem;
 
     /**
      * Store the Command Helper instance.
@@ -66,7 +67,7 @@ class Publish extends Command
     /**
      * Setup the command signature and help text.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('publish')
             ->setDescription('Publishes files from a package into the current SnapWP theme.')
@@ -107,9 +108,10 @@ class Publish extends Command
      * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
      *
+     * @return int
      * @throws \Hodl\Exceptions\ContainerException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input, $output);
 
@@ -124,13 +126,16 @@ class Publish extends Command
                     "\n<info>Published %d %s successfully:\n%s</info>",
                     \count($this->copied),
                     _n('file', 'files', \count($this->copied)),
-                    \implode($this->copied, "\n")
+                    \implode("\n", $this->copied)
                 )
             );
-            exit;
+
+            return Command::SUCCESS;
         }
 
         $this->output->writeln("\n<info>Nothing needed to be published</info>");
+
+        return Command::SUCCESS;
     }
 
     /**

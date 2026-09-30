@@ -15,7 +15,7 @@ class I18n extends Hookable
         // register the snap text domain
         'after_setup_theme' => 'loadThemeTextdomain',
     ];
-    
+
     /**
      * Register the snap text domain
      */

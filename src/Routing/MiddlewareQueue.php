@@ -3,7 +3,7 @@
 namespace Snap\Routing;
 
 use RuntimeException;
-use Tightenco\Collect\Support\Arr;
+use Illuminate\Support\Arr;
 
 class MiddlewareQueue
 {

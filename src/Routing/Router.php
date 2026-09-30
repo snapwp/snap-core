@@ -272,7 +272,7 @@ class Router
             return;
         }
 
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             [$fqn, $action] = $controller;
         } else {
             [$class, $action] = \explode('@', $controller);

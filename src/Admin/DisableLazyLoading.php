@@ -23,7 +23,7 @@ class DisableLazyLoading extends Hookable
      */
     public function stripLazyAttribute(string $content): string
     {
-        return str_replace('loading="lazy"', '', $content);
+        return \str_replace('loading="lazy"', '', $content);
     }
 
     /**
