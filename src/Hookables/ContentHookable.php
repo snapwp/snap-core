@@ -2,9 +2,9 @@
 
 namespace Snap\Hookables;
 
+use Illuminate\Support\Str;
 use Snap\Core\Hookable;
 use Snap\Hookables\Content\ColumnManager;
-use Snap\Utils\Str;
 
 abstract class ContentHookable extends Hookable
 {
@@ -211,7 +211,7 @@ abstract class ContentHookable extends Hookable
             return __($this->plural, 'theme');
         }
 
-        $this->plural = \ucwords(Str::toPlural($this->getSingular()));
+        $this->plural = \ucwords(Str::plural($this->getSingular()));
         return __($this->plural, 'theme');
     }
 
@@ -242,7 +242,7 @@ abstract class ContentHookable extends Hookable
         }
 
         if (static::$type === 'taxonomy') {
-            static::$taxonomy_plurals[$this->getName()] = Str::toSnake($this->getPlural());
+            static::$taxonomy_plurals[$this->getName()] = Str::snake($this->getPlural());
         }
 
         static::$has_registered[static::$type][$this->getName()] = static::class;

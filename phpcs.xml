@@ -6,8 +6,6 @@
     <exclude-pattern>*/tests/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
 
-    <autoload>./vendor/wp-coding-standards/wpcs/WordPress/PHPCSAliases.php</autoload>
-
     <arg name="colors"/>
 
     <rule ref="PSR2">
@@ -21,18 +19,19 @@
 
     <rule ref="WordPress.Arrays.ArrayIndentation"/>
     <!--<rule ref="WordPress.Arrays.ArrayKeySpacingRestrictions"/>-->
-    <rule ref="WordPress.Arrays.CommaAfterArrayItem"/>
+    <rule ref="NormalizedArrays.Arrays.CommaAfterLast"/>
+    <rule ref="Universal.WhiteSpace.CommaSpacing"/>
     <!--<rule ref="WordPress.Arrays.MultipleStatementAlignment"/>-->
     <rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
     <rule ref="WordPress.DB.RestrictedClasses"/>
     <rule ref="WordPress.DB.RestrictedFunctions"/>
-    <rule ref="WordPress.PHP.DiscourageGoto"/>
+    <rule ref="Generic.PHP.DiscourageGoto"/>
     <rule ref="WordPress.PHP.POSIXFunctions"/>
     <rule ref="WordPress.PHP.RestrictedPHPFunctions"/>
 
     <rule ref="WordPress.WP.CapitalPDangit"/>
     <rule ref="WordPress.WP.I18n"/>
-    <rule ref="WordPress.WP.PreparedSQL"/>
+    <rule ref="WordPress.DB.PreparedSQL"/>
 
     <rule ref="PEAR.Functions.FunctionCallSignature"/>
     <!--<rule ref="PEAR.NamingConventions.ValidClassName"/>-->

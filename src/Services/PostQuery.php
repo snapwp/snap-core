@@ -8,11 +8,11 @@ namespace Snap\Services;
  * @method static \Snap\Database\PostQuery type(string $type = 'post')
  *
  * @method static false|\WP_Post first()
- * @method static \Tightenco\Collect\Support\Collection get()
+ * @method static \Illuminate\Support\Collection get()
  * @method static \WP_Query getWPQuery()
- * @method static \Tightenco\Collect\Support\Collection all()
+ * @method static \Illuminate\Support\Collection all()
  * @method static int count()
- * @method static false|\WP_Term|\Tightenco\Collect\Support\Collection find(string|string[]|int|int[] $search)
+ * @method static false|\WP_Term|\Illuminate\Support\Collection find(string|string[]|int|int[] $search)
  *
  * @method static \Snap\Database\PostQuery withStatus(string|string[]|int|int[] $status)
  * @method static \Snap\Database\PostQuery withSticky()

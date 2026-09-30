@@ -4,7 +4,7 @@ namespace Snap\Media;
 
 use Snap\Core\Hookable;
 use Snap\Services\Config;
-use Tightenco\Collect\Support\Arr;
+use Illuminate\Support\Arr;
 
 class SizeManager extends Hookable
 {

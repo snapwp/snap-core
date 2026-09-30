@@ -2,7 +2,7 @@
 
 namespace Snap\Bootstrap;
 
-use Bladezero\View\Engines\CompilerEngine;
+use Illuminate\View\Engines\CompilerEngine;
 use Snap\Core\Hookable;
 use Snap\Services\Config;
 use Snap\Utils\Theme;

@@ -4,8 +4,8 @@ namespace Snap\Database;
 
 use Snap\Database\Concerns\QueriesDate;
 use Snap\Database\Concerns\QueriesMeta;
-use Tightenco\Collect\Support\Arr;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use WP_Post;
 use WP_Query;
 use WP_User;
@@ -60,7 +60,7 @@ class PostQuery extends Query
     /**
      * Return found WP_Posts.
      *
-     * @return \Tightenco\Collect\Support\Collection;
+     * @return \Illuminate\Support\Collection;
      */
     public function get(): Collection
     {
@@ -93,7 +93,7 @@ class PostQuery extends Query
     /**
      * Return all found WP_Posts with no pagination, ignoring any additional arguments.
      *
-     * @return \Tightenco\Collect\Support\Collection;
+     * @return \Illuminate\Support\Collection;
      */
     public function all(): Collection
     {
@@ -132,7 +132,7 @@ class PostQuery extends Query
      * Lookup Posts by slugs or IDs.
      *
      * @param string|string[]|int|int[] $search
-     * @return false|WP_Post|\Tightenco\Collect\Support\Collection;
+     * @return false|WP_Post|\Illuminate\Support\Collection;
      */
     public function find($search)
     {
@@ -488,7 +488,7 @@ class PostQuery extends Query
      * Perform a query and return a Collection of WP_Posts.
      *
      * @param array $args WP_Query arguments.
-     * @return \Tightenco\Collect\Support\Collection;
+     * @return \Illuminate\Support\Collection;
      */
     private function getCollection(array $args): Collection
     {
@@ -590,7 +590,7 @@ class PostQuery extends Query
      * Performs a find() for multiple ids or slugs.
      *
      * @param array $search Search terms.
-     * @return \Tightenco\Collect\Support\Collection;
+     * @return \Illuminate\Support\Collection;
      */
     private function findMultiple(array $search): Collection
     {

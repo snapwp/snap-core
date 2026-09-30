@@ -2,12 +2,12 @@
 
 namespace Snap\Core;
 
+use Illuminate\Support\Str;
 use Snap\Core\Concerns\ManagesHooks;
 use Snap\Services\Config;
 use Snap\Services\Container;
 use Snap\Services\Request;
 use Snap\Services\ServiceProvider;
-use Snap\Utils\Str;
 use Somnambulist\Components\Validation\Rule;
 use Somnambulist\Components\Validation\Validator;
 use Theme\Bootstrap;
@@ -207,7 +207,7 @@ class Loader
                 $class_parts = \explode('\\', $class_name);
 
                 Container::get('validationFactory')->addRule(
-                    Str::toSnake(\end($class_parts)),
+                    Str::snake(\end($class_parts)),
                     Container::resolve($class_name)
                 );
             }

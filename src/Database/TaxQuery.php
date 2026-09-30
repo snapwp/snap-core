@@ -3,7 +3,7 @@
 namespace Snap\Database;
 
 use Snap\Database\Concerns\QueriesMeta;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 use WP_Term_Query;
 
 class TaxQuery extends Query
@@ -58,7 +58,7 @@ class TaxQuery extends Query
      * Return the found WP_Term objects by slug or ID.
      *
      * @param int|int[]|string|string[] $search
-     * @return null|\WP_Term|\Tightenco\Collect\Support\Collection
+     * @return null|\WP_Term|\Illuminate\Support\Collection
      */
     public function find($search)
     {
@@ -74,7 +74,7 @@ class TaxQuery extends Query
     /**
      * Return all (even empty) found WP_Terms.
      *
-     * @return \Tightenco\Collect\Support\Collection
+     * @return \Illuminate\Support\Collection
      */
     public function all(): Collection
     {
@@ -92,7 +92,7 @@ class TaxQuery extends Query
     /**
      * Return found (non-empty) WP_Terms.
      *
-     * @return \Tightenco\Collect\Support\Collection
+     * @return \Illuminate\Support\Collection
      */
     public function get(): Collection
     {
@@ -417,7 +417,7 @@ class TaxQuery extends Query
      * Perform a query and return a Collection of WP_Terms.
      *
      * @param array $args WP_Query arguments.
-     * @return \Tightenco\Collect\Support\Collection
+     * @return \Illuminate\Support\Collection
      */
     private function getCollection(array $args): Collection
     {
@@ -484,7 +484,7 @@ class TaxQuery extends Query
      * Performs a find() for multiple ids or slugs.
      *
      * @param array $search Search terms.
-     * @return \Tightenco\Collect\Support\Collection
+     * @return \Illuminate\Support\Collection
      */
     private function findMultiple(array $search): Collection
     {

@@ -13,6 +13,32 @@ class Vite
     private static bool $isDev = false;
 
     /**
+     * Stylesheet extensions which are enqueued as styles rather than scripts.
+     */
+    private const STYLE_EXTENSIONS = ['css', 'scss', 'sass', 'less', 'styl', 'stylus', 'pcss', 'postcss'];
+
+    /**
+     * Register one or more entry points, enqueueing each as a script or style based on its extension.
+     *
+     * Used by the @vite Blade directive.
+     *
+     * @param string|string[] $entries
+     */
+    public static function register(string|array $entries): void
+    {
+        foreach ((array) $entries as $entry) {
+            $extension = \strtolower(\pathinfo($entry, PATHINFO_EXTENSION));
+
+            if (\in_array($extension, self::STYLE_EXTENSIONS, true)) {
+                self::registerStyle($entry);
+                continue;
+            }
+
+            self::registerScript($entry);
+        }
+    }
+
+    /**
      * Add a script src.
      */
     public static function registerScript(string $path): void

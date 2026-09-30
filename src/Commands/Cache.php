@@ -23,7 +23,7 @@ class Cache extends Command
     /**
      * Setup the command signature and help text.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('cache:generate')
             ->setDescription('Caches config and templates for a production environment.')
@@ -42,16 +42,17 @@ class Cache extends Command
      *
      * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @return int
      * @throws \Hodl\Exceptions\ContainerException If something is wrong with the container.
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initWordpress();
         $this->setupFilesystem();
 
         if ($input->getOption('force') === false && (!\defined('WP_DEBUG') || WP_DEBUG === false)) {
             if ($this->confirmChoice($input, $output) === false) {
-                return;
+                return Command::SUCCESS;
             }
         }
 
@@ -92,10 +93,12 @@ class Cache extends Command
 
         if ($config_created && $autoload_created) {
             $output->writeln('<info>Snap cache was set up successfully.</info>');
-            return;
+            return Command::SUCCESS;
         }
 
         $output->writeln('<error>Snap cache could not be set up successfully.</error>');
+
+        return Command::FAILURE;
     }
 
     /**

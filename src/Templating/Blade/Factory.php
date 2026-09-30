@@ -2,115 +2,141 @@
 
 namespace Snap\Templating\Blade;
 
-use Snap\Services\Container;
-use Snap\Services\Request;
+use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Factory as BaseFactory;
 use Snap\Services\View;
+use Snap\Templating\Blade\Concerns\ProvidesHandlers;
 
-class Factory extends \Bladezero\Factory
+class Factory extends BaseFactory
 {
+    use ProvidesHandlers;
+
     /**
-     * Get the evaluated view contents for the given view.
+     * Get the evaluated view contents for the given path, including any additional data registered for it.
      *
      * @param string $path
-     * @param array  $data
-     * @param array  $mergeData
-     * @return string
-     * @throws \Throwable
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array  $merge_data
+     * @return \Illuminate\Contracts\View\View
      */
-    public function file($path, array $data = [], array $mergeData = []): string
+    public function file($path, $data = [], $merge_data = [])
     {
-        $data = \array_merge(
-            $this->getShared(),
-            $mergeData,
-            View::getAdditionalData(View::normalizePath($path)),
-            $this->parseData($data)
-        );
-
-        return $this->render($path, $data);
+        return parent::file($path, $data, $this->withAdditionalData($path, $merge_data));
     }
 
     /**
-     * Get the evaluated view contents for the given view.
+     * Get the evaluated view contents for the given view, including any additional data registered for it.
      *
      * @param string $view
-     * @param array  $data
-     * @param array  $mergeData
-     * @return string
-     * @throws \Throwable
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array  $merge_data
+     * @return \Illuminate\Contracts\View\View
      */
-    public function make($view, $data = [], $mergeData = [])
+    public function make($view, $data = [], $merge_data = [])
     {
-        $path = static::$finder->find(
-            $view = $this->normalizeName($view)
-        );
+        $path = $this->finder->find($this->normalizeName($view));
 
-        // Next, we will create the view instance and call the view creator for the view
-        // which can set any data, etc. Then we will return the view instance back to
-        // the caller for rendering or performing other view manipulations on this.
-        $data = \array_merge(
-            $this->getShared(),
-            $mergeData,
-            View::getAdditionalData(View::normalizePath($path)),
-            $this->parseData($data)
-        );
-
-        return $this->viewInstance($view, $path, $data);
+        return parent::make($view, $data, $this->withAdditionalData($path, $merge_data));
     }
 
     /**
-     * Default CSRF token generation.
+     * Merge any additional data registered for a view over the merge data.
      *
-     * A real implementation should save this value to the session or some other store to allow validation.
+     * Explicitly passed data always takes precedence over both.
      *
-     * @return string
+     * @param string $path
+     * @param array  $merge_data
+     * @return array
      */
-    public function defaultCsrfHandler(): string
+    private function withAdditionalData(string $path, array $merge_data): array
     {
-        return \wp_create_nonce(View::getCurrentView());
+        return \array_merge($merge_data, View::getAdditionalData(View::normalizePath($path)));
     }
 
     /**
-     * Default auth handler.
+     * Get the extension used by the view file.
      *
-     * @param string|null $guard
-     * @return bool
+     * @param string $path
+     * @return string|null
      */
-    protected function defaultAuthHandler(string $guard = null): bool
+    public function getExtension($path)
     {
-        return $guard ? \current_user_can($guard) : is_user_logged_in();
+        return parent::getExtension($path);
     }
 
     /**
-     * Default can handler.
+     * Get the Blade compiler instance.
      *
-     * @param string|array $abilities
-     * @param string|array $arguments
-     * @return bool
+     * @return \Snap\Templating\Blade\Compiler
      */
-    protected function defaultCanHandler($abilities, $arguments = null): bool
+    public function getCompiler(): BladeCompiler
     {
-        return \current_user_can($abilities, $arguments);
+        return $this->getEngineResolver()->resolve('blade')->getCompiler();
     }
 
     /**
-     * Default service injection handler.
+     * Register a handler for custom directives.
      *
-     * @param string $service
-     * @return object
+     * @param string   $name
+     * @param callable $handler
      */
-    protected function defaultInjectHandler(string $service)
+    public function directive($name, callable $handler): void
     {
-        return Container::get($service);
+        $this->getCompiler()->directive($name, $handler);
     }
 
     /**
-     * Default error handler.
+     * Register an "if" statement directive.
      *
-     * @param string $error
-     * @return string|false
+     * @param string   $name
+     * @param callable $callback
      */
-    protected function defaultErrorHandler(string $error)
+    public function if($name, callable $callback): void
     {
-        return Request::getGlobalErrors()->first($error) ?? false;
+        $this->getCompiler()->if($name, $callback);
+    }
+
+    /**
+     * Register a class-based component alias directive.
+     *
+     * @param string      $class
+     * @param string|null $alias
+     * @param string      $prefix
+     */
+    public function component($class, $alias = null, $prefix = ''): void
+    {
+        $this->getCompiler()->component($class, $alias, $prefix);
+    }
+
+    /**
+     * Register a component alias directive.
+     *
+     * @param string      $path
+     * @param string|null $alias
+     */
+    public function aliasComponent($path, $alias = null): void
+    {
+        $this->getCompiler()->aliasComponent($path, $alias);
+    }
+
+    /**
+     * Register an include alias directive.
+     *
+     * @param string      $path
+     * @param string|null $alias
+     */
+    public function include($path, $alias = null): void
+    {
+        $this->getCompiler()->include($path, $alias);
+    }
+
+    /**
+     * Set the namespace class based components are guessed from.
+     *
+     * @param string $namespace
+     */
+    public static function setComponentNamespace(string $namespace): void
+    {
+        ComponentTagCompiler::setComponentNamespace($namespace);
     }
 }

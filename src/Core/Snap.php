@@ -210,13 +210,15 @@ class Snap
             static::$container->addSingleton(
                 \Snap\Templating\Blade\Factory::class,
                 static function (Container $container) {
-                    $factory =  new \Snap\Templating\Blade\Factory(
-                        \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.templates_directory')),
+                    $templates_directory = $container->get('config')->get('theme.templates_directory');
+
+                    $factory = self::createBladeFactory(
+                        \Snap\Utils\Theme::getActiveThemePath($templates_directory),
                         \Snap\Utils\Theme::getActiveThemePath($container->get('config')->get('theme.cache_directory')) . '/templates'
                     );
 
                     if (\is_child_theme()) {
-                        $factory->addLocation(\Snap\Utils\Theme::getParentThemePath($container->get('config')->get('theme.templates_directory')));
+                        $factory->addLocation(\Snap\Utils\Theme::getParentThemePath($templates_directory));
                     }
 
                     return $factory;
@@ -235,6 +237,48 @@ class Snap
                 StrategyInterface::class
             );
         }
+    }
+
+    /**
+     * Build the Blade view factory.
+     *
+     * Laravel's view components resolve their dependencies through the global Illuminate container, so a
+     * private instance is set up containing only the bindings Blade needs.
+     *
+     * @param string $templates_path
+     * @param string $cache_path
+     * @return \Snap\Templating\Blade\Factory
+     */
+    private static function createBladeFactory(string $templates_path, string $cache_path): \Snap\Templating\Blade\Factory
+    {
+        $illuminate = new \Illuminate\Container\Container();
+        \Illuminate\Container\Container::setInstance($illuminate);
+
+        $files = new \Illuminate\Filesystem\Filesystem();
+        $compiler = new \Snap\Templating\Blade\Compiler($files, $cache_path);
+
+        $resolver = new \Illuminate\View\Engines\EngineResolver();
+        $resolver->register('blade', static fn () => new \Illuminate\View\Engines\CompilerEngine($compiler, $files));
+        $resolver->register('php', static fn () => new \Illuminate\View\Engines\PhpEngine($files));
+        $resolver->register('file', static fn () => new \Illuminate\View\Engines\FileEngine($files));
+
+        $factory = new \Snap\Templating\Blade\Factory(
+            $resolver,
+            new \Illuminate\View\FileViewFinder($files, [$templates_path]),
+            new \Illuminate\Events\Dispatcher($illuminate)
+        );
+
+        $factory->setContainer($illuminate);
+
+        $illuminate->instance(\Illuminate\Contracts\View\Factory::class, $factory);
+        $illuminate->alias(\Illuminate\Contracts\View\Factory::class, 'view');
+        $illuminate->instance(\Illuminate\View\Compilers\BladeCompiler::class, $compiler);
+        $illuminate->alias(\Illuminate\View\Compilers\BladeCompiler::class, 'blade.compiler');
+
+        // Used by class components which return an inline template from render().
+        $illuminate->instance('config', new \Illuminate\Support\Fluent(['view' => ['compiled' => $cache_path]]));
+
+        return $factory;
     }
 
     /**

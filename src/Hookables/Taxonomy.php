@@ -4,15 +4,15 @@ namespace Snap\Hookables;
 
 use Snap\Database\TaxQuery;
 use Snap\Hookables\Content\ColumnController;
-use Tightenco\Collect\Support\Arr;
+use Illuminate\Support\Arr;
 use WP_Taxonomy;
 
 /**
  * The Post Type Hookable.
  *
- * @method static \Tightenco\Collect\Support\Collection all()
- * @method static \Tightenco\Collect\Support\Collection get()
- * @method static \Tightenco\Collect\Support\Collection|false|\WP_Term find(int|int[]|string|string[] $ids)
+ * @method static \Illuminate\Support\Collection all()
+ * @method static \Illuminate\Support\Collection get()
+ * @method static \Illuminate\Support\Collection|false|\WP_Term find(int|int[]|string|string[] $ids)
  * @method static array getNames()
  * @method static array getIds()
  * @method static array getSlugs()

@@ -6,11 +6,11 @@
 /sitemap.xml
 /sitemap.xml.gz
 
-.php_cs.cache
+.php-cs-fixer.cache
 
 vendor
 *.lock
 
 \.idea/
 
-\.phpunit\.result\.cache
+.phpunit.cache

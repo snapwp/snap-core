@@ -43,7 +43,7 @@ class DefaultStrategy implements StrategyInterface
     ];
 
     /**
-     * @var \Bladezero\Factory
+     * @var \Snap\Templating\Blade\Factory
      */
     private $factory;
 

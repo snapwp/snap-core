@@ -94,6 +94,6 @@ trait SnapDirectives
      */
     public function compilePosttypepartial()
     {
-        return '<?php global $post; echo $__env->make(\'partials.post-type.\' . \get_post_type(), \Tightenco\Collect\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\', \'__loop_query\', \'__currentLoopData\', \'obLevel\'])); ?>';
+        return '<?php global $post; echo $__env->make(\'partials.post-type.\' . \get_post_type(), \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\', \'__loop_query\', \'__currentLoopData\', \'obLevel\'])); ?>';
     }
 }

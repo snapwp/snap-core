@@ -3,8 +3,8 @@
 namespace Snap\Core\Bootstrap;
 
 use Hodl\Container;
+use Illuminate\Support\Str;
 use Snap\Core\Hookable;
-use Snap\Utils\Str;
 
 class SnapLoader
 {
@@ -100,7 +100,7 @@ class SnapLoader
                 $class_parts = \explode('\\', $class_name);
 
                 $this->container->get('validationFactory')->addRule(
-                    Str::toSnake(\end($class_parts)),
+                    Str::snake(\end($class_parts)),
                     $this->container->resolve($class_name)
                 );
             }

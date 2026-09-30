@@ -2,12 +2,12 @@
 
 namespace Snap\Hookables;
 
+use Illuminate\Support\Str;
 use Snap\Database\PostQuery;
 use Snap\Hookables\Content\ColumnController;
 use Snap\Hookables\Content\Concerns\InteractsWithAcf;
-use Snap\Utils\Str;
-use Tightenco\Collect\Support\Arr;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 /**
  * Class PostType
@@ -219,7 +219,7 @@ class PostType extends ContentHookable
             return null;
         }
 
-        $method = 'get' . Str::toStudly($meta_key) . 'Attribute';
+        $method = 'get' . Str::studly($meta_key) . 'Attribute';
 
         // Handle ACF data
         $this->primeAcfCache($object_id);
