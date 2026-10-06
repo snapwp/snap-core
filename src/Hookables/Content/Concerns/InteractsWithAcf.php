@@ -69,7 +69,7 @@ trait InteractsWithAcf
             return $data;
         }
 
-        if (\is_numeric(\key($data))) {
+        if ($data === [] || \is_numeric(\key($data))) {
             return \array_map([$this, 'convertToObject'], $data);
         }
 
