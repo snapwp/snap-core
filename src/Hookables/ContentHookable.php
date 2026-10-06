@@ -32,11 +32,6 @@ abstract class ContentHookable extends Hookable
     protected static bool $has_attached_taxonomies = false;
 
     /**
-     * Map of scope methods.
-     */
-    protected static array $scope_cache = [];
-
-    /**
      * Holds all relationships to be registered.
      */
     protected static array $relationships = [];
@@ -151,14 +146,9 @@ abstract class ContentHookable extends Hookable
      */
     public function __call(string $name, array $arguments)
     {
-        if (\array_key_exists($name, static::$scope_cache)) {
-            return $this->{static::$scope_cache[$name]}($this->makeNewQuery());
-        }
-
         $scoped = 'scope' . \ucfirst($name);
 
         if (\method_exists($this, $scoped)) {
-            static::$scope_cache[$name] = $scoped;
             return $this->{$scoped}($this->makeNewQuery(), ...$arguments);
         }
 
