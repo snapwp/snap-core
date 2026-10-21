@@ -58,6 +58,26 @@ class Factory extends \Bladezero\Factory
     }
 
     /**
+     * Register a component.
+     *
+     * Bladezero 8 uses component() for class-based components only. To stay backwards compatible, a view path
+     * (e.g. 'partials.components.image') is registered as an alias directive instead, as it was in Bladezero 6.
+     *
+     * @param string      $class  The component class, or a view path.
+     * @param string|null $alias  The component alias.
+     * @param string      $prefix The component prefix. Only used for class-based components.
+     */
+    public function component($class, $alias = null, $prefix = ''): void
+    {
+        if (\class_exists($class) || (!\is_null($alias) && \class_exists($alias))) {
+            parent::component($class, $alias, $prefix);
+            return;
+        }
+
+        $this->aliasComponent($class, $alias);
+    }
+
+    /**
      * Default CSRF token generation.
      *
      * A real implementation should save this value to the session or some other store to allow validation.

@@ -18,7 +18,8 @@ namespace Snap\Services;
  * @method static \Snap\Templating\Blade\Factory prependNamespace(string $namespace, string|array $hints)
  * @method static \Snap\Templating\Blade\Factory replaceNamespace(string $namespace, string|array $hints)
  * @method static void if($name, callable $callback): void
- * @method static void component($path, $alias = null): void
+ * @method static void component($class, $alias = null, $prefix = ''): void
+ * @method static void aliasComponent($path, $alias = null): void
  * @method static void directive($name, callable $handler): void
  * @method static void include($path, $alias = null): void
  * @method static void addExtension($extension, $engine, $resolver = null): void
