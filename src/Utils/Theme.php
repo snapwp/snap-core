@@ -153,7 +153,7 @@ class Theme
      */
     private static function stripExtension(string $path): string
     {
-        return \trim(\str_replace(Blade::getExtension($path), '', $path), ". \t\n\r\0\x0B");
+        return \trim(\str_replace(Blade::getExtension($path) ?? '', '', $path), ". \t\n\r\0\x0B");
     }
 
     /**

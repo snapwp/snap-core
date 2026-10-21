@@ -6,7 +6,7 @@ namespace Snap\Services;
  * Allow static access to the Blade service.
  *
  * @method static string file($path, array $data = [], array $mergeData = [])
- * @method static string make($view, $data = [], $mergeData = [])
+ * @method static \Bladezero\View\View make($view, $data = [], $mergeData = [])
  * @method static string first(array $views, array $data = [], array $mergeData = [])
  * @method static string renderWhen($condition, string $view, array $data = [], array $mergeData = [])
  * @method static string renderEach($view, $data, $iterator, $empty = 'raw|')
@@ -26,7 +26,7 @@ namespace Snap\Services;
  * @method static \Bladezero\View\Compilers\BladeCompiler  getCompiler()
  * @method static \Bladezero\View\ViewFinderInterface  getFinder()
  * @method static \Bladezero\Filesystem\Filesystem  getFiles()
- * @method static string getExtension(string $path)
+ * @method static string|null getExtension(string $path)
  * @method static mixed shared($key, $default = null)
  * @method static array getShared()
  *

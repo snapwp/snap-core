@@ -211,7 +211,7 @@ class Email
         $this->with($data);
 
         $this->message = static function ($data) use ($template) {
-            return Blade::make($template, $data);
+            return (string) Blade::make($template, $data);
         };
 
         return $this;
