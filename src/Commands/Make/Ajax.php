@@ -42,6 +42,7 @@ class Ajax extends Creator
      *
      * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @return int
      * @throws \Hodl\Exceptions\ContainerException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -61,5 +62,7 @@ class Ajax extends Creator
         } else {
             $output->writeln("<error>{$input->getArgument('name')} could not be created</error>");
         }
+
+        return 0;
     }
 }

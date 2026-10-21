@@ -219,7 +219,7 @@ class Bag implements ArrayAccess
      * @param  mixed $offset The offset to set.
      * @param  mixed $value  The value to set.
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (\is_null($offset)) {
             $this->data[] = $value;
@@ -244,7 +244,7 @@ class Bag implements ArrayAccess
      *
      * @param  mixed $offset The offset to unset.
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->data[$offset]);
     }
@@ -255,6 +255,7 @@ class Bag implements ArrayAccess
      * @param  mixed $offset The offset to get.
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->get($offset, null);

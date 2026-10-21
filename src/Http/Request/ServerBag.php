@@ -18,7 +18,7 @@ class ServerBag extends Bag
             'REQUEST_METHOD' => [
                 'filter' => FILTER_CALLBACK,
                 'options' => function ($method) {
-                    return \strtoupper(\filter_var($method, FILTER_SANITIZE_STRING));
+                    return \strtoupper(static::sanitizeString($method));
                 },
             ],
             'QUERY_STRING' => FILTER_UNSAFE_RAW,
@@ -31,18 +31,35 @@ class ServerBag extends Bag
             'HTTP_FORWARDED_FOR' => FILTER_VALIDATE_IP,
             'HTTP_FORWARDED' => FILTER_VALIDATE_IP,
             'SERVER_PORT' => FILTER_SANITIZE_NUMBER_INT,
-            'SERVER_NAME' => FILTER_SANITIZE_STRING,
+            'SERVER_NAME' => [
+                'filter' => FILTER_CALLBACK,
+                'options' => [static::class, 'sanitizeString'],
+            ],
             'HTTP_HOST' => FILTER_SANITIZE_URL,
             'HTTP_REFERER' => FILTER_SANITIZE_URL,
-            'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING,
+            'HTTP_USER_AGENT' => [
+                'filter' => FILTER_CALLBACK,
+                'options' => [static::class, 'sanitizeString'],
+            ],
         ];
         
         $server = \filter_input_array(INPUT_SERVER, $definition);
 
-        if ('' !== \preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $server['HTTP_HOST'])) {
+        if ('' !== \preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $server['HTTP_HOST'] ?? '')) {
             \wp_die('This site has been temporarily disabled due to suspicious activity');
         }
 
         $this->data = $server;
+    }
+
+    /**
+     * Replacement for the deprecated FILTER_SANITIZE_STRING filter.
+     *
+     * @param string $value The value to sanitize.
+     * @return string
+     */
+    public static function sanitizeString($value): string
+    {
+        return \str_replace(["'", '"'], ['&#39;', '&#34;'], \strip_tags((string) $value));
     }
 }

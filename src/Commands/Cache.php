@@ -42,6 +42,7 @@ class Cache extends Command
      *
      * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @return int
      * @throws \Hodl\Exceptions\ContainerException If something is wrong with the container.
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -51,7 +52,7 @@ class Cache extends Command
 
         if ($input->getOption('force') === false && (!\defined('WP_DEBUG') || WP_DEBUG === false)) {
             if ($this->confirmChoice($input, $output) === false) {
-                return;
+                return 0;
             }
         }
 
@@ -92,10 +93,12 @@ class Cache extends Command
 
         if ($config_created && $autoload_created) {
             $output->writeln('<info>Snap cache was set up successfully.</info>');
-            return;
+            return 0;
         }
 
         $output->writeln('<error>Snap cache could not be set up successfully.</error>');
+
+        return 1;
     }
 
     /**

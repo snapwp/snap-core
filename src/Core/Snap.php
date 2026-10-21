@@ -67,7 +67,7 @@ class Snap
     /**
      * This class never needs to be instantiated.
      */
-    final private function __clone()
+    private function __clone()
     {
         // No code here...
     }

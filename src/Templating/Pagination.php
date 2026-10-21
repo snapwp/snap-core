@@ -74,7 +74,7 @@ class Pagination
      * }
      * @param WP_Query $global_query Global WP_Query instance.
      */
-    public function __construct($args = [], WP_Query $global_query)
+    public function __construct($args, WP_Query $global_query)
     {
         $this->args = wp_parse_args(
             $args,

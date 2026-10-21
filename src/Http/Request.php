@@ -567,6 +567,7 @@ class Request extends Validator implements ArrayAccess
      * @param mixed $offset The offset to get.
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->input->get($offset, null);

@@ -7,6 +7,8 @@
 /sitemap.xml.gz
 
 .php_cs.cache
+.php-cs-fixer.cache
+.phpunit.cache
 
 vendor
 *.lock

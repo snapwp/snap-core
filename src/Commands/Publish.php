@@ -106,6 +106,7 @@ class Publish extends Command
      *
      * @param  InputInterface  $input  Command input.
      * @param  OutputInterface $output Command output.
+     * @return int
      *
      * @throws \Hodl\Exceptions\ContainerException
      */
@@ -124,13 +125,15 @@ class Publish extends Command
                     "\n<info>Published %d %s successfully:\n%s</info>",
                     \count($this->copied),
                     _n('file', 'files', \count($this->copied)),
-                    \implode($this->copied, "\n")
+                    \implode("\n", $this->copied)
                 )
             );
             exit;
         }
 
         $this->output->writeln("\n<info>Nothing needed to be published</info>");
+
+        return 0;
     }
 
     /**
