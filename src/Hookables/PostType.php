@@ -219,38 +219,53 @@ class PostType extends ContentHookable
             return null;
         }
 
-        $method = 'get' . Str::studly($meta_key) . 'Attribute';
+        $post_type = $post->post_type;
+        $class = static::$has_registered[self::$type][$post_type] ?? null;
 
-        // Handle ACF data
-        $this->primeAcfCache($object_id);
-
-        foreach (static::$has_registered[self::$type] as $post_type => $class) {
-            if ($post->post_type !== $post_type) {
-                continue;
-            }
-
+        if ($class !== null) {
             // Return taxonomy Collection if the taxonomy exists.
             if (\in_array($meta_key, static::$taxonomy_plurals, true)) {
                 $name = \array_search($meta_key, self::$taxonomy_plurals, true);
 
                 if (isset(self::$relationships[$post_type]) && \in_array($name, self::$relationships[$post_type], true)) {
-                    return (new self::$has_registered['taxonomy'][$name]())->for($object_id)->get();
+                    return $this->getAttachedTerms($post, $name);
                 }
             }
 
             // Call accessor.
+            $method = 'get' . Str::studly($meta_key) . 'Attribute';
+
             if (\method_exists($class, $method)) {
                 $returnValue = (new $class())->{$method}($post);
                 return \is_array($returnValue) ? collect($returnValue) : $returnValue;
             }
         }
 
-        // Try to find the meta key in the ACF cache
-        if ($this->hasKeyInAcfCache($meta_key)) {
-            return $this->getKeyFromAcfCache($meta_key);
+        // Try to find the meta key as an ACF field, loaded on its own and cached per post and key
+        $found = $this->findAcfValue($object_id, $meta_key);
+
+        if ($found !== null) {
+            return $this->prepareAcfValue($found[0]);
         }
 
         return null;
+    }
+
+    /**
+     * The non-empty terms of $taxonomy on a post, sorted by name: the same terms as
+     * Taxonomy::for($post)->get(), read through WordPress's object term cache. WP_Query and get_posts() prime
+     * that cache for every post they return, so looping over their posts adds no queries.
+     */
+    protected function getAttachedTerms(\WP_Post $post, string $taxonomy): Collection
+    {
+        $terms = \get_the_terms($post, $taxonomy);
+
+        if (!\is_array($terms)) {
+            return new Collection();
+        }
+
+        // Already sorted by name by the database, as the term cache is filled with orderby 'name'
+        return new Collection(\array_values(\array_filter($terms, fn ($term) => $term->count > 0)));
     }
 
     /**
