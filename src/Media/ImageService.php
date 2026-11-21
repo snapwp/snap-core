@@ -68,7 +68,15 @@ class ImageService
 
         $update = false;
 
-        if (\is_array($size)) {
+        /*
+         * Whether WordPress can make a size from this image: the same check the image editor runs before resizing.
+         * It fails when the image is already that size or smaller (WordPress won't upscale). Such a size never gets
+         * saved to the meta, so without this check every request would load and decode the original again, only for
+         * the resize to fail.
+         */
+        $canMake = static fn ($w, $h, $c) => \image_resize_dimensions($meta['width'], $meta['height'], $w, $h, $c) !== false;
+
+        if (\is_array($size) && $canMake($width, $height, $crop)) {
             $new_meta = \image_make_intermediate_size($parent_image_path, $width, $height, $crop);
 
             if ($new_meta !== false) {
@@ -83,7 +91,10 @@ class ImageService
                 continue;
             }
 
-            if (\wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)) {
+            if (
+                \wp_image_matches_ratio($size_data['width'], $size_data['height'], $width, $height)
+                && $canMake($size_data['width'], $size_data['height'], $size_data['crop'])
+            ) {
                 /*
                  * This size is has not been requested, but matches the requested size ratio so should be generated
                  * for use within the srcset.
